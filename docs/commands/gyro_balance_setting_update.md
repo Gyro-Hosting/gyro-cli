@@ -6,7 +6,7 @@ Update balance settings
 
 Update balance settings
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/hesap-bakiyesi-api
+Update balance settings. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/hesap-bakiyesi-api).
 
 API: PATCH /balance/settings (operationId coreUpdateBalanceSettings, scope Balance/UpdateBalanceSettings)
 

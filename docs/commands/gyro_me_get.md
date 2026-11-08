@@ -6,7 +6,7 @@ Get me
 
 Get me
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/anahtarin-hesabi
+Get me. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/anahtarin-hesabi).
 
 API: GET /me (operationId coreGetMe, scope Account/GetMe)
 

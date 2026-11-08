@@ -35,5 +35,6 @@ gyro mail catch-all [flags]
 * [gyro mail catch-all create](gyro_mail_catch-all_create.md)	 - create (fields with --set key=value)
 * [gyro mail catch-all delete](gyro_mail_catch-all_delete.md)	 - delete (fields with --set key=value)
 * [gyro mail catch-all list](gyro_mail_catch-all_list.md)	 - Show
+* [gyro mail catch-all set](gyro_mail_catch-all_set.md)	 - PUT catch-all:edit (GyroMail)
 * [gyro mail catch-all update](gyro_mail_catch-all_update.md)	 - update (fields with --set key=value)
 

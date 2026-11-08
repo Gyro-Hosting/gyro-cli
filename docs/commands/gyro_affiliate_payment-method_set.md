@@ -6,7 +6,7 @@ Save affiliate payout method
 
 Save affiliate payout method
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/satis-ortakligi-kazanci
+Save affiliate payout method. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/satis-ortakligi-kazanci).
 
 API: PUT /affiliate/payment-method (operationId coreSaveAffiliatePayoutMethod, scope Affiliate/SaveAffiliatePayoutMethod)
 

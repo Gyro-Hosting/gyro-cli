@@ -1,6 +1,6 @@
 ## gyro ticket department
 
-Get ticket departments
+List ticket departments
 
 ```
 gyro ticket department [flags]
@@ -32,5 +32,5 @@ gyro ticket department [flags]
 ### SEE ALSO
 
 * [gyro ticket](gyro_ticket.md)	 - Support tickets
-* [gyro ticket department list](gyro_ticket_department_list.md)	 - Get ticket departments
+* [gyro ticket department list](gyro_ticket_department_list.md)	 - List ticket departments
 

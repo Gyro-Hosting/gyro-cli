@@ -2,7 +2,7 @@
 .TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
 
 .SH NAME
-gyro-domain-nameserver-set - Update nameservers
+gyro-domain-nameserver-set - Update nameservers (path: {domain})
 
 
 .SH SYNOPSIS
@@ -10,10 +10,10 @@ gyro-domain-nameserver-set - Update nameservers
 
 
 .SH DESCRIPTION
-Update nameservers
+Update nameservers (path: {domain})
 
 .PP
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/ad-sunuculari-ve-kayitlar
+Update nameservers (path: {domain}). Domain operations run against the registrar module of the domain. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/ad-sunuculari-ve-kayitlar).
 
 .PP
 API: PUT /domains/{domain}/nameservers (operationId coreUpdateNameservers, scope Domains/UpdateNameservers)

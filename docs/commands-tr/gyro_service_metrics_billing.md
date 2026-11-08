@@ -32,5 +32,5 @@ gyro service metrics billing [flags]
 ### SEE ALSO
 
 * [gyro service metrics](gyro_service_metrics.md)	 - Ölçümleri Okuma
-* [gyro service metrics billing get](gyro_service_metrics_billing_get.md)	 - Kullanım Fatura Geçmişi
+* [gyro service metrics billing list](gyro_service_metrics_billing_list.md)	 - Kullanım Fatura Geçmişi
 

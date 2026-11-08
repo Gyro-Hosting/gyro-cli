@@ -1,12 +1,12 @@
 ## gyro domain forwarding delete
 
-Delete url forwarding
+Delete url forwarding (path: {domain})
 
 ### Synopsis
 
-Delete url forwarding
+Delete url forwarding (path: {domain})
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/yonlendirme-kurma
+Delete url forwarding (path: {domain}). Domain operations run against the registrar module of the domain. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/yonlendirme-kurma).
 
 API: DELETE /domains/{domain}/forwarding (operationId coreDeleteUrlForwarding, scope Domains/DeleteUrlForwarding)
 
@@ -41,5 +41,5 @@ gyro domain forwarding delete <DOMAIN> [flags]
 
 ### SEE ALSO
 
-* [gyro domain forwarding](gyro_domain_forwarding.md)	 - Get url forwarding
+* [gyro domain forwarding](gyro_domain_forwarding.md)	 - Get url forwarding (path: {domain})
 

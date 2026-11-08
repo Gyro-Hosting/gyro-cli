@@ -6,7 +6,7 @@ Update default nameservers
 
 Update default nameservers
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/ad-sunuculari-ve-kayitlar
+Update default nameservers. Domain operations run against the registrar module of the domain. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/ad-sunuculari-ve-kayitlar).
 
 API: PUT /domains/default-nameservers (operationId coreUpdateDefaultNameservers, scope Domains/UpdateDefaultNameservers)
 

@@ -1,12 +1,12 @@
 ## gyro service module-method
 
-Use service module method
+Use service module method (path: {id})
 
 ### Synopsis
 
-Use service module method
+Use service module method (path: {id})
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/hizmetin-icine-erisim
+Use service module method (path: {id}). Service of the calling account (any product line). Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/hizmetin-icine-erisim).
 
 API: POST /services/{id}/module-method (operationId coreUseServiceModuleMethod, scope Services/UseServiceModuleMethod)
 

@@ -1,6 +1,6 @@
 ## gyro domain forwarding
 
-Get url forwarding
+Get url forwarding (path: {domain})
 
 ```
 gyro domain forwarding [flags]
@@ -32,7 +32,7 @@ gyro domain forwarding [flags]
 ### SEE ALSO
 
 * [gyro domain](gyro_domain.md)	 - Domains: search, register, transfer, nameservers, DNS, WHOIS
-* [gyro domain forwarding delete](gyro_domain_forwarding_delete.md)	 - Delete url forwarding
-* [gyro domain forwarding get](gyro_domain_forwarding_get.md)	 - Get url forwarding
-* [gyro domain forwarding set](gyro_domain_forwarding_set.md)	 - Update url forwarding
+* [gyro domain forwarding delete](gyro_domain_forwarding_delete.md)	 - Delete url forwarding (path: {domain})
+* [gyro domain forwarding get](gyro_domain_forwarding_get.md)	 - Get url forwarding (path: {domain})
+* [gyro domain forwarding set](gyro_domain_forwarding_set.md)	 - Update url forwarding (path: {domain})
 

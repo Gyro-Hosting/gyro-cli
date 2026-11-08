@@ -35,5 +35,6 @@ gyro mail migration [flags]
 * [gyro mail migration create](gyro_mail_migration_create.md)	 - create (fields with --set key=value)
 * [gyro mail migration delete](gyro_mail_migration_delete.md)	 - delete (fields with --set key=value)
 * [gyro mail migration list](gyro_mail_migration_list.md)	 - Show
+* [gyro mail migration run](gyro_mail_migration_run.md)	 - POST sync-jobs:run (GyroMail)
 * [gyro mail migration update](gyro_mail_migration_update.md)	 - update (fields with --set key=value)
 

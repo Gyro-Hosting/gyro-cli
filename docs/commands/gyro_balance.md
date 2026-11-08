@@ -33,5 +33,6 @@ gyro balance [flags]
 
 * [gyro](gyro.md)	 - Gyro Hosting command-line interface
 * [gyro balance setting](gyro_balance_setting.md)	 - Update balance settings
+* [gyro balance top-up](gyro_balance_top-up.md)	 - Create a balance top-up invoice and get its payment link
 * [gyro balance transaction](gyro_balance_transaction.md)	 - Balance ledger
 

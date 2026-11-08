@@ -1,6 +1,6 @@
 ## gyro service invoice
 
-Get service invoices
+List service invoices (path: {id})
 
 ```
 gyro service invoice [flags]
@@ -32,5 +32,5 @@ gyro service invoice [flags]
 ### SEE ALSO
 
 * [gyro service](gyro_service.md)	 - All services of every product line (generic bridge)
-* [gyro service invoice list](gyro_service_invoice_list.md)	 - Get service invoices
+* [gyro service invoice list](gyro_service_invoice_list.md)	 - List service invoices (path: {id})
 

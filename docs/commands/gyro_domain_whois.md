@@ -1,6 +1,6 @@
 ## gyro domain whois
 
-Get whois contacts
+Get whois contacts (path: {domain})
 
 ```
 gyro domain whois [flags]
@@ -32,7 +32,7 @@ gyro domain whois [flags]
 ### SEE ALSO
 
 * [gyro domain](gyro_domain.md)	 - Domains: search, register, transfer, nameservers, DNS, WHOIS
-* [gyro domain whois apply](gyro_domain_whois_apply.md)	 - Apply whois profile
-* [gyro domain whois get](gyro_domain_whois_get.md)	 - Get whois contacts
-* [gyro domain whois set](gyro_domain_whois_set.md)	 - Update whois contacts
+* [gyro domain whois apply](gyro_domain_whois_apply.md)	 - Apply whois profile (path: {domain})
+* [gyro domain whois get](gyro_domain_whois_get.md)	 - Get whois contacts (path: {domain})
+* [gyro domain whois set](gyro_domain_whois_set.md)	 - Update whois contacts (path: {domain})
 

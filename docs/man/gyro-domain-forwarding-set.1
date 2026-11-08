@@ -2,7 +2,7 @@
 .TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
 
 .SH NAME
-gyro-domain-forwarding-set - Update url forwarding
+gyro-domain-forwarding-set - Update url forwarding (path: {domain})
 
 
 .SH SYNOPSIS
@@ -10,10 +10,10 @@ gyro-domain-forwarding-set - Update url forwarding
 
 
 .SH DESCRIPTION
-Update url forwarding
+Update url forwarding (path: {domain})
 
 .PP
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/yonlendirme-kurma
+Update url forwarding (path: {domain}). Domain operations run against the registrar module of the domain. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/yonlendirme-kurma).
 
 .PP
 API: PUT /domains/{domain}/forwarding (operationId coreUpdateUrlForwarding, scope Domains/UpdateUrlForwarding)

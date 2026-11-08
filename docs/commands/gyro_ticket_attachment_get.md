@@ -1,12 +1,12 @@
 ## gyro ticket attachment get
 
-Get ticket attachment
+Get ticket attachment (path: {id}, {aid})
 
 ### Synopsis
 
-Get ticket attachment
+Get ticket attachment (path: {id}, {aid})
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/destek-isteme
+Get ticket attachment (path: {id}, {aid}). Support ticket of the calling account. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/destek-isteme).
 
 API: GET /tickets/{id}/attachments/{aid} (operationId coreGetTicketAttachment, scope Tickets/GetTicketAttachment)
 
@@ -39,5 +39,5 @@ gyro ticket attachment get <ID> <AID> [flags]
 
 ### SEE ALSO
 
-* [gyro ticket attachment](gyro_ticket_attachment.md)	 - Get ticket attachment
+* [gyro ticket attachment](gyro_ticket_attachment.md)	 - Get ticket attachment (path: {id}, {aid})
 

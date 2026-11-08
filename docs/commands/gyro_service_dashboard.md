@@ -1,6 +1,6 @@
 ## gyro service dashboard
 
-Get service dashboard
+Get service dashboard (path: {id})
 
 ```
 gyro service dashboard [flags]
@@ -32,5 +32,5 @@ gyro service dashboard [flags]
 ### SEE ALSO
 
 * [gyro service](gyro_service.md)	 - All services of every product line (generic bridge)
-* [gyro service dashboard get](gyro_service_dashboard_get.md)	 - Get service dashboard
+* [gyro service dashboard get](gyro_service_dashboard_get.md)	 - Get service dashboard (path: {id})
 

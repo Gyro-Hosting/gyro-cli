@@ -36,4 +36,5 @@ gyro mail dns [flags]
 * [gyro mail dns delete](gyro_mail_dns_delete.md)	 - delete (alanlar --set anahtar=değer)
 * [gyro mail dns list](gyro_mail_dns_list.md)	 - Göster
 * [gyro mail dns update](gyro_mail_dns_update.md)	 - update (alanlar --set anahtar=değer)
+* [gyro mail dns verify](gyro_mail_dns_verify.md)	 - dns-setup:verify (GyroMail)
 

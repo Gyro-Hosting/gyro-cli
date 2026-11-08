@@ -32,8 +32,9 @@ gyro invoice [flags]
 ### SEE ALSO
 
 * [gyro](gyro.md)	 - Gyro Hosting command-line interface
-* [gyro invoice coupon](gyro_invoice_coupon.md)	 - Apply invoice coupon
+* [gyro invoice coupon](gyro_invoice_coupon.md)	 - Apply invoice coupon (path: {id})
 * [gyro invoice get](gyro_invoice_get.md)	 - Get an invoice
 * [gyro invoice list](gyro_invoice_list.md)	 - List invoices
 * [gyro invoice pay](gyro_invoice_pay.md)	 - Pay an invoice from the account balance
+* [gyro invoice pdf](gyro_invoice_pdf.md)	 - Invoice PDF (base64 in JSON)
 

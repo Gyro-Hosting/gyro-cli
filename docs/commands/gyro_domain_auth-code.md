@@ -1,6 +1,6 @@
 ## gyro domain auth-code
 
-Send auth code
+Send auth code (path: {domain})
 
 ```
 gyro domain auth-code [flags]
@@ -32,6 +32,6 @@ gyro domain auth-code [flags]
 ### SEE ALSO
 
 * [gyro domain](gyro_domain.md)	 - Domains: search, register, transfer, nameservers, DNS, WHOIS
-* [gyro domain auth-code send](gyro_domain_auth-code_send.md)	 - Send auth code
-* [gyro domain auth-code set](gyro_domain_auth-code_set.md)	 - Save auth code
+* [gyro domain auth-code send](gyro_domain_auth-code_send.md)	 - Send auth code (path: {domain})
+* [gyro domain auth-code set](gyro_domain_auth-code_set.md)	 - Save auth code (path: {domain})
 

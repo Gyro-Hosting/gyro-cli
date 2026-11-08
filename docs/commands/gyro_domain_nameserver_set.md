@@ -1,12 +1,12 @@
 ## gyro domain nameserver set
 
-Update nameservers
+Update nameservers (path: {domain})
 
 ### Synopsis
 
-Update nameservers
+Update nameservers (path: {domain})
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/ad-sunuculari-ve-kayitlar
+Update nameservers (path: {domain}). Domain operations run against the registrar module of the domain. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/ad-sunuculari-ve-kayitlar).
 
 API: PUT /domains/{domain}/nameservers (operationId coreUpdateNameservers, scope Domains/UpdateNameservers)
 
@@ -44,5 +44,5 @@ gyro domain nameserver set <DOMAIN> [flags]
 
 ### SEE ALSO
 
-* [gyro domain nameserver](gyro_domain_nameserver.md)	 - Get nameservers
+* [gyro domain nameserver](gyro_domain_nameserver.md)	 - Get nameservers (path: {domain})
 

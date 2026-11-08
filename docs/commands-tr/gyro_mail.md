@@ -33,15 +33,22 @@ gyro mail [flags]
 
 * [gyro](gyro.md)	 - Gyro Hosting komut satırı aracı
 * [gyro mail alias](gyro_mail_alias.md)	 - Takma adlar (yönlendirmeler)
+* [gyro mail archive](gyro_mail_archive.md)	 - archive (GyroMail)
 * [gyro mail autoresponder](gyro_mail_autoresponder.md)	 - Otomatik yanıtlar
 * [gyro mail call](gyro_mail_call.md)	 - Hizmetin modül metodunu çağır
 * [gyro mail catch-all](gyro_mail_catch-all.md)	 - Tümünü yakala adresi
+* [gyro mail deleted](gyro_mail_deleted.md)	 - deleted-mail (GyroMail)
+* [gyro mail delivery-log](gyro_mail_delivery-log.md)	 - delivery-log (GyroMail)
 * [gyro mail device](gyro_mail_device.md)	 - Cihaz kurulumu / uygulama şifreleri
 * [gyro mail dns](gyro_mail_dns.md)	 - Gerekli DNS kayıtları ve durumları
 * [gyro mail list](gyro_mail_list.md)	 - Bu ürün hattındaki hizmetlerinizi listele
 * [gyro mail mailbox](gyro_mail_mailbox.md)	 - Posta kutuları
 * [gyro mail migration](gyro_mail_migration.md)	 - IMAP taşıma işleri
+* [gyro mail plan](gyro_mail_plan.md)	 - plan-size (GyroMail)
+* [gyro mail quarantine](gyro_mail_quarantine.md)	 - quarantine (GyroMail)
 * [gyro mail spam](gyro_mail_spam.md)	 - Spam filtresi
+* [gyro mail spam-filter](gyro_mail_spam-filter.md)	 - spam-filter (GyroMail)
 * [gyro mail tool](gyro_mail_tool.md)	 - Bir aracın verisini oku ya da eylemini çalıştır ('tools' ile bakın)
 * [gyro mail tools](gyro_mail_tools.md)	 - Hizmetin araçlarını, eylemlerini ve güvenlik politikasını göster
+* [gyro mail two-factor](gyro_mail_two-factor.md)	 - two-factor (GyroMail)
 

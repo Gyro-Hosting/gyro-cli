@@ -33,10 +33,14 @@ gyro monitor [flags]
 
 * [gyro](gyro.md)	 - Gyro Hosting komut satırı aracı
 * [gyro monitor call](gyro_monitor_call.md)	 - Hizmetin modül metodunu çağır
+* [gyro monitor channel](gyro_monitor_channel.md)	 - channels (GyroMonitor)
 * [gyro monitor check](gyro_monitor_check.md)	 - İzleme kontrolleri
 * [gyro monitor contact](gyro_monitor_contact.md)	 - Uyarı kişileri
+* [gyro monitor heartbeat](gyro_monitor_heartbeat.md)	 - heartbeats (GyroMonitor)
 * [gyro monitor incident](gyro_monitor_incident.md)	 - Olaylar
 * [gyro monitor list](gyro_monitor_list.md)	 - Bu ürün hattındaki hizmetlerinizi listele
+* [gyro monitor monitor](gyro_monitor_monitor.md)	 - monitors (GyroMonitor)
+* [gyro monitor status-page](gyro_monitor_status-page.md)	 - status-pages (GyroMonitor)
 * [gyro monitor tool](gyro_monitor_tool.md)	 - Bir aracın verisini oku ya da eylemini çalıştır ('tools' ile bakın)
 * [gyro monitor tools](gyro_monitor_tools.md)	 - Hizmetin araçlarını, eylemlerini ve güvenlik politikasını göster
 

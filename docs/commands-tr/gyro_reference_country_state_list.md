@@ -6,7 +6,7 @@ Get states
 
 Get states
 
-Core WISECP client endpoint. Reference:
+List states (path: {code}). Core WISECP client endpoint (Turkish reference: ).
 
 API: GET /reference/countries/{code}/states (operationId coreGetStates, scope Reference/GetStates)
 

@@ -36,4 +36,5 @@ gyro invoice [flags]
 * [gyro invoice get](gyro_invoice_get.md)	 - Faturayı getir
 * [gyro invoice list](gyro_invoice_list.md)	 - Faturaları listele
 * [gyro invoice pay](gyro_invoice_pay.md)	 - Faturayı hesap bakiyesinden öde
+* [gyro invoice pdf](gyro_invoice_pdf.md)	 - Fatura PDF (JSON içinde base64)
 

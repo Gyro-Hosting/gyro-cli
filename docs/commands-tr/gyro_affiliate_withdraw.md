@@ -6,7 +6,7 @@
 
 Ödeme Talebi Açma
 
-**Para harcar.** Kullanılabilir kazancın ödenmesini ister. — aynı anda tek talep
+Kullanılabilir kazancın ödenmesini ister. — aynı anda tek talep
 
 API: POST /affiliate/withdraw (operationId coreWithdrawAffiliate, scope Affiliate/WithdrawAffiliate)
 

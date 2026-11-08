@@ -1,12 +1,12 @@
 ## gyro domain list
 
-Get domains
+List domains
 
 ### Synopsis
 
-Get domains
+List domains
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/sahip-olunan-alan-adlari
+List domains. Domain operations run against the registrar module of the domain. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/sahip-olunan-alan-adlari).
 
 API: GET /domains (operationId coreGetDomains, scope Domains/GetDomains)
 

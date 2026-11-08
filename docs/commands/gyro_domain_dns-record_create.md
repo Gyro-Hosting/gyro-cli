@@ -1,12 +1,12 @@
 ## gyro domain dns-record create
 
-Create dns record
+Create dns record (path: {domain})
 
 ### Synopsis
 
-Create dns record
+Create dns record (path: {domain})
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/ad-sunuculari-ve-kayitlar
+Create dns record (path: {domain}). Domain operations run against the registrar module of the domain. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/ad-sunuculari-ve-kayitlar).
 
 API: POST /domains/{domain}/dns-records (operationId coreCreateDnsRecord, scope Domains/CreateDnsRecord)
 
@@ -49,5 +49,5 @@ gyro domain dns-record create <DOMAIN> [flags]
 
 ### SEE ALSO
 
-* [gyro domain dns-record](gyro_domain_dns-record.md)	 - Get dns records
+* [gyro domain dns-record](gyro_domain_dns-record.md)	 - List dns records (path: {domain})
 

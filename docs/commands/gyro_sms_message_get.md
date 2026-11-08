@@ -1,12 +1,12 @@
 ## gyro sms message get
 
-Get sms message
+Get sms message (path: {id})
 
 ### Synopsis
 
-Get sms message
+Get sms message (path: {id})
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/mesaj-gonderme
+Get sms message (path: {id}). Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/mesaj-gonderme).
 
 API: GET /sms/messages/{id} (operationId coreGetSmsMessage, scope Sms/GetSmsMessage)
 
@@ -39,5 +39,5 @@ gyro sms message get <ID> [flags]
 
 ### SEE ALSO
 
-* [gyro sms message](gyro_sms_message.md)	 - Get sms messages
+* [gyro sms message](gyro_sms_message.md)	 - List sms messages
 

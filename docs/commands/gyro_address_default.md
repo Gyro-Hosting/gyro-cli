@@ -1,12 +1,12 @@
 ## gyro address default
 
-Set default address
+Set default address (path: {id})
 
 ### Synopsis
 
-Set default address
+Set default address (path: {id})
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/adres-defteri
+Set default address (path: {id}). Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/adres-defteri).
 
 API: POST /addresses/{id}/default (operationId coreSetDefaultAddress, scope Addresses/SetDefaultAddress)
 

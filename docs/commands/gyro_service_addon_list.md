@@ -1,12 +1,12 @@
 ## gyro service addon list
 
-Get service addons
+List service addons (path: {id})
 
 ### Synopsis
 
-Get service addons
+List service addons (path: {id})
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/sahip-olunan-hizmetler
+List service addons (path: {id}). Service of the calling account (any product line). Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/sahip-olunan-hizmetler).
 
 API: GET /services/{id}/addons (operationId coreGetServiceAddons, scope Services/GetServiceAddons)
 
@@ -39,5 +39,5 @@ gyro service addon list <ID> [flags]
 
 ### SEE ALSO
 
-* [gyro service addon](gyro_service_addon.md)	 - Get service addons
+* [gyro service addon](gyro_service_addon.md)	 - List service addons (path: {id})
 

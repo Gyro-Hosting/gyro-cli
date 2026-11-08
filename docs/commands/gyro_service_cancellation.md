@@ -1,6 +1,6 @@
 ## gyro service cancellation
 
-Create cancellation
+Create cancellation (path: {id})
 
 ```
 gyro service cancellation [flags]
@@ -32,6 +32,6 @@ gyro service cancellation [flags]
 ### SEE ALSO
 
 * [gyro service](gyro_service.md)	 - All services of every product line (generic bridge)
-* [gyro service cancellation create](gyro_service_cancellation_create.md)	 - Create cancellation
-* [gyro service cancellation delete](gyro_service_cancellation_delete.md)	 - Revoke cancellation
+* [gyro service cancellation create](gyro_service_cancellation_create.md)	 - Create cancellation (path: {id})
+* [gyro service cancellation delete](gyro_service_cancellation_delete.md)	 - Revoke cancellation (path: {id})
 

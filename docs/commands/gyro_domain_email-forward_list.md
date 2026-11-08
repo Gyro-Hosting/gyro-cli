@@ -1,12 +1,12 @@
 ## gyro domain email-forward list
 
-Get email forwards
+List email forwards (path: {domain})
 
 ### Synopsis
 
-Get email forwards
+List email forwards (path: {domain})
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/yonlendirme-kurma
+List email forwards (path: {domain}). Domain operations run against the registrar module of the domain. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/yonlendirme-kurma).
 
 API: GET /domains/{domain}/email-forwards (operationId coreGetEmailForwards, scope Domains/GetEmailForwards)
 
@@ -39,5 +39,5 @@ gyro domain email-forward list <DOMAIN> [flags]
 
 ### SEE ALSO
 
-* [gyro domain email-forward](gyro_domain_email-forward.md)	 - Get email forwards
+* [gyro domain email-forward](gyro_domain_email-forward.md)	 - List email forwards (path: {domain})
 

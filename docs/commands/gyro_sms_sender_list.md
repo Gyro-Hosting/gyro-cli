@@ -1,12 +1,12 @@
 ## gyro sms sender list
 
-Get sms senders
+List sms senders
 
 ### Synopsis
 
-Get sms senders
+List sms senders
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/mesaj-gonderme
+List sms senders. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/mesaj-gonderme).
 
 API: GET /sms/senders (operationId coreGetSmsSenders, scope Sms/GetSmsSenders)
 
@@ -39,5 +39,5 @@ gyro sms sender list [flags]
 
 ### SEE ALSO
 
-* [gyro sms sender](gyro_sms_sender.md)	 - Get sms senders
+* [gyro sms sender](gyro_sms_sender.md)	 - List sms senders
 

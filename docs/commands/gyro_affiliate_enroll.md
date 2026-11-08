@@ -6,7 +6,7 @@ Enroll affiliate
 
 Enroll affiliate
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/satis-ortakligi-kazanci
+Enroll affiliate. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/satis-ortakligi-kazanci).
 
 API: POST /affiliate/enroll (operationId coreEnrollAffiliate, scope Affiliate/EnrollAffiliate)
 

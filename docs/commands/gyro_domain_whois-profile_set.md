@@ -1,12 +1,12 @@
 ## gyro domain whois-profile set
 
-Update whois profile
+Update whois profile (path: {pid})
 
 ### Synopsis
 
-Update whois profile
+Update whois profile (path: {pid})
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/alan-adi-kisileri-ve-gizlilik
+Update whois profile (path: {pid}). Domain operations run against the registrar module of the domain. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/alan-adi-kisileri-ve-gizlilik).
 
 API: PUT /domains/whois-profiles/{pid} (operationId coreUpdateWhoisProfile, scope Domains/UpdateWhoisProfile)
 
@@ -57,5 +57,5 @@ gyro domain whois-profile set <PID> [flags]
 
 ### SEE ALSO
 
-* [gyro domain whois-profile](gyro_domain_whois-profile.md)	 - Get whois profiles
+* [gyro domain whois-profile](gyro_domain_whois-profile.md)	 - List whois profiles
 

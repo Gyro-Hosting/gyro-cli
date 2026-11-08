@@ -6,7 +6,7 @@ Update me
 
 Update me
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/anahtarin-hesabi
+Update me. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/anahtarin-hesabi).
 
 API: PATCH /me (operationId coreUpdateMe, scope Account/UpdateMe)
 

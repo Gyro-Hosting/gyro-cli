@@ -2,7 +2,7 @@
 .TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
 
 .SH NAME
-gyro-domain-auth-code-set - Save auth code
+gyro-domain-auth-code-set - Save auth code (path: {domain})
 
 
 .SH SYNOPSIS
@@ -10,10 +10,10 @@ gyro-domain-auth-code-set - Save auth code
 
 
 .SH DESCRIPTION
-Save auth code
+Save auth code (path: {domain})
 
 .PP
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/alan-adi-edinme
+Save auth code (path: {domain}). Domain operations run against the registrar module of the domain. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/alan-adi-edinme).
 
 .PP
 API: PUT /domains/{domain}/auth-code (operationId coreSaveAuthCode, scope Domains/SaveAuthCode)

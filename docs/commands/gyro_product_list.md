@@ -1,12 +1,12 @@
 ## gyro product list
 
-Get products
+List products
 
 ### Synopsis
 
-Get products
+List products
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/satistaki-urunler
+List products. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/satistaki-urunler).
 
 API: GET /products (operationId coreGetProducts, scope Products/GetProducts)
 

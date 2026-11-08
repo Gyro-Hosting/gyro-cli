@@ -1,6 +1,6 @@
 ## gyro sms sender
 
-Get sms senders
+List sms senders
 
 ```
 gyro sms sender [flags]
@@ -32,5 +32,5 @@ gyro sms sender [flags]
 ### SEE ALSO
 
 * [gyro sms](gyro_sms.md)	 - SMS messages
-* [gyro sms sender list](gyro_sms_sender_list.md)	 - Get sms senders
+* [gyro sms sender list](gyro_sms_sender_list.md)	 - List sms senders
 

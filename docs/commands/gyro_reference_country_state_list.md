@@ -1,12 +1,12 @@
 ## gyro reference country state list
 
-Get states
+List states (path: {code})
 
 ### Synopsis
 
-Get states
+List states (path: {code})
 
-Core WISECP client endpoint. Reference:
+List states (path: {code}). Core WISECP client endpoint (Turkish reference: ).
 
 API: GET /reference/countries/{code}/states (operationId coreGetStates, scope Reference/GetStates)
 
@@ -39,5 +39,5 @@ gyro reference country state list <CODE> [flags]
 
 ### SEE ALSO
 
-* [gyro reference country state](gyro_reference_country_state.md)	 - Get states
+* [gyro reference country state](gyro_reference_country_state.md)	 - List states (path: {code})
 

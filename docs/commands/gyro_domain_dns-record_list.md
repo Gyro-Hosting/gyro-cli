@@ -1,12 +1,12 @@
 ## gyro domain dns-record list
 
-Get dns records
+List dns records (path: {domain})
 
 ### Synopsis
 
-Get dns records
+List dns records (path: {domain})
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/ad-sunuculari-ve-kayitlar
+List dns records (path: {domain}). Domain operations run against the registrar module of the domain. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/ad-sunuculari-ve-kayitlar).
 
 API: GET /domains/{domain}/dns-records (operationId coreGetDnsRecords, scope Domains/GetDnsRecords)
 
@@ -39,5 +39,5 @@ gyro domain dns-record list <DOMAIN> [flags]
 
 ### SEE ALSO
 
-* [gyro domain dns-record](gyro_domain_dns-record.md)	 - Get dns records
+* [gyro domain dns-record](gyro_domain_dns-record.md)	 - List dns records (path: {domain})
 

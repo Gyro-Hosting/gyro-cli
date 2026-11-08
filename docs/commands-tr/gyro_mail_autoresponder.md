@@ -35,5 +35,6 @@ gyro mail autoresponder [flags]
 * [gyro mail autoresponder create](gyro_mail_autoresponder_create.md)	 - create (alanlar --set anahtar=değer)
 * [gyro mail autoresponder delete](gyro_mail_autoresponder_delete.md)	 - delete (alanlar --set anahtar=değer)
 * [gyro mail autoresponder list](gyro_mail_autoresponder_list.md)	 - Göster
+* [gyro mail autoresponder set](gyro_mail_autoresponder_set.md)	 - autoresponder:edit (GyroMail)
 * [gyro mail autoresponder update](gyro_mail_autoresponder_update.md)	 - update (alanlar --set anahtar=değer)
 

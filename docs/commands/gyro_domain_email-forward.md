@@ -1,6 +1,6 @@
 ## gyro domain email-forward
 
-Get email forwards
+List email forwards (path: {domain})
 
 ```
 gyro domain email-forward [flags]
@@ -32,7 +32,7 @@ gyro domain email-forward [flags]
 ### SEE ALSO
 
 * [gyro domain](gyro_domain.md)	 - Domains: search, register, transfer, nameservers, DNS, WHOIS
-* [gyro domain email-forward create](gyro_domain_email-forward_create.md)	 - Create email forward
-* [gyro domain email-forward delete](gyro_domain_email-forward_delete.md)	 - Delete email forward
-* [gyro domain email-forward list](gyro_domain_email-forward_list.md)	 - Get email forwards
+* [gyro domain email-forward create](gyro_domain_email-forward_create.md)	 - Create email forward (path: {domain})
+* [gyro domain email-forward delete](gyro_domain_email-forward_delete.md)	 - Delete email forward (path: {domain})
+* [gyro domain email-forward list](gyro_domain_email-forward_list.md)	 - List email forwards (path: {domain})
 

@@ -1,12 +1,12 @@
 ## gyro domain update
 
-Update domain
+Update domain (path: {domain})
 
 ### Synopsis
 
-Update domain
+Update domain (path: {domain})
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/sahip-olunan-alan-adlari
+Update domain (path: {domain}). Domain operations run against the registrar module of the domain. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/sahip-olunan-alan-adlari).
 
 API: PATCH /domains/{domain} (operationId coreUpdateDomain, scope Domains/UpdateDomain)
 

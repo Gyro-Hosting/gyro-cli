@@ -1,12 +1,12 @@
 ## gyro domain dns-record delete
 
-Delete dns record
+Delete dns record (path: {domain})
 
 ### Synopsis
 
-Delete dns record
+Delete dns record (path: {domain})
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/ad-sunuculari-ve-kayitlar
+Delete dns record (path: {domain}). Domain operations run against the registrar module of the domain. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/ad-sunuculari-ve-kayitlar).
 
 API: DELETE /domains/{domain}/dns-records (operationId coreDeleteDnsRecord, scope Domains/DeleteDnsRecord)
 
@@ -41,5 +41,5 @@ gyro domain dns-record delete <DOMAIN> [flags]
 
 ### SEE ALSO
 
-* [gyro domain dns-record](gyro_domain_dns-record.md)	 - Get dns records
+* [gyro domain dns-record](gyro_domain_dns-record.md)	 - List dns records (path: {domain})
 

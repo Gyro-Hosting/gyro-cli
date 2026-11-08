@@ -6,7 +6,7 @@ Ping
 
 Ping
 
-Core WISECP client endpoint. Reference:
+Ping. Core WISECP client endpoint (Turkish reference: ).
 
 API: GET /ping (operationId corePing, scope System/Ping)
 

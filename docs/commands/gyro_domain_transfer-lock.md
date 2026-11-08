@@ -1,6 +1,6 @@
 ## gyro domain transfer-lock
 
-Get transfer lock
+Get transfer lock (path: {domain})
 
 ```
 gyro domain transfer-lock [flags]
@@ -32,6 +32,6 @@ gyro domain transfer-lock [flags]
 ### SEE ALSO
 
 * [gyro domain](gyro_domain.md)	 - Domains: search, register, transfer, nameservers, DNS, WHOIS
-* [gyro domain transfer-lock get](gyro_domain_transfer-lock_get.md)	 - Get transfer lock
-* [gyro domain transfer-lock set](gyro_domain_transfer-lock_set.md)	 - Update transfer lock
+* [gyro domain transfer-lock get](gyro_domain_transfer-lock_get.md)	 - Get transfer lock (path: {domain})
+* [gyro domain transfer-lock set](gyro_domain_transfer-lock_set.md)	 - Update transfer lock (path: {domain})
 

@@ -6,7 +6,7 @@ Get notifications
 
 Get notifications
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/anahtarin-hesabi
+Get notifications. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/anahtarin-hesabi).
 
 API: GET /me/notifications (operationId coreGetNotifications, scope Account/GetNotifications)
 

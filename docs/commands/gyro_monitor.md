@@ -33,10 +33,14 @@ gyro monitor [flags]
 
 * [gyro](gyro.md)	 - Gyro Hosting command-line interface
 * [gyro monitor call](gyro_monitor_call.md)	 - Call a module method of a service
+* [gyro monitor channel](gyro_monitor_channel.md)	 - GET channels (GyroMonitor)
 * [gyro monitor check](gyro_monitor_check.md)	 - Monitor checks
 * [gyro monitor contact](gyro_monitor_contact.md)	 - Alert contacts
+* [gyro monitor heartbeat](gyro_monitor_heartbeat.md)	 - GET heartbeats (GyroMonitor)
 * [gyro monitor incident](gyro_monitor_incident.md)	 - Incidents
 * [gyro monitor list](gyro_monitor_list.md)	 - List your services of this product line
+* [gyro monitor monitor](gyro_monitor_monitor.md)	 - GET monitors (GyroMonitor)
+* [gyro monitor status-page](gyro_monitor_status-page.md)	 - GET status-pages (GyroMonitor)
 * [gyro monitor tool](gyro_monitor_tool.md)	 - Read a tool's data or run one of its actions (see 'tools')
 * [gyro monitor tools](gyro_monitor_tools.md)	 - Show the tools, actions and safety policy of a service
 

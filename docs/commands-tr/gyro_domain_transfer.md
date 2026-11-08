@@ -6,7 +6,7 @@ Alan Adı Transferi
 
 Alan Adı Transferi
 
-**Para harcar.** Başka bir sağlayıcıdaki alan adını buraya taşır. — kod gerekebilir
+**Para harcar / fatura oluşturur.** Para kuralları (AK-40): gövdede `"confirm": true`, `Idempotency-Key` başlığı, yalnız bakiye (kayıtlı kart yok), hesap başına günlük sınır. Başka bir sağlayıcıdaki alan adını buraya taşır. — kod gerekebilir
 
 API: POST /domains/transfer (operationId coreTransferDomain, scope Domains/TransferDomain)
 

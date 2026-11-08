@@ -1,12 +1,12 @@
 ## gyro service metrics list
 
-Get service metrics
+Get service metrics (path: {id})
 
 ### Synopsis
 
-Get service metrics
+Get service metrics (path: {id})
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/sahip-olunan-hizmetler
+Get service metrics (path: {id}). Service of the calling account (any product line). Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/sahip-olunan-hizmetler).
 
 API: GET /services/{id}/metrics (operationId coreGetServiceMetrics, scope Services/GetServiceMetrics)
 
@@ -39,5 +39,5 @@ gyro service metrics list <ID> [flags]
 
 ### SEE ALSO
 
-* [gyro service metrics](gyro_service_metrics.md)	 - Get service metrics
+* [gyro service metrics](gyro_service_metrics.md)	 - Get service metrics (path: {id})
 

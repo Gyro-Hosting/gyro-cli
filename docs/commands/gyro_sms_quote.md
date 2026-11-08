@@ -6,7 +6,7 @@ Quote sms
 
 Quote sms
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/mesaj-gonderme
+Quote sms. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/mesaj-gonderme).
 
 API: POST /sms/quote (operationId coreQuoteSms, scope Sms/QuoteSms)
 

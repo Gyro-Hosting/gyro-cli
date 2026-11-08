@@ -1,6 +1,6 @@
 ## gyro service addon
 
-Get service addons
+List service addons (path: {id})
 
 ```
 gyro service addon [flags]
@@ -32,5 +32,6 @@ gyro service addon [flags]
 ### SEE ALSO
 
 * [gyro service](gyro_service.md)	 - All services of every product line (generic bridge)
-* [gyro service addon list](gyro_service_addon_list.md)	 - Get service addons
+* [gyro service addon available](gyro_service_addon_available.md)	 - Add-ons offered for this service (with options and prices)
+* [gyro service addon list](gyro_service_addon_list.md)	 - List service addons (path: {id})
 

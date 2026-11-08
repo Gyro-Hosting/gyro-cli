@@ -32,8 +32,8 @@ gyro sms [flags]
 ### SEE ALSO
 
 * [gyro](gyro.md)	 - Gyro Hosting command-line interface
-* [gyro sms message](gyro_sms_message.md)	 - Get sms messages
+* [gyro sms message](gyro_sms_message.md)	 - List sms messages
 * [gyro sms quote](gyro_sms_quote.md)	 - Quote sms
 * [gyro sms send](gyro_sms_send.md)	 - Send sms
-* [gyro sms sender](gyro_sms_sender.md)	 - Get sms senders
+* [gyro sms sender](gyro_sms_sender.md)	 - List sms senders
 

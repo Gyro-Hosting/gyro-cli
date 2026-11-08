@@ -32,5 +32,6 @@ gyro service addon [flags]
 ### SEE ALSO
 
 * [gyro service](gyro_service.md)	 - Tüm ürün hatlarındaki hizmetler (genel köprü)
+* [gyro service addon available](gyro_service_addon_available.md)	 - Bu hizmete alınabilecek ek hizmetler
 * [gyro service addon list](gyro_service_addon_list.md)	 - Hizmet Eklentilerini Okuma
 

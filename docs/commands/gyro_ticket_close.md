@@ -1,12 +1,12 @@
 ## gyro ticket close
 
-Close ticket
+Close ticket (path: {id})
 
 ### Synopsis
 
-Close ticket
+Close ticket (path: {id})
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/destek-isteme
+Close ticket (path: {id}). Support ticket of the calling account. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/destek-isteme).
 
 API: POST /tickets/{id}/close (operationId coreCloseTicket, scope Tickets/CloseTicket)
 

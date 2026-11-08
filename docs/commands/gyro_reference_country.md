@@ -1,6 +1,6 @@
 ## gyro reference country
 
-Get countries
+List countries
 
 ```
 gyro reference country [flags]
@@ -32,6 +32,6 @@ gyro reference country [flags]
 ### SEE ALSO
 
 * [gyro reference](gyro_reference.md)	 - Countries, states and cities
-* [gyro reference country list](gyro_reference_country_list.md)	 - Get countries
-* [gyro reference country state](gyro_reference_country_state.md)	 - Get states
+* [gyro reference country list](gyro_reference_country_list.md)	 - List countries
+* [gyro reference country state](gyro_reference_country_state.md)	 - List states (path: {code})
 

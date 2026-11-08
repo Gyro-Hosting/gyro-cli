@@ -6,7 +6,7 @@ Yenileme Faturası Kesme
 
 Yenileme Faturası Kesme
 
-**Para harcar.** Hizmet için bir yenileme faturası keser. — fatura üretir
+**Para harcar / fatura oluşturur.** Para kuralları (AK-40): gövdede `"confirm": true`, `Idempotency-Key` başlığı, yalnız bakiye (kayıtlı kart yok), hesap başına günlük sınır. Hizmet için bir yenileme faturası keser. — fatura üretir
 
 API: POST /services/{id}/renew (operationId coreRenewService, scope Services/RenewService)
 

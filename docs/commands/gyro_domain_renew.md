@@ -1,12 +1,12 @@
 ## gyro domain renew
 
-Renew domain
+Renew domain (path: {domain})
 
 ### Synopsis
 
-Renew domain
+Renew domain (path: {domain})
 
-**Spends money** (paid from balance or a stored card; prefer the GyroAPI equivalents with confirm + idempotency where available). Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/sahip-olunan-alan-adlari
+Renew domain (path: {domain}). Domain operations run against the registrar module of the domain. **Spends money / creates an invoice.** Money rules apply (AK-40): `"confirm": true` in the body, an `Idempotency-Key` header, account balance only (no stored card), daily limit per account; violations answer 422 with `[confirm_required]`, `[idempotency_key_required]`, `[balance_only]` or `[daily_limit]` in the message. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/sahip-olunan-alan-adlari).
 
 API: POST /domains/{domain}/renew (operationId coreRenewDomain, scope Domains/RenewDomain)
 

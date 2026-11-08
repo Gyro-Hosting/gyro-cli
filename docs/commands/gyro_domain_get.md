@@ -1,12 +1,12 @@
 ## gyro domain get
 
-Get domain
+Get domain (path: {domain})
 
 ### Synopsis
 
-Get domain
+Get domain (path: {domain})
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/sahip-olunan-alan-adlari
+Get domain (path: {domain}). Domain operations run against the registrar module of the domain. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/sahip-olunan-alan-adlari).
 
 API: GET /domains/{domain} (operationId coreGetDomain, scope Domains/GetDomain)
 

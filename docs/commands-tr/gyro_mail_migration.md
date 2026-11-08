@@ -35,5 +35,6 @@ gyro mail migration [flags]
 * [gyro mail migration create](gyro_mail_migration_create.md)	 - create (alanlar --set anahtar=değer)
 * [gyro mail migration delete](gyro_mail_migration_delete.md)	 - delete (alanlar --set anahtar=değer)
 * [gyro mail migration list](gyro_mail_migration_list.md)	 - Göster
+* [gyro mail migration run](gyro_mail_migration_run.md)	 - sync-jobs:run (GyroMail)
 * [gyro mail migration update](gyro_mail_migration_update.md)	 - update (alanlar --set anahtar=değer)
 

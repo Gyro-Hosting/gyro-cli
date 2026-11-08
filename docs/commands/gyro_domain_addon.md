@@ -1,6 +1,6 @@
 ## gyro domain addon
 
-Buy domain addon
+Buy domain addon (path: {domain}, {key})
 
 ```
 gyro domain addon [flags]
@@ -32,5 +32,5 @@ gyro domain addon [flags]
 ### SEE ALSO
 
 * [gyro domain](gyro_domain.md)	 - Domains: search, register, transfer, nameservers, DNS, WHOIS
-* [gyro domain addon buy](gyro_domain_addon_buy.md)	 - Buy domain addon
+* [gyro domain addon buy](gyro_domain_addon_buy.md)	 - Buy domain addon (path: {domain}, {key})
 

@@ -2,7 +2,7 @@
 .TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
 
 .SH NAME
-gyro-domain-dns-record-list - Get dns records
+gyro-domain-dns-record-list - List dns records (path: {domain})
 
 
 .SH SYNOPSIS
@@ -10,10 +10,10 @@ gyro-domain-dns-record-list - Get dns records
 
 
 .SH DESCRIPTION
-Get dns records
+List dns records (path: {domain})
 
 .PP
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/ad-sunuculari-ve-kayitlar
+List dns records (path: {domain}). Domain operations run against the registrar module of the domain. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/ad-sunuculari-ve-kayitlar).
 
 .PP
 API: GET /domains/{domain}/dns-records (operationId coreGetDnsRecords, scope Domains/GetDnsRecords)

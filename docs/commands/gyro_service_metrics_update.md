@@ -1,12 +1,12 @@
 ## gyro service metrics update
 
-Update service metric
+Update service metric (path: {id}, {key})
 
 ### Synopsis
 
-Update service metric
+Update service metric (path: {id}, {key})
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/sahip-olunan-hizmetler
+Update service metric (path: {id}, {key}). Service of the calling account (any product line). Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/sahip-olunan-hizmetler).
 
 API: PATCH /services/{id}/metrics/{key} (operationId coreUpdateServiceMetric, scope Services/UpdateServiceMetric)
 
@@ -44,5 +44,5 @@ gyro service metrics update <ID> <KEY> [flags]
 
 ### SEE ALSO
 
-* [gyro service metrics](gyro_service_metrics.md)	 - Get service metrics
+* [gyro service metrics](gyro_service_metrics.md)	 - Get service metrics (path: {id})
 

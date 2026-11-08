@@ -1,6 +1,6 @@
 ## gyro affiliate commission
 
-Get affiliate commissions
+List affiliate commissions
 
 ```
 gyro affiliate commission [flags]
@@ -32,5 +32,5 @@ gyro affiliate commission [flags]
 ### SEE ALSO
 
 * [gyro affiliate](gyro_affiliate.md)	 - Get affiliate
-* [gyro affiliate commission list](gyro_affiliate_commission_list.md)	 - Get affiliate commissions
+* [gyro affiliate commission list](gyro_affiliate_commission_list.md)	 - List affiliate commissions
 

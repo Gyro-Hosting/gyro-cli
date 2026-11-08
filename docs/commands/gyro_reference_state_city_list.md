@@ -1,12 +1,12 @@
 ## gyro reference state city list
 
-Get cities
+List cities (path: {id})
 
 ### Synopsis
 
-Get cities
+List cities (path: {id})
 
-Core WISECP client endpoint. Reference:
+List cities (path: {id}). Core WISECP client endpoint (Turkish reference: ).
 
 API: GET /reference/states/{id}/cities (operationId coreGetCities, scope Reference/GetCities)
 
@@ -39,5 +39,5 @@ gyro reference state city list <ID> [flags]
 
 ### SEE ALSO
 
-* [gyro reference state city](gyro_reference_state_city.md)	 - Get cities
+* [gyro reference state city](gyro_reference_state_city.md)	 - List cities (path: {id})
 

@@ -6,7 +6,7 @@ Yenileme Faturası Kesme
 
 Yenileme Faturası Kesme
 
-**Para harcar.** Alan adı için istenen yıl sayısı kadar yenileme faturası keser. — fatura üretir
+**Para harcar / fatura oluşturur.** Para kuralları (AK-40): gövdede `"confirm": true`, `Idempotency-Key` başlığı, yalnız bakiye (kayıtlı kart yok), hesap başına günlük sınır. Alan adı için istenen yıl sayısı kadar yenileme faturası keser. — fatura üretir
 
 API: POST /domains/{domain}/renew (operationId coreRenewDomain, scope Domains/RenewDomain)
 

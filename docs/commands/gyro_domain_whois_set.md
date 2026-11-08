@@ -1,12 +1,12 @@
 ## gyro domain whois set
 
-Update whois contacts
+Update whois contacts (path: {domain})
 
 ### Synopsis
 
-Update whois contacts
+Update whois contacts (path: {domain})
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/alan-adi-kisileri-ve-gizlilik
+Update whois contacts (path: {domain}). Domain operations run against the registrar module of the domain. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/alan-adi-kisileri-ve-gizlilik).
 
 API: PUT /domains/{domain}/whois (operationId coreUpdateWhoisContacts, scope Domains/UpdateWhoisContacts)
 
@@ -57,5 +57,5 @@ gyro domain whois set <DOMAIN> [flags]
 
 ### SEE ALSO
 
-* [gyro domain whois](gyro_domain_whois.md)	 - Get whois contacts
+* [gyro domain whois](gyro_domain_whois.md)	 - Get whois contacts (path: {domain})
 

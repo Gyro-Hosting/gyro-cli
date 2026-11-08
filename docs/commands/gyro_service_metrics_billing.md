@@ -1,6 +1,6 @@
 ## gyro service metrics billing
 
-Get service metric billing
+List service metric billing (path: {id})
 
 ```
 gyro service metrics billing [flags]
@@ -31,6 +31,6 @@ gyro service metrics billing [flags]
 
 ### SEE ALSO
 
-* [gyro service metrics](gyro_service_metrics.md)	 - Get service metrics
-* [gyro service metrics billing get](gyro_service_metrics_billing_get.md)	 - Get service metric billing
+* [gyro service metrics](gyro_service_metrics.md)	 - Get service metrics (path: {id})
+* [gyro service metrics billing list](gyro_service_metrics_billing_list.md)	 - List service metric billing (path: {id})
 

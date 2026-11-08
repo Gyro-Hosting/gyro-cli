@@ -32,18 +32,21 @@ gyro service [flags]
 ### SEE ALSO
 
 * [gyro](gyro.md)	 - Gyro Hosting command-line interface
-* [gyro service addon](gyro_service_addon.md)	 - Get service addons
-* [gyro service cancellation](gyro_service_cancellation.md)	 - Create cancellation
-* [gyro service dashboard](gyro_service_dashboard.md)	 - Get service dashboard
+* [gyro service addon](gyro_service_addon.md)	 - List service addons (path: {id})
+* [gyro service addons](gyro_service_addons.md)	 - Buy an add-on (paid from balance)
+* [gyro service cancellation](gyro_service_cancellation.md)	 - Create cancellation (path: {id})
+* [gyro service dashboard](gyro_service_dashboard.md)	 - Get service dashboard (path: {id})
 * [gyro service get](gyro_service_get.md)	 - Get a service (renewal, cancellation, access details)
-* [gyro service invoice](gyro_service_invoice.md)	 - Get service invoices
+* [gyro service invoice](gyro_service_invoice.md)	 - List service invoices (path: {id})
 * [gyro service list](gyro_service_list.md)	 - List services of every product line
 * [gyro service method](gyro_service_method.md)	 - Call a client-callable module method (e.g. license change_ip)
-* [gyro service metrics](gyro_service_metrics.md)	 - Get service metrics
-* [gyro service module-method](gyro_service_module-method.md)	 - Use service module method
-* [gyro service password](gyro_service_password.md)	 - Change service password
-* [gyro service renew](gyro_service_renew.md)	 - Renew service
-* [gyro service sso](gyro_service_sso.md)	 - Get service sso
+* [gyro service metrics](gyro_service_metrics.md)	 - Get service metrics (path: {id})
+* [gyro service module-method](gyro_service_module-method.md)	 - Use service module method (path: {id})
+* [gyro service password](gyro_service_password.md)	 - Change service password (path: {id})
+* [gyro service renew](gyro_service_renew.md)	 - Renew service (path: {id})
+* [gyro service resize](gyro_service_resize.md)	 - Upgrade the plan (paid from balance)
+* [gyro service resize-option](gyro_service_resize-option.md)	 - Products this service can be upgraded to, with prices
+* [gyro service sso](gyro_service_sso.md)	 - Get service sso (path: {id})
 * [gyro service tool](gyro_service_tool.md)	 - Discover tools, actions and safety policy of a service
-* [gyro service update](gyro_service_update.md)	 - Update service
+* [gyro service update](gyro_service_update.md)	 - Update service (path: {id})
 

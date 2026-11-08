@@ -1,12 +1,12 @@
 ## gyro domain nameserver list
 
-Get nameservers
+Get nameservers (path: {domain})
 
 ### Synopsis
 
-Get nameservers
+Get nameservers (path: {domain})
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/ad-sunuculari-ve-kayitlar
+Get nameservers (path: {domain}). Domain operations run against the registrar module of the domain. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/ad-sunuculari-ve-kayitlar).
 
 API: GET /domains/{domain}/nameservers (operationId coreGetNameservers, scope Domains/GetNameservers)
 
@@ -39,5 +39,5 @@ gyro domain nameserver list <DOMAIN> [flags]
 
 ### SEE ALSO
 
-* [gyro domain nameserver](gyro_domain_nameserver.md)	 - Get nameservers
+* [gyro domain nameserver](gyro_domain_nameserver.md)	 - Get nameservers (path: {domain})
 

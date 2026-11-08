@@ -1,12 +1,12 @@
 ## gyro domain whois-profile default
 
-Set default whois profile
+Set default whois profile (path: {pid})
 
 ### Synopsis
 
-Set default whois profile
+Set default whois profile (path: {pid})
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/alan-adi-kisileri-ve-gizlilik
+Set default whois profile (path: {pid}). Domain operations run against the registrar module of the domain. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/alan-adi-kisileri-ve-gizlilik).
 
 API: POST /domains/whois-profiles/{pid}/default (operationId coreSetDefaultWhoisProfile, scope Domains/SetDefaultWhoisProfile)
 
@@ -41,5 +41,5 @@ gyro domain whois-profile default <PID> [flags]
 
 ### SEE ALSO
 
-* [gyro domain whois-profile](gyro_domain_whois-profile.md)	 - Get whois profiles
+* [gyro domain whois-profile](gyro_domain_whois-profile.md)	 - List whois profiles
 

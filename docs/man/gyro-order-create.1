@@ -13,7 +13,7 @@ gyro-order-create - Create order
 Create order
 
 .PP
-\fBSpends money\fP (paid from balance or a stored card; prefer the GyroAPI equivalents with confirm + idempotency where available). Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/musteri-olarak-siparis
+Create order. Orders of the calling account. \fBSpends money / creates an invoice.\fP Money rules apply (AK-40): \fB"confirm": true\fR in the body, an \fBIdempotency-Key\fR header, account balance only (no stored card), daily limit per account; violations answer 422 with \fB[confirm_required]\fR, \fB[idempotency_key_required]\fR, \fB[balance_only]\fR or \fB[daily_limit]\fR in the message. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/musteri-olarak-siparis).
 
 .PP
 API: POST /orders (operationId coreCreateOrder, scope Orders/CreateOrder)

@@ -6,7 +6,7 @@ Toplu Gönderim
 
 Toplu Gönderim
 
-**Para harcar.** Mesajı gönderir ve tutarı cüzdandan keser. — cüzdandan keser
+Mesajı gönderir ve tutarı cüzdandan keser. — cüzdandan keser
 
 API: POST /sms/send (operationId coreSendSms, scope Sms/SendSms)
 

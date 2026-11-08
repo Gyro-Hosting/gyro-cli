@@ -1,6 +1,6 @@
 ## gyro sms message
 
-Get sms messages
+List sms messages
 
 ```
 gyro sms message [flags]
@@ -32,6 +32,6 @@ gyro sms message [flags]
 ### SEE ALSO
 
 * [gyro sms](gyro_sms.md)	 - SMS messages
-* [gyro sms message get](gyro_sms_message_get.md)	 - Get sms message
-* [gyro sms message list](gyro_sms_message_list.md)	 - Get sms messages
+* [gyro sms message get](gyro_sms_message_get.md)	 - Get sms message (path: {id})
+* [gyro sms message list](gyro_sms_message_list.md)	 - List sms messages
 

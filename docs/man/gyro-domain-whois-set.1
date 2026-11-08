@@ -2,7 +2,7 @@
 .TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
 
 .SH NAME
-gyro-domain-whois-set - Update whois contacts
+gyro-domain-whois-set - Update whois contacts (path: {domain})
 
 
 .SH SYNOPSIS
@@ -10,10 +10,10 @@ gyro-domain-whois-set - Update whois contacts
 
 
 .SH DESCRIPTION
-Update whois contacts
+Update whois contacts (path: {domain})
 
 .PP
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/alan-adi-kisileri-ve-gizlilik
+Update whois contacts (path: {domain}). Domain operations run against the registrar module of the domain. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/alan-adi-kisileri-ve-gizlilik).
 
 .PP
 API: PUT /domains/{domain}/whois (operationId coreUpdateWhoisContacts, scope Domains/UpdateWhoisContacts)

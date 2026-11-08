@@ -1,12 +1,12 @@
 ## gyro domain whois-privacy set
 
-Update whois privacy
+Update whois privacy (path: {domain})
 
 ### Synopsis
 
-Update whois privacy
+Update whois privacy (path: {domain})
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/alan-adi-kisileri-ve-gizlilik
+Update whois privacy (path: {domain}). Domain operations run against the registrar module of the domain. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/alan-adi-kisileri-ve-gizlilik).
 
 API: PUT /domains/{domain}/whois-privacy (operationId coreUpdateWhoisPrivacy, scope Domains/UpdateWhoisPrivacy)
 
@@ -44,5 +44,5 @@ gyro domain whois-privacy set <DOMAIN> [flags]
 
 ### SEE ALSO
 
-* [gyro domain whois-privacy](gyro_domain_whois-privacy.md)	 - Update whois privacy
+* [gyro domain whois-privacy](gyro_domain_whois-privacy.md)	 - Update whois privacy (path: {domain})
 

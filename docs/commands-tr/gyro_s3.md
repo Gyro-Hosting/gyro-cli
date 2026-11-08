@@ -34,8 +34,10 @@ gyro s3 [flags]
 * [gyro](gyro.md)	 - Gyro Hosting komut satırı aracı
 * [gyro s3 bucket](gyro_s3_bucket.md)	 - Kovalar
 * [gyro s3 call](gyro_s3_call.md)	 - Hizmetin modül metodunu çağır
+* [gyro s3 connect](gyro_s3_connect.md)	 - connect (GyroDepolama)
 * [gyro s3 key](gyro_s3_key.md)	 - Erişim anahtarları (gizli anahtar bir kez gösterilir)
 * [gyro s3 list](gyro_s3_list.md)	 - Bu ürün hattındaki hizmetlerinizi listele
 * [gyro s3 tool](gyro_s3_tool.md)	 - Bir aracın verisini oku ya da eylemini çalıştır ('tools' ile bakın)
 * [gyro s3 tools](gyro_s3_tools.md)	 - Hizmetin araçlarını, eylemlerini ve güvenlik politikasını göster
+* [gyro s3 usage](gyro_s3_usage.md)	 - usage (GyroDepolama)
 

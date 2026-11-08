@@ -1,6 +1,6 @@
 ## gyro reference country state
 
-Get states
+List states (path: {code})
 
 ```
 gyro reference country state [flags]
@@ -31,6 +31,6 @@ gyro reference country state [flags]
 
 ### SEE ALSO
 
-* [gyro reference country](gyro_reference_country.md)	 - Get countries
-* [gyro reference country state list](gyro_reference_country_state_list.md)	 - Get states
+* [gyro reference country](gyro_reference_country.md)	 - List countries
+* [gyro reference country state list](gyro_reference_country_state_list.md)	 - List states (path: {code})
 

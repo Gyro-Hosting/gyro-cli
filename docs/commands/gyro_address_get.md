@@ -1,12 +1,12 @@
 ## gyro address get
 
-Get address
+Get address (path: {id})
 
 ### Synopsis
 
-Get address
+Get address (path: {id})
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/adres-defteri
+Get address (path: {id}). Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/adres-defteri).
 
 API: GET /addresses/{id} (operationId coreGetAddress, scope Addresses/GetAddress)
 

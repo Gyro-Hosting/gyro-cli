@@ -35,5 +35,6 @@ gyro mail mailbox [flags]
 * [gyro mail mailbox create](gyro_mail_mailbox_create.md)	 - create (fields with --set key=value)
 * [gyro mail mailbox delete](gyro_mail_mailbox_delete.md)	 - delete (fields with --set key=value)
 * [gyro mail mailbox list](gyro_mail_mailbox_list.md)	 - Show
+* [gyro mail mailbox password](gyro_mail_mailbox_password.md)	 - POST mailboxes:password (GyroMail)
 * [gyro mail mailbox update](gyro_mail_mailbox_update.md)	 - update (fields with --set key=value)
 

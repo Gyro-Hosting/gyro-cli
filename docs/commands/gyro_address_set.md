@@ -1,12 +1,12 @@
 ## gyro address set
 
-Update address
+Update address (path: {id})
 
 ### Synopsis
 
-Update address
+Update address (path: {id})
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/adres-defteri
+Update address (path: {id}). Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/adres-defteri).
 
 API: PUT /addresses/{id} (operationId coreUpdateAddress, scope Addresses/UpdateAddress)
 

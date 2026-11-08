@@ -1,6 +1,6 @@
 ## gyro ticket access-group
 
-Get ticket access groups
+List ticket access groups
 
 ```
 gyro ticket access-group [flags]
@@ -32,5 +32,5 @@ gyro ticket access-group [flags]
 ### SEE ALSO
 
 * [gyro ticket](gyro_ticket.md)	 - Support tickets
-* [gyro ticket access-group list](gyro_ticket_access-group_list.md)	 - Get ticket access groups
+* [gyro ticket access-group list](gyro_ticket_access-group_list.md)	 - List ticket access groups
 

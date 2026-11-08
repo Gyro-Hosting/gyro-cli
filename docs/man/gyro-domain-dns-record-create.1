@@ -2,7 +2,7 @@
 .TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
 
 .SH NAME
-gyro-domain-dns-record-create - Create dns record
+gyro-domain-dns-record-create - Create dns record (path: {domain})
 
 
 .SH SYNOPSIS
@@ -10,10 +10,10 @@ gyro-domain-dns-record-create - Create dns record
 
 
 .SH DESCRIPTION
-Create dns record
+Create dns record (path: {domain})
 
 .PP
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/ad-sunuculari-ve-kayitlar
+Create dns record (path: {domain}). Domain operations run against the registrar module of the domain. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/ad-sunuculari-ve-kayitlar).
 
 .PP
 API: POST /domains/{domain}/dns-records (operationId coreCreateDnsRecord, scope Domains/CreateDnsRecord)

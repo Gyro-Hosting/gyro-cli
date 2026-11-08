@@ -1,12 +1,12 @@
 ## gyro domain dnssec delete
 
-Delete dnssec record
+Delete dnssec record (path: {domain})
 
 ### Synopsis
 
-Delete dnssec record
+Delete dnssec record (path: {domain})
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/ad-sunuculari-ve-kayitlar
+Delete dnssec record (path: {domain}). Domain operations run against the registrar module of the domain. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/ad-sunuculari-ve-kayitlar).
 
 API: DELETE /domains/{domain}/dnssec (operationId coreDeleteDnssecRecord, scope Domains/DeleteDnssecRecord)
 
@@ -41,5 +41,5 @@ gyro domain dnssec delete <DOMAIN> [flags]
 
 ### SEE ALSO
 
-* [gyro domain dnssec](gyro_domain_dnssec.md)	 - Get dnssec records
+* [gyro domain dnssec](gyro_domain_dnssec.md)	 - List dnssec records (path: {domain})
 

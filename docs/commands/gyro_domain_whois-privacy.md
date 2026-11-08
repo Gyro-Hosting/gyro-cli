@@ -1,6 +1,6 @@
 ## gyro domain whois-privacy
 
-Update whois privacy
+Update whois privacy (path: {domain})
 
 ```
 gyro domain whois-privacy [flags]
@@ -32,5 +32,5 @@ gyro domain whois-privacy [flags]
 ### SEE ALSO
 
 * [gyro domain](gyro_domain.md)	 - Domains: search, register, transfer, nameservers, DNS, WHOIS
-* [gyro domain whois-privacy set](gyro_domain_whois-privacy_set.md)	 - Update whois privacy
+* [gyro domain whois-privacy set](gyro_domain_whois-privacy_set.md)	 - Update whois privacy (path: {domain})
 

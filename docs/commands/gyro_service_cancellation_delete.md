@@ -1,12 +1,12 @@
 ## gyro service cancellation delete
 
-Revoke cancellation
+Revoke cancellation (path: {id})
 
 ### Synopsis
 
-Revoke cancellation
+Revoke cancellation (path: {id})
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/sahip-olunan-hizmetler
+Revoke cancellation (path: {id}). Service of the calling account (any product line). Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/sahip-olunan-hizmetler).
 
 API: DELETE /services/{id}/cancellation (operationId coreRevokeCancellation, scope Services/RevokeCancellation)
 
@@ -41,5 +41,5 @@ gyro service cancellation delete <ID> [flags]
 
 ### SEE ALSO
 
-* [gyro service cancellation](gyro_service_cancellation.md)	 - Create cancellation
+* [gyro service cancellation](gyro_service_cancellation.md)	 - Create cancellation (path: {id})
 

@@ -36,4 +36,5 @@ gyro mail dns [flags]
 * [gyro mail dns delete](gyro_mail_dns_delete.md)	 - delete (fields with --set key=value)
 * [gyro mail dns list](gyro_mail_dns_list.md)	 - Show
 * [gyro mail dns update](gyro_mail_dns_update.md)	 - update (fields with --set key=value)
+* [gyro mail dns verify](gyro_mail_dns_verify.md)	 - POST dns-setup:verify (GyroMail)
 

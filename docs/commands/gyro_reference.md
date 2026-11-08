@@ -32,6 +32,6 @@ gyro reference [flags]
 ### SEE ALSO
 
 * [gyro](gyro.md)	 - Gyro Hosting command-line interface
-* [gyro reference country](gyro_reference_country.md)	 - Get countries
-* [gyro reference state](gyro_reference_state.md)	 - Get cities
+* [gyro reference country](gyro_reference_country.md)	 - List countries
+* [gyro reference state](gyro_reference_state.md)	 - List cities (path: {id})
 

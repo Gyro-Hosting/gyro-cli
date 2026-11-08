@@ -1,12 +1,12 @@
 ## gyro service update
 
-Update service
+Update service (path: {id})
 
 ### Synopsis
 
-Update service
+Update service (path: {id})
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/sahip-olunan-hizmetler
+Update service (path: {id}). Service of the calling account (any product line). Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/sahip-olunan-hizmetler).
 
 API: PATCH /services/{id} (operationId coreUpdateService, scope Services/UpdateService)
 

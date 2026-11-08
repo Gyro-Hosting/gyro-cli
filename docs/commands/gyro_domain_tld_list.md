@@ -1,12 +1,12 @@
 ## gyro domain tld list
 
-Get tlds
+List tlds
 
 ### Synopsis
 
-Get tlds
+List tlds
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/alan-adi-edinme
+List tlds. Domain operations run against the registrar module of the domain. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/alan-adi-edinme).
 
 API: GET /domains/tlds (operationId coreGetTlds, scope Domains/GetTlds)
 
@@ -40,5 +40,5 @@ gyro domain tld list [flags]
 
 ### SEE ALSO
 
-* [gyro domain tld](gyro_domain_tld.md)	 - Get tlds
+* [gyro domain tld](gyro_domain_tld.md)	 - List tlds
 

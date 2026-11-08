@@ -2,7 +2,7 @@
 .TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
 
 .SH NAME
-gyro-domain-whois-privacy-set - Update whois privacy
+gyro-domain-whois-privacy-set - Update whois privacy (path: {domain})
 
 
 .SH SYNOPSIS
@@ -10,10 +10,10 @@ gyro-domain-whois-privacy-set - Update whois privacy
 
 
 .SH DESCRIPTION
-Update whois privacy
+Update whois privacy (path: {domain})
 
 .PP
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/alan-adi-kisileri-ve-gizlilik
+Update whois privacy (path: {domain}). Domain operations run against the registrar module of the domain. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/alan-adi-kisileri-ve-gizlilik).
 
 .PP
 API: PUT /domains/{domain}/whois-privacy (operationId coreUpdateWhoisPrivacy, scope Domains/UpdateWhoisPrivacy)

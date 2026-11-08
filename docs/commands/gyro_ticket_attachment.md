@@ -1,6 +1,6 @@
 ## gyro ticket attachment
 
-Get ticket attachment
+Get ticket attachment (path: {id}, {aid})
 
 ```
 gyro ticket attachment [flags]
@@ -32,5 +32,5 @@ gyro ticket attachment [flags]
 ### SEE ALSO
 
 * [gyro ticket](gyro_ticket.md)	 - Support tickets
-* [gyro ticket attachment get](gyro_ticket_attachment_get.md)	 - Get ticket attachment
+* [gyro ticket attachment get](gyro_ticket_attachment_get.md)	 - Get ticket attachment (path: {id}, {aid})
 

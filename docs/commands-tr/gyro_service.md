@@ -33,6 +33,7 @@ gyro service [flags]
 
 * [gyro](gyro.md)	 - Gyro Hosting komut satırı aracı
 * [gyro service addon](gyro_service_addon.md)	 - Hizmet Eklentilerini Okuma
+* [gyro service addons](gyro_service_addons.md)	 - Ek hizmet satın al (bakiyeden ödenir)
 * [gyro service cancellation](gyro_service_cancellation.md)	 - İptal Talebi Açma
 * [gyro service dashboard](gyro_service_dashboard.md)	 - Panel Özetini Okuma
 * [gyro service get](gyro_service_get.md)	 - Hizmeti getir (yenileme, iptal, erişim bilgileri)
@@ -43,6 +44,8 @@ gyro service [flags]
 * [gyro service module-method](gyro_service_module-method.md)	 - Modül Metodu Çalıştırma
 * [gyro service password](gyro_service_password.md)	 - Panel Parolasını Değiştirme
 * [gyro service renew](gyro_service_renew.md)	 - Yenileme Faturası Kesme
+* [gyro service resize](gyro_service_resize.md)	 - Paketi yükselt (bakiyeden ödenir)
+* [gyro service resize-option](gyro_service_resize-option.md)	 - Hizmetin yükseltilebileceği ürünler ve fiyatları
 * [gyro service sso](gyro_service_sso.md)	 - Panele Tek Oturum Açma
 * [gyro service tool](gyro_service_tool.md)	 - Hizmetin araçlarını, eylemlerini ve güvenlik politikasını keşfet
 * [gyro service update](gyro_service_update.md)	 - Hizmet Tercihlerini Değiştirme

@@ -6,7 +6,7 @@ Create ticket
 
 Create ticket
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/destek-isteme
+Create ticket. Support ticket of the calling account. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/destek-isteme).
 
 API: POST /tickets (operationId coreCreateTicket, scope Tickets/CreateTicket)
 

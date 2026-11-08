@@ -1,12 +1,12 @@
 ## gyro domain transfer-status get
 
-Get transfer status
+Get transfer status (path: {domain})
 
 ### Synopsis
 
-Get transfer status
+Get transfer status (path: {domain})
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/alan-adi-edinme
+Get transfer status (path: {domain}). Domain operations run against the registrar module of the domain. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/alan-adi-edinme).
 
 API: GET /domains/{domain}/transfer-status (operationId coreGetTransferStatus, scope Domains/GetTransferStatus)
 
@@ -39,5 +39,5 @@ gyro domain transfer-status get <DOMAIN> [flags]
 
 ### SEE ALSO
 
-* [gyro domain transfer-status](gyro_domain_transfer-status.md)	 - Get transfer status
+* [gyro domain transfer-status](gyro_domain_transfer-status.md)	 - Get transfer status (path: {domain})
 

@@ -1,6 +1,6 @@
 ## gyro product category
 
-Get product categories
+List product categories
 
 ```
 gyro product category [flags]
@@ -32,5 +32,5 @@ gyro product category [flags]
 ### SEE ALSO
 
 * [gyro product](gyro_product.md)	 - Full product catalog (all product lines)
-* [gyro product category list](gyro_product_category_list.md)	 - Get product categories
+* [gyro product category list](gyro_product_category_list.md)	 - List product categories
 

@@ -35,5 +35,6 @@ gyro mail autoresponder [flags]
 * [gyro mail autoresponder create](gyro_mail_autoresponder_create.md)	 - create (fields with --set key=value)
 * [gyro mail autoresponder delete](gyro_mail_autoresponder_delete.md)	 - delete (fields with --set key=value)
 * [gyro mail autoresponder list](gyro_mail_autoresponder_list.md)	 - Show
+* [gyro mail autoresponder set](gyro_mail_autoresponder_set.md)	 - PUT autoresponder:edit (GyroMail)
 * [gyro mail autoresponder update](gyro_mail_autoresponder_update.md)	 - update (fields with --set key=value)
 

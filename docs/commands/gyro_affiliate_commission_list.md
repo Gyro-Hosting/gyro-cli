@@ -1,12 +1,12 @@
 ## gyro affiliate commission list
 
-Get affiliate commissions
+List affiliate commissions
 
 ### Synopsis
 
-Get affiliate commissions
+List affiliate commissions
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/satis-ortakligi-kazanci
+List affiliate commissions. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/satis-ortakligi-kazanci).
 
 API: GET /affiliate/commissions (operationId coreGetAffiliateCommissions, scope Affiliate/GetAffiliateCommissions)
 
@@ -42,5 +42,5 @@ gyro affiliate commission list [flags]
 
 ### SEE ALSO
 
-* [gyro affiliate commission](gyro_affiliate_commission.md)	 - Get affiliate commissions
+* [gyro affiliate commission](gyro_affiliate_commission.md)	 - List affiliate commissions
 

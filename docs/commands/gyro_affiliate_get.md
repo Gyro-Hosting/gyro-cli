@@ -6,7 +6,7 @@ Get affiliate
 
 Get affiliate
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/satis-ortakligi-kazanci
+Get affiliate. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/satis-ortakligi-kazanci).
 
 API: GET /affiliate (operationId coreGetAffiliate, scope Affiliate/GetAffiliate)
 

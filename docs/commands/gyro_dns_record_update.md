@@ -1,12 +1,12 @@
 ## gyro dns record update
 
-Update dns record
+Update dns record (path: {domain})
 
 ### Synopsis
 
-Update dns record
+Update dns record (path: {domain})
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/ad-sunuculari-ve-kayitlar
+Update dns record (path: {domain}). Domain operations run against the registrar module of the domain. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/ad-sunuculari-ve-kayitlar).
 
 API: PUT /domains/{domain}/dns-records (operationId coreUpdateDnsRecord, scope Domains/UpdateDnsRecord)
 

@@ -1,12 +1,12 @@
 ## gyro order get
 
-Get order
+Get order (path: {id})
 
 ### Synopsis
 
-Get order
+Get order (path: {id})
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/musteri-olarak-siparis
+Get order (path: {id}). Orders of the calling account. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/musteri-olarak-siparis).
 
 API: GET /orders/{id} (operationId coreGetOrder, scope Orders/GetOrder)
 

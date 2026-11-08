@@ -1,12 +1,12 @@
 ## gyro domain auth-code set
 
-Save auth code
+Save auth code (path: {domain})
 
 ### Synopsis
 
-Save auth code
+Save auth code (path: {domain})
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/alan-adi-edinme
+Save auth code (path: {domain}). Domain operations run against the registrar module of the domain. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/alan-adi-edinme).
 
 API: PUT /domains/{domain}/auth-code (operationId coreSaveAuthCode, scope Domains/SaveAuthCode)
 
@@ -44,5 +44,5 @@ gyro domain auth-code set <DOMAIN> [flags]
 
 ### SEE ALSO
 
-* [gyro domain auth-code](gyro_domain_auth-code.md)	 - Send auth code
+* [gyro domain auth-code](gyro_domain_auth-code.md)	 - Send auth code (path: {domain})
 

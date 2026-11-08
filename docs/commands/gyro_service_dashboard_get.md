@@ -1,12 +1,12 @@
 ## gyro service dashboard get
 
-Get service dashboard
+Get service dashboard (path: {id})
 
 ### Synopsis
 
-Get service dashboard
+Get service dashboard (path: {id})
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/hizmetin-icine-erisim
+Get service dashboard (path: {id}). Service of the calling account (any product line). Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/hizmetin-icine-erisim).
 
 API: GET /services/{id}/dashboard (operationId coreGetServiceDashboard, scope Services/GetServiceDashboard)
 
@@ -39,5 +39,5 @@ gyro service dashboard get <ID> [flags]
 
 ### SEE ALSO
 
-* [gyro service dashboard](gyro_service_dashboard.md)	 - Get service dashboard
+* [gyro service dashboard](gyro_service_dashboard.md)	 - Get service dashboard (path: {id})
 

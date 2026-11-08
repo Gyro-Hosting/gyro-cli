@@ -32,8 +32,8 @@ gyro dns record [flags]
 ### SEE ALSO
 
 * [gyro dns](gyro_dns.md)	 - DNS records of your domains
-* [gyro dns record add](gyro_dns_record_add.md)	 - Create dns record
-* [gyro dns record delete](gyro_dns_record_delete.md)	 - Delete dns record
-* [gyro dns record list](gyro_dns_record_list.md)	 - Get dns records
-* [gyro dns record update](gyro_dns_record_update.md)	 - Update dns record
+* [gyro dns record add](gyro_dns_record_add.md)	 - Create dns record (path: {domain})
+* [gyro dns record delete](gyro_dns_record_delete.md)	 - Delete dns record (path: {domain})
+* [gyro dns record list](gyro_dns_record_list.md)	 - List dns records (path: {domain})
+* [gyro dns record update](gyro_dns_record_update.md)	 - Update dns record (path: {domain})
 

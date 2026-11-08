@@ -1,6 +1,6 @@
 ## gyro domain nameserver
 
-Get nameservers
+Get nameservers (path: {domain})
 
 ```
 gyro domain nameserver [flags]
@@ -32,6 +32,6 @@ gyro domain nameserver [flags]
 ### SEE ALSO
 
 * [gyro domain](gyro_domain.md)	 - Domains: search, register, transfer, nameservers, DNS, WHOIS
-* [gyro domain nameserver list](gyro_domain_nameserver_list.md)	 - Get nameservers
-* [gyro domain nameserver set](gyro_domain_nameserver_set.md)	 - Update nameservers
+* [gyro domain nameserver list](gyro_domain_nameserver_list.md)	 - Get nameservers (path: {domain})
+* [gyro domain nameserver set](gyro_domain_nameserver_set.md)	 - Update nameservers (path: {domain})
 

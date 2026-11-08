@@ -1,12 +1,12 @@
 ## gyro service invoice list
 
-Get service invoices
+List service invoices (path: {id})
 
 ### Synopsis
 
-Get service invoices
+List service invoices (path: {id})
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/sahip-olunan-hizmetler
+List service invoices (path: {id}). Service of the calling account (any product line). Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/sahip-olunan-hizmetler).
 
 API: GET /services/{id}/invoices (operationId coreGetServiceInvoices, scope Services/GetServiceInvoices)
 
@@ -42,5 +42,5 @@ gyro service invoice list <ID> [flags]
 
 ### SEE ALSO
 
-* [gyro service invoice](gyro_service_invoice.md)	 - Get service invoices
+* [gyro service invoice](gyro_service_invoice.md)	 - List service invoices (path: {id})
 

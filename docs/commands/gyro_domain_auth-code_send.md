@@ -1,12 +1,12 @@
 ## gyro domain auth-code send
 
-Send auth code
+Send auth code (path: {domain})
 
 ### Synopsis
 
-Send auth code
+Send auth code (path: {domain})
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/alan-adi-edinme
+Send auth code (path: {domain}). Domain operations run against the registrar module of the domain. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/alan-adi-edinme).
 
 API: POST /domains/{domain}/auth-code (operationId coreSendAuthCode, scope Domains/SendAuthCode)
 
@@ -41,5 +41,5 @@ gyro domain auth-code send <DOMAIN> [flags]
 
 ### SEE ALSO
 
-* [gyro domain auth-code](gyro_domain_auth-code.md)	 - Send auth code
+* [gyro domain auth-code](gyro_domain_auth-code.md)	 - Send auth code (path: {domain})
 

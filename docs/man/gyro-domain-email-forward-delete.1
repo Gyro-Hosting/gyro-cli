@@ -2,7 +2,7 @@
 .TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
 
 .SH NAME
-gyro-domain-email-forward-delete - Delete email forward
+gyro-domain-email-forward-delete - Delete email forward (path: {domain})
 
 
 .SH SYNOPSIS
@@ -10,10 +10,10 @@ gyro-domain-email-forward-delete - Delete email forward
 
 
 .SH DESCRIPTION
-Delete email forward
+Delete email forward (path: {domain})
 
 .PP
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/yonlendirme-kurma
+Delete email forward (path: {domain}). Domain operations run against the registrar module of the domain. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/yonlendirme-kurma).
 
 .PP
 API: DELETE /domains/{domain}/email-forwards (operationId coreDeleteEmailForward, scope Domains/DeleteEmailForward)

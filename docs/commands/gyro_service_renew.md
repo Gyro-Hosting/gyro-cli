@@ -1,12 +1,12 @@
 ## gyro service renew
 
-Renew service
+Renew service (path: {id})
 
 ### Synopsis
 
-Renew service
+Renew service (path: {id})
 
-**Spends money** (paid from balance or a stored card; prefer the GyroAPI equivalents with confirm + idempotency where available). Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/sahip-olunan-hizmetler
+Renew service (path: {id}). Service of the calling account (any product line). **Spends money / creates an invoice.** Money rules apply (AK-40): `"confirm": true` in the body, an `Idempotency-Key` header, account balance only (no stored card), daily limit per account; violations answer 422 with `[confirm_required]`, `[idempotency_key_required]`, `[balance_only]` or `[daily_limit]` in the message. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/sahip-olunan-hizmetler).
 
 API: POST /services/{id}/renew (operationId coreRenewService, scope Services/RenewService)
 

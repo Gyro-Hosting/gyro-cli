@@ -1,6 +1,6 @@
 ## gyro domain whois-profile
 
-Get whois profiles
+List whois profiles
 
 ```
 gyro domain whois-profile [flags]
@@ -33,8 +33,8 @@ gyro domain whois-profile [flags]
 
 * [gyro domain](gyro_domain.md)	 - Domains: search, register, transfer, nameservers, DNS, WHOIS
 * [gyro domain whois-profile create](gyro_domain_whois-profile_create.md)	 - Create whois profile
-* [gyro domain whois-profile default](gyro_domain_whois-profile_default.md)	 - Set default whois profile
-* [gyro domain whois-profile delete](gyro_domain_whois-profile_delete.md)	 - Delete whois profile
-* [gyro domain whois-profile list](gyro_domain_whois-profile_list.md)	 - Get whois profiles
-* [gyro domain whois-profile set](gyro_domain_whois-profile_set.md)	 - Update whois profile
+* [gyro domain whois-profile default](gyro_domain_whois-profile_default.md)	 - Set default whois profile (path: {pid})
+* [gyro domain whois-profile delete](gyro_domain_whois-profile_delete.md)	 - Delete whois profile (path: {pid})
+* [gyro domain whois-profile list](gyro_domain_whois-profile_list.md)	 - List whois profiles
+* [gyro domain whois-profile set](gyro_domain_whois-profile_set.md)	 - Update whois profile (path: {pid})
 

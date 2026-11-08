@@ -2,7 +2,7 @@
 .TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
 
 .SH NAME
-gyro-service-renew - Renew service
+gyro-service-renew - Renew service (path: {id})
 
 
 .SH SYNOPSIS
@@ -10,10 +10,10 @@ gyro-service-renew - Renew service
 
 
 .SH DESCRIPTION
-Renew service
+Renew service (path: {id})
 
 .PP
-\fBSpends money\fP (paid from balance or a stored card; prefer the GyroAPI equivalents with confirm + idempotency where available). Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/sahip-olunan-hizmetler
+Renew service (path: {id}). Service of the calling account (any product line). \fBSpends money / creates an invoice.\fP Money rules apply (AK-40): \fB"confirm": true\fR in the body, an \fBIdempotency-Key\fR header, account balance only (no stored card), daily limit per account; violations answer 422 with \fB[confirm_required]\fR, \fB[idempotency_key_required]\fR, \fB[balance_only]\fR or \fB[daily_limit]\fR in the message. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/sahip-olunan-hizmetler).
 
 .PP
 API: POST /services/{id}/renew (operationId coreRenewService, scope Services/RenewService)

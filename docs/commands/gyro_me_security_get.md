@@ -6,7 +6,7 @@ Get security
 
 Get security
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/anahtarin-hesabi
+Get security. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/anahtarin-hesabi).
 
 API: GET /me/security (operationId coreGetSecurity, scope Account/GetSecurity)
 

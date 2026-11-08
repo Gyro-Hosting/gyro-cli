@@ -6,7 +6,7 @@ Preview order
 
 Preview order
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/musteri-olarak-siparis
+Preview order. Orders of the calling account. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/musteri-olarak-siparis).
 
 API: POST /orders/preview (operationId corePreviewOrder, scope Orders/PreviewOrder)
 

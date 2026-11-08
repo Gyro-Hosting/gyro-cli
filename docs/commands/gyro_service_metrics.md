@@ -1,6 +1,6 @@
 ## gyro service metrics
 
-Get service metrics
+Get service metrics (path: {id})
 
 ```
 gyro service metrics [flags]
@@ -32,7 +32,7 @@ gyro service metrics [flags]
 ### SEE ALSO
 
 * [gyro service](gyro_service.md)	 - All services of every product line (generic bridge)
-* [gyro service metrics billing](gyro_service_metrics_billing.md)	 - Get service metric billing
-* [gyro service metrics list](gyro_service_metrics_list.md)	 - Get service metrics
-* [gyro service metrics update](gyro_service_metrics_update.md)	 - Update service metric
+* [gyro service metrics billing](gyro_service_metrics_billing.md)	 - List service metric billing (path: {id})
+* [gyro service metrics list](gyro_service_metrics_list.md)	 - Get service metrics (path: {id})
+* [gyro service metrics update](gyro_service_metrics_update.md)	 - Update service metric (path: {id}, {key})
 

@@ -1,12 +1,12 @@
 ## gyro ticket list
 
-Get tickets
+List tickets
 
 ### Synopsis
 
-Get tickets
+List tickets
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/destek-isteme
+List tickets. Support ticket of the calling account. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/destek-isteme).
 
 API: GET /tickets (operationId coreGetTickets, scope Tickets/GetTickets)
 

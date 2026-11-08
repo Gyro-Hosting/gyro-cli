@@ -1,12 +1,12 @@
 ## gyro domain whois apply
 
-Apply whois profile
+Apply whois profile (path: {domain})
 
 ### Synopsis
 
-Apply whois profile
+Apply whois profile (path: {domain})
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/alan-adi-kisileri-ve-gizlilik
+Apply whois profile (path: {domain}). Domain operations run against the registrar module of the domain. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/alan-adi-kisileri-ve-gizlilik).
 
 API: POST /domains/{domain}/whois/apply (operationId coreApplyWhoisProfile, scope Domains/ApplyWhoisProfile)
 
@@ -44,5 +44,5 @@ gyro domain whois apply <DOMAIN> [flags]
 
 ### SEE ALSO
 
-* [gyro domain whois](gyro_domain_whois.md)	 - Get whois contacts
+* [gyro domain whois](gyro_domain_whois.md)	 - Get whois contacts (path: {domain})
 

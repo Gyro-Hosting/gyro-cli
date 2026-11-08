@@ -34,5 +34,5 @@ gyro domain dnssec [flags]
 * [gyro domain](gyro_domain.md)	 - Alan adları: sorgu, kayıt, transfer, ad sunucuları, DNS, WHOIS
 * [gyro domain dnssec create](gyro_domain_dnssec_create.md)	 - İmza Kaydı Ekleme
 * [gyro domain dnssec delete](gyro_domain_dnssec_delete.md)	 - İmza Kaydını Silme
-* [gyro domain dnssec get](gyro_domain_dnssec_get.md)	 - İmza Kayıtlarını Listeleme
+* [gyro domain dnssec list](gyro_domain_dnssec_list.md)	 - İmza Kayıtlarını Listeleme
 

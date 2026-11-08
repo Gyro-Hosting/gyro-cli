@@ -1,12 +1,12 @@
 ## gyro domain child-nameserver create
 
-Create child nameserver
+Create child nameserver (path: {domain})
 
 ### Synopsis
 
-Create child nameserver
+Create child nameserver (path: {domain})
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/ad-sunuculari-ve-kayitlar
+Create child nameserver (path: {domain}). Domain operations run against the registrar module of the domain. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/ad-sunuculari-ve-kayitlar).
 
 API: POST /domains/{domain}/child-nameservers (operationId coreCreateChildNameserver, scope Domains/CreateChildNameserver)
 
@@ -46,5 +46,5 @@ gyro domain child-nameserver create <DOMAIN> [flags]
 
 ### SEE ALSO
 
-* [gyro domain child-nameserver](gyro_domain_child-nameserver.md)	 - Get child nameservers
+* [gyro domain child-nameserver](gyro_domain_child-nameserver.md)	 - Get child nameservers (path: {domain})
 

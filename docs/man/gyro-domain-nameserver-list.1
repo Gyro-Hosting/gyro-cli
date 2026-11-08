@@ -2,7 +2,7 @@
 .TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
 
 .SH NAME
-gyro-domain-nameserver-list - Get nameservers
+gyro-domain-nameserver-list - Get nameservers (path: {domain})
 
 
 .SH SYNOPSIS
@@ -10,10 +10,10 @@ gyro-domain-nameserver-list - Get nameservers
 
 
 .SH DESCRIPTION
-Get nameservers
+Get nameservers (path: {domain})
 
 .PP
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/ad-sunuculari-ve-kayitlar
+Get nameservers (path: {domain}). Domain operations run against the registrar module of the domain. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/ad-sunuculari-ve-kayitlar).
 
 .PP
 API: GET /domains/{domain}/nameservers (operationId coreGetNameservers, scope Domains/GetNameservers)

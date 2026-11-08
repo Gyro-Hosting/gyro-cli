@@ -33,5 +33,6 @@ gyro balance [flags]
 
 * [gyro](gyro.md)	 - Gyro Hosting komut satırı aracı
 * [gyro balance setting](gyro_balance_setting.md)	 - Cüzdan Ayarlarını Değiştirme
+* [gyro balance top-up](gyro_balance_top-up.md)	 - Bakiye yükleme faturası oluştur, ödeme linkini al
 * [gyro balance transaction](gyro_balance_transaction.md)	 - Bakiye hareketleri
 

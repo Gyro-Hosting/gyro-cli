@@ -6,7 +6,7 @@ Send sms
 
 Send sms
 
-**Spends money** (paid from balance or a stored card; prefer the GyroAPI equivalents with confirm + idempotency where available). Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/mesaj-gonderme
+Send sms. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/mesaj-gonderme).
 
 API: POST /sms/send (operationId coreSendSms, scope Sms/SendSms)
 

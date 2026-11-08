@@ -2,7 +2,7 @@
 .TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
 
 .SH NAME
-gyro-domain-email-forward-list - Get email forwards
+gyro-domain-email-forward-list - List email forwards (path: {domain})
 
 
 .SH SYNOPSIS
@@ -10,10 +10,10 @@ gyro-domain-email-forward-list - Get email forwards
 
 
 .SH DESCRIPTION
-Get email forwards
+List email forwards (path: {domain})
 
 .PP
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/yonlendirme-kurma
+List email forwards (path: {domain}). Domain operations run against the registrar module of the domain. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/yonlendirme-kurma).
 
 .PP
 API: GET /domains/{domain}/email-forwards (operationId coreGetEmailForwards, scope Domains/GetEmailForwards)

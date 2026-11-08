@@ -1,12 +1,12 @@
 ## gyro domain whois-profile delete
 
-Delete whois profile
+Delete whois profile (path: {pid})
 
 ### Synopsis
 
-Delete whois profile
+Delete whois profile (path: {pid})
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/alan-adi-kisileri-ve-gizlilik
+Delete whois profile (path: {pid}). Domain operations run against the registrar module of the domain. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/alan-adi-kisileri-ve-gizlilik).
 
 API: DELETE /domains/whois-profiles/{pid} (operationId coreDeleteWhoisProfile, scope Domains/DeleteWhoisProfile)
 
@@ -41,5 +41,5 @@ gyro domain whois-profile delete <PID> [flags]
 
 ### SEE ALSO
 
-* [gyro domain whois-profile](gyro_domain_whois-profile.md)	 - Get whois profiles
+* [gyro domain whois-profile](gyro_domain_whois-profile.md)	 - List whois profiles
 

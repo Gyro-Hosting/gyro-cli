@@ -1,6 +1,6 @@
 ## gyro reference state
 
-Get cities
+List cities (path: {id})
 
 ```
 gyro reference state [flags]
@@ -32,5 +32,5 @@ gyro reference state [flags]
 ### SEE ALSO
 
 * [gyro reference](gyro_reference.md)	 - Countries, states and cities
-* [gyro reference state city](gyro_reference_state_city.md)	 - Get cities
+* [gyro reference state city](gyro_reference_state_city.md)	 - List cities (path: {id})
 

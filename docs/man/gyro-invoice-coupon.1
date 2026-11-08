@@ -2,7 +2,7 @@
 .TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
 
 .SH NAME
-gyro-invoice-coupon - Apply invoice coupon
+gyro-invoice-coupon - Apply invoice coupon (path: {id})
 
 
 .SH SYNOPSIS
@@ -10,10 +10,10 @@ gyro-invoice-coupon - Apply invoice coupon
 
 
 .SH DESCRIPTION
-Apply invoice coupon
+Apply invoice coupon (path: {id})
 
 .PP
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/fatura-odeme-api
+Apply invoice coupon (path: {id}). Invoices of the calling account. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/fatura-odeme-api).
 
 .PP
 API: POST /invoices/{id}/coupon (operationId coreApplyInvoiceCoupon, scope Invoices/ApplyInvoiceCoupon)

@@ -1,12 +1,12 @@
 ## gyro domain email-forward create
 
-Create email forward
+Create email forward (path: {domain})
 
 ### Synopsis
 
-Create email forward
+Create email forward (path: {domain})
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/yonlendirme-kurma
+Create email forward (path: {domain}). Domain operations run against the registrar module of the domain. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/yonlendirme-kurma).
 
 API: POST /domains/{domain}/email-forwards (operationId coreCreateEmailForward, scope Domains/CreateEmailForward)
 
@@ -45,5 +45,5 @@ gyro domain email-forward create <DOMAIN> [flags]
 
 ### SEE ALSO
 
-* [gyro domain email-forward](gyro_domain_email-forward.md)	 - Get email forwards
+* [gyro domain email-forward](gyro_domain_email-forward.md)	 - List email forwards (path: {domain})
 

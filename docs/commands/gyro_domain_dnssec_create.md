@@ -1,12 +1,12 @@
 ## gyro domain dnssec create
 
-Create dnssec record
+Create dnssec record (path: {domain})
 
 ### Synopsis
 
-Create dnssec record
+Create dnssec record (path: {domain})
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/ad-sunuculari-ve-kayitlar
+Create dnssec record (path: {domain}). Domain operations run against the registrar module of the domain. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/ad-sunuculari-ve-kayitlar).
 
 API: POST /domains/{domain}/dnssec (operationId coreCreateDnssecRecord, scope Domains/CreateDnssecRecord)
 
@@ -47,5 +47,5 @@ gyro domain dnssec create <DOMAIN> [flags]
 
 ### SEE ALSO
 
-* [gyro domain dnssec](gyro_domain_dnssec.md)	 - Get dnssec records
+* [gyro domain dnssec](gyro_domain_dnssec.md)	 - List dnssec records (path: {domain})
 

@@ -6,7 +6,7 @@ Alan Adı Kaydetme
 
 Alan Adı Kaydetme
 
-**Para harcar.** Yeni bir alan adı sipariş eder ve tahsil eder. — bakiye ya da kayıtlı kart
+**Para harcar / fatura oluşturur.** Para kuralları (AK-40): gövdede `"confirm": true`, `Idempotency-Key` başlığı, yalnız bakiye (kayıtlı kart yok), hesap başına günlük sınır. Yeni bir alan adı sipariş eder ve tahsil eder. — bakiye ya da kayıtlı kart
 
 API: POST /domains/register (operationId coreRegisterDomain, scope Domains/RegisterDomain)
 

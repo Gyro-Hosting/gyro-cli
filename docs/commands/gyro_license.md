@@ -34,6 +34,7 @@ gyro license [flags]
 * [gyro](gyro.md)	 - Gyro Hosting command-line interface
 * [gyro license call](gyro_license_call.md)	 - Call a module method of a service
 * [gyro license change-ip](gyro_license_change-ip.md)	 - Run change_ip on a license
+* [gyro license get](gyro_license_get.md)	 - GET method license_status (LisansAPP)
 * [gyro license list](gyro_license_list.md)	 - List your services of this product line
 * [gyro license status](gyro_license_status.md)	 - Run license_status on a license
 * [gyro license tool](gyro_license_tool.md)	 - Read a tool's data or run one of its actions (see 'tools')

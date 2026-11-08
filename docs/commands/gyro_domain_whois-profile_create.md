@@ -6,7 +6,7 @@ Create whois profile
 
 Create whois profile
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/alan-adi-kisileri-ve-gizlilik
+Create whois profile. Domain operations run against the registrar module of the domain. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/alan-adi-kisileri-ve-gizlilik).
 
 API: POST /domains/whois-profiles (operationId coreCreateWhoisProfile, scope Domains/CreateWhoisProfile)
 
@@ -57,5 +57,5 @@ gyro domain whois-profile create [flags]
 
 ### SEE ALSO
 
-* [gyro domain whois-profile](gyro_domain_whois-profile.md)	 - Get whois profiles
+* [gyro domain whois-profile](gyro_domain_whois-profile.md)	 - List whois profiles
 

@@ -1,12 +1,12 @@
 ## gyro domain child-nameserver list
 
-Get child nameservers
+Get child nameservers (path: {domain})
 
 ### Synopsis
 
-Get child nameservers
+Get child nameservers (path: {domain})
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/ad-sunuculari-ve-kayitlar
+Get child nameservers (path: {domain}). Domain operations run against the registrar module of the domain. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/ad-sunuculari-ve-kayitlar).
 
 API: GET /domains/{domain}/child-nameservers (operationId coreGetChildNameservers, scope Domains/GetChildNameservers)
 
@@ -39,5 +39,5 @@ gyro domain child-nameserver list <DOMAIN> [flags]
 
 ### SEE ALSO
 
-* [gyro domain child-nameserver](gyro_domain_child-nameserver.md)	 - Get child nameservers
+* [gyro domain child-nameserver](gyro_domain_child-nameserver.md)	 - Get child nameservers (path: {domain})
 

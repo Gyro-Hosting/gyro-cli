@@ -34,6 +34,7 @@ gyro license [flags]
 * [gyro](gyro.md)	 - Gyro Hosting komut satırı aracı
 * [gyro license call](gyro_license_call.md)	 - Hizmetin modül metodunu çağır
 * [gyro license change-ip](gyro_license_change-ip.md)	 - Lisansta change_ip çalıştır
+* [gyro license get](gyro_license_get.md)	 - method license_status (LisansAPP)
 * [gyro license list](gyro_license_list.md)	 - Bu ürün hattındaki hizmetlerinizi listele
 * [gyro license status](gyro_license_status.md)	 - Lisansta license_status çalıştır
 * [gyro license tool](gyro_license_tool.md)	 - Bir aracın verisini oku ya da eylemini çalıştır ('tools' ile bakın)

@@ -6,7 +6,7 @@ Check domain
 
 Check domain
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/alan-adi-edinme
+Check domain. Domain operations run against the registrar module of the domain. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/alan-adi-edinme).
 
 API: POST /domains/check (operationId coreCheckDomain, scope Domains/CheckDomain)
 

@@ -1,12 +1,12 @@
 ## gyro service password
 
-Change service password
+Change service password (path: {id})
 
 ### Synopsis
 
-Change service password
+Change service password (path: {id})
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/hizmetin-icine-erisim
+Change service password (path: {id}). Service of the calling account (any product line). Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/hizmetin-icine-erisim).
 
 API: POST /services/{id}/password (operationId coreChangeServicePassword, scope Services/ChangeServicePassword)
 

@@ -1,12 +1,12 @@
 ## gyro ticket access-group list
 
-Get ticket access groups
+List ticket access groups
 
 ### Synopsis
 
-Get ticket access groups
+List ticket access groups
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/destek-isteme
+List ticket access groups. Support ticket of the calling account. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/destek-isteme).
 
 API: GET /tickets/access-groups (operationId coreGetTicketAccessGroups, scope Tickets/GetTicketAccessGroups)
 
@@ -39,5 +39,5 @@ gyro ticket access-group list [flags]
 
 ### SEE ALSO
 
-* [gyro ticket access-group](gyro_ticket_access-group.md)	 - Get ticket access groups
+* [gyro ticket access-group](gyro_ticket_access-group.md)	 - List ticket access groups
 

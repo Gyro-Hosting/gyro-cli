@@ -1,12 +1,12 @@
 ## gyro domain whois-profile list
 
-Get whois profiles
+List whois profiles
 
 ### Synopsis
 
-Get whois profiles
+List whois profiles
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/alan-adi-kisileri-ve-gizlilik
+List whois profiles. Domain operations run against the registrar module of the domain. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/alan-adi-kisileri-ve-gizlilik).
 
 API: GET /domains/whois-profiles (operationId coreGetWhoisProfiles, scope Domains/GetWhoisProfiles)
 
@@ -39,5 +39,5 @@ gyro domain whois-profile list [flags]
 
 ### SEE ALSO
 
-* [gyro domain whois-profile](gyro_domain_whois-profile.md)	 - Get whois profiles
+* [gyro domain whois-profile](gyro_domain_whois-profile.md)	 - List whois profiles
 

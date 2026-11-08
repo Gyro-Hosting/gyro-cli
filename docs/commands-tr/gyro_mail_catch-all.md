@@ -35,5 +35,6 @@ gyro mail catch-all [flags]
 * [gyro mail catch-all create](gyro_mail_catch-all_create.md)	 - create (alanlar --set anahtar=değer)
 * [gyro mail catch-all delete](gyro_mail_catch-all_delete.md)	 - delete (alanlar --set anahtar=değer)
 * [gyro mail catch-all list](gyro_mail_catch-all_list.md)	 - Göster
+* [gyro mail catch-all set](gyro_mail_catch-all_set.md)	 - catch-all:edit (GyroMail)
 * [gyro mail catch-all update](gyro_mail_catch-all_update.md)	 - update (alanlar --set anahtar=değer)
 

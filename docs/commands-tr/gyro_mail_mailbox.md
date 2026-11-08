@@ -35,5 +35,6 @@ gyro mail mailbox [flags]
 * [gyro mail mailbox create](gyro_mail_mailbox_create.md)	 - create (alanlar --set anahtar=değer)
 * [gyro mail mailbox delete](gyro_mail_mailbox_delete.md)	 - delete (alanlar --set anahtar=değer)
 * [gyro mail mailbox list](gyro_mail_mailbox_list.md)	 - Göster
+* [gyro mail mailbox password](gyro_mail_mailbox_password.md)	 - mailboxes:password (GyroMail)
 * [gyro mail mailbox update](gyro_mail_mailbox_update.md)	 - update (alanlar --set anahtar=değer)
 

@@ -1,6 +1,6 @@
 ## gyro domain child-nameserver
 
-Get child nameservers
+Get child nameservers (path: {domain})
 
 ```
 gyro domain child-nameserver [flags]
@@ -32,7 +32,7 @@ gyro domain child-nameserver [flags]
 ### SEE ALSO
 
 * [gyro domain](gyro_domain.md)	 - Domains: search, register, transfer, nameservers, DNS, WHOIS
-* [gyro domain child-nameserver create](gyro_domain_child-nameserver_create.md)	 - Create child nameserver
-* [gyro domain child-nameserver delete](gyro_domain_child-nameserver_delete.md)	 - Delete child nameserver
-* [gyro domain child-nameserver list](gyro_domain_child-nameserver_list.md)	 - Get child nameservers
+* [gyro domain child-nameserver create](gyro_domain_child-nameserver_create.md)	 - Create child nameserver (path: {domain})
+* [gyro domain child-nameserver delete](gyro_domain_child-nameserver_delete.md)	 - Delete child nameserver (path: {domain})
+* [gyro domain child-nameserver list](gyro_domain_child-nameserver_list.md)	 - Get child nameservers (path: {domain})
 

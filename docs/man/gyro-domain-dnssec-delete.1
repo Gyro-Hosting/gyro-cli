@@ -2,7 +2,7 @@
 .TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
 
 .SH NAME
-gyro-domain-dnssec-delete - Delete dnssec record
+gyro-domain-dnssec-delete - Delete dnssec record (path: {domain})
 
 
 .SH SYNOPSIS
@@ -10,10 +10,10 @@ gyro-domain-dnssec-delete - Delete dnssec record
 
 
 .SH DESCRIPTION
-Delete dnssec record
+Delete dnssec record (path: {domain})
 
 .PP
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/ad-sunuculari-ve-kayitlar
+Delete dnssec record (path: {domain}). Domain operations run against the registrar module of the domain. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/ad-sunuculari-ve-kayitlar).
 
 .PP
 API: DELETE /domains/{domain}/dnssec (operationId coreDeleteDnssecRecord, scope Domains/DeleteDnssecRecord)

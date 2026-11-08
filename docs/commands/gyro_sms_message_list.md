@@ -1,12 +1,12 @@
 ## gyro sms message list
 
-Get sms messages
+List sms messages
 
 ### Synopsis
 
-Get sms messages
+List sms messages
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/mesaj-gonderme
+List sms messages. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/mesaj-gonderme).
 
 API: GET /sms/messages (operationId coreGetSmsMessages, scope Sms/GetSmsMessages)
 
@@ -42,5 +42,5 @@ gyro sms message list [flags]
 
 ### SEE ALSO
 
-* [gyro sms message](gyro_sms_message.md)	 - Get sms messages
+* [gyro sms message](gyro_sms_message.md)	 - List sms messages
 

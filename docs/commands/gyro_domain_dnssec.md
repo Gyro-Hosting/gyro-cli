@@ -1,6 +1,6 @@
 ## gyro domain dnssec
 
-Get dnssec records
+List dnssec records (path: {domain})
 
 ```
 gyro domain dnssec [flags]
@@ -32,7 +32,7 @@ gyro domain dnssec [flags]
 ### SEE ALSO
 
 * [gyro domain](gyro_domain.md)	 - Domains: search, register, transfer, nameservers, DNS, WHOIS
-* [gyro domain dnssec create](gyro_domain_dnssec_create.md)	 - Create dnssec record
-* [gyro domain dnssec delete](gyro_domain_dnssec_delete.md)	 - Delete dnssec record
-* [gyro domain dnssec get](gyro_domain_dnssec_get.md)	 - Get dnssec records
+* [gyro domain dnssec create](gyro_domain_dnssec_create.md)	 - Create dnssec record (path: {domain})
+* [gyro domain dnssec delete](gyro_domain_dnssec_delete.md)	 - Delete dnssec record (path: {domain})
+* [gyro domain dnssec list](gyro_domain_dnssec_list.md)	 - List dnssec records (path: {domain})
 

@@ -1,12 +1,12 @@
 ## gyro address delete
 
-Delete address
+Delete address (path: {id})
 
 ### Synopsis
 
-Delete address
+Delete address (path: {id})
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/adres-defteri
+Delete address (path: {id}). Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/adres-defteri).
 
 API: DELETE /addresses/{id} (operationId coreDeleteAddress, scope Addresses/DeleteAddress)
 

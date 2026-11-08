@@ -1,12 +1,12 @@
 ## gyro domain forwarding get
 
-Get url forwarding
+Get url forwarding (path: {domain})
 
 ### Synopsis
 
-Get url forwarding
+Get url forwarding (path: {domain})
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/yonlendirme-kurma
+Get url forwarding (path: {domain}). Domain operations run against the registrar module of the domain. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/yonlendirme-kurma).
 
 API: GET /domains/{domain}/forwarding (operationId coreGetUrlForwarding, scope Domains/GetUrlForwarding)
 
@@ -39,5 +39,5 @@ gyro domain forwarding get <DOMAIN> [flags]
 
 ### SEE ALSO
 
-* [gyro domain forwarding](gyro_domain_forwarding.md)	 - Get url forwarding
+* [gyro domain forwarding](gyro_domain_forwarding.md)	 - Get url forwarding (path: {domain})
 

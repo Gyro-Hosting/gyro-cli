@@ -1,12 +1,12 @@
 ## gyro address list
 
-Get addresses
+List addresses
 
 ### Synopsis
 
-Get addresses
+List addresses
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/adres-defteri
+List addresses. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/adres-defteri).
 
 API: GET /addresses (operationId coreGetAddresses, scope Addresses/GetAddresses)
 

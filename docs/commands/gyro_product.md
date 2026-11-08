@@ -32,7 +32,7 @@ gyro product [flags]
 ### SEE ALSO
 
 * [gyro](gyro.md)	 - Gyro Hosting command-line interface
-* [gyro product category](gyro_product_category.md)	 - Get product categories
-* [gyro product get](gyro_product_get.md)	 - Get product
-* [gyro product list](gyro_product_list.md)	 - Get products
+* [gyro product category](gyro_product_category.md)	 - List product categories
+* [gyro product get](gyro_product_get.md)	 - Get product (path: {id})
+* [gyro product list](gyro_product_list.md)	 - List products
 

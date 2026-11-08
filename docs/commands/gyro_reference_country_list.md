@@ -1,12 +1,12 @@
 ## gyro reference country list
 
-Get countries
+List countries
 
 ### Synopsis
 
-Get countries
+List countries
 
-Core WISECP client endpoint. Reference:
+List countries. Core WISECP client endpoint (Turkish reference: ).
 
 API: GET /reference/countries (operationId coreGetCountries, scope Reference/GetCountries)
 
@@ -39,5 +39,5 @@ gyro reference country list [flags]
 
 ### SEE ALSO
 
-* [gyro reference country](gyro_reference_country.md)	 - Get countries
+* [gyro reference country](gyro_reference_country.md)	 - List countries
 

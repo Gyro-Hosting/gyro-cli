@@ -1,6 +1,6 @@
 ## gyro domain transfer-status
 
-Get transfer status
+Get transfer status (path: {domain})
 
 ```
 gyro domain transfer-status [flags]
@@ -32,5 +32,5 @@ gyro domain transfer-status [flags]
 ### SEE ALSO
 
 * [gyro domain](gyro_domain.md)	 - Domains: search, register, transfer, nameservers, DNS, WHOIS
-* [gyro domain transfer-status get](gyro_domain_transfer-status_get.md)	 - Get transfer status
+* [gyro domain transfer-status get](gyro_domain_transfer-status_get.md)	 - Get transfer status (path: {domain})
 

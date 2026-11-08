@@ -1,12 +1,12 @@
 ## gyro invoice coupon
 
-Apply invoice coupon
+Apply invoice coupon (path: {id})
 
 ### Synopsis
 
-Apply invoice coupon
+Apply invoice coupon (path: {id})
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/fatura-odeme-api
+Apply invoice coupon (path: {id}). Invoices of the calling account. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/fatura-odeme-api).
 
 API: POST /invoices/{id}/coupon (operationId coreApplyInvoiceCoupon, scope Invoices/ApplyInvoiceCoupon)
 

@@ -1,6 +1,6 @@
 ## gyro domain tld
 
-Get tlds
+List tlds
 
 ```
 gyro domain tld [flags]
@@ -32,5 +32,5 @@ gyro domain tld [flags]
 ### SEE ALSO
 
 * [gyro domain](gyro_domain.md)	 - Domains: search, register, transfer, nameservers, DNS, WHOIS
-* [gyro domain tld list](gyro_domain_tld_list.md)	 - Get tlds
+* [gyro domain tld list](gyro_domain_tld_list.md)	 - List tlds
 

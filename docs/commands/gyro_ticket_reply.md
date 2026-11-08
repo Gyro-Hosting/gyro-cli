@@ -1,12 +1,12 @@
 ## gyro ticket reply
 
-Reply ticket
+Reply ticket (path: {id})
 
 ### Synopsis
 
-Reply ticket
+Reply ticket (path: {id})
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/destek-isteme
+Reply ticket (path: {id}). Support ticket of the calling account. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/destek-isteme).
 
 API: POST /tickets/{id}/reply (operationId coreReplyTicket, scope Tickets/ReplyTicket)
 
@@ -48,5 +48,5 @@ gyro ticket reply <ID> [flags]
 ### SEE ALSO
 
 * [gyro ticket](gyro_ticket.md)	 - Support tickets
-* [gyro ticket reply rating](gyro_ticket_reply_rating.md)	 - Rate ticket reply
+* [gyro ticket reply rating](gyro_ticket_reply_rating.md)	 - Rate ticket reply (path: {id}, {rid})
 

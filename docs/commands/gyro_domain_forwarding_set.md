@@ -1,12 +1,12 @@
 ## gyro domain forwarding set
 
-Update url forwarding
+Update url forwarding (path: {domain})
 
 ### Synopsis
 
-Update url forwarding
+Update url forwarding (path: {domain})
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/yonlendirme-kurma
+Update url forwarding (path: {domain}). Domain operations run against the registrar module of the domain. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/yonlendirme-kurma).
 
 API: PUT /domains/{domain}/forwarding (operationId coreUpdateUrlForwarding, scope Domains/UpdateUrlForwarding)
 
@@ -45,5 +45,5 @@ gyro domain forwarding set <DOMAIN> [flags]
 
 ### SEE ALSO
 
-* [gyro domain forwarding](gyro_domain_forwarding.md)	 - Get url forwarding
+* [gyro domain forwarding](gyro_domain_forwarding.md)	 - Get url forwarding (path: {domain})
 

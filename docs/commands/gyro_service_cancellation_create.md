@@ -1,12 +1,12 @@
 ## gyro service cancellation create
 
-Create cancellation
+Create cancellation (path: {id})
 
 ### Synopsis
 
-Create cancellation
+Create cancellation (path: {id})
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/sahip-olunan-hizmetler
+Create cancellation (path: {id}). Service of the calling account (any product line). Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/sahip-olunan-hizmetler).
 
 API: POST /services/{id}/cancellation (operationId coreCreateCancellation, scope Services/CreateCancellation)
 
@@ -47,5 +47,5 @@ gyro service cancellation create <ID> [flags]
 
 ### SEE ALSO
 
-* [gyro service cancellation](gyro_service_cancellation.md)	 - Create cancellation
+* [gyro service cancellation](gyro_service_cancellation.md)	 - Create cancellation (path: {id})
 

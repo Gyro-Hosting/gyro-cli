@@ -32,7 +32,7 @@ gyro affiliate [flags]
 ### SEE ALSO
 
 * [gyro](gyro.md)	 - Gyro Hosting command-line interface
-* [gyro affiliate commission](gyro_affiliate_commission.md)	 - Get affiliate commissions
+* [gyro affiliate commission](gyro_affiliate_commission.md)	 - List affiliate commissions
 * [gyro affiliate enroll](gyro_affiliate_enroll.md)	 - Enroll affiliate
 * [gyro affiliate get](gyro_affiliate_get.md)	 - Get affiliate
 * [gyro affiliate payment-method](gyro_affiliate_payment-method.md)	 - Save affiliate payout method

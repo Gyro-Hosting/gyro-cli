@@ -33,9 +33,9 @@ gyro address [flags]
 
 * [gyro](gyro.md)	 - Gyro Hosting command-line interface
 * [gyro address create](gyro_address_create.md)	 - Create address
-* [gyro address default](gyro_address_default.md)	 - Set default address
-* [gyro address delete](gyro_address_delete.md)	 - Delete address
-* [gyro address get](gyro_address_get.md)	 - Get address
-* [gyro address list](gyro_address_list.md)	 - Get addresses
-* [gyro address set](gyro_address_set.md)	 - Update address
+* [gyro address default](gyro_address_default.md)	 - Set default address (path: {id})
+* [gyro address delete](gyro_address_delete.md)	 - Delete address (path: {id})
+* [gyro address get](gyro_address_get.md)	 - Get address (path: {id})
+* [gyro address list](gyro_address_list.md)	 - List addresses
+* [gyro address set](gyro_address_set.md)	 - Update address (path: {id})
 

@@ -35,5 +35,6 @@ gyro s3 key [flags]
 * [gyro s3 key create](gyro_s3_key_create.md)	 - create (alanlar --set anahtar=değer)
 * [gyro s3 key delete](gyro_s3_key_delete.md)	 - delete (alanlar --set anahtar=değer)
 * [gyro s3 key list](gyro_s3_key_list.md)	 - Göster
+* [gyro s3 key rotate](gyro_s3_key_rotate.md)	 - access-keys:rotate (GyroDepolama)
 * [gyro s3 key update](gyro_s3_key_update.md)	 - update (alanlar --set anahtar=değer)
 

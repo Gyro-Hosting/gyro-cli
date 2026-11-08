@@ -6,7 +6,7 @@ Create address
 
 Create address
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/adres-defteri
+Create address. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/adres-defteri).
 
 API: POST /addresses (operationId coreCreateAddress, scope Addresses/CreateAddress)
 

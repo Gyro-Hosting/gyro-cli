@@ -6,7 +6,7 @@ Get cities
 
 Get cities
 
-Core WISECP client endpoint. Reference:
+List cities (path: {id}). Core WISECP client endpoint (Turkish reference: ).
 
 API: GET /reference/states/{id}/cities (operationId coreGetCities, scope Reference/GetCities)
 

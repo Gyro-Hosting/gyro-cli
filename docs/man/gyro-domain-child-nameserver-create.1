@@ -2,7 +2,7 @@
 .TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
 
 .SH NAME
-gyro-domain-child-nameserver-create - Create child nameserver
+gyro-domain-child-nameserver-create - Create child nameserver (path: {domain})
 
 
 .SH SYNOPSIS
@@ -10,10 +10,10 @@ gyro-domain-child-nameserver-create - Create child nameserver
 
 
 .SH DESCRIPTION
-Create child nameserver
+Create child nameserver (path: {domain})
 
 .PP
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/ad-sunuculari-ve-kayitlar
+Create child nameserver (path: {domain}). Domain operations run against the registrar module of the domain. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/ad-sunuculari-ve-kayitlar).
 
 .PP
 API: POST /domains/{domain}/child-nameservers (operationId coreCreateChildNameserver, scope Domains/CreateChildNameserver)

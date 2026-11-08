@@ -1,12 +1,12 @@
 ## gyro domain transfer-lock set
 
-Update transfer lock
+Update transfer lock (path: {domain})
 
 ### Synopsis
 
-Update transfer lock
+Update transfer lock (path: {domain})
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/alan-adi-edinme
+Update transfer lock (path: {domain}). Domain operations run against the registrar module of the domain. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/alan-adi-edinme).
 
 API: PUT /domains/{domain}/transfer-lock (operationId coreUpdateTransferLock, scope Domains/UpdateTransferLock)
 
@@ -44,5 +44,5 @@ gyro domain transfer-lock set <DOMAIN> [flags]
 
 ### SEE ALSO
 
-* [gyro domain transfer-lock](gyro_domain_transfer-lock.md)	 - Get transfer lock
+* [gyro domain transfer-lock](gyro_domain_transfer-lock.md)	 - Get transfer lock (path: {domain})
 

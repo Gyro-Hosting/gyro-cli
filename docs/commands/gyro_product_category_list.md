@@ -1,12 +1,12 @@
 ## gyro product category list
 
-Get product categories
+List product categories
 
 ### Synopsis
 
-Get product categories
+List product categories
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/satistaki-urunler
+List product categories. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/satistaki-urunler).
 
 API: GET /products/categories (operationId coreGetProductCategories, scope Products/GetProductCategories)
 
@@ -40,5 +40,5 @@ gyro product category list [flags]
 
 ### SEE ALSO
 
-* [gyro product category](gyro_product_category.md)	 - Get product categories
+* [gyro product category](gyro_product_category.md)	 - List product categories
 

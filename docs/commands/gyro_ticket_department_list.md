@@ -1,12 +1,12 @@
 ## gyro ticket department list
 
-Get ticket departments
+List ticket departments
 
 ### Synopsis
 
-Get ticket departments
+List ticket departments
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/destek-isteme
+List ticket departments. Support ticket of the calling account. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/destek-isteme).
 
 API: GET /tickets/departments (operationId coreGetTicketDepartments, scope Tickets/GetTicketDepartments)
 
@@ -39,5 +39,5 @@ gyro ticket department list [flags]
 
 ### SEE ALSO
 
-* [gyro ticket department](gyro_ticket_department.md)	 - Get ticket departments
+* [gyro ticket department](gyro_ticket_department.md)	 - List ticket departments
 

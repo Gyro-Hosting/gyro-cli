@@ -32,14 +32,14 @@ gyro ticket [flags]
 ### SEE ALSO
 
 * [gyro](gyro.md)	 - Gyro Hosting command-line interface
-* [gyro ticket access-group](gyro_ticket_access-group.md)	 - Get ticket access groups
-* [gyro ticket attachment](gyro_ticket_attachment.md)	 - Get ticket attachment
-* [gyro ticket close](gyro_ticket_close.md)	 - Close ticket
+* [gyro ticket access-group](gyro_ticket_access-group.md)	 - List ticket access groups
+* [gyro ticket attachment](gyro_ticket_attachment.md)	 - Get ticket attachment (path: {id}, {aid})
+* [gyro ticket close](gyro_ticket_close.md)	 - Close ticket (path: {id})
 * [gyro ticket create](gyro_ticket_create.md)	 - Create ticket
-* [gyro ticket department](gyro_ticket_department.md)	 - Get ticket departments
-* [gyro ticket get](gyro_ticket_get.md)	 - Get ticket
-* [gyro ticket list](gyro_ticket_list.md)	 - Get tickets
-* [gyro ticket rating](gyro_ticket_rating.md)	 - Rate ticket
-* [gyro ticket reopen](gyro_ticket_reopen.md)	 - Reopen ticket
-* [gyro ticket reply](gyro_ticket_reply.md)	 - Reply ticket
+* [gyro ticket department](gyro_ticket_department.md)	 - List ticket departments
+* [gyro ticket get](gyro_ticket_get.md)	 - Get ticket (path: {id})
+* [gyro ticket list](gyro_ticket_list.md)	 - List tickets
+* [gyro ticket rating](gyro_ticket_rating.md)	 - Rate ticket (path: {id})
+* [gyro ticket reopen](gyro_ticket_reopen.md)	 - Reopen ticket (path: {id})
+* [gyro ticket reply](gyro_ticket_reply.md)	 - Reply ticket (path: {id})
 

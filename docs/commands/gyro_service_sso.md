@@ -1,12 +1,12 @@
 ## gyro service sso
 
-Get service sso
+Get service sso (path: {id})
 
 ### Synopsis
 
-Get service sso
+Get service sso (path: {id})
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/hizmetin-icine-erisim
+Get service sso (path: {id}). Service of the calling account (any product line). Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/hizmetin-icine-erisim).
 
 API: POST /services/{id}/sso (operationId coreGetServiceSso, scope Services/GetServiceSso)
 

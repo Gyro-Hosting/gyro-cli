@@ -6,7 +6,7 @@ Update notifications
 
 Update notifications
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/anahtarin-hesabi
+Update notifications. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/anahtarin-hesabi).
 
 API: PUT /me/notifications (operationId coreUpdateNotifications, scope Account/UpdateNotifications)
 

@@ -1,12 +1,12 @@
 ## gyro domain email-forward delete
 
-Delete email forward
+Delete email forward (path: {domain})
 
 ### Synopsis
 
-Delete email forward
+Delete email forward (path: {domain})
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/yonlendirme-kurma
+Delete email forward (path: {domain}). Domain operations run against the registrar module of the domain. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/yonlendirme-kurma).
 
 API: DELETE /domains/{domain}/email-forwards (operationId coreDeleteEmailForward, scope Domains/DeleteEmailForward)
 
@@ -41,5 +41,5 @@ gyro domain email-forward delete <DOMAIN> [flags]
 
 ### SEE ALSO
 
-* [gyro domain email-forward](gyro_domain_email-forward.md)	 - Get email forwards
+* [gyro domain email-forward](gyro_domain_email-forward.md)	 - List email forwards (path: {domain})
 

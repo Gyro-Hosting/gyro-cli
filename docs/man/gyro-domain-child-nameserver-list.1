@@ -2,7 +2,7 @@
 .TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
 
 .SH NAME
-gyro-domain-child-nameserver-list - Get child nameservers
+gyro-domain-child-nameserver-list - Get child nameservers (path: {domain})
 
 
 .SH SYNOPSIS
@@ -10,10 +10,10 @@ gyro-domain-child-nameserver-list - Get child nameservers
 
 
 .SH DESCRIPTION
-Get child nameservers
+Get child nameservers (path: {domain})
 
 .PP
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/ad-sunuculari-ve-kayitlar
+Get child nameservers (path: {domain}). Domain operations run against the registrar module of the domain. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/ad-sunuculari-ve-kayitlar).
 
 .PP
 API: GET /domains/{domain}/child-nameservers (operationId coreGetChildNameservers, scope Domains/GetChildNameservers)

@@ -1,12 +1,12 @@
 ## gyro domain child-nameserver delete
 
-Delete child nameserver
+Delete child nameserver (path: {domain})
 
 ### Synopsis
 
-Delete child nameserver
+Delete child nameserver (path: {domain})
 
-Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/ad-sunuculari-ve-kayitlar
+Delete child nameserver (path: {domain}). Domain operations run against the registrar module of the domain. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/ad-sunuculari-ve-kayitlar).
 
 API: DELETE /domains/{domain}/child-nameservers (operationId coreDeleteChildNameserver, scope Domains/DeleteChildNameserver)
 
@@ -41,5 +41,5 @@ gyro domain child-nameserver delete <DOMAIN> [flags]
 
 ### SEE ALSO
 
-* [gyro domain child-nameserver](gyro_domain_child-nameserver.md)	 - Get child nameservers
+* [gyro domain child-nameserver](gyro_domain_child-nameserver.md)	 - Get child nameservers (path: {domain})
 
