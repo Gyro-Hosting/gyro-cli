@@ -6,7 +6,7 @@ List states (path: {code})
 
 List states (path: {code})
 
-List states (path: {code}). Core WISECP client endpoint (Turkish reference: ).
+List states (path: {code}). Core WISECP client endpoint.
 
 API: GET /reference/countries/{code}/states (operationId coreGetStates, scope Reference/GetStates)
 

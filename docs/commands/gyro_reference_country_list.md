@@ -6,7 +6,7 @@ List countries
 
 List countries
 
-List countries. Core WISECP client endpoint (Turkish reference: ).
+List countries. Core WISECP client endpoint.
 
 API: GET /reference/countries (operationId coreGetCountries, scope Reference/GetCountries)
 

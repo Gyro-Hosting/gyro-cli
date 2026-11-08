@@ -4773,7 +4773,7 @@ paths:
       x-summary-tr: Ping
       x-scope: System/Ping
       x-generated: core-catalog
-      description: "Ping. \n\nCore WISECP client endpoint (Turkish reference: )."
+      description: "Ping. \n\nCore WISECP client endpoint."
       x-description-tr: ''
       responses:
         '200':
@@ -4799,7 +4799,7 @@ paths:
       x-summary-tr: Get countries
       x-scope: Reference/GetCountries
       x-generated: core-catalog
-      description: "List countries. \n\nCore WISECP client endpoint (Turkish reference: )."
+      description: "List countries. \n\nCore WISECP client endpoint."
       x-description-tr: ''
       responses:
         '200':
@@ -4827,7 +4827,7 @@ paths:
       x-summary-tr: Get states
       x-scope: Reference/GetStates
       x-generated: core-catalog
-      description: "List states (path: {code}). \n\nCore WISECP client endpoint (Turkish reference: )."
+      description: "List states (path: {code}). \n\nCore WISECP client endpoint."
       x-description-tr: ''
       responses:
         '200':
@@ -4861,7 +4861,7 @@ paths:
       x-summary-tr: Get cities
       x-scope: Reference/GetCities
       x-generated: core-catalog
-      description: "List cities (path: {id}). \n\nCore WISECP client endpoint (Turkish reference: )."
+      description: "List cities (path: {id}). \n\nCore WISECP client endpoint."
       x-description-tr: ''
       responses:
         '200':
