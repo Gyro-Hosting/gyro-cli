@@ -1,0 +1,2 @@
+# Keep LF everywhere (golden test files compare byte for byte, also on Windows)
+* text=auto eol=lf
