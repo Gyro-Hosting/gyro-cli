@@ -1,0 +1,99 @@
+# Keeps the CLI in step with the Gyro Public API.
+# Downloads the published OpenAPI document (SPEC_URL: repository secret or variable), and when it differs from
+# internal/spec/openapi.yaml: regenerates the command table and docs, runs the tests, commits, tags and releases.
+#   new / removed operations -> minor version, description-only changes -> patch version.
+# If anything fails, an issue labelled "spec-sync" is opened (or commented) instead of a release.
+# Triggers: every 6 hours, manually, and repository_dispatch "spec-updated" (sent by the API build).
+name: spec-sync
+on:
+  schedule:
+    - cron: '23 */6 * * *'
+  workflow_dispatch:
+  repository_dispatch:
+    types: [spec-updated]
+permissions:
+  contents: write
+  packages: write
+  issues: write
+concurrency:
+  group: spec-sync
+  cancel-in-progress: false
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.bump.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-go@v5
+        with: {go-version-file: go.mod, cache: true}
+      - name: Download spec
+        id: dl
+        env:
+          SPEC_URL: ${{ secrets.SPEC_URL || vars.SPEC_URL }}
+        run: |
+          test -n "$SPEC_URL" || { echo "::error::SPEC_URL is not set"; exit 1; }
+          curl -fsSL --retry 3 --max-time 60 -o "$RUNNER_TEMP/openapi.yaml" "$SPEC_URL"
+          grep -q '^openapi: 3' "$RUNNER_TEMP/openapi.yaml" || { echo "::error::not an OpenAPI 3 document"; exit 1; }
+          if cmp -s "$RUNNER_TEMP/openapi.yaml" internal/spec/openapi.yaml; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"; echo "spec unchanged"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"; echo "spec changed"
+          fi
+      - name: Sync, generate, test
+        if: steps.dl.outputs.changed == 'true'
+        run: |
+          grep -o 'operationId: .*' internal/spec/openapi.yaml | sort > "$RUNNER_TEMP/old-ops"
+          sh scripts/sync-spec.sh "$RUNNER_TEMP/openapi.yaml"
+          grep -o 'operationId: .*' internal/spec/openapi.yaml | sort > "$RUNNER_TEMP/new-ops"
+          go generate ./...
+          go vet ./...
+          go test ./...
+          go run ./cmd/gyro gen-docs --dir docs/commands
+          GYRO_LANG=tr go run ./cmd/gyro gen-docs --dir docs/commands-tr
+          go run ./cmd/gyro gen-docs --dir docs/man --format man
+          python3 scripts/docs-site.py
+      - name: Commit and tag
+        id: bump
+        if: steps.dl.outputs.changed == 'true'
+        run: |
+          last=$(git describe --tags --abbrev=0 --match 'v[0-9]*')
+          IFS=. read -r MA MI PA <<< "${last#v}"
+          added=$(comm -13 "$RUNNER_TEMP/old-ops" "$RUNNER_TEMP/new-ops" | wc -l)
+          removed=$(comm -23 "$RUNNER_TEMP/old-ops" "$RUNNER_TEMP/new-ops" | wc -l)
+          if [ "$added" -gt 0 ] || [ "$removed" -gt 0 ]; then MI=$((MI+1)); PA=0; else PA=$((PA+1)); fi
+          tag="v$MA.$MI.$PA"
+          ver=$(grep -m1 '^  version:' internal/spec/openapi.yaml | awk '{print $2}')
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "spec-sync: Gyro Public API $ver (+$added / -$removed operations)"
+          git tag "$tag"
+          git push origin HEAD:main "$tag"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "### $tag — API $ver, +$added / -$removed operations" >> "$GITHUB_STEP_SUMMARY"
+  release:
+    needs: sync
+    if: needs.sync.outputs.tag != ''
+    uses: ./.github/workflows/release.yml
+    with:
+      tag: ${{ needs.sync.outputs.tag }}
+      publish: true
+    secrets: inherit
+  report-failure:
+    needs: [sync, release]
+    if: ${{ always() && (needs.sync.result == 'failure' || needs.release.result == 'failure') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Open or update issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          STAGE: ${{ needs.sync.result == 'failure' && 'sync / tests' || 'release' }}
+        run: |
+          gh label create spec-sync --color D93F0B --description "Automatic API spec sync" --force >/dev/null
+          body="spec-sync failed at **$STAGE**. Nothing was released. Run: $RUN"
+          n=$(gh issue list --label spec-sync --state open --json number -q '.[0].number')
+          if [ -n "$n" ]; then gh issue comment "$n" --body "$body"; else gh issue create --title "spec-sync failed ($STAGE)" --label spec-sync --body "$body"; fi

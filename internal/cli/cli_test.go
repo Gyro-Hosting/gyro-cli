@@ -10,6 +10,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"sync"
 	"testing"
@@ -529,7 +530,7 @@ func TestConfigureAndContext(t *testing.T) {
 		t.Fatalf("configure: %d %s", r.code, r.err)
 	}
 	st, err := os.Stat(os.Getenv("GYRO_CONFIG_FILE"))
-	if err != nil || st.Mode().Perm() != 0o600 {
+	if err != nil || (runtime.GOOS != "windows" && st.Mode().Perm() != 0o600) { // Windows has no POSIX modes
 		t.Fatalf("config perms: %v %v", err, st.Mode())
 	}
 	b, _ := os.ReadFile(os.Getenv("GYRO_CONFIG_FILE"))
@@ -552,6 +553,9 @@ func TestConfigureAndContext(t *testing.T) {
 }
 
 func TestSSHHelper(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("argv uses ssh.exe on Windows")
+	}
 	setup(t)
 	_, srv := newMock(t)
 	r := run(t, srv, nil, "", false, "server", "ssh", "web-1", "-i", "/k/id", "--", "uptime")

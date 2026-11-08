@@ -4,9 +4,15 @@
 #   SCOOP_BUCKET_TOKEN            - fine-grained PAT with write access to Gyro-Hosting/scoop-bucket (optional)
 # GHCR uses the built-in GITHUB_TOKEN (packages: write).
 name: release
+# Also called by spec-sync.yml (workflow_call) for automatic releases; pushes made with GITHUB_TOKEN
+# do not trigger workflows, so spec-sync calls this workflow directly and asks it to publish (not draft).
 on:
   push:
     tags: ['v*']
+  workflow_call:
+    inputs:
+      tag: {type: string, required: true}
+      publish: {type: boolean, default: false}
 permissions:
   contents: write
   packages: write
@@ -15,7 +21,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with: {fetch-depth: 0}
+        with:
+          fetch-depth: 0
+          ref: ${{ inputs.tag || github.ref }}
       - uses: actions/setup-go@v5
         with: {go-version-file: go.mod, cache: true}
       - uses: docker/setup-qemu-action@v3
@@ -37,3 +45,9 @@ jobs:
           GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
           HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
           SCOOP_BUCKET_TOKEN: ${{ secrets.SCOOP_BUCKET_TOKEN }}
+      - name: Publish release (automatic spec-sync releases only)
+        if: ${{ inputs.publish }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ inputs.tag }}
+        run: gh release edit "$TAG" --draft=false --latest

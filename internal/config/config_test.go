@@ -3,6 +3,7 @@ package config
 import (
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 )
 
@@ -23,7 +24,7 @@ func TestRoundTripAndPrecedence(t *testing.T) {
 		t.Fatal(err)
 	}
 	st, _ := os.Stat(p)
-	if st.Mode().Perm() != 0o600 {
+	if runtime.GOOS != "windows" && st.Mode().Perm() != 0o600 { // Windows has no POSIX modes
 		t.Fatalf("perm %v", st.Mode())
 	}
 	g, err := Load()
