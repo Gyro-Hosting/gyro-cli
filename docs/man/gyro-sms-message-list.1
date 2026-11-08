@@ -1,0 +1,89 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-sms-message-list - Get sms messages
+
+
+.SH SYNOPSIS
+\fBgyro sms message list [flags]\fP
+
+
+.SH DESCRIPTION
+Get sms messages
+
+.PP
+Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/mesaj-gonderme
+
+.PP
+API: GET /sms/messages (operationId coreGetSmsMessages, scope Sms/GetSmsMessages)
+
+
+.SH OPTIONS
+\fB--all\fP[=false]
+	fetch every page
+
+.PP
+\fB-h\fP, \fB--help\fP[=false]
+	help for list
+
+.PP
+\fB--limit\fP=0
+	items per page (max 100)
+
+.PP
+\fB--page\fP=1
+	page number
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH SEE ALSO
+\fBgyro-sms-message(1)\fP

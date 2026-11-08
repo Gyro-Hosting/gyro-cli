@@ -1,0 +1,39 @@
+## gyro dedicated
+
+Dedicated servers
+
+```
+gyro dedicated [flags]
+```
+
+### Options
+
+```
+  -h, --help   help for dedicated
+```
+
+### Options inherited from parent commands
+
+```
+      --api-url string     API base URL (env GYRO_API_URL)
+      --debug              log HTTP requests to stderr (secrets masked)
+      --lang string        message language: tr or en (default from locale)
+      --no-color           disable colours (also NO_COLOR)
+      --no-header          omit the table header
+  -o, --output string      output format: table, json, yaml, text
+  -p, --profile string     profile to use (env GYRO_PROFILE)
+      --query string       JMESPath query applied to the result
+  -q, --quiet              print only ids
+      --timeout duration   overall timeout, e.g. 30s, 10m
+      --wide               show all table columns
+  -y, --yes                do not ask for confirmation
+```
+
+### SEE ALSO
+
+* [gyro](gyro.md)	 - Gyro Hosting command-line interface
+* [gyro dedicated call](gyro_dedicated_call.md)	 - Call a module method of a service
+* [gyro dedicated list](gyro_dedicated_list.md)	 - List your services of this product line
+* [gyro dedicated tool](gyro_dedicated_tool.md)	 - Read a tool's data or run one of its actions (see 'tools')
+* [gyro dedicated tools](gyro_dedicated_tools.md)	 - Show the tools, actions and safety policy of a service
+

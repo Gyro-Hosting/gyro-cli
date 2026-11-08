@@ -1,0 +1,129 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-ticket-create - Create ticket
+
+
+.SH SYNOPSIS
+\fBgyro ticket create [flags]\fP
+
+
+.SH DESCRIPTION
+Create ticket
+
+.PP
+Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/destek-isteme
+
+.PP
+API: POST /tickets (operationId coreCreateTicket, scope Tickets/CreateTicket)
+
+
+.SH OPTIONS
+\fB--attachments\fP=[]
+	Ekler. Kodlanmış içerik olarak gönderilir; adres reddedilir.
+
+.PP
+\fB--credentials\fP=""
+	Erişim bilgileri. Her satır bir grup numarası ve alan haritası taşır; mesaja şifreli işlenir.
+
+.PP
+\fB--custom-fields\fP=""
+	Departman alanlarının yanıtları. Alan numarasını değere eşler; kutu tipli alanlar dizi alır. (JSON)
+
+.PP
+\fB--data\fP=""
+	request body as JSON, @file or @- (stdin)
+
+.PP
+\fB--department-id\fP=0
+	Departmanın numarası.
+
+.PP
+\fB--dry-run\fP[=false]
+	show the price quote / request without changing anything
+
+.PP
+\fB--encrypt-message\fP[=false]
+	Mesaj gövdesi şifreli saklansın mı.
+
+.PP
+\fB-h\fP, \fB--help\fP[=false]
+	help for create
+
+.PP
+\fB--idempotency-key\fP=""
+	idempotency key (automatic for money operations)
+
+.PP
+\fB--message\fP=""
+	Açılış mesajı. En az beş karakter; düz metindir ve işaretleme ayıklanır.
+
+.PP
+\fB--priority\fP=0
+	Öncelik. Verilmezse orta alınır.
+
+.PP
+\fB--service-id\fP=0
+	Talebi bir hizmete bağlar.
+
+.PP
+\fB--set\fP=[]
+	extra body field key=value (repeatable)
+
+.PP
+\fB--subject\fP=""
+	Konu.
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH SEE ALSO
+\fBgyro-ticket(1)\fP

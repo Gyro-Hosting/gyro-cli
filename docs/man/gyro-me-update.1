@@ -1,0 +1,157 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-me-update - Update me
+
+
+.SH SYNOPSIS
+\fBgyro me update [flags]\fP
+
+
+.SH DESCRIPTION
+Update me
+
+.PP
+Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/anahtarin-hesabi
+
+.PP
+API: PATCH /me (operationId coreUpdateMe, scope Account/UpdateMe)
+
+
+.SH OPTIONS
+\fB--avatar\fP=""
+	Profil görseli. Yalnız kodlanmış içerik kabul edilir; adres reddedilir.
+
+.PP
+\fB--birthday\fP=""
+	Doğum tarihi.
+
+.PP
+\fB--company\fP=""
+	Şirket bilgileri. Hesabın kurumsal olmasını gerektirir. (JSON)
+
+.PP
+\fB--country\fP=""
+	Ülke kodu.
+
+.PP
+\fB--currency\fP=""
+	Görüntü para birimi kodu.
+
+.PP
+\fB--custom-fields\fP=""
+	Ek alanların değerleri. Kutu tipli alanlar dizi alır. (JSON)
+
+.PP
+\fB--data\fP=""
+	request body as JSON, @file or @- (stdin)
+
+.PP
+\fB--date-format\fP=""
+	Tarih biçimi. Boş göndermek hesabın kendi seçimini siler.
+
+.PP
+\fB--dry-run\fP[=false]
+	show the price quote / request without changing anything
+
+.PP
+\fB--email\fP=""
+	email
+
+.PP
+\fB-h\fP, \fB--help\fP[=false]
+	help for update
+
+.PP
+\fB--idempotency-key\fP=""
+	idempotency key (automatic for money operations)
+
+.PP
+\fB--identity\fP=""
+	Kimlik numarası.
+
+.PP
+\fB--kind\fP=""
+	Hesap türü. Bireysele geçmek şirket bilgilerini temizler.
+
+.PP
+\fB--landline-phone\fP=""
+	Sabit telefon.
+
+.PP
+\fB--language\fP=""
+	Dil kodu. Kurulumda bulunmalıdır.
+
+.PP
+\fB--name\fP=""
+	Adı. Boşaltılamaz.
+
+.PP
+\fB--phone\fP=""
+	phone
+
+.PP
+\fB--set\fP=[]
+	extra body field key=value (repeatable)
+
+.PP
+\fB--surname\fP=""
+	Soyadı. Boşaltılamaz.
+
+.PP
+\fB--timezone\fP=""
+	Saat dilimi. Boş göndermek hesabın kendi seçimini siler.
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH SEE ALSO
+\fBgyro-me(1)\fP

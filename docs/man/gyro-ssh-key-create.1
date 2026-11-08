@@ -1,0 +1,83 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-ssh-key-create - Upload an SSH public key
+
+
+.SH SYNOPSIS
+\fBgyro ssh-key create [PUBLIC-KEY-FILE] [flags]\fP
+
+
+.SH DESCRIPTION
+Upload an SSH public key
+
+
+.SH OPTIONS
+\fB-h\fP, \fB--help\fP[=false]
+	help for create
+
+.PP
+\fB--name\fP=""
+	key name (default: the key comment)
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH EXAMPLE
+.EX
+  gyro ssh-key create                      # ~/.ssh/id_ed25519.pub
+  gyro ssh-key create ~/.ssh/work.pub --name work
+  cat key.pub | gyro ssh-key create - --name ci
+.EE
+
+
+.SH SEE ALSO
+\fBgyro-ssh-key(1)\fP

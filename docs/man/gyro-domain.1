@@ -1,0 +1,71 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-domain - Domains: search, register, transfer, nameservers, DNS, WHOIS
+
+
+.SH SYNOPSIS
+\fBgyro domain [flags]\fP
+
+
+.SH DESCRIPTION
+Domains: search, register, transfer, nameservers, DNS, WHOIS
+
+
+.SH OPTIONS
+\fB-h\fP, \fB--help\fP[=false]
+	help for domain
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH SEE ALSO
+\fBgyro(1)\fP, \fBgyro-domain-addon(1)\fP, \fBgyro-domain-auth-code(1)\fP, \fBgyro-domain-check(1)\fP, \fBgyro-domain-child-nameserver(1)\fP, \fBgyro-domain-default-nameserver(1)\fP, \fBgyro-domain-dns-record(1)\fP, \fBgyro-domain-dnssec(1)\fP, \fBgyro-domain-email-forward(1)\fP, \fBgyro-domain-forwarding(1)\fP, \fBgyro-domain-get(1)\fP, \fBgyro-domain-list(1)\fP, \fBgyro-domain-nameserver(1)\fP, \fBgyro-domain-register(1)\fP, \fBgyro-domain-renew(1)\fP, \fBgyro-domain-tld(1)\fP, \fBgyro-domain-transfer(1)\fP, \fBgyro-domain-transfer-lock(1)\fP, \fBgyro-domain-transfer-status(1)\fP, \fBgyro-domain-update(1)\fP, \fBgyro-domain-whois(1)\fP, \fBgyro-domain-whois-privacy(1)\fP, \fBgyro-domain-whois-profile(1)\fP

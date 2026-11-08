@@ -1,0 +1,149 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-domain-whois-profile-create - Create whois profile
+
+
+.SH SYNOPSIS
+\fBgyro domain whois-profile create [flags]\fP
+
+
+.SH DESCRIPTION
+Create whois profile
+
+.PP
+Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/alan-adi-kisileri-ve-gizlilik
+
+.PP
+API: POST /domains/whois-profiles (operationId coreCreateWhoisProfile, scope Domains/CreateWhoisProfile)
+
+
+.SH OPTIONS
+\fB--address\fP=""
+	Adres satırı.
+
+.PP
+\fB--address2\fP=""
+	İkinci adres satırı. İsteğe bağlı; anahtar yoksa boş satır kaydedilir.
+
+.PP
+\fB--city\fP=""
+	Şehir.
+
+.PP
+\fB--company\fP=""
+	Kurum adı. Tek isteğe bağlı alandır.
+
+.PP
+\fB--contact\fP=""
+	contactKaydedilecek kişi. İl burada zorunlu değildir. (JSON)
+
+.PP
+\fB--country\fP=""
+	Ülke kodu. Büyük harfe çevrilir.
+
+.PP
+\fB--data\fP=""
+	request body as JSON, @file or @- (stdin)
+
+.PP
+\fB--dry-run\fP[=false]
+	show the price quote / request without changing anything
+
+.PP
+\fB--email\fP=""
+	Geçerli bir e-posta.
+
+.PP
+\fB--first-name\fP=""
+	Kişinin adı.
+
+.PP
+\fB-h\fP, \fB--help\fP[=false]
+	help for create
+
+.PP
+\fB--idempotency-key\fP=""
+	idempotency key (automatic for money operations)
+
+.PP
+\fB--last-name\fP=""
+	Kişinin soyadı.
+
+.PP
+\fB--name\fP=""
+	Profilin etiketi.
+
+.PP
+\fB--phone\fP=""
+	Telefon.
+
+.PP
+\fB--postal-code\fP=""
+	postal_code
+
+.PP
+\fB--set\fP=[]
+	extra body field key=value (repeatable)
+
+.PP
+\fB--state\fP=""
+	İl ya da eyalet. Alan adı kişilerinde zorunludur, kayıtlı profillerde değildir.
+
+.PP
+\fB--zip\fP=""
+	Posta kodu.
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH SEE ALSO
+\fBgyro-domain-whois-profile(1)\fP

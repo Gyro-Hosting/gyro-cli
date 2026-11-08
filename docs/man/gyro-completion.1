@@ -1,0 +1,76 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-completion - Generate a shell completion script
+
+
+.SH SYNOPSIS
+\fBgyro completion bash|zsh|fish|powershell [flags]\fP
+
+
+.SH DESCRIPTION
+Load completions:
+  bash:  source <(gyro completion bash)        # or: gyro completion bash > /etc/bash_completion.d/gyro
+  zsh:   gyro completion zsh > "${fpath[1]}/_gyro"
+  fish:  gyro completion fish > ~/.config/fish/completions/gyro.fish
+  pwsh:  gyro completion powershell | Out-String | Invoke-Expression
+Server, SSH key and other ids complete from the API.
+
+
+.SH OPTIONS
+\fB-h\fP, \fB--help\fP[=false]
+	help for completion
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH SEE ALSO
+\fBgyro(1)\fP

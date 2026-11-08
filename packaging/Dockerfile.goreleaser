@@ -1,0 +1,7 @@
+# Used by GoReleaser (dockers_v2): the binary is pre-built per platform.
+FROM alpine:3.22
+RUN apk add --no-cache ca-certificates openssh-client tzdata && adduser -D -u 10001 gyro
+ARG TARGETPLATFORM
+COPY $TARGETPLATFORM/gyro /usr/local/bin/gyro
+USER gyro
+ENTRYPOINT ["/usr/local/bin/gyro"]

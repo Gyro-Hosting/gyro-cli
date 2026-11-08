@@ -1,0 +1,145 @@
+# GoReleaser v2 — gyro CLI. Run by .github/workflows/release.yml on tag v*.
+# Local check (no publish):  goreleaser release --snapshot --clean --skip=sign,publish,docker
+# Signing: same GPG key as terraform-provider-gyro (fingerprint E96BE9635E77A0D9119AC8C3A7986589A154B990),
+# imported in CI from repository secrets GPG_PRIVATE_KEY / PASSPHRASE.
+version: 2
+project_name: gyro
+
+before:
+  hooks:
+    - go mod tidy
+    - go generate ./...
+    - go test ./...
+    - sh -c 'go run ./cmd/gyro gen-docs --dir dist-docs/man --format man && go run ./cmd/gyro completion bash > dist-docs/gyro.bash && go run ./cmd/gyro completion zsh > dist-docs/_gyro && go run ./cmd/gyro completion fish > dist-docs/gyro.fish'
+
+builds:
+  - id: gyro
+    main: ./cmd/gyro
+    binary: gyro
+    env: [CGO_ENABLED=0]
+    flags: [-trimpath]
+    mod_timestamp: '{{ .CommitTimestamp }}'
+    ldflags:
+      - -s -w -X main.version={{.Version}} -X main.commit={{.ShortCommit}} -X main.date={{.CommitDate}}
+    goos: [linux, darwin, windows]
+    goarch: [amd64, arm64]
+
+archives:
+  - id: gyro
+    ids: [gyro]
+    name_template: 'gyro_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
+    formats: [tar.gz]
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+    files:
+      - README.md
+      - README.en.md
+      - LICENSE
+      - src: dist-docs/gyro.bash
+        dst: completions
+        strip_parent: true
+      - src: dist-docs/_gyro
+        dst: completions
+        strip_parent: true
+      - src: dist-docs/gyro.fish
+        dst: completions
+        strip_parent: true
+      - src: dist-docs/man/*
+        dst: man
+        strip_parent: true
+
+checksum:
+  name_template: 'gyro_{{ .Version }}_SHA256SUMS'
+  algorithm: sha256
+
+signs:
+  - artifacts: checksum
+    args: ["--batch", "--local-user", "{{ .Env.GPG_FINGERPRINT }}", "--output", "${signature}", "--detach-sign", "${artifact}"]
+
+nfpms:
+  - id: packages
+    ids: [gyro]
+    package_name: gyro
+    file_name_template: 'gyro_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
+    vendor: Gyro Bilisim
+    homepage: https://www.gyrohosting.com/developers/
+    maintainer: Gyro Hosting <destek@gyrohosting.com>
+    description: Official command-line interface for Gyro Hosting (Gyro Public API).
+    license: MPL-2.0
+    formats: [deb, rpm, apk]
+    bindir: /usr/bin
+    section: utils
+    contents:
+      - src: dist-docs/man/*.1
+        dst: /usr/share/man/man1/
+      - src: dist-docs/gyro.bash
+        dst: /usr/share/bash-completion/completions/gyro
+      - src: dist-docs/_gyro
+        dst: /usr/share/zsh/vendor-completions/_gyro
+      - src: dist-docs/gyro.fish
+        dst: /usr/share/fish/vendor_completions.d/gyro.fish
+    recommends: [openssh-client]
+
+# Homebrew: brew install gyro-hosting/tap/gyro  (tap repo Gyro-Hosting/homebrew-tap, token HOMEBREW_TAP_TOKEN)
+homebrew_casks:
+  - name: gyro
+    ids: [gyro]
+    repository:
+      owner: Gyro-Hosting
+      name: homebrew-tap
+      token: '{{ envOrDefault "HOMEBREW_TAP_TOKEN" "" }}'
+    directory: Casks
+    homepage: https://www.gyrohosting.com/developers/
+    description: Official command-line interface for Gyro Hosting
+    license: MPL-2.0
+    binaries: [gyro]
+    manpages: [man/gyro.1]
+    completions:
+      bash: completions/gyro.bash
+      zsh: completions/_gyro
+      fish: completions/gyro.fish
+    skip_upload: '{{ if isEnvSet "HOMEBREW_TAP_TOKEN" }}false{{ else }}true{{ end }}'
+
+# Scoop: scoop bucket add gyro https://github.com/Gyro-Hosting/scoop-bucket ; scoop install gyro
+scoops:
+  - name: gyro
+    ids: [gyro]
+    repository:
+      owner: Gyro-Hosting
+      name: scoop-bucket
+      token: '{{ envOrDefault "SCOOP_BUCKET_TOKEN" "" }}'
+    homepage: https://www.gyrohosting.com/developers/
+    description: Official command-line interface for Gyro Hosting
+    license: MPL-2.0
+    skip_upload: '{{ if isEnvSet "SCOOP_BUCKET_TOKEN" }}false{{ else }}true{{ end }}'
+
+dockers_v2:
+  - id: gyro
+    ids: [gyro]
+    images:
+      - ghcr.io/gyro-hosting/gyro
+    tags:
+      - '{{ .Version }}'
+      - latest
+    dockerfile: packaging/Dockerfile.goreleaser
+    platforms: [linux/amd64, linux/arm64]
+    labels:
+      org.opencontainers.image.title: gyro
+      org.opencontainers.image.source: https://github.com/Gyro-Hosting/gyro-cli
+      org.opencontainers.image.version: '{{ .Version }}'
+      org.opencontainers.image.licenses: MPL-2.0
+
+release:
+  github:
+    owner: Gyro-Hosting
+    name: gyro-cli
+  draft: true
+  extra_files:
+    - glob: packaging/install.sh
+
+changelog:
+  use: github
+  sort: asc
+  filters:
+    exclude: ['^docs:', '^test:', '^ci:']

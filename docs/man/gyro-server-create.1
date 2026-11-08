@@ -1,0 +1,141 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-server-create - Order a new cloud server (paid from your balance)
+
+
+.SH SYNOPSIS
+\fBgyro server create [HOSTNAME] [flags]\fP
+
+
+.SH DESCRIPTION
+Order a cloud server. The price is shown first (a quote from the API) and you are asked to confirm;
+the order is paid from your account balance, never from a card. An idempotency key is attached
+automatically, so a retried command never orders twice.
+
+.PP
+--plan accepts a plan name (standart-2-4, pro-2-8 ...), a server type (cpx22, ccx13 ...) or a product id
+(see 'gyro plan list'). --location accepts a code (fsn1) or a city (falkenstein).
+
+
+.SH OPTIONS
+\fB--app\fP=""
+	one-click app to install (needs API v2)
+
+.PP
+\fB--cycle\fP="monthly"
+	monthly|quarterly|semiannually|annually
+
+.PP
+\fB--data\fP=""
+	extra request body JSON / @file
+
+.PP
+\fB--dry-run\fP[=false]
+	only show the price quote
+
+.PP
+\fB-h\fP, \fB--help\fP[=false]
+	help for create
+
+.PP
+\fB--hostname\fP=""
+	host name (or give it as the argument)
+
+.PP
+\fB--idempotency-key\fP=""
+	idempotency key (default: random)
+
+.PP
+\fB--image\fP=""
+	OS image slug, e.g. ubuntu-24.04 (required)
+
+.PP
+\fB--location\fP=""
+	location code or city
+
+.PP
+\fB--plan\fP=""
+	plan name, server type or product id (required)
+
+.PP
+\fB--set\fP=[]
+	extra body field key=value (repeatable)
+
+.PP
+\fB--ssh-key\fP=[]
+	SSH key id, name or .pub file (uploaded if new)
+
+.PP
+\fB--user-data\fP=""
+	cloud-init user data, inline or @file
+
+.PP
+\fB--wait\fP[=false]
+	wait until the server is running
+
+.PP
+\fB--wait-timeout\fP=15m0s
+	maximum time for --wait
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH EXAMPLE
+.EX
+  gyro server create web-1 --plan pro-2-8 --location falkenstein --image ubuntu-24.04 --ssh-key mykey --wait
+  gyro server create --plan cpx22 --location fsn1 --image debian-12 --ssh-key ~/.ssh/id_ed25519.pub --dry-run
+  gyro server create db-1 --plan standart-2-4 --location nbg1 --image ubuntu-24.04 --user-data @cloud-init.yaml --yes -o json
+.EE
+
+
+.SH SEE ALSO
+\fBgyro-server(1)\fP

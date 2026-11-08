@@ -1,0 +1,109 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-balance-setting-update - Update balance settings
+
+
+.SH SYNOPSIS
+\fBgyro balance setting update [flags]\fP
+
+
+.SH DESCRIPTION
+Update balance settings
+
+.PP
+Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/hesap-bakiyesi-api
+
+.PP
+API: PATCH /balance/settings (operationId coreUpdateBalanceSettings, scope Balance/UpdateBalanceSettings)
+
+
+.SH OPTIONS
+\fB--alert\fP=""
+	Uyarı bloğu. Açık ve eşik alanlarını taşır; açarken pozitif bir eşik gerekir. (JSON)
+
+.PP
+\fB--alert-recipients\fP=""
+	Uyarıyı alacak fatura adresi numaraları. Liste yerine geçer; hesabın sahibi burada yer almaz, her zaman alır.
+
+.PP
+\fB--auto-pay-from-balance\fP[=false]
+	Yenilemeler cüzdandan tahsil edilsin mi. Bu değiştiğinde açık yenileme faturaları yeni tercihe göre yeniden ele alınır.
+
+.PP
+\fB--backup-card-id\fP=0
+	Cüzdan yetmediğinde çekilecek kart. Sıfır göndermek kart zincirini tümüyle kaldırır.
+
+.PP
+\fB--data\fP=""
+	request body as JSON, @file or @- (stdin)
+
+.PP
+\fB--dry-run\fP[=false]
+	show the price quote / request without changing anything
+
+.PP
+\fB-h\fP, \fB--help\fP[=false]
+	help for update
+
+.PP
+\fB--idempotency-key\fP=""
+	idempotency key (automatic for money operations)
+
+.PP
+\fB--set\fP=[]
+	extra body field key=value (repeatable)
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH SEE ALSO
+\fBgyro-balance-setting(1)\fP

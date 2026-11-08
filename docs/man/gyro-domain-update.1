@@ -1,0 +1,101 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-domain-update - Update domain
+
+
+.SH SYNOPSIS
+\fBgyro domain update  [flags]\fP
+
+
+.SH DESCRIPTION
+Update domain
+
+.PP
+Core WISECP client endpoint. Reference: https://dev.wisecp.com/tr/sahip-olunan-alan-adlari
+
+.PP
+API: PATCH /domains/{domain} (operationId coreUpdateDomain, scope Domains/UpdateDomain)
+
+
+.SH OPTIONS
+\fB--auto-renew\fP[=false]
+	Alan adı bazlı otomatik yenileme. Yalnız etkin alan adlarında ve gerçek bir mantıksal değerle.
+
+.PP
+\fB--billing-profile-id\fP=0
+	Fatura profilinin numarası. Sıfır hesabın varsayılanına döner.
+
+.PP
+\fB--data\fP=""
+	request body as JSON, @file or @- (stdin)
+
+.PP
+\fB--dry-run\fP[=false]
+	show the price quote / request without changing anything
+
+.PP
+\fB-h\fP, \fB--help\fP[=false]
+	help for update
+
+.PP
+\fB--idempotency-key\fP=""
+	idempotency key (automatic for money operations)
+
+.PP
+\fB--set\fP=[]
+	extra body field key=value (repeatable)
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH SEE ALSO
+\fBgyro-domain(1)\fP

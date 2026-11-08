@@ -1,0 +1,98 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-api-request - Send a raw request to a path below the API URL
+
+
+.SH SYNOPSIS
+\fBgyro api request   [flags]\fP
+
+
+.SH DESCRIPTION
+Send a raw request to a path below the API URL
+
+
+.SH OPTIONS
+\fB--all\fP[=false]
+	follow pagination (GET)
+
+.PP
+\fB--data\fP=""
+	JSON body, @file or @-
+
+.PP
+\fB-h\fP, \fB--help\fP[=false]
+	help for request
+
+.PP
+\fB--idempotency-key\fP=""
+	send an Idempotency-Key header
+
+.PP
+\fB-P\fP, \fB--param\fP=[]
+	query parameter key=value
+
+.PP
+\fB--set\fP=[]
+	body field key=value (value @file reads a file)
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH EXAMPLE
+.EX
+  gyro api request GET /cloud/servers -p status=active
+  gyro api request POST /cloud/ssh-keys --set name=ci --set public_key=@~/.ssh/id_ed25519.pub
+.EE
+
+
+.SH SEE ALSO
+\fBgyro-api(1)\fP

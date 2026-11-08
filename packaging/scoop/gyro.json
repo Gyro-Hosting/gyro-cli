@@ -1,0 +1,22 @@
+{
+    "version": "0.0.0-SNAPSHOT-none",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/Gyro-Hosting/gyro-cli/releases/download/v0.0.0/gyro_0.0.0-SNAPSHOT-none_windows_amd64.zip",
+            "bin": [
+                "gyro.exe"
+            ],
+            "hash": "c5db9cfd7c21979bd1e7761ef955c1d46cee5df1e387125dcbd9feee9728cfb7"
+        },
+        "arm64": {
+            "url": "https://github.com/Gyro-Hosting/gyro-cli/releases/download/v0.0.0/gyro_0.0.0-SNAPSHOT-none_windows_arm64.zip",
+            "bin": [
+                "gyro.exe"
+            ],
+            "hash": "aca2881021aef0dd4c48aedddb5014a57c3c73debe39b7a0e03d72b5eeaec0fe"
+        }
+    },
+    "homepage": "https://www.gyrohosting.com/developers/",
+    "license": "MPL-2.0",
+    "description": "Official command-line interface for Gyro Hosting"
+}

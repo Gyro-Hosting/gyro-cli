@@ -1,0 +1,214 @@
+# Gyro CLI — komut satırı aracı
+
+gyro: Gyro Hosting hizmetlerini terminalden yönetin.
+
+## Kurulum
+
+(HTML: cli.html#install)
+
+## Başlarken
+
+(HTML: cli.html#start)
+
+## Örnek oturum
+
+(HTML: cli.html#session)
+
+## Profiller ve kimlik
+
+(HTML: cli.html#profiles)
+
+## Çıktı ve betikler
+
+(HTML: cli.html#output)
+
+## Güvenlik: onay, deneme, idempotency
+
+(HTML: cli.html#safety)
+
+## Tüm ürünler
+
+(HTML: cli.html#lines)
+
+## Komut başvurusu
+
+| Komut | Açıklama | API |
+|---|---|---|
+| `gyro activity list` | API anahtarlarınızla yapılan yazma çağrılarını listele | `GET /cloud/activity` |
+| `gyro address create` | Adres Ekleme | `POST /addresses` |
+| `gyro address default` | Varsayılanı Taşıma | `POST /addresses/{id}/default` |
+| `gyro address delete` | Adresi Silme | `DELETE /addresses/{id}` |
+| `gyro address get` | Tek Adresi Okuma | `GET /addresses/{id}` |
+| `gyro address list` | Adresleri Listeleme | `GET /addresses` |
+| `gyro address set` | Adresi Güncelleme | `PUT /addresses/{id}` |
+| `gyro affiliate commission list` | Komisyonları Listeleme | `GET /affiliate/commissions` |
+| `gyro affiliate enroll` | Programa Katılma | `POST /affiliate/enroll` |
+| `gyro affiliate get` | Program Durumunu Okuma | `GET /affiliate` |
+| `gyro affiliate payment-method set` | Ödeme Hedefini Kaydetme | `PUT /affiliate/payment-method` |
+| `gyro affiliate withdraw` | Ödeme Talebi Açma | `POST /affiliate/withdraw` |
+| `gyro balance` | Hesap bakiyesi | `GET /balance` |
+| `gyro balance setting update` | Cüzdan Ayarlarını Değiştirme | `PATCH /balance/settings` |
+| `gyro balance transaction list` | Bakiye hareketleri | `GET /balance/transactions` |
+| `gyro bulk` | Bir eylemi 50 sunucuya kadar toplu çalıştır | `POST /cloud/bulk` |
+| `gyro core invoice pay` | Faturayı Ödeme | `POST /invoices/{id}/pay` |
+| `gyro core product list` | Ürünleri Listeleme | `GET /products` |
+| `gyro core service get` | Hizmeti Okuma | `GET /services/{id}` |
+| `gyro core service list` | Hizmetleri Listeleme | `GET /services` |
+| `gyro core service tool get` | Araç Verisini Okuma | `GET /services/{id}/tools/{tool}` |
+| `gyro core service tool list` | Araçları Listeleme | `GET /services/{id}/tools` |
+| `gyro core service tool run` | Araç Eylemi Çalıştırma | `POST /services/{id}/tools/{tool}/{action}` |
+| `gyro domain addon buy` | Alan Adı Ek Hizmeti Alma | `POST /domains/{domain}/addons/{key}` |
+| `gyro domain auth-code send` | Transfer Kodunu İsteme | `POST /domains/{domain}/auth-code` |
+| `gyro domain auth-code set` | Gelen Transfer Kodunu Kaydetme | `PUT /domains/{domain}/auth-code` |
+| `gyro domain check` | Alan Adının Boş Olup Olmadığını Sorma | `POST /domains/check` |
+| `gyro domain child-nameserver create` | Kendi Ad Sunucusunu Tanımlama | `POST /domains/{domain}/child-nameservers` |
+| `gyro domain child-nameserver delete` | Kendi Ad Sunucusunu Kaldırma | `DELETE /domains/{domain}/child-nameservers` |
+| `gyro domain child-nameserver list` | Kendi Ad Sunucularını Listeleme | `GET /domains/{domain}/child-nameservers` |
+| `gyro domain default-nameserver list` | Varsayılan Ad Sunucularını Okuma | `GET /domains/default-nameservers` |
+| `gyro domain default-nameserver set` | Varsayılan Ad Sunucularını Kaydetme | `PUT /domains/default-nameservers` |
+| `gyro domain dns-record create` | DNS Kaydı Ekleme | `POST /domains/{domain}/dns-records` |
+| `gyro domain dns-record delete` | DNS Kaydını Silme | `DELETE /domains/{domain}/dns-records` |
+| `gyro domain dns-record list` | DNS Kayıtlarını Listeleme | `GET /domains/{domain}/dns-records` |
+| `gyro domain dns-record set` | DNS Kaydını Düzenleme | `PUT /domains/{domain}/dns-records` |
+| `gyro domain dnssec create` | İmza Kaydı Ekleme | `POST /domains/{domain}/dnssec` |
+| `gyro domain dnssec delete` | İmza Kaydını Silme | `DELETE /domains/{domain}/dnssec` |
+| `gyro domain dnssec get` | İmza Kayıtlarını Listeleme | `GET /domains/{domain}/dnssec` |
+| `gyro domain email-forward create` | E-posta Yönlendirmesi Ekleme | `POST /domains/{domain}/email-forwards` |
+| `gyro domain email-forward delete` | E-posta Yönlendirmesini Silme | `DELETE /domains/{domain}/email-forwards` |
+| `gyro domain email-forward list` | E-posta Yönlendirmelerini Listeleme | `GET /domains/{domain}/email-forwards` |
+| `gyro domain forwarding delete` | Adres Yönlendirmesini Kaldırma | `DELETE /domains/{domain}/forwarding` |
+| `gyro domain forwarding get` | Adres Yönlendirmesini Okuma | `GET /domains/{domain}/forwarding` |
+| `gyro domain forwarding set` | Adres Yönlendirmesi Kurma | `PUT /domains/{domain}/forwarding` |
+| `gyro domain get` | Alan Adını Okuma | `GET /domains/{domain}` |
+| `gyro domain list` | Alan Adlarını Listeleme | `GET /domains` |
+| `gyro domain nameserver list` | Ad Sunucularını Okuma | `GET /domains/{domain}/nameservers` |
+| `gyro domain nameserver set` | Ad Sunucularını Değiştirme | `PUT /domains/{domain}/nameservers` |
+| `gyro domain register` | Alan Adı Kaydetme | `POST /domains/register` |
+| `gyro domain renew` | Yenileme Faturası Kesme | `POST /domains/{domain}/renew` |
+| `gyro domain tld list` | Uzantı Fiyatlarını Okuma | `GET /domains/tlds` |
+| `gyro domain transfer` | Alan Adı Transferi | `POST /domains/transfer` |
+| `gyro domain transfer-lock get` | Transfer Kilidini Okuma | `GET /domains/{domain}/transfer-lock` |
+| `gyro domain transfer-lock set` | Transfer Kilidini Değiştirme | `PUT /domains/{domain}/transfer-lock` |
+| `gyro domain transfer-status get` | Transferin Nerede Olduğunu Sorma | `GET /domains/{domain}/transfer-status` |
+| `gyro domain update` | Alan Adı Tercihlerini Değiştirme | `PATCH /domains/{domain}` |
+| `gyro domain whois apply` | Kayıtlı Profili Uygulama | `POST /domains/{domain}/whois/apply` |
+| `gyro domain whois get` | Alan Adı Kişilerini Okuma | `GET /domains/{domain}/whois` |
+| `gyro domain whois set` | Alan Adı Kişilerini Yazma | `PUT /domains/{domain}/whois` |
+| `gyro domain whois-privacy set` | Kayıt Gizliliğini Değiştirme | `PUT /domains/{domain}/whois-privacy` |
+| `gyro domain whois-profile create` | Profil Oluşturma | `POST /domains/whois-profiles` |
+| `gyro domain whois-profile default` | Profili Varsayılan Yapma | `POST /domains/whois-profiles/{pid}/default` |
+| `gyro domain whois-profile delete` | Profili Silme | `DELETE /domains/whois-profiles/{pid}` |
+| `gyro domain whois-profile list` | Kayıtlı Profilleri Listeleme | `GET /domains/whois-profiles` |
+| `gyro domain whois-profile set` | Profili Güncelleme | `PUT /domains/whois-profiles/{pid}` |
+| `gyro image list` | İşletim sistemi imajlarını listele | `GET /cloud/images` |
+| `gyro invoice coupon` | Faturaya Kupon Uygulama | `POST /invoices/{id}/coupon` |
+| `gyro invoice get` | Faturayı getir | `GET /invoices/{id}` |
+| `gyro invoice list` | Faturaları listele | `GET /invoices` |
+| `gyro invoice pay` | Faturayı hesap bakiyesinden öde | `POST /cloud/invoices/{id}/pay` |
+| `gyro key create` | Alt hesap anahtarı oluştur (token bir kez döner) | `POST /cloud/keys` |
+| `gyro key delete` | Alt hesap anahtarını sil | `DELETE /cloud/keys/{id}` |
+| `gyro key list` | Alt hesap anahtarlarını listele (token göstermez) | `GET /cloud/keys` |
+| `gyro location list` | Sipariş verilebilen lokasyonları listele | `GET /cloud/locations` |
+| `gyro me get` | Profili Okuma | `GET /me` |
+| `gyro me notification list` | Bildirim Tercihlerini Okuma | `GET /me/notifications` |
+| `gyro me notification set` | Bildirim Tercihlerini Yazma | `PUT /me/notifications` |
+| `gyro me security get` | Güvenlik Özetini Okuma | `GET /me/security` |
+| `gyro me update` | Profili Güncelleme | `PATCH /me` |
+| `gyro order create` | Sipariş Verme | `POST /orders` |
+| `gyro order get` | Sipariş Detayını Okuma | `GET /orders/{id}` |
+| `gyro order list` | Siparişleri Listeleme | `GET /orders` |
+| `gyro order preview` | Siparişi Fiyatlandırma | `POST /orders/preview` |
+| `gyro ping get` | Ping | `GET /ping` |
+| `gyro plan list` | Sipariş verilebilen bulut sunucu ürünlerini listele | `GET /cloud/products` |
+| `gyro product category list` | Kategorileri Listeleme | `GET /products/categories` |
+| `gyro product get` | Ürün Detayı ve Sipariş Şeması | `GET /products/{id}` |
+| `gyro reference country list` | Get countries | `GET /reference/countries` |
+| `gyro reference country state list` | Get states | `GET /reference/countries/{code}/states` |
+| `gyro reference state city list` | Get cities | `GET /reference/states/{id}/cities` |
+| `gyro reseller assign` | Hizmeti uç-müşteriye ata (customer_id 0 = atamayı kaldır) | `POST /cloud/reseller/assign` |
+| `gyro reseller customer create` | Uç-müşteri oluştur | `POST /cloud/reseller/customers` |
+| `gyro reseller customer delete` | Uç-müşteriyi sil (anahtarlar ve webhook'lar iptal, hizmet ataması kalkar) | `DELETE /cloud/reseller/customers/{id}` |
+| `gyro reseller customer get` | Uç-müşteriyi getir | `GET /cloud/reseller/customers/{id}` |
+| `gyro reseller customer key create` | Uç-müşteri için anahtar üret (token bir kez döner) | `POST /cloud/reseller/customers/{id}/keys` |
+| `gyro reseller customer key delete` | Uç-müşteri anahtarını iptal et | `DELETE /cloud/reseller/customers/{id}/keys/{kid}` |
+| `gyro reseller customer key list` | Uç-müşterinin anahtarlarını listele | `GET /cloud/reseller/customers/{id}/keys` |
+| `gyro reseller customer list` | Uç-müşterileri listele | `GET /cloud/reseller/customers` |
+| `gyro reseller customer update` | Uç-müşteriyi güncelle (askıya alma = anahtarları çalışmaz) | `PATCH /cloud/reseller/customers/{id}` |
+| `gyro reseller report get` | Uç-müşteri başına kullanım ve fatura raporu | `GET /cloud/reseller/report` |
+| `gyro reseller setting get` | Bayi ayarları | `GET /cloud/reseller/settings` |
+| `gyro reseller setting set` | Bayi ayarlarını kaydet (beyaz etiket) | `PUT /cloud/reseller/settings` |
+| `gyro server activity list` | Sunucudaki son platform işlemleri | `GET /cloud/servers/{id}/activity` |
+| `gyro server backup create` | Elle yedek al (yedekleme ek hizmeti gerekir) | `POST /cloud/servers/{id}/backups` |
+| `gyro server backup list` | Otomatik yedekleri listele | `GET /cloud/servers/{id}/backups` |
+| `gyro server console` | Tek seferlik VNC konsol bileti al | `POST /cloud/servers/{id}/console` |
+| `gyro server create` | Bulut sunucu oluştur (sipariş) | `POST /cloud/servers` |
+| `gyro server delete` | Sunucuyu sil (iptal) | `DELETE /cloud/servers/{id}` |
+| `gyro server firewall list` | Gelen trafik güvenlik duvarı kuralları | `GET /cloud/servers/{id}/firewall` |
+| `gyro server firewall rule add` | Gelen trafik kuralı ekle | `POST /cloud/servers/{id}/firewall/rules` |
+| `gyro server firewall rule delete` | Güvenlik duvarı kuralı sil (son kural confirm ister) | `DELETE /cloud/servers/{id}/firewall/rules/{n}` |
+| `gyro server get` | Sunucuyu canlı durumuyla getir | `GET /cloud/servers/{id}` |
+| `gyro server list` | Bulut sunucuları listele | `GET /cloud/servers` |
+| `gyro server metrics` | CPU, disk ve ağ zaman serileri | `GET /cloud/servers/{id}/metrics` |
+| `gyro server power off` | Sunucu işlemi çalıştır | `POST /cloud/servers/{id}/actions/{action}` |
+| `gyro server power on` | Sunucu işlemi çalıştır | `POST /cloud/servers/{id}/actions/{action}` |
+| `gyro server power reboot` | Sunucu işlemi çalıştır | `POST /cloud/servers/{id}/actions/{action}` |
+| `gyro server power reset` | Sunucu işlemi çalıştır | `POST /cloud/servers/{id}/actions/{action}` |
+| `gyro server power shutdown` | Sunucu işlemi çalıştır | `POST /cloud/servers/{id}/actions/{action}` |
+| `gyro server rdns list` | Ters DNS kayıtlarını listele | `GET /cloud/servers/{id}/rdns` |
+| `gyro server rdns set` | Bir adresin PTR kaydını ayarla (veya sıfırla) | `PUT /cloud/servers/{id}/rdns` |
+| `gyro server rebuild` | Sunucu işlemi çalıştır | `POST /cloud/servers/{id}/actions/{action}` |
+| `gyro server rescue disable` | Sunucu işlemi çalıştır | `POST /cloud/servers/{id}/actions/{action}` |
+| `gyro server rescue enable` | Sunucu işlemi çalıştır | `POST /cloud/servers/{id}/actions/{action}` |
+| `gyro server reset-password` | Sunucu işlemi çalıştır | `POST /cloud/servers/{id}/actions/{action}` |
+| `gyro server snapshot create` | Snapshot al | `POST /cloud/servers/{id}/snapshots` |
+| `gyro server snapshot delete` | Snapshot sil | `DELETE /cloud/servers/{id}/snapshots/{sid}` |
+| `gyro server snapshot list` | Snapshot'ları ve kotayı listele | `GET /cloud/servers/{id}/snapshots` |
+| `gyro server snapshot restore` | Snapshot'ı sunucuya geri yükle (diski ezer) | `POST /cloud/servers/{id}/snapshots/{sid}/restore` |
+| `gyro server update | rename` | Sunucu adını değiştir veya otomatik yenilemeyi aç/kapat | `PATCH /cloud/servers/{id}` |
+| `gyro service addon list` | Hizmet Eklentilerini Okuma | `GET /services/{id}/addons` |
+| `gyro service cancellation create` | İptal Talebi Açma | `POST /services/{id}/cancellation` |
+| `gyro service cancellation delete` | İptal Talebini Geri Çekme | `DELETE /services/{id}/cancellation` |
+| `gyro service dashboard get` | Panel Özetini Okuma | `GET /services/{id}/dashboard` |
+| `gyro service get` | Hizmeti getir (yenileme, iptal, erişim bilgileri) | `GET /cloud/services/{id}` |
+| `gyro service invoice list` | Hizmetin Faturalarını Okuma | `GET /services/{id}/invoices` |
+| `gyro service list` | Tüm ürün hatlarındaki hizmetleri listele | `GET /cloud/services` |
+| `gyro service method call` | Müşteri-çağrılabilir modül metodunu çağır (örn. lisans change_ip) | `POST /cloud/services/{id}/methods/{method}` |
+| `gyro service metrics billing get` | Kullanım Fatura Geçmişi | `GET /services/{id}/metrics/billing` |
+| `gyro service metrics list` | Ölçümleri Okuma | `GET /services/{id}/metrics` |
+| `gyro service metrics update` | Ölçümü Açma ve Kapatma | `PATCH /services/{id}/metrics/{key}` |
+| `gyro service module-method` | Modül Metodu Çalıştırma | `POST /services/{id}/module-method` |
+| `gyro service password` | Panel Parolasını Değiştirme | `POST /services/{id}/password` |
+| `gyro service renew` | Yenileme Faturası Kesme | `POST /services/{id}/renew` |
+| `gyro service sso` | Panele Tek Oturum Açma | `POST /services/{id}/sso` |
+| `gyro service tool get` | Bir aracı oku (posta kutuları, snapshot'lar, DNS kayıtları, ...) | `GET /cloud/services/{id}/tools/{tool}` |
+| `gyro service tool list` | Hizmetin araçlarını, eylemlerini ve güvenlik politikasını keşfet | `GET /cloud/services/{id}/tools` |
+| `gyro service tool run` | Bir araç eylemi çalıştır (posta kutusu oluştur, snapshot'tan dön, ...) | `POST /cloud/services/{id}/tools/{tool}/{action}` |
+| `gyro service update` | Hizmet Tercihlerini Değiştirme | `PATCH /services/{id}` |
+| `gyro sms message get` | Tek Gönderimi Okuma | `GET /sms/messages/{id}` |
+| `gyro sms message list` | Gönderim Geçmişi | `GET /sms/messages` |
+| `gyro sms quote` | Fiyat Alma | `POST /sms/quote` |
+| `gyro sms send` | Toplu Gönderim | `POST /sms/send` |
+| `gyro sms sender list` | Başlıkları Listeleme | `GET /sms/senders` |
+| `gyro ssh-key create` | SSH anahtarı ekle | `POST /cloud/ssh-keys` |
+| `gyro ssh-key delete` | SSH anahtarını sil | `DELETE /cloud/ssh-keys/{id}` |
+| `gyro ssh-key get` | SSH anahtarını getir | `GET /cloud/ssh-keys/{id}` |
+| `gyro ssh-key list` | SSH anahtarlarını listele | `GET /cloud/ssh-keys` |
+| `gyro ticket access-group list` | Erişim Gruplarını Listeleme | `GET /tickets/access-groups` |
+| `gyro ticket attachment get` | Eki İndirme | `GET /tickets/{id}/attachments/{aid}` |
+| `gyro ticket close` | Talebi Kapatma | `POST /tickets/{id}/close` |
+| `gyro ticket create` | Talep Açma | `POST /tickets` |
+| `gyro ticket department list` | Departmanları Listeleme | `GET /tickets/departments` |
+| `gyro ticket get` | Talebi ve Mesajları Okuma | `GET /tickets/{id}` |
+| `gyro ticket list` | Talepleri Listeleme | `GET /tickets` |
+| `gyro ticket rating` | Talebi Puanlama | `POST /tickets/{id}/rating` |
+| `gyro ticket reopen` | Talebi Yeniden Açma | `POST /tickets/{id}/reopen` |
+| `gyro ticket reply` | Yanıt Yazma | `POST /tickets/{id}/reply` |
+| `gyro ticket reply rating` | Personel Yanıtını Puanlama | `POST /tickets/{id}/replies/{rid}/rating` |
+| `gyro webhook create` | Webhook oluştur (gizli anahtar bir kez döner) | `POST /cloud/webhooks` |
+| `gyro webhook delete` | Webhook'u sil | `DELETE /cloud/webhooks/{id}` |
+| `gyro webhook delivery list` | Son 100 teslim | `GET /cloud/webhooks/{id}/deliveries` |
+| `gyro webhook get` | Webhook'u getir | `GET /cloud/webhooks/{id}` |
+| `gyro webhook list` | Webhook'ları listele | `GET /cloud/webhooks` |
+| `gyro webhook test` | Şimdi bir api.test olayı gönder | `POST /cloud/webhooks/{id}/test` |
+| `gyro webhook update` | Adres, olay, açıklama ya da durumu güncelle | `PATCH /cloud/webhooks/{id}` |
+| `gyro whoami` | Çağıran API anahtarını göster | `GET /whoami` |

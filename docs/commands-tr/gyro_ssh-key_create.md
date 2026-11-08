@@ -1,0 +1,44 @@
+## gyro ssh-key create
+
+SSH açık anahtarı yükle
+
+```
+gyro ssh-key create [PUBLIC-KEY-FILE] [flags]
+```
+
+### Examples
+
+```
+  gyro ssh-key create                      # ~/.ssh/id_ed25519.pub
+  gyro ssh-key create ~/.ssh/work.pub --name work
+  cat key.pub | gyro ssh-key create - --name ci
+```
+
+### Options
+
+```
+  -h, --help          help for create
+      --name string   anahtar adı (varsayılan: anahtar yorumu)
+```
+
+### Options inherited from parent commands
+
+```
+      --api-url string     API taban adresi (ortam GYRO_API_URL)
+      --debug              HTTP isteklerini stderr'e yaz (sırlar maskeli)
+      --lang string        mesaj dili: tr ya da en (varsayılan yerel ayar)
+      --no-color           renkleri kapat (NO_COLOR da olur)
+      --no-header          tablo başlığını yazma
+  -o, --output string      çıktı biçimi: table, json, yaml, text
+  -p, --profile string     kullanılacak profil (ortam GYRO_PROFILE)
+      --query string       sonuca uygulanacak JMESPath sorgusu
+  -q, --quiet              yalnız kimlikleri yaz
+      --timeout duration   toplam zaman aşımı, ör. 30s, 10m
+      --wide               tüm tablo sütunlarını göster
+  -y, --yes                onay sorma
+```
+
+### SEE ALSO
+
+* [gyro ssh-key](gyro_ssh-key.md)	 - Hesabınızdaki SSH açık anahtarları
+
