@@ -251,8 +251,16 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro ssh-key delete` | Delete an SSH key | `DELETE /cloud/ssh-keys/{id}` |
 | `gyro ssh-key get` | Get an SSH key | `GET /cloud/ssh-keys/{id}` |
 | `gyro ssh-key list` | List SSH keys | `GET /cloud/ssh-keys` |
+| `gyro storage bucket rename` | Rename a bucket | `POST /cloud/storage/{id}/buckets/{bucket}/rename` |
 | `gyro storage connect get` | GET connect (GyroDepolama) | `GET /cloud/storage/{id}/connect` |
+| `gyro storage folder count` | Count objects in a folder | `GET /cloud/storage/{id}/buckets/{bucket}/folders/count` |
+| `gyro storage folder create` | Create a folder | `POST /cloud/storage/{id}/buckets/{bucket}/folders` |
+| `gyro storage folder delete` | Delete a folder with its contents | `DELETE /cloud/storage/{id}/buckets/{bucket}/folders` |
 | `gyro storage key rotate` | POST access-keys:rotate (GyroDepolama) | `POST /cloud/storage/{id}/keys/{key}/rotate` |
+| `gyro storage object delete` | Delete objects | `POST /cloud/storage/{id}/buckets/{bucket}/objects/delete` |
+| `gyro storage object download-url` | Presigned download URL | `POST /cloud/storage/{id}/buckets/{bucket}/objects/download-url` |
+| `gyro storage object list` | List objects in a bucket folder | `GET /cloud/storage/{id}/buckets/{bucket}/objects` |
+| `gyro storage object upload-url` | Presigned upload URLs | `POST /cloud/storage/{id}/buckets/{bucket}/objects/upload-url` |
 | `gyro storage usage get` | GET usage (GyroDepolama) | `GET /cloud/storage/{id}/usage` |
 | `gyro ticket access-group list` | List ticket access groups | `GET /tickets/access-groups` |
 | `gyro ticket attachment get` | Get ticket attachment (path: {id}, {aid}) | `GET /tickets/{id}/attachments/{aid}` |

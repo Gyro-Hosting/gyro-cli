@@ -251,8 +251,16 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro ssh-key delete` | SSH anahtarını sil | `DELETE /cloud/ssh-keys/{id}` |
 | `gyro ssh-key get` | SSH anahtarını getir | `GET /cloud/ssh-keys/{id}` |
 | `gyro ssh-key list` | SSH anahtarlarını listele | `GET /cloud/ssh-keys` |
+| `gyro storage bucket rename` | Kova adını değiştir | `POST /cloud/storage/{id}/buckets/{bucket}/rename` |
 | `gyro storage connect get` | connect (GyroDepolama) | `GET /cloud/storage/{id}/connect` |
+| `gyro storage folder count` | Klasördeki nesneleri say | `GET /cloud/storage/{id}/buckets/{bucket}/folders/count` |
+| `gyro storage folder create` | Klasör oluştur | `POST /cloud/storage/{id}/buckets/{bucket}/folders` |
+| `gyro storage folder delete` | Klasörü içindekilerle sil | `DELETE /cloud/storage/{id}/buckets/{bucket}/folders` |
 | `gyro storage key rotate` | access-keys:rotate (GyroDepolama) | `POST /cloud/storage/{id}/keys/{key}/rotate` |
+| `gyro storage object delete` | Nesneleri sil | `POST /cloud/storage/{id}/buckets/{bucket}/objects/delete` |
+| `gyro storage object download-url` | İmzalı indirme adresi | `POST /cloud/storage/{id}/buckets/{bucket}/objects/download-url` |
+| `gyro storage object list` | Kova klasöründeki nesneleri listele | `GET /cloud/storage/{id}/buckets/{bucket}/objects` |
+| `gyro storage object upload-url` | İmzalı yükleme adresleri | `POST /cloud/storage/{id}/buckets/{bucket}/objects/upload-url` |
 | `gyro storage usage get` | usage (GyroDepolama) | `GET /cloud/storage/{id}/usage` |
 | `gyro ticket access-group list` | Erişim Gruplarını Listeleme | `GET /tickets/access-groups` |
 | `gyro ticket attachment get` | Eki İndirme | `GET /tickets/{id}/attachments/{aid}` |

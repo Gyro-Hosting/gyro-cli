@@ -35,5 +35,6 @@ gyro s3 bucket [flags]
 * [gyro s3 bucket create](gyro_s3_bucket_create.md)	 - create (fields with --set key=value)
 * [gyro s3 bucket delete](gyro_s3_bucket_delete.md)	 - delete (fields with --set key=value)
 * [gyro s3 bucket list](gyro_s3_bucket_list.md)	 - Show
+* [gyro s3 bucket rename](gyro_s3_bucket_rename.md)	 - Rename a bucket
 * [gyro s3 bucket update](gyro_s3_bucket_update.md)	 - update (fields with --set key=value)
 

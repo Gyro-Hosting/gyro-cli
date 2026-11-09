@@ -1,0 +1,89 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-s3-object-list - List objects in a bucket folder
+
+
+.SH SYNOPSIS
+\fBgyro s3 object list   [flags]\fP
+
+
+.SH DESCRIPTION
+List objects in a bucket folder
+
+.PP
+One page (200) of a folder: \fBfolders\fR (common prefixes) and \fBfiles\fR (key, size, modified). Pass \fBnext\fR from the previous page to continue.
+
+.PP
+API: GET /cloud/storage/{id}/buckets/{bucket}/objects (operationId typed_get_storage\fBid\fPbuckets\fBbucket\fPobjects, scope services_read)
+
+
+.SH OPTIONS
+\fB-h\fP, \fB--help\fP[=false]
+	help for list
+
+.PP
+\fB--next\fP=""
+	Continuation token
+
+.PP
+\fB--prefix\fP=""
+	Folder, ends with / (empty = root)
+
+.PP
+\fB--search\fP=""
+	Name prefix inside the folder
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH SEE ALSO
+\fBgyro-s3-object(1)\fP

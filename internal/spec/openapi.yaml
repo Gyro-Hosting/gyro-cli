@@ -4254,6 +4254,477 @@ paths:
           $ref: '#/components/responses/Conflict'
         '422':
           $ref: '#/components/responses/Validation'
+  /cloud/storage/{id}/buckets/{bucket}/rename:
+    post:
+      tags:
+      - Object storage
+      operationId: typed_post_storage__id__buckets__bucket__rename
+      summary: Rename a bucket
+      x-summary-tr: Kova adını değiştir
+      x-scope: services_write
+      description: 'Data is not moved; the old name stops working at once (S3, website, share links). Max 5 renames per bucket per day; a released name stays reserved
+        for 40 days. Needs `"confirm": true`.'
+      x-description-tr: 'Veri taşınmaz; eski ad hemen çalışmayı durdurur (S3, web sitesi, paylaşım bağlantıları). Kova başına günde en çok 5; bırakılan ad 40 gün
+        rezerve kalır. `"confirm": true` gerekir.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: bucket
+        in: path
+        required: true
+        schema:
+          type: string
+        description: ''
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                new_name:
+                  type: string
+                confirm:
+                  type: boolean
+              required:
+              - new_name
+      x-cli:
+        command: storage bucket rename
+        confirm: true
+  /cloud/storage/{id}/buckets/{bucket}/objects:
+    get:
+      tags:
+      - Object storage
+      operationId: typed_get_storage__id__buckets__bucket__objects
+      summary: List objects in a bucket folder
+      x-summary-tr: Kova klasöründeki nesneleri listele
+      x-scope: services_read
+      description: 'One page (200) of a folder: `folders` (common prefixes) and `files` (key, size, modified). Pass `next` from the previous page to continue.'
+      x-description-tr: 'Bir klasörün bir sayfası (200): `folders` ve `files` (anahtar, boyut, tarih). Devam için önceki sayfanın `next` değerini verin.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: bucket
+        in: path
+        required: true
+        schema:
+          type: string
+        description: ''
+      - name: prefix
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Folder, ends with / (empty = root)
+      - name: search
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Name prefix inside the folder
+      - name: next
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Continuation token
+      responses:
+        '200':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      x-cli:
+        command: storage object list
+        confirm: false
+  /cloud/storage/{id}/buckets/{bucket}/objects/upload-url:
+    post:
+      tags:
+      - Object storage
+      operationId: typed_post_storage__id__buckets__bucket__objects_upload_url
+      summary: Presigned upload URLs
+      x-summary-tr: İmzalı yükleme adresleri
+      x-scope: services_write
+      description: 'Up to 100 files per call, max 5 GiB each. PUT the file body to each `url` within 15 minutes; data never passes through the API. Larger files:
+        any S3 client (multipart).'
+      x-description-tr: 'Çağrı başına en çok 100 dosya, dosya başına 5 GiB. Dosyayı 15 dakika içinde her `url` adresine PUT edin; veri API''den geçmez. Büyük dosyalar:
+        herhangi bir S3 istemcisi (multipart).'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: bucket
+        in: path
+        required: true
+        schema:
+          type: string
+        description: ''
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                prefix:
+                  type: string
+                  description: Target folder (ends with /)
+                items:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      size:
+                        type: integer
+                    required:
+                    - name
+                    - size
+                confirm:
+                  type: boolean
+              required:
+              - items
+      x-cli:
+        command: storage object upload-url
+        confirm: false
+  /cloud/storage/{id}/buckets/{bucket}/objects/download-url:
+    post:
+      tags:
+      - Object storage
+      operationId: typed_post_storage__id__buckets__bucket__objects_download_url
+      summary: Presigned download URL
+      x-summary-tr: İmzalı indirme adresi
+      x-scope: services_write
+      description: 'Returns a 15-minute GET URL (Content-Disposition: attachment). Downloads count toward the service''s monthly traffic.'
+      x-description-tr: '15 dakikalık GET adresi döner (Content-Disposition: attachment). İndirmeler hizmetin aylık trafiğinden düşer.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: bucket
+        in: path
+        required: true
+        schema:
+          type: string
+        description: ''
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                key:
+                  type: string
+                  description: Object key
+                confirm:
+                  type: boolean
+              required:
+              - key
+      x-cli:
+        command: storage object download-url
+        confirm: false
+  /cloud/storage/{id}/buckets/{bucket}/objects/delete:
+    post:
+      tags:
+      - Object storage
+      operationId: typed_post_storage__id__buckets__bucket__objects_delete
+      summary: Delete objects
+      x-summary-tr: Nesneleri sil
+      x-scope: services_write
+      description: 'Deletes up to 1000 keys in one call. Needs `"confirm": true`.'
+      x-description-tr: 'Tek çağrıda en çok 1000 anahtar siler. `"confirm": true` gerekir.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: bucket
+        in: path
+        required: true
+        schema:
+          type: string
+        description: ''
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                keys:
+                  type: array
+                  items:
+                    type: string
+                confirm:
+                  type: boolean
+              required:
+              - keys
+      x-cli:
+        command: storage object delete
+        confirm: true
+  /cloud/storage/{id}/buckets/{bucket}/folders:
+    post:
+      tags:
+      - Object storage
+      operationId: typed_post_storage__id__buckets__bucket__folders
+      summary: Create a folder
+      x-summary-tr: Klasör oluştur
+      x-scope: services_write
+      description: Creates an empty folder marker `prefix + name + /`.
+      x-description-tr: Boş klasör işareti `prefix + name + /` oluşturur.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: bucket
+        in: path
+        required: true
+        schema:
+          type: string
+        description: ''
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                prefix:
+                  type: string
+                name:
+                  type: string
+                confirm:
+                  type: boolean
+              required:
+              - name
+      x-cli:
+        command: storage folder create
+        confirm: false
+    delete:
+      tags:
+      - Object storage
+      operationId: typed_delete_storage__id__buckets__bucket__folders
+      summary: Delete a folder with its contents
+      x-summary-tr: Klasörü içindekilerle sil
+      x-scope: services_write
+      description: 'Deletes every object under `prefix` (query). Large folders are deleted in batches: repeat while `more` is true. Needs `"confirm": true`.'
+      x-description-tr: '`prefix` (sorgu) altındaki tüm nesneleri siler. Büyük klasörler parça parça silinir: `more` true olduğu sürece tekrarlayın. `"confirm": true`
+        gerekir.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: bucket
+        in: path
+        required: true
+        schema:
+          type: string
+        description: ''
+      - name: prefix
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Folder, ends with /
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                confirm:
+                  type: boolean
+              required: []
+      x-cli:
+        command: storage folder delete
+        confirm: true
+  /cloud/storage/{id}/buckets/{bucket}/folders/count:
+    get:
+      tags:
+      - Object storage
+      operationId: typed_get_storage__id__buckets__bucket__folders_count
+      summary: Count objects in a folder
+      x-summary-tr: Klasördeki nesneleri say
+      x-scope: services_read
+      description: Number of objects under `prefix` (`more` = over 100000 or time limit).
+      x-description-tr: '`prefix` altındaki nesne sayısı (`more` = 100000 üstü ya da süre sınırı).'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: bucket
+        in: path
+        required: true
+        schema:
+          type: string
+        description: ''
+      - name: prefix
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Folder, ends with /
+      responses:
+        '200':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      x-cli:
+        command: storage folder count
+        confirm: false
   /cloud/storage/{id}/connect:
     get:
       tags:
