@@ -6,7 +6,7 @@ Alan Adı Ek Hizmeti Alma
 
 Alan Adı Ek Hizmeti Alma
 
-**Para harcar / fatura oluşturur.** Para kuralları (AK-40): gövdede `"confirm": true`, `Idempotency-Key` başlığı, yalnız bakiye (kayıtlı kart yok), hesap başına günlük sınır. Alan adı yönetimi, gizlilik ya da yönlendirme ek hizmetini satın alır. — oranlı ilk dönem
+**Para harcar / fatura oluşturur.** Para kuralları (AK-40): gövdede `"confirm": true`, `Idempotency-Key` başlığı, yalnız bakiye (kayıtlı kart yok), hesap başına günlük ücretli işlem sınırı (varsayılan 50, hesap/bayi bazında değiştirilebilir, 00:00 TR'de sıfırlanır). Alan adı yönetimi, gizlilik ya da yönlendirme ek hizmetini satın alır. — oranlı ilk dönem
 
 API: POST /domains/{domain}/addons/{key} (operationId coreBuyDomainAddon, scope Domains/BuyDomainAddon)
 

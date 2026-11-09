@@ -2,7 +2,7 @@
 openapi: 3.1.0
 info:
   title: Gyro Public API
-  version: 2.1.0
+  version: 2.1.1
   summary: Manage Gyro cloud servers, SSH keys and billing programmatically.
   x-summary-tr: Gyro bulut sunucularınızı, SSH anahtarlarınızı ve faturalarınızı programla yönetin.
   description: "The Gyro Public API lets you automate everything you do in the Gyro client area:\norder and manage cloud servers, keep SSH keys, read invoices and\
@@ -104,8 +104,10 @@ tags:
   description: Install a one-click app on a cloud server (the disk is rebuilt).
   x-description-tr: Bulut sunucuya tek tık uygulama kur (disk yeniden kurulur).
 - name: Plan changes and add-ons
-  description: Resize (plan upgrade) and add-on purchase, paid from the account balance (dry_run, confirm, Idempotency-Key, daily limit).
-  x-description-tr: Paket yükseltme ve ek hizmet satın alma; bakiyeden ödenir (dry_run, confirm, Idempotency-Key, günlük sınır).
+  description: 'Resize (plan upgrade) and add-on purchase, paid from the account balance (dry_run, confirm, Idempotency-Key, daily limit: default 50 paid operations
+    per account, per-account/reseller override, 429 daily_limit).'
+  x-description-tr: 'Paket yükseltme ve ek hizmet satın alma; bakiyeden ödenir (dry_run, confirm, Idempotency-Key, günlük sınır: hesap başına varsayılan 50 ücretli
+    işlem, hesap/bayi bazında istisna, 429 daily_limit).'
 - name: Panel users
   description: 'Sub-users: extra panel logins with limited permissions (accountant, technical staff). Scope `users`.'
   x-description-tr: 'Alt kullanıcılar: sınırlı izinli ek panel girişleri (muhasebe, teknik ekip). Kapsam `users`.'
@@ -5620,11 +5622,12 @@ paths:
       x-scope: Services/RenewService
       x-generated: core-catalog
       description: "Renew service (path: {id}). Service of the calling account (any product line).\n\n**Spends money / creates an invoice.** Money rules apply (AK-40):\
-        \ `\"confirm\": true` in the body, an `Idempotency-Key` header, account balance only (no stored card), daily limit per account; violations answer 422 with\
-        \ `[confirm_required]`, `[idempotency_key_required]`, `[balance_only]` or `[daily_limit]` in the message. \n\nCore WISECP client endpoint (Turkish reference:\
-        \ https://dev.wisecp.com/tr/sahip-olunan-hizmetler)."
+        \ `\"confirm\": true` in the body, an `Idempotency-Key` header, account balance only (no stored card), daily limit of paid API operations per account (default\
+        \ 50, operator can override per account/reseller, resets 00:00 Europe/Istanbul); violations answer 422 with `[confirm_required]`, `[idempotency_key_required]`,\
+        \ `[balance_only]` or `[daily_limit]` in the message. \n\nCore WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/sahip-olunan-hizmetler)."
       x-description-tr: '**Para harcar / fatura oluşturur.** Para kuralları (AK-40): gövdede `"confirm": true`, `Idempotency-Key` başlığı, yalnız bakiye (kayıtlı
-        kart yok), hesap başına günlük sınır. Hizmet için bir yenileme faturası keser. — fatura üretir'
+        kart yok), hesap başına günlük ücretli işlem sınırı (varsayılan 50, hesap/bayi bazında değiştirilebilir, 00:00 TR''de sıfırlanır). Hizmet için bir yenileme
+        faturası keser. — fatura üretir'
       responses:
         '200':
           description: Success
@@ -6562,11 +6565,12 @@ paths:
       x-scope: Domains/RegisterDomain
       x-generated: core-catalog
       description: "Register domain. Domain operations run against the registrar module of the domain.\n\n**Spends money / creates an invoice.** Money rules apply\
-        \ (AK-40): `\"confirm\": true` in the body, an `Idempotency-Key` header, account balance only (no stored card), daily limit per account; violations answer\
-        \ 422 with `[confirm_required]`, `[idempotency_key_required]`, `[balance_only]` or `[daily_limit]` in the message. \n\nCore WISECP client endpoint (Turkish\
-        \ reference: https://dev.wisecp.com/tr/alan-adi-edinme)."
+        \ (AK-40): `\"confirm\": true` in the body, an `Idempotency-Key` header, account balance only (no stored card), daily limit of paid API operations per account\
+        \ (default 50, operator can override per account/reseller, resets 00:00 Europe/Istanbul); violations answer 422 with `[confirm_required]`, `[idempotency_key_required]`,\
+        \ `[balance_only]` or `[daily_limit]` in the message. \n\nCore WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/alan-adi-edinme)."
       x-description-tr: '**Para harcar / fatura oluşturur.** Para kuralları (AK-40): gövdede `"confirm": true`, `Idempotency-Key` başlığı, yalnız bakiye (kayıtlı
-        kart yok), hesap başına günlük sınır. Yeni bir alan adı sipariş eder ve tahsil eder. — bakiye ya da kayıtlı kart'
+        kart yok), hesap başına günlük ücretli işlem sınırı (varsayılan 50, hesap/bayi bazında değiştirilebilir, 00:00 TR''de sıfırlanır). Yeni bir alan adı sipariş
+        eder ve tahsil eder. — bakiye ya da kayıtlı kart'
       responses:
         '200':
           description: Success
@@ -6667,11 +6671,12 @@ paths:
       x-scope: Domains/TransferDomain
       x-generated: core-catalog
       description: "Transfer domain. Domain operations run against the registrar module of the domain.\n\n**Spends money / creates an invoice.** Money rules apply\
-        \ (AK-40): `\"confirm\": true` in the body, an `Idempotency-Key` header, account balance only (no stored card), daily limit per account; violations answer\
-        \ 422 with `[confirm_required]`, `[idempotency_key_required]`, `[balance_only]` or `[daily_limit]` in the message. \n\nCore WISECP client endpoint (Turkish\
-        \ reference: https://dev.wisecp.com/tr/alan-adi-edinme)."
+        \ (AK-40): `\"confirm\": true` in the body, an `Idempotency-Key` header, account balance only (no stored card), daily limit of paid API operations per account\
+        \ (default 50, operator can override per account/reseller, resets 00:00 Europe/Istanbul); violations answer 422 with `[confirm_required]`, `[idempotency_key_required]`,\
+        \ `[balance_only]` or `[daily_limit]` in the message. \n\nCore WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/alan-adi-edinme)."
       x-description-tr: '**Para harcar / fatura oluşturur.** Para kuralları (AK-40): gövdede `"confirm": true`, `Idempotency-Key` başlığı, yalnız bakiye (kayıtlı
-        kart yok), hesap başına günlük sınır. Başka bir sağlayıcıdaki alan adını buraya taşır. — kod gerekebilir'
+        kart yok), hesap başına günlük ücretli işlem sınırı (varsayılan 50, hesap/bayi bazında değiştirilebilir, 00:00 TR''de sıfırlanır). Başka bir sağlayıcıdaki
+        alan adını buraya taşır. — kod gerekebilir'
       responses:
         '200':
           description: Success
@@ -7314,11 +7319,12 @@ paths:
       x-scope: Domains/RenewDomain
       x-generated: core-catalog
       description: "Renew domain (path: {domain}). Domain operations run against the registrar module of the domain.\n\n**Spends money / creates an invoice.** Money\
-        \ rules apply (AK-40): `\"confirm\": true` in the body, an `Idempotency-Key` header, account balance only (no stored card), daily limit per account; violations\
-        \ answer 422 with `[confirm_required]`, `[idempotency_key_required]`, `[balance_only]` or `[daily_limit]` in the message. \n\nCore WISECP client endpoint\
-        \ (Turkish reference: https://dev.wisecp.com/tr/sahip-olunan-alan-adlari)."
+        \ rules apply (AK-40): `\"confirm\": true` in the body, an `Idempotency-Key` header, account balance only (no stored card), daily limit of paid API operations\
+        \ per account (default 50, operator can override per account/reseller, resets 00:00 Europe/Istanbul); violations answer 422 with `[confirm_required]`, `[idempotency_key_required]`,\
+        \ `[balance_only]` or `[daily_limit]` in the message. \n\nCore WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/sahip-olunan-alan-adlari)."
       x-description-tr: '**Para harcar / fatura oluşturur.** Para kuralları (AK-40): gövdede `"confirm": true`, `Idempotency-Key` başlığı, yalnız bakiye (kayıtlı
-        kart yok), hesap başına günlük sınır. Alan adı için istenen yıl sayısı kadar yenileme faturası keser. — fatura üretir'
+        kart yok), hesap başına günlük ücretli işlem sınırı (varsayılan 50, hesap/bayi bazında değiştirilebilir, 00:00 TR''de sıfırlanır). Alan adı için istenen yıl
+        sayısı kadar yenileme faturası keser. — fatura üretir'
       responses:
         '200':
           description: Success
@@ -9001,11 +9007,12 @@ paths:
       x-scope: Domains/BuyDomainAddon
       x-generated: core-catalog
       description: "Buy domain addon (path: {domain}, {key}). Domain operations run against the registrar module of the domain.\n\n**Spends money / creates an invoice.**\
-        \ Money rules apply (AK-40): `\"confirm\": true` in the body, an `Idempotency-Key` header, account balance only (no stored card), daily limit per account;\
-        \ violations answer 422 with `[confirm_required]`, `[idempotency_key_required]`, `[balance_only]` or `[daily_limit]` in the message. \n\nCore WISECP client\
-        \ endpoint (Turkish reference: https://dev.wisecp.com/tr/sahip-olunan-alan-adlari)."
+        \ Money rules apply (AK-40): `\"confirm\": true` in the body, an `Idempotency-Key` header, account balance only (no stored card), daily limit of paid API\
+        \ operations per account (default 50, operator can override per account/reseller, resets 00:00 Europe/Istanbul); violations answer 422 with `[confirm_required]`,\
+        \ `[idempotency_key_required]`, `[balance_only]` or `[daily_limit]` in the message. \n\nCore WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/sahip-olunan-alan-adlari)."
       x-description-tr: '**Para harcar / fatura oluşturur.** Para kuralları (AK-40): gövdede `"confirm": true`, `Idempotency-Key` başlığı, yalnız bakiye (kayıtlı
-        kart yok), hesap başına günlük sınır. Alan adı yönetimi, gizlilik ya da yönlendirme ek hizmetini satın alır. — oranlı ilk dönem'
+        kart yok), hesap başına günlük ücretli işlem sınırı (varsayılan 50, hesap/bayi bazında değiştirilebilir, 00:00 TR''de sıfırlanır). Alan adı yönetimi, gizlilik
+        ya da yönlendirme ek hizmetini satın alır. — oranlı ilk dönem'
       responses:
         '200':
           description: Success
@@ -9255,10 +9262,12 @@ paths:
       x-scope: Orders/CreateOrder
       x-generated: core-catalog
       description: "Create order. Orders of the calling account.\n\n**Spends money / creates an invoice.** Money rules apply (AK-40): `\"confirm\": true` in the body,\
-        \ an `Idempotency-Key` header, account balance only (no stored card), daily limit per account; violations answer 422 with `[confirm_required]`, `[idempotency_key_required]`,\
-        \ `[balance_only]` or `[daily_limit]` in the message. \n\nCore WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/musteri-olarak-siparis)."
+        \ an `Idempotency-Key` header, account balance only (no stored card), daily limit of paid API operations per account (default 50, operator can override per\
+        \ account/reseller, resets 00:00 Europe/Istanbul); violations answer 422 with `[confirm_required]`, `[idempotency_key_required]`, `[balance_only]` or `[daily_limit]`\
+        \ in the message. \n\nCore WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/musteri-olarak-siparis)."
       x-description-tr: '**Para harcar / fatura oluşturur.** Para kuralları (AK-40): gövdede `"confirm": true`, `Idempotency-Key` başlığı, yalnız bakiye (kayıtlı
-        kart yok), hesap başına günlük sınır. Siparişi verir ve aynı çağrıda tahsil eder. — bakiye ya da kayıtlı kart'
+        kart yok), hesap başına günlük ücretli işlem sınırı (varsayılan 50, hesap/bayi bazında değiştirilebilir, 00:00 TR''de sıfırlanır). Siparişi verir ve aynı
+        çağrıda tahsil eder. — bakiye ya da kayıtlı kart'
       responses:
         '200':
           description: Success
@@ -9505,10 +9514,12 @@ paths:
       x-scope: Invoices/PayInvoice
       x-generated: core-catalog
       description: "Pay invoice (path: {id}). Invoices of the calling account.\n\n**Spends money / creates an invoice.** Money rules apply (AK-40): `\"confirm\":\
-        \ true` in the body, an `Idempotency-Key` header, account balance only (no stored card), daily limit per account; violations answer 422 with `[confirm_required]`,\
-        \ `[idempotency_key_required]`, `[balance_only]` or `[daily_limit]` in the message. \n\nCore WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/fatura-odeme-api)."
+        \ true` in the body, an `Idempotency-Key` header, account balance only (no stored card), daily limit of paid API operations per account (default 50, operator\
+        \ can override per account/reseller, resets 00:00 Europe/Istanbul); violations answer 422 with `[confirm_required]`, `[idempotency_key_required]`, `[balance_only]`\
+        \ or `[daily_limit]` in the message. \n\nCore WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/fatura-odeme-api)."
       x-description-tr: '**Para harcar / fatura oluşturur.** Para kuralları (AK-40): gövdede `"confirm": true`, `Idempotency-Key` başlığı, yalnız bakiye (kayıtlı
-        kart yok), hesap başına günlük sınır. Açık bir faturayı bakiyeyle ya da kayıtlı kartla kapatır. — bakiye ya da kayıtlı kart'
+        kart yok), hesap başına günlük ücretli işlem sınırı (varsayılan 50, hesap/bayi bazında değiştirilebilir, 00:00 TR''de sıfırlanır). Açık bir faturayı bakiyeyle
+        ya da kayıtlı kartla kapatır. — bakiye ya da kayıtlı kart'
       responses:
         '200':
           description: Success

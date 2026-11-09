@@ -6,7 +6,7 @@ Sipariş Verme
 
 Sipariş Verme
 
-**Para harcar / fatura oluşturur.** Para kuralları (AK-40): gövdede `"confirm": true`, `Idempotency-Key` başlığı, yalnız bakiye (kayıtlı kart yok), hesap başına günlük sınır. Siparişi verir ve aynı çağrıda tahsil eder. — bakiye ya da kayıtlı kart
+**Para harcar / fatura oluşturur.** Para kuralları (AK-40): gövdede `"confirm": true`, `Idempotency-Key` başlığı, yalnız bakiye (kayıtlı kart yok), hesap başına günlük ücretli işlem sınırı (varsayılan 50, hesap/bayi bazında değiştirilebilir, 00:00 TR'de sıfırlanır). Siparişi verir ve aynı çağrıda tahsil eder. — bakiye ya da kayıtlı kart
 
 API: POST /orders (operationId coreCreateOrder, scope Orders/CreateOrder)
 

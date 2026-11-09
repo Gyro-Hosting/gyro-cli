@@ -13,7 +13,7 @@ gyro-domain-renew - Renew domain (path: {domain})
 Renew domain (path: {domain})
 
 .PP
-Renew domain (path: {domain}). Domain operations run against the registrar module of the domain. \fBSpends money / creates an invoice.\fP Money rules apply (AK-40): \fB"confirm": true\fR in the body, an \fBIdempotency-Key\fR header, account balance only (no stored card), daily limit per account; violations answer 422 with \fB[confirm_required]\fR, \fB[idempotency_key_required]\fR, \fB[balance_only]\fR or \fB[daily_limit]\fR in the message. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/sahip-olunan-alan-adlari).
+Renew domain (path: {domain}). Domain operations run against the registrar module of the domain. \fBSpends money / creates an invoice.\fP Money rules apply (AK-40): \fB"confirm": true\fR in the body, an \fBIdempotency-Key\fR header, account balance only (no stored card), daily limit of paid API operations per account (default 50, operator can override per account/reseller, resets 00:00 Europe/Istanbul); violations answer 422 with \fB[confirm_required]\fR, \fB[idempotency_key_required]\fR, \fB[balance_only]\fR or \fB[daily_limit]\fR in the message. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/sahip-olunan-alan-adlari).
 
 .PP
 API: POST /domains/{domain}/renew (operationId coreRenewDomain, scope Domains/RenewDomain)
