@@ -1,0 +1,101 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-service-label-set - Set the nickname and/or tags of a service
+
+
+.SH SYNOPSIS
+\fBgyro service label set  [flags]\fP
+
+
+.SH DESCRIPTION
+Set the nickname and/or tags of a service
+
+.PP
+Send \fBnickname\fR, \fBtags\fR or both; a field that is not sent stays unchanged. \fBnickname\fR "" or null clears it; \fBtags\fR replaces all tags and \fB[]\fR clears them. A tag is \fB"name"\fR or \fB{"name", "color"}\fR; an unknown or missing colour gets a stable default. Duplicate names (case-insensitive) are merged. Limit: 30 label writes per minute per key (429 \fBrate_limited\fR). Sub-account keys need the \fBlabel:edit\fR action. Errors: 422 \fBnothing_to_update\fR, \fBinvalid_nickname\fR, \fBinvalid_tags\fR; 404 \fBservice_not_found\fR (also for services of other accounts) or \fBfeature_unavailable\fR\&.
+
+.PP
+API: PUT /cloud/services/{id}/label (operationId updateServiceLabel, scope services_write)
+
+
+.SH OPTIONS
+\fB--data\fP=""
+	request body as JSON, @file or @- (stdin)
+
+.PP
+\fB--dry-run\fP[=false]
+	show the price quote / request without changing anything
+
+.PP
+\fB-h\fP, \fB--help\fP[=false]
+	help for set
+
+.PP
+\fB--idempotency-key\fP=""
+	idempotency key (automatic for money operations)
+
+.PP
+\fB--nickname\fP=""
+	"" or null clears the nickname. No control characters.
+
+.PP
+\fB--set\fP=[]
+	extra body field key=value (repeatable)
+
+.PP
+\fB--tags\fP=[]
+	Replaces all tags; [] or null clears them. Item: a tag name, or {"name", "color"} (CLI: use --data for colours).
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH SEE ALSO
+\fBgyro-service-label(1)\fP

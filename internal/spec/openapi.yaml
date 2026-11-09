@@ -2,7 +2,7 @@
 openapi: 3.1.0
 info:
   title: Gyro Public API
-  version: 2.1.1
+  version: 2.2.0
   summary: Manage Gyro cloud servers, SSH keys and billing programmatically.
   x-summary-tr: Gyro bulut sunucularınızı, SSH anahtarlarınızı ve faturalarınızı programla yönetin.
   description: "The Gyro Public API lets you automate everything you do in the Gyro client area:\norder and manage cloud servers, keep SSH keys, read invoices and\
@@ -1391,6 +1391,111 @@ paths:
           $ref: '#/components/responses/NotFound'
         '422':
           $ref: '#/components/responses/Validation'
+  /cloud/services/{id}/label:
+    parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: Service id
+    get:
+      tags:
+      - Services (all products)
+      operationId: getServiceLabel
+      summary: Get the nickname and tags of a service
+      x-summary-tr: Hizmetin takma adını ve etiketlerini getir
+      description: 'Customer-defined nickname and colour tags of one of your services (any product line). A service without a label answers `"nickname": null` and
+        `"tags": []`. Labels are private to the service owner; after a transfer the old owner''s label is not shown.'
+      x-description-tr: 'Hizmetlerinizden birinin (her ürün hattı) müşteri tanımlı takma adı ve renkli etiketleri. Etiketsiz hizmet `"nickname": null` ve `"tags":
+        []` döner. Etiketler yalnız hizmet sahibine görünür; devirden sonra eski sahibin etiketi gösterilmez.'
+      x-scope: services_read
+      responses:
+        '200':
+          description: Label
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ServiceLabel'
+              example:
+                data:
+                  service_id: 17488
+                  nickname: Accounting server
+                  tags:
+                  - name: production
+                    color: green
+                  - name: customer-A
+                    color: blue
+                  updated_at: '2026-11-10T02:30:00+03:00'
+                  colors:
+                  - gray
+                  - blue
+                  - green
+                  - red
+                  - orange
+                  - yellow
+                  - purple
+                  - pink
+                  - teal
+                  - indigo
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+    put:
+      tags:
+      - Services (all products)
+      operationId: updateServiceLabel
+      summary: Set the nickname and/or tags of a service
+      x-summary-tr: Hizmetin takma adını ve/veya etiketlerini ayarla
+      description: 'Send `nickname`, `tags` or both; a field that is not sent stays unchanged. `nickname` "" or null clears it; `tags` replaces all tags and `[]`
+        clears them. A tag is `"name"` or `{"name", "color"}`; an unknown or missing colour gets a stable default. Duplicate names (case-insensitive) are merged.
+        Limit: 30 label writes per minute per key (429 `rate_limited`). Sub-account keys need the `label:edit` action. Errors: 422 `nothing_to_update`, `invalid_nickname`,
+        `invalid_tags`; 404 `service_not_found` (also for services of other accounts) or `feature_unavailable`.'
+      x-description-tr: '`nickname`, `tags` ya da ikisini gönderin; gönderilmeyen alan değişmez. `nickname` "" veya null temizler; `tags` tüm etiketlerin yerine geçer,
+        `[]` temizler. Etiket `"ad"` ya da `{"name", "color"}`; bilinmeyen/eksik renk için sabit varsayılan atanır. Aynı adlı (büyük/küçük harf duyarsız) etiketler
+        birleştirilir. Sınır: anahtar başına dakikada 30 etiket yazması (429 `rate_limited`). Alt hesap anahtarı `label:edit` eylemi ister. Hatalar: 422 `nothing_to_update`,
+        `invalid_nickname`, `invalid_tags`; 404 `service_not_found` (başka hesabın hizmeti dahil) veya `feature_unavailable`.'
+      x-scope: services_write
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceLabelUpdate'
+            example:
+              nickname: Accounting server
+              tags:
+              - name: production
+                color: green
+              - customer-A
+      responses:
+        '200':
+          description: Saved label
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ServiceLabel'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/Validation'
+        '429':
+          $ref: '#/components/responses/RateLimited'
   /cloud/servers/{id}/firewall/rules:
     parameters:
     - $ref: '#/components/parameters/ServerId'
@@ -10829,6 +10934,17 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
+    RateLimited:
+      description: Too many requests (`rate_limited`); see the `Retry-After` and `X-RateLimit-*` headers
+      headers:
+        Retry-After:
+          description: Seconds to wait
+          schema:
+            type: integer
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
   schemas:
     Error:
       type: object
@@ -11446,6 +11562,91 @@ components:
           - integer
           - 'null'
           description: Reseller end-customer the service is assigned to
+        nickname:
+          type:
+          - string
+          - 'null'
+          description: Customer-defined nickname (see `/cloud/services/{id}/label`); null when not set
+        tags:
+          type: array
+          description: Customer-defined colour tags (see `/cloud/services/{id}/label`); empty when not set
+          items:
+            $ref: '#/components/schemas/ServiceLabelTag'
+    ServiceLabelTag:
+      type: object
+      required:
+      - name
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 24
+          description: 'Letter or digit first; then letters, digits, space and . _ - / + # &'
+          example: production
+        color:
+          type: string
+          enum:
+          - gray
+          - blue
+          - green
+          - red
+          - orange
+          - yellow
+          - purple
+          - pink
+          - teal
+          - indigo
+          example: green
+    ServiceLabel:
+      type: object
+      properties:
+        service_id:
+          type: integer
+        nickname:
+          type:
+          - string
+          - 'null'
+          maxLength: 60
+          description: Shown next to the product name in the client area
+        tags:
+          type: array
+          maxItems: 10
+          items:
+            $ref: '#/components/schemas/ServiceLabelTag'
+        updated_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        colors:
+          type: array
+          description: Allowed colour keys (palette)
+          items:
+            type: string
+    ServiceLabelUpdate:
+      type: object
+      minProperties: 1
+      properties:
+        nickname:
+          type:
+          - string
+          - 'null'
+          maxLength: 60
+          description: '"" or null clears the nickname. No control characters.'
+          x-description-tr: '"" veya null takma adı temizler. Kontrol karakteri içeremez.'
+        tags:
+          type:
+          - array
+          - 'null'
+          maxItems: 10
+          description: 'Replaces all tags; [] or null clears them. Item: a tag name, or {"name", "color"} (CLI: use --data for colours).'
+          x-description-tr: 'Tüm etiketlerin yerine geçer; [] veya null temizler. Öğe: etiket adı ya da {"name", "color"} (CLI: renk için --data kullanın).'
+          items:
+            oneOf:
+            - type: string
+              minLength: 1
+              maxLength: 24
+            - $ref: '#/components/schemas/ServiceLabelTag'
     ServiceTools:
       type: object
       properties:

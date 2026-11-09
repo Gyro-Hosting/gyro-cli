@@ -38,6 +38,7 @@ gyro service [flags]
 * [gyro service dashboard](gyro_service_dashboard.md)	 - Get service dashboard (path: {id})
 * [gyro service get](gyro_service_get.md)	 - Get a service (renewal, cancellation, access details)
 * [gyro service invoice](gyro_service_invoice.md)	 - List service invoices (path: {id})
+* [gyro service label](gyro_service_label.md)	 - Get the nickname and tags of a service
 * [gyro service list](gyro_service_list.md)	 - List services of every product line
 * [gyro service method](gyro_service_method.md)	 - Call a client-callable module method (e.g. license change_ip)
 * [gyro service metrics](gyro_service_metrics.md)	 - Get service metrics (path: {id})

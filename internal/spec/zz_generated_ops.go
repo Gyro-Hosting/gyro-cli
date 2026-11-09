@@ -3,7 +3,7 @@
 package spec
 
 // APIVersion is info.version of the spec this table was generated from.
-const APIVersion = "2.1.1"
+const APIVersion = "2.2.0"
 
 // Ops lists every API operation.
 var Ops = []Op{
@@ -1076,7 +1076,7 @@ var Ops = []Op{
 		Summary: "List services of every product line", SummaryTR: "Tüm ürün hatlarındaki hizmetleri listele",
 		Scope: "services_read", Command: []string{"service", "list"},
 		HasBody: false, BodyRequired: false, ListResponse: true, Paginated: true, Confirm: false, Money: false, Hidden: false,
-		Columns: []string{"id", "type", "product_line", "module", "name", "status", "product_id", "host", "ip", "cycle", "price", "auto_renew", "due_date", "customer_id"},
+		Columns: []string{"id", "type", "product_line", "module", "name", "status", "product_id", "host", "ip", "cycle", "price", "auto_renew", "due_date", "customer_id", "nickname"},
 		Params: []Param{
 			{Name: "product_line", In: "query", Type: "string", Items: "", Enum: []string{"cloud_server", "vds", "dedicated_server", "mail", "monitor", "storage", "license", "app"}, Default: "", Required: false, Desc: "", DescTR: ""},
 			{Name: "status", In: "query", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
@@ -1089,7 +1089,7 @@ var Ops = []Op{
 		Summary: "Get a service (renewal, cancellation, access details)", SummaryTR: "Hizmeti getir (yenileme, iptal, erişim bilgileri)",
 		Scope: "services_read", Command: []string{"service", "get"},
 		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
-		Columns: []string{"id", "type", "product_line", "module", "name", "status", "product_id", "host", "ip", "cycle", "price", "auto_renew", "due_date", "customer_id"},
+		Columns: []string{"id", "type", "product_line", "module", "name", "status", "product_id", "host", "ip", "cycle", "price", "auto_renew", "due_date", "customer_id", "nickname"},
 		Params: []Param{
 			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "", DescTR: ""},
 		},
@@ -1116,6 +1116,30 @@ var Ops = []Op{
 		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
 		Params: []Param{
 			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "", DescTR: ""},
+		},
+	},
+	{ID: "getServiceLabel", Method: "GET", Path: "/cloud/services/{id}/label", Tag: "Services (all products)",
+		Summary: "Get the nickname and tags of a service", SummaryTR: "Hizmetin takma adını ve etiketlerini getir",
+		Desc: "Customer-defined nickname and colour tags of one of your services (any product line). A service without a label answers `\"nickname\": null` and `\"tags\": []`. Labels are private to the service owner; after a transfer the old owner's label is not shown.", DescTR: "Hizmetlerinizden birinin (her ürün hattı) müşteri tanımlı takma adı ve renkli etiketleri. Etiketsiz hizmet `\"nickname\": null` ve `\"tags\": []` döner. Etiketler yalnız hizmet sahibine görünür; devirden sonra eski sahibin etiketi gösterilmez.",
+		Scope: "services_read", Command: []string{"service", "label", "get"},
+		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
+		Columns: []string{"service_id", "nickname", "updated_at"},
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Service id", DescTR: ""},
+		},
+	},
+	{ID: "updateServiceLabel", Method: "PUT", Path: "/cloud/services/{id}/label", Tag: "Services (all products)",
+		Summary: "Set the nickname and/or tags of a service", SummaryTR: "Hizmetin takma adını ve/veya etiketlerini ayarla",
+		Desc: "Send `nickname`, `tags` or both; a field that is not sent stays unchanged. `nickname` \"\" or null clears it; `tags` replaces all tags and `[]` clears them. A tag is `\"name\"` or `{\"name\", \"color\"}`; an unknown or missing colour gets a stable default. Duplicate names (case-insensitive) are merged. Limit: 30 label writes per minute per key (429 `rate_limited`). Sub-account keys need the `label:edit` action. Errors: 422 `nothing_to_update`, `invalid_nickname`, `invalid_tags`; 404 `service_not_found` (also for services of other accounts) or `feature_unavailable`.", DescTR: "`nickname`, `tags` ya da ikisini gönderin; gönderilmeyen alan değişmez. `nickname` \"\" veya null temizler; `tags` tüm etiketlerin yerine geçer, `[]` temizler. Etiket `\"ad\"` ya da `{\"name\", \"color\"}`; bilinmeyen/eksik renk için sabit varsayılan atanır. Aynı adlı (büyük/küçük harf duyarsız) etiketler birleştirilir. Sınır: anahtar başına dakikada 30 etiket yazması (429 `rate_limited`). Alt hesap anahtarı `label:edit` eylemi ister. Hatalar: 422 `nothing_to_update`, `invalid_nickname`, `invalid_tags`; 404 `service_not_found` (başka hesabın hizmeti dahil) veya `feature_unavailable`.",
+		Scope: "services_write", Command: []string{"service", "label", "set"},
+		HasBody: true, BodyRequired: true, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
+		Columns: []string{"service_id", "nickname", "updated_at"},
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Service id", DescTR: ""},
+		},
+		Body: []Field{
+			{Name: "nickname", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "\"\" or null clears the nickname. No control characters.", DescTR: "\"\" veya null takma adı temizler. Kontrol karakteri içeremez."},
+			{Name: "tags", Type: "array", Items: "string", Enum: nil, Default: "", Required: false, Desc: "Replaces all tags; [] or null clears them. Item: a tag name, or {\"name\", \"color\"} (CLI: use --data for colours).", DescTR: "Tüm etiketlerin yerine geçer; [] veya null temizler. Öğe: etiket adı ya da {\"name\", \"color\"} (CLI: renk için --data kullanın)."},
 		},
 	},
 	{ID: "callServiceMethod", Method: "POST", Path: "/cloud/services/{id}/methods/{method}", Tag: "Services (all products)",

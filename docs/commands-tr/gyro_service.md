@@ -38,6 +38,7 @@ gyro service [flags]
 * [gyro service dashboard](gyro_service_dashboard.md)	 - Panel Özetini Okuma
 * [gyro service get](gyro_service_get.md)	 - Hizmeti getir (yenileme, iptal, erişim bilgileri)
 * [gyro service invoice](gyro_service_invoice.md)	 - Hizmetin Faturalarını Okuma
+* [gyro service label](gyro_service_label.md)	 - Hizmetin takma adını ve etiketlerini getir
 * [gyro service list](gyro_service_list.md)	 - Tüm ürün hatlarındaki hizmetleri listele
 * [gyro service method](gyro_service_method.md)	 - Müşteri-çağrılabilir modül metodunu çağır (örn. lisans change_ip)
 * [gyro service metrics](gyro_service_metrics.md)	 - Ölçümleri Okuma

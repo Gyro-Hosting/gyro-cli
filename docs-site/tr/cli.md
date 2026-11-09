@@ -225,6 +225,8 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro service dashboard get` | Panel Özetini Okuma | `GET /services/{id}/dashboard` |
 | `gyro service get` | Hizmeti getir (yenileme, iptal, erişim bilgileri) | `GET /cloud/services/{id}` |
 | `gyro service invoice list` | Hizmetin Faturalarını Okuma | `GET /services/{id}/invoices` |
+| `gyro service label get` | Hizmetin takma adını ve etiketlerini getir | `GET /cloud/services/{id}/label` |
+| `gyro service label set` | Hizmetin takma adını ve/veya etiketlerini ayarla | `PUT /cloud/services/{id}/label` |
 | `gyro service list` | Tüm ürün hatlarındaki hizmetleri listele | `GET /cloud/services` |
 | `gyro service method call` | Müşteri-çağrılabilir modül metodunu çağır (örn. lisans change_ip) | `POST /cloud/services/{id}/methods/{method}` |
 | `gyro service metrics billing list` | Kullanım Fatura Geçmişi | `GET /services/{id}/metrics/billing` |

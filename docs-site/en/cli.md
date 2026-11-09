@@ -225,6 +225,8 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro service dashboard get` | Get service dashboard (path: {id}) | `GET /services/{id}/dashboard` |
 | `gyro service get` | Get a service (renewal, cancellation, access details) | `GET /cloud/services/{id}` |
 | `gyro service invoice list` | List service invoices (path: {id}) | `GET /services/{id}/invoices` |
+| `gyro service label get` | Get the nickname and tags of a service | `GET /cloud/services/{id}/label` |
+| `gyro service label set` | Set the nickname and/or tags of a service | `PUT /cloud/services/{id}/label` |
 | `gyro service list` | List services of every product line | `GET /cloud/services` |
 | `gyro service method call` | Call a client-callable module method (e.g. license change_ip) | `POST /cloud/services/{id}/methods/{method}` |
 | `gyro service metrics billing list` | List service metric billing (path: {id}) | `GET /services/{id}/metrics/billing` |
