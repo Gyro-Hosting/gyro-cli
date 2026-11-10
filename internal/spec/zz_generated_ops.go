@@ -3,7 +3,7 @@
 package spec
 
 // APIVersion is info.version of the spec this table was generated from.
-const APIVersion = "2.2.1"
+const APIVersion = "2.3.0"
 
 // Ops lists every API operation.
 var Ops = []Op{
@@ -125,7 +125,7 @@ var Ops = []Op{
 		Summary: "List locations with orderable products", SummaryTR: "Sipariş verilebilen lokasyonları listele",
 		Scope: "cloud_read", Command: []string{"location", "list"},
 		HasBody: false, BodyRequired: false, ListResponse: true, Paginated: false, Confirm: false, Money: false, Hidden: false,
-		Columns: []string{"code", "city", "country", "zone", "products"},
+		Columns: []string{"region", "code", "city", "country", "zone", "products"},
 	},
 	{ID: "typed_get_mail__id__aliases", Method: "GET", Path: "/cloud/mail/{id}/aliases", Tag: "Mail",
 		Summary: "GET aliases (GyroMail)", SummaryTR: "aliases (GyroMail)",
@@ -563,10 +563,12 @@ var Ops = []Op{
 		Desc: "Prices are in the product currency, VAT excluded. `available=false` means temporarily out of stock.", DescTR: "Fiyatlar ürün para biriminde ve KDV hariçtir. `available=false` geçici olarak stokta yok demektir.",
 		Scope: "cloud_read", Command: []string{"product", "list"},
 		HasBody: false, BodyRequired: false, ListResponse: true, Paginated: true, Confirm: false, Money: false, Hidden: false,
-		Columns: []string{"id", "name", "server_type", "location", "cores", "memory_gb", "disk_gb", "cpu_type", "architecture", "traffic_tb", "ipv4", "ipv6", "available", "product_line"},
+		Columns: []string{"id", "name", "plan", "region", "server_type", "location", "cores", "memory_gb", "disk_gb", "cpu_type", "architecture", "traffic_tb", "ipv4", "ipv6", "available", "product_line"},
 		Params: []Param{
-			{Name: "location", In: "query", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "Filter by location code", DescTR: ""},
-			{Name: "server_type", In: "query", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "Filter by server type", DescTR: ""},
+			{Name: "region", In: "query", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "Filter by region (see GET /cloud/locations). A city name (falkenstein) also works.", DescTR: ""},
+			{Name: "plan", In: "query", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "Filter by plan name", DescTR: ""},
+			{Name: "location", In: "query", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "Deprecated alias of region (legacy location code)", DescTR: ""},
+			{Name: "server_type", In: "query", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "Deprecated alias of plan (legacy type code)", DescTR: ""},
 			{Name: "page", In: "query", Type: "integer", Items: "", Enum: nil, Default: "1", Required: false, Desc: "", DescTR: ""},
 			{Name: "limit", In: "query", Type: "integer", Items: "", Enum: nil, Default: "100", Required: false, Desc: "", DescTR: ""},
 		},
@@ -705,7 +707,7 @@ var Ops = []Op{
 		Summary: "List cloud servers", SummaryTR: "Bulut sunucuları listele",
 		Scope: "cloud_read", Command: []string{"server", "list"},
 		HasBody: false, BodyRequired: false, ListResponse: true, Paginated: true, Confirm: false, Money: false, Hidden: false,
-		Columns: []string{"id", "name", "hostname", "status", "product_id", "server_type", "location", "ipv4", "ipv6", "provisioned", "cycle", "price", "auto_renew", "created_at", "due_date", "cancellation", "customer_id", "product_line"},
+		Columns: []string{"id", "name", "hostname", "status", "product_id", "plan", "region", "server_type", "location", "ipv4", "ipv6", "provisioned", "cycle", "price", "auto_renew", "created_at", "due_date", "cancellation", "customer_id", "product_line"},
 		Params: []Param{
 			{Name: "status", In: "query", Type: "string", Items: "", Enum: []string{"active", "waiting", "inprocess", "suspended", "cancelled"}, Default: "", Required: false, Desc: "", DescTR: ""},
 			{Name: "page", In: "query", Type: "integer", Items: "", Enum: nil, Default: "1", Required: false, Desc: "", DescTR: ""},
@@ -722,9 +724,11 @@ var Ops = []Op{
 			{Name: "Idempotency-Key", In: "header", Type: "string", Items: "", Enum: nil, Default: "", Required: true, Desc: "Unique per logical request (e.g. a UUID). Replays within 24 hours return the stored answer.", DescTR: ""},
 		},
 		Body: []Field{
-			{Name: "product_id", Type: "integer", Items: "", Enum: nil, Default: "", Required: false, Desc: "From GET /cloud/products (or give server_type + location)", DescTR: ""},
-			{Name: "server_type", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
-			{Name: "location", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
+			{Name: "product_id", Type: "integer", Items: "", Enum: nil, Default: "", Required: false, Desc: "From GET /cloud/products (or give plan + region)", DescTR: ""},
+			{Name: "plan", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "Plan name from GET /cloud/products", DescTR: ""},
+			{Name: "region", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "Region from GET /cloud/locations", DescTR: ""},
+			{Name: "server_type", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "Deprecated alias of plan", DescTR: ""},
+			{Name: "location", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "Deprecated alias of region", DescTR: ""},
 			{Name: "cycle", Type: "string", Items: "", Enum: []string{"monthly", "quarterly", "semiannually", "annually"}, Default: "monthly", Required: false, Desc: "", DescTR: ""},
 			{Name: "image", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
 			{Name: "ssh_keys", Type: "array", Items: "integer", Enum: nil, Default: "", Required: false, Desc: "Ids from /cloud/ssh-keys (one key at creation in v1)", DescTR: ""},
@@ -740,7 +744,7 @@ var Ops = []Op{
 		Desc: "`live` is read from the platform (cached for 15 seconds) and is `null` while the server is not active.", DescTR: "`live` platformdan okunur (15 saniye önbellek) ve sunucu etkin değilken `null` olur.",
 		Scope: "cloud_read", Command: []string{"server", "get"},
 		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
-		Columns: []string{"id", "name", "hostname", "status", "product_id", "server_type", "location", "ipv4", "ipv6", "provisioned", "cycle", "price", "auto_renew", "created_at", "due_date", "cancellation", "customer_id", "product_line"},
+		Columns: []string{"id", "name", "hostname", "status", "product_id", "plan", "region", "server_type", "location", "ipv4", "ipv6", "provisioned", "cycle", "price", "auto_renew", "created_at", "due_date", "cancellation", "customer_id", "product_line"},
 		Params: []Param{
 			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Server id (= service id in the client area)", DescTR: ""},
 		},
@@ -749,7 +753,7 @@ var Ops = []Op{
 		Summary: "Rename a server or switch auto-renew", SummaryTR: "Sunucu adını değiştir veya otomatik yenilemeyi aç/kapat",
 		Scope: "cloud_write", Command: []string{"server", "update"},
 		HasBody: true, BodyRequired: true, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
-		Columns: []string{"id", "name", "hostname", "status", "product_id", "server_type", "location", "ipv4", "ipv6", "provisioned", "cycle", "price", "auto_renew", "created_at", "due_date", "cancellation", "customer_id", "product_line"},
+		Columns: []string{"id", "name", "hostname", "status", "product_id", "plan", "region", "server_type", "location", "ipv4", "ipv6", "provisioned", "cycle", "price", "auto_renew", "created_at", "due_date", "cancellation", "customer_id", "product_line"},
 		Params: []Param{
 			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Server id (= service id in the client area)", DescTR: ""},
 		},
