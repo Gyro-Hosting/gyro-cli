@@ -293,6 +293,9 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro ssh-key list` | List SSH keys | `GET /cloud/ssh-keys` |
 | `gyro storage bucket rename` | Rename a bucket | `POST /cloud/storage/{id}/buckets/{bucket}/rename` |
 | `gyro storage connect get` | GET connect (GyroDepolama) | `GET /cloud/storage/{id}/connect` |
+| `gyro storage cors delete` | Remove every CORS rule of a bucket | `DELETE /cloud/storage/{id}/buckets/{bucket}/cors` |
+| `gyro storage cors get` | CORS rules of a bucket | `GET /cloud/storage/{id}/buckets/{bucket}/cors` |
+| `gyro storage cors set` | Replace the CORS rules of a bucket | `PUT /cloud/storage/{id}/buckets/{bucket}/cors` |
 | `gyro storage folder count` | Count objects in a folder | `GET /cloud/storage/{id}/buckets/{bucket}/folders/count` |
 | `gyro storage folder create` | Create a folder | `POST /cloud/storage/{id}/buckets/{bucket}/folders` |
 | `gyro storage folder delete` | Delete a folder with its contents | `DELETE /cloud/storage/{id}/buckets/{bucket}/folders` |
@@ -302,6 +305,9 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro storage object list` | List objects in a bucket folder | `GET /cloud/storage/{id}/buckets/{bucket}/objects` |
 | `gyro storage object upload-url` | Presigned upload URLs | `POST /cloud/storage/{id}/buckets/{bucket}/objects/upload-url` |
 | `gyro storage usage get` | GET usage (GyroDepolama) | `GET /cloud/storage/{id}/usage` |
+| `gyro storage website disable` | Disable the static website | `DELETE /cloud/storage/{id}/buckets/{bucket}/website` |
+| `gyro storage website get` | Static website settings of a bucket | `GET /cloud/storage/{id}/buckets/{bucket}/website` |
+| `gyro storage website set` | Enable / update the static website | `PUT /cloud/storage/{id}/buckets/{bucket}/website` |
 | `gyro ticket access-group list` | List ticket access groups | `GET /tickets/access-groups` |
 | `gyro ticket attachment get` | Get ticket attachment (path: {id}, {aid}) | `GET /tickets/{id}/attachments/{aid}` |
 | `gyro ticket close` | Close ticket (path: {id}) | `POST /tickets/{id}/close` |

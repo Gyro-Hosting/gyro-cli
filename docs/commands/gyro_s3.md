@@ -35,6 +35,7 @@ gyro s3 [flags]
 * [gyro s3 bucket](gyro_s3_bucket.md)	 - Buckets
 * [gyro s3 call](gyro_s3_call.md)	 - Call a module method of a service
 * [gyro s3 connect](gyro_s3_connect.md)	 - GET connect (GyroDepolama)
+* [gyro s3 cors](gyro_s3_cors.md)	 - CORS rules of a bucket
 * [gyro s3 folder](gyro_s3_folder.md)	 - Count objects in a folder
 * [gyro s3 key](gyro_s3_key.md)	 - Access keys (secret shown once)
 * [gyro s3 list](gyro_s3_list.md)	 - List your services of this product line
@@ -42,4 +43,5 @@ gyro s3 [flags]
 * [gyro s3 tool](gyro_s3_tool.md)	 - Read a tool's data or run one of its actions (see 'tools')
 * [gyro s3 tools](gyro_s3_tools.md)	 - Show the tools, actions and safety policy of a service
 * [gyro s3 usage](gyro_s3_usage.md)	 - GET usage (GyroDepolama)
+* [gyro s3 website](gyro_s3_website.md)	 - Static website settings of a bucket
 

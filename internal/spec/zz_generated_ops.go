@@ -3,7 +3,7 @@
 package spec
 
 // APIVersion is info.version of the spec this table was generated from.
-const APIVersion = "2.5.0"
+const APIVersion = "2.6.0"
 
 // Ops lists every API operation.
 var Ops = []Op{
@@ -1819,6 +1819,44 @@ var Ops = []Op{
 			{Name: "confirm", Type: "boolean", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
 		},
 	},
+	{ID: "typed_get_storage__id__buckets__bucket__cors", Method: "GET", Path: "/cloud/storage/{id}/buckets/{bucket}/cors", Tag: "Object storage",
+		Summary: "CORS rules of a bucket", SummaryTR: "Kovanın CORS kuralları",
+		Desc: "`rules` (snake_case) and `json` (the same rules in AWS S3 format, pretty printed).", DescTR: "`rules` (snake_case) ve `json` (aynı kurallar AWS S3 biçiminde).",
+		Scope: "services_read", Command: []string{"storage", "cors", "get"},
+		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Service id", DescTR: ""},
+			{Name: "bucket", In: "path", Type: "string", Items: "", Enum: nil, Default: "", Required: true, Desc: "", DescTR: ""},
+		},
+	},
+	{ID: "typed_put_storage__id__buckets__bucket__cors", Method: "PUT", Path: "/cloud/storage/{id}/buckets/{bucket}/cors", Tag: "Object storage",
+		Summary: "Replace the CORS rules of a bucket", SummaryTR: "Kovanın CORS kurallarını değiştir",
+		Desc: "Replaces every rule. Send `rules` (array), `CORSRules` (an AWS `put-bucket-cors` file works as is: `gyro storage cors set ID BUCKET --data @cors.json`) or `cors_json` (the JSON as text). Field names may be AWS style (`AllowedOrigins`) or snake_case (`allowed_origins`). Limits: 100 rules, 50 origins/headers per rule, 16 KB, methods GET/PUT/POST/DELETE/HEAD, `MaxAgeSeconds` 0-86400, at most one `*` per origin. An empty list removes the rules. Rules apply to the S3 endpoint and to the static website (and custom domains).", DescTR: "Tüm kuralların yerine geçer. `rules` (dizi), `CORSRules` (AWS `put-bucket-cors` dosyası olduğu gibi: `--data @cors.json`) ya da `cors_json` (metin) gönderin. Alan adları AWS (`AllowedOrigins`) ya da snake_case olabilir. Sınırlar: 100 kural, kural başına 50 köken/başlık, 16 KB, yöntemler GET/PUT/POST/DELETE/HEAD, `MaxAgeSeconds` 0-86400, kökende en çok bir `*`. Boş liste kuralları kaldırır. Kurallar S3 adresinde ve statik web sitesinde (özel alan adları dahil) geçerlidir.",
+		Scope: "services_write", Command: []string{"storage", "cors", "set"},
+		HasBody: true, BodyRequired: true, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Service id", DescTR: ""},
+			{Name: "bucket", In: "path", Type: "string", Items: "", Enum: nil, Default: "", Required: true, Desc: "", DescTR: ""},
+		},
+		Body: []Field{
+			{Name: "rules", Type: "object", Items: "", Enum: nil, Default: "", Required: false, Desc: "CORS rules as a JSON array", DescTR: "CORS kuralları (JSON dizi)"},
+			{Name: "cors_json", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "Alternative: the rules as JSON text ({\"CORSRules\":[...]} or [...])", DescTR: "Alternatif: kurallar JSON metni olarak"},
+			{Name: "confirm", Type: "boolean", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
+		},
+	},
+	{ID: "typed_delete_storage__id__buckets__bucket__cors", Method: "DELETE", Path: "/cloud/storage/{id}/buckets/{bucket}/cors", Tag: "Object storage",
+		Summary: "Remove every CORS rule of a bucket", SummaryTR: "Kovanın tüm CORS kurallarını kaldır",
+		Desc: "Browsers can no longer read the bucket cross-origin. Needs `\"confirm\": true`.", DescTR: "Tarayıcılar kovayı başka kökenden okuyamaz. `\"confirm\": true` gerekir.",
+		Scope: "services_write", Command: []string{"storage", "cors", "delete"},
+		HasBody: true, BodyRequired: true, ListResponse: false, Paginated: false, Confirm: true, Money: false, Hidden: false,
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Service id", DescTR: ""},
+			{Name: "bucket", In: "path", Type: "string", Items: "", Enum: nil, Default: "", Required: true, Desc: "", DescTR: ""},
+		},
+		Body: []Field{
+			{Name: "confirm", Type: "boolean", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
+		},
+	},
 	{ID: "typed_post_storage__id__buckets__bucket__folders", Method: "POST", Path: "/cloud/storage/{id}/buckets/{bucket}/folders", Tag: "Object storage",
 		Summary: "Create a folder", SummaryTR: "Klasör oluştur",
 		Desc: "Creates an empty folder marker `prefix + name + /`.", DescTR: "Boş klasör işareti `prefix + name + /` oluşturur.",
@@ -1926,6 +1964,46 @@ var Ops = []Op{
 		},
 		Body: []Field{
 			{Name: "new_name", Type: "string", Items: "", Enum: nil, Default: "", Required: true, Desc: "", DescTR: ""},
+			{Name: "confirm", Type: "boolean", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
+		},
+	},
+	{ID: "typed_get_storage__id__buckets__bucket__website", Method: "GET", Path: "/cloud/storage/{id}/buckets/{bucket}/website", Tag: "Object storage",
+		Summary: "Static website settings of a bucket", SummaryTR: "Kovanın statik web sitesi ayarları",
+		Desc: "`enabled`, `url`, `index_document` (entry file, default index.html), `error_document` (404 page) and `spa` (single-page app fallback).", DescTR: "`enabled`, `url`, `index_document` (giriş dosyası, varsayılan index.html), `error_document` (404 sayfası) ve `spa` (tek sayfa uygulama yönlendirmesi).",
+		Scope: "services_read", Command: []string{"storage", "website", "get"},
+		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Service id", DescTR: ""},
+			{Name: "bucket", In: "path", Type: "string", Items: "", Enum: nil, Default: "", Required: true, Desc: "", DescTR: ""},
+		},
+	},
+	{ID: "typed_put_storage__id__buckets__bucket__website", Method: "PUT", Path: "/cloud/storage/{id}/buckets/{bucket}/website", Tag: "Object storage",
+		Summary: "Enable / update the static website", SummaryTR: "Statik web sitesini aç / güncelle",
+		Desc: "Full replace: omitted fields fall back to the defaults (index.html, no error page, SPA off). `index_document` is a file name (no `/`), served at the root and in every folder. `spa: true` answers every missing path with the entry file and status 200 (React/Vue/Angular routing, page reloads); real files are served as they are and the error page is not used while SPA is on. Enabling a disabled website needs `accept: true` (abuse rules: everything in the bucket becomes public). Address: `https://<bucket>-<service code>.web.gyro-s3.com` and connected custom domains.", DescTR: "Tam değiştirme: verilmeyen alanlar varsayılana döner (index.html, 404 sayfası yok, SPA kapalı). `index_document` bir dosya adıdır (`/` yok); kökte ve her klasörde açılır. `spa: true` bulunmayan her yolu giriş dosyasıyla ve 200 koduyla yanıtlar (React/Vue/Angular yönlendirme, sayfa yenileme); gerçek dosyalar olduğu gibi gelir, SPA açıkken 404 sayfası kullanılmaz. Kapalı siteyi açmak `accept: true` ister (kötüye kullanım kuralları: kovadaki her şey herkese açılır).",
+		Scope: "services_write", Command: []string{"storage", "website", "set"},
+		HasBody: true, BodyRequired: true, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Service id", DescTR: ""},
+			{Name: "bucket", In: "path", Type: "string", Items: "", Enum: nil, Default: "", Required: true, Desc: "", DescTR: ""},
+		},
+		Body: []Field{
+			{Name: "index_document", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "Entry file name, default index.html (e.g. app.html)", DescTR: "Giriş dosyası adı, varsayılan index.html (ör. app.html)"},
+			{Name: "error_document", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "Object key of the 404 page (e.g. 404.html or errors/404.html), empty = none", DescTR: "404 sayfasının nesne anahtarı (ör. 404.html), boş = yok"},
+			{Name: "spa", Type: "boolean", Items: "", Enum: nil, Default: "", Required: false, Desc: "Route missing sub-paths to the entry file with status 200", DescTR: "Bulunmayan alt yolları giriş dosyasına 200 ile yönlendir"},
+			{Name: "accept", Type: "boolean", Items: "", Enum: nil, Default: "", Required: false, Desc: "Accept the abuse rules (needed when the website is off)", DescTR: "Kötüye kullanım kurallarını kabul et (site kapalıyken gerekli)"},
+			{Name: "confirm", Type: "boolean", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
+		},
+	},
+	{ID: "typed_delete_storage__id__buckets__bucket__website", Method: "DELETE", Path: "/cloud/storage/{id}/buckets/{bucket}/website", Tag: "Object storage",
+		Summary: "Disable the static website", SummaryTR: "Statik web sitesini kapat",
+		Desc: "The bucket stays; settings (entry file, error page, SPA) are kept for the next enable. Needs `\"confirm\": true`.", DescTR: "Kova durur; ayarlar (giriş dosyası, 404, SPA) sonraki açılış için saklanır. `\"confirm\": true` gerekir.",
+		Scope: "services_write", Command: []string{"storage", "website", "disable"},
+		HasBody: true, BodyRequired: true, ListResponse: false, Paginated: false, Confirm: true, Money: false, Hidden: false,
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Service id", DescTR: ""},
+			{Name: "bucket", In: "path", Type: "string", Items: "", Enum: nil, Default: "", Required: true, Desc: "", DescTR: ""},
+		},
+		Body: []Field{
 			{Name: "confirm", Type: "boolean", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
 		},
 	},

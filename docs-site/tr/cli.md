@@ -293,6 +293,9 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro ssh-key list` | SSH anahtarlarını listele | `GET /cloud/ssh-keys` |
 | `gyro storage bucket rename` | Kova adını değiştir | `POST /cloud/storage/{id}/buckets/{bucket}/rename` |
 | `gyro storage connect get` | connect (GyroDepolama) | `GET /cloud/storage/{id}/connect` |
+| `gyro storage cors delete` | Kovanın tüm CORS kurallarını kaldır | `DELETE /cloud/storage/{id}/buckets/{bucket}/cors` |
+| `gyro storage cors get` | Kovanın CORS kuralları | `GET /cloud/storage/{id}/buckets/{bucket}/cors` |
+| `gyro storage cors set` | Kovanın CORS kurallarını değiştir | `PUT /cloud/storage/{id}/buckets/{bucket}/cors` |
 | `gyro storage folder count` | Klasördeki nesneleri say | `GET /cloud/storage/{id}/buckets/{bucket}/folders/count` |
 | `gyro storage folder create` | Klasör oluştur | `POST /cloud/storage/{id}/buckets/{bucket}/folders` |
 | `gyro storage folder delete` | Klasörü içindekilerle sil | `DELETE /cloud/storage/{id}/buckets/{bucket}/folders` |
@@ -302,6 +305,9 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro storage object list` | Kova klasöründeki nesneleri listele | `GET /cloud/storage/{id}/buckets/{bucket}/objects` |
 | `gyro storage object upload-url` | İmzalı yükleme adresleri | `POST /cloud/storage/{id}/buckets/{bucket}/objects/upload-url` |
 | `gyro storage usage get` | usage (GyroDepolama) | `GET /cloud/storage/{id}/usage` |
+| `gyro storage website disable` | Statik web sitesini kapat | `DELETE /cloud/storage/{id}/buckets/{bucket}/website` |
+| `gyro storage website get` | Kovanın statik web sitesi ayarları | `GET /cloud/storage/{id}/buckets/{bucket}/website` |
+| `gyro storage website set` | Statik web sitesini aç / güncelle | `PUT /cloud/storage/{id}/buckets/{bucket}/website` |
 | `gyro ticket access-group list` | Erişim Gruplarını Listeleme | `GET /tickets/access-groups` |
 | `gyro ticket attachment get` | Eki İndirme | `GET /tickets/{id}/attachments/{aid}` |
 | `gyro ticket close` | Talebi Kapatma | `POST /tickets/{id}/close` |

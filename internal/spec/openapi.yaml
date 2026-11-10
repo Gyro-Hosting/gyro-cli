@@ -2,7 +2,7 @@
 openapi: 3.1.0
 info:
   title: Gyro Public API
-  version: 2.5.0
+  version: 2.6.0
   summary: Manage Gyro cloud servers, SSH keys and billing programmatically.
   x-summary-tr: Gyro bulut sunucularınızı, SSH anahtarlarınızı ve faturalarınızı programla yönetin.
   description: "The Gyro Public API lets you automate everything you do in the Gyro client area:\norder and manage cloud servers, keep SSH keys, read invoices and\
@@ -5009,6 +5009,339 @@ paths:
           $ref: '#/components/responses/Conflict'
         '422':
           $ref: '#/components/responses/Validation'
+  /cloud/storage/{id}/buckets/{bucket}/website:
+    get:
+      tags:
+      - Object storage
+      operationId: typed_get_storage__id__buckets__bucket__website
+      summary: Static website settings of a bucket
+      x-summary-tr: Kovanın statik web sitesi ayarları
+      x-scope: services_read
+      description: '`enabled`, `url`, `index_document` (entry file, default index.html), `error_document` (404 page) and `spa` (single-page app fallback).'
+      x-description-tr: '`enabled`, `url`, `index_document` (giriş dosyası, varsayılan index.html), `error_document` (404 sayfası) ve `spa` (tek sayfa uygulama yönlendirmesi).'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: bucket
+        in: path
+        required: true
+        schema:
+          type: string
+        description: ''
+      responses:
+        '200':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      x-cli:
+        command: storage website get
+        confirm: false
+    put:
+      tags:
+      - Object storage
+      operationId: typed_put_storage__id__buckets__bucket__website
+      summary: Enable / update the static website
+      x-summary-tr: Statik web sitesini aç / güncelle
+      x-scope: services_write
+      description: 'Full replace: omitted fields fall back to the defaults (index.html, no error page, SPA off). `index_document` is a file name (no `/`), served
+        at the root and in every folder. `spa: true` answers every missing path with the entry file and status 200 (React/Vue/Angular routing, page reloads); real
+        files are served as they are and the error page is not used while SPA is on. Enabling a disabled website needs `accept: true` (abuse rules: everything in
+        the bucket becomes public). Address: `https://<bucket>-<service code>.web.gyro-s3.com` and connected custom domains.'
+      x-description-tr: 'Tam değiştirme: verilmeyen alanlar varsayılana döner (index.html, 404 sayfası yok, SPA kapalı). `index_document` bir dosya adıdır (`/` yok);
+        kökte ve her klasörde açılır. `spa: true` bulunmayan her yolu giriş dosyasıyla ve 200 koduyla yanıtlar (React/Vue/Angular yönlendirme, sayfa yenileme); gerçek
+        dosyalar olduğu gibi gelir, SPA açıkken 404 sayfası kullanılmaz. Kapalı siteyi açmak `accept: true` ister (kötüye kullanım kuralları: kovadaki her şey herkese
+        açılır).'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: bucket
+        in: path
+        required: true
+        schema:
+          type: string
+        description: ''
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                index_document:
+                  type: string
+                  description: Entry file name, default index.html (e.g. app.html)
+                  x-description-tr: Giriş dosyası adı, varsayılan index.html (ör. app.html)
+                error_document:
+                  type: string
+                  description: Object key of the 404 page (e.g. 404.html or errors/404.html), empty = none
+                  x-description-tr: 404 sayfasının nesne anahtarı (ör. 404.html), boş = yok
+                spa:
+                  type: boolean
+                  description: Route missing sub-paths to the entry file with status 200
+                  x-description-tr: Bulunmayan alt yolları giriş dosyasına 200 ile yönlendir
+                accept:
+                  type: boolean
+                  description: Accept the abuse rules (needed when the website is off)
+                  x-description-tr: Kötüye kullanım kurallarını kabul et (site kapalıyken gerekli)
+                confirm:
+                  type: boolean
+              required: []
+      x-cli:
+        command: storage website set
+        confirm: false
+    delete:
+      tags:
+      - Object storage
+      operationId: typed_delete_storage__id__buckets__bucket__website
+      summary: Disable the static website
+      x-summary-tr: Statik web sitesini kapat
+      x-scope: services_write
+      description: 'The bucket stays; settings (entry file, error page, SPA) are kept for the next enable. Needs `"confirm": true`.'
+      x-description-tr: 'Kova durur; ayarlar (giriş dosyası, 404, SPA) sonraki açılış için saklanır. `"confirm": true` gerekir.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: bucket
+        in: path
+        required: true
+        schema:
+          type: string
+        description: ''
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                confirm:
+                  type: boolean
+              required: []
+      x-cli:
+        command: storage website disable
+        confirm: true
+  /cloud/storage/{id}/buckets/{bucket}/cors:
+    get:
+      tags:
+      - Object storage
+      operationId: typed_get_storage__id__buckets__bucket__cors
+      summary: CORS rules of a bucket
+      x-summary-tr: Kovanın CORS kuralları
+      x-scope: services_read
+      description: '`rules` (snake_case) and `json` (the same rules in AWS S3 format, pretty printed).'
+      x-description-tr: '`rules` (snake_case) ve `json` (aynı kurallar AWS S3 biçiminde).'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: bucket
+        in: path
+        required: true
+        schema:
+          type: string
+        description: ''
+      responses:
+        '200':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      x-cli:
+        command: storage cors get
+        confirm: false
+    put:
+      tags:
+      - Object storage
+      operationId: typed_put_storage__id__buckets__bucket__cors
+      summary: Replace the CORS rules of a bucket
+      x-summary-tr: Kovanın CORS kurallarını değiştir
+      x-scope: services_write
+      description: 'Replaces every rule. Send `rules` (array), `CORSRules` (an AWS `put-bucket-cors` file works as is: `gyro storage cors set ID BUCKET --data @cors.json`)
+        or `cors_json` (the JSON as text). Field names may be AWS style (`AllowedOrigins`) or snake_case (`allowed_origins`). Limits: 100 rules, 50 origins/headers
+        per rule, 16 KB, methods GET/PUT/POST/DELETE/HEAD, `MaxAgeSeconds` 0-86400, at most one `*` per origin. An empty list removes the rules. Rules apply to the
+        S3 endpoint and to the static website (and custom domains).'
+      x-description-tr: 'Tüm kuralların yerine geçer. `rules` (dizi), `CORSRules` (AWS `put-bucket-cors` dosyası olduğu gibi: `--data @cors.json`) ya da `cors_json`
+        (metin) gönderin. Alan adları AWS (`AllowedOrigins`) ya da snake_case olabilir. Sınırlar: 100 kural, kural başına 50 köken/başlık, 16 KB, yöntemler GET/PUT/POST/DELETE/HEAD,
+        `MaxAgeSeconds` 0-86400, kökende en çok bir `*`. Boş liste kuralları kaldırır. Kurallar S3 adresinde ve statik web sitesinde (özel alan adları dahil) geçerlidir.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: bucket
+        in: path
+        required: true
+        schema:
+          type: string
+        description: ''
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                rules:
+                  allOf:
+                  - type: array
+                    maxItems: 100
+                    items:
+                      $ref: '#/components/schemas/StorageCorsRule'
+                  description: CORS rules as a JSON array
+                  x-description-tr: CORS kuralları (JSON dizi)
+                cors_json:
+                  type: string
+                  description: 'Alternative: the rules as JSON text ({"CORSRules":[...]} or [...])'
+                  x-description-tr: 'Alternatif: kurallar JSON metni olarak'
+                confirm:
+                  type: boolean
+              required: []
+      x-cli:
+        command: storage cors set
+        confirm: false
+    delete:
+      tags:
+      - Object storage
+      operationId: typed_delete_storage__id__buckets__bucket__cors
+      summary: Remove every CORS rule of a bucket
+      x-summary-tr: Kovanın tüm CORS kurallarını kaldır
+      x-scope: services_write
+      description: 'Browsers can no longer read the bucket cross-origin. Needs `"confirm": true`.'
+      x-description-tr: 'Tarayıcılar kovayı başka kökenden okuyamaz. `"confirm": true` gerekir.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: bucket
+        in: path
+        required: true
+        schema:
+          type: string
+        description: ''
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                confirm:
+                  type: boolean
+              required: []
+      x-cli:
+        command: storage cors delete
+        confirm: true
   /cloud/monitors/{id}/monitors:
     get:
       tags:
@@ -14724,3 +15057,43 @@ components:
                 additionalProperties: true
             private_network:
               type: boolean
+    StorageCorsRule:
+      type: object
+      additionalProperties: false
+      required:
+      - AllowedOrigins
+      - AllowedMethods
+      properties:
+        ID:
+          type: string
+          maxLength: 64
+        AllowedOrigins:
+          type: array
+          maxItems: 50
+          items:
+            type: string
+          description: https://www.example.com, https://*.example.com, http://localhost:3000 or *
+        AllowedMethods:
+          type: array
+          items:
+            type: string
+            enum:
+            - GET
+            - PUT
+            - POST
+            - DELETE
+            - HEAD
+        AllowedHeaders:
+          type: array
+          maxItems: 50
+          items:
+            type: string
+        ExposeHeaders:
+          type: array
+          maxItems: 50
+          items:
+            type: string
+        MaxAgeSeconds:
+          type: integer
+          minimum: 0
+          maximum: 86400
