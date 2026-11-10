@@ -133,6 +133,30 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro key create` | Alt hesap anahtarı oluştur (token bir kez döner) | `POST /cloud/keys` |
 | `gyro key delete` | Alt hesap anahtarını sil | `DELETE /cloud/keys/{id}` |
 | `gyro key list` | Alt hesap anahtarlarını listele (token göstermez) | `GET /cloud/keys` |
+| `gyro lb algorithm set` | Dağıtım algoritmasını değiştir | `PUT /cloud/load-balancers/{id}/algorithm` |
+| `gyro lb cert cancel` | Bekleyen Let's Encrypt isteğini iptal et | `DELETE /cloud/load-balancers/{id}/certificates/letsencrypt` |
+| `gyro lb cert delete` | Sertifikayı sil | `DELETE /cloud/load-balancers/{id}/certificates/{cid}` |
+| `gyro lb cert letsencrypt` | Ücretsiz Let's Encrypt sertifikası iste | `POST /cloud/load-balancers/{id}/certificates/letsencrypt` |
+| `gyro lb cert list` | Sertifikaları listele | `GET /cloud/load-balancers/{id}/certificates` |
+| `gyro lb cert upload` | Sertifika yükle | `POST /cloud/load-balancers/{id}/certificates` |
+| `gyro lb cert verify` | Bekleyen Let's Encrypt isteğini sürdür | `POST /cloud/load-balancers/{id}/certificates/letsencrypt/verify` |
+| `gyro lb create` | Yük dengeleyici sipariş et | `POST /cloud/load-balancers` |
+| `gyro lb delete` | Yük dengeleyiciyi sil (iptal) | `DELETE /cloud/load-balancers/{id}` |
+| `gyro lb get` | Yük dengeleyiciyi getir | `GET /cloud/load-balancers/{id}` |
+| `gyro lb list` | Yük dengeleyicileri listele | `GET /cloud/load-balancers` |
+| `gyro lb metrics` | Yük dengeleyici ölçümleri | `GET /cloud/load-balancers/{id}/metrics` |
+| `gyro lb network attach` | Özel ağa bağla | `POST /cloud/load-balancers/{id}/network` |
+| `gyro lb network detach` | Özel ağdan ayır | `DELETE /cloud/load-balancers/{id}/network/{nid}` |
+| `gyro lb rdns set` | Ters DNS ayarla | `PUT /cloud/load-balancers/{id}/rdns` |
+| `gyro lb service add` | Servis ekle | `POST /cloud/load-balancers/{id}/services` |
+| `gyro lb service delete` | Servisi sil | `DELETE /cloud/load-balancers/{id}/services/{port}` |
+| `gyro lb service list` | Yük dengeleyicinin servislerini (portlarını) listele | `GET /cloud/load-balancers/{id}/services` |
+| `gyro lb service update` | Servisi güncelle | `PATCH /cloud/load-balancers/{id}/services/{port}` |
+| `gyro lb settings` | Algoritma, ters DNS, özel ağ | `GET /cloud/load-balancers/{id}/settings` |
+| `gyro lb target add` | Hedef ekle | `POST /cloud/load-balancers/{id}/targets` |
+| `gyro lb target list` | Hedefleri sağlık durumuyla listele | `GET /cloud/load-balancers/{id}/targets` |
+| `gyro lb target remove` | Hedefi çıkar | `DELETE /cloud/load-balancers/{id}/targets` |
+| `gyro lb types` | Yük dengeleyici boyutları ve fiyatları | `GET /cloud/load-balancer-types` |
 | `gyro license get` | method license_status (LisansAPP) | `GET /cloud/licenses/{id}` |
 | `gyro location list` | Sipariş verilebilen lokasyonları listele | `GET /cloud/locations` |
 | `gyro mail archive get` | archive (GyroMail) | `GET /cloud/mail/{id}/archive` |

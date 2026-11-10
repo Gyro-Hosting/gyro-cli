@@ -1,0 +1,161 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-lb-service-update - Update a service
+
+
+.SH SYNOPSIS
+\fBgyro lb service update   [flags]\fP
+
+
+.SH DESCRIPTION
+Update a service
+
+.PP
+Changes options of the service on {port}. The protocol cannot change (delete and add).
+
+.PP
+API: PATCH /cloud/load-balancers/{id}/services/{port} (operationId typed_patch_load_balancers\fBid\fPservices__port, scope services_write)
+
+
+.SH OPTIONS
+\fB--certificates\fP=""
+	HTTPS: comma separated certificate ids of this load balancer
+
+.PP
+\fB--cookie-lifetime\fP=0
+	cookie_lifetime
+
+.PP
+\fB--cookie-name\fP=""
+	cookie_name
+
+.PP
+\fB--data\fP=""
+	request body as JSON, @file or @- (stdin)
+
+.PP
+\fB--destination-port\fP=0
+	Port on the targets
+
+.PP
+\fB--dry-run\fP[=false]
+	show the price quote / request without changing anything
+
+.PP
+\fB--hc-domain\fP=""
+	HTTP check Host header
+
+.PP
+\fB--hc-interval\fP=0
+	3-60 s
+
+.PP
+\fB--hc-path\fP=""
+	HTTP check path (starts with /)
+
+.PP
+\fB--hc-port\fP=0
+	hc_port
+
+.PP
+\fB--hc-protocol\fP=""
+	Health check type (tcp|http)
+
+.PP
+\fB--hc-retries\fP=0
+	0-5
+
+.PP
+\fB--hc-status-codes\fP=""
+	Comma separated, e.g. 2??,3??
+
+.PP
+\fB--hc-timeout\fP=0
+	1-30 s, below interval
+
+.PP
+\fB--hc-tls\fP[=false]
+	HTTP check over TLS
+
+.PP
+\fB-h\fP, \fB--help\fP[=false]
+	help for update
+
+.PP
+\fB--idempotency-key\fP=""
+	idempotency key (automatic for money operations)
+
+.PP
+\fB--idle-timeout\fP=0
+	Idle timeout (s)
+
+.PP
+\fB--proxyprotocol\fP[=false]
+	Send PROXY protocol header to targets
+
+.PP
+\fB--redirect-http\fP[=false]
+	HTTPS: redirect port 80 to HTTPS (port 80 must be free)
+
+.PP
+\fB--set\fP=[]
+	extra body field key=value (repeatable)
+
+.PP
+\fB--sticky\fP[=false]
+	Sticky sessions (cookie)
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH SEE ALSO
+\fBgyro-lb-service(1)\fP

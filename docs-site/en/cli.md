@@ -133,6 +133,30 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro key create` | Create a sub-account key (token returned once) | `POST /cloud/keys` |
 | `gyro key delete` | Delete a sub-account key | `DELETE /cloud/keys/{id}` |
 | `gyro key list` | List sub-account keys (never shows tokens) | `GET /cloud/keys` |
+| `gyro lb algorithm set` | Change the balancing algorithm | `PUT /cloud/load-balancers/{id}/algorithm` |
+| `gyro lb cert cancel` | Cancel a pending Let's Encrypt request | `DELETE /cloud/load-balancers/{id}/certificates/letsencrypt` |
+| `gyro lb cert delete` | Delete a certificate | `DELETE /cloud/load-balancers/{id}/certificates/{cid}` |
+| `gyro lb cert letsencrypt` | Request a free Let's Encrypt certificate | `POST /cloud/load-balancers/{id}/certificates/letsencrypt` |
+| `gyro lb cert list` | List certificates | `GET /cloud/load-balancers/{id}/certificates` |
+| `gyro lb cert upload` | Upload a certificate | `POST /cloud/load-balancers/{id}/certificates` |
+| `gyro lb cert verify` | Continue a pending Let's Encrypt request | `POST /cloud/load-balancers/{id}/certificates/letsencrypt/verify` |
+| `gyro lb create` | Order a load balancer | `POST /cloud/load-balancers` |
+| `gyro lb delete` | Delete (cancel) a load balancer | `DELETE /cloud/load-balancers/{id}` |
+| `gyro lb get` | Get a load balancer | `GET /cloud/load-balancers/{id}` |
+| `gyro lb list` | List load balancers | `GET /cloud/load-balancers` |
+| `gyro lb metrics` | Load balancer metrics | `GET /cloud/load-balancers/{id}/metrics` |
+| `gyro lb network attach` | Attach to a private network | `POST /cloud/load-balancers/{id}/network` |
+| `gyro lb network detach` | Detach from a private network | `DELETE /cloud/load-balancers/{id}/network/{nid}` |
+| `gyro lb rdns set` | Set reverse DNS | `PUT /cloud/load-balancers/{id}/rdns` |
+| `gyro lb service add` | Add a service | `POST /cloud/load-balancers/{id}/services` |
+| `gyro lb service delete` | Delete a service | `DELETE /cloud/load-balancers/{id}/services/{port}` |
+| `gyro lb service list` | List services (ports) of a load balancer | `GET /cloud/load-balancers/{id}/services` |
+| `gyro lb service update` | Update a service | `PATCH /cloud/load-balancers/{id}/services/{port}` |
+| `gyro lb settings` | Algorithm, reverse DNS, private network | `GET /cloud/load-balancers/{id}/settings` |
+| `gyro lb target add` | Add a target | `POST /cloud/load-balancers/{id}/targets` |
+| `gyro lb target list` | List targets with health | `GET /cloud/load-balancers/{id}/targets` |
+| `gyro lb target remove` | Remove a target | `DELETE /cloud/load-balancers/{id}/targets` |
+| `gyro lb types` | List load balancer sizes and prices | `GET /cloud/load-balancer-types` |
 | `gyro license get` | GET method license_status (LisansAPP) | `GET /cloud/licenses/{id}` |
 | `gyro location list` | List locations with orderable products | `GET /cloud/locations` |
 | `gyro mail archive get` | GET archive (GyroMail) | `GET /cloud/mail/{id}/archive` |

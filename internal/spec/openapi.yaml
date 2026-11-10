@@ -2,7 +2,7 @@
 openapi: 3.1.0
 info:
   title: Gyro Public API
-  version: 2.3.0
+  version: 2.4.0
   summary: Manage Gyro cloud servers, SSH keys and billing programmatically.
   x-summary-tr: Gyro bulut sunucularınızı, SSH anahtarlarınızı ve faturalarınızı programla yönetin.
   description: "The Gyro Public API lets you automate everything you do in the Gyro client area:\norder and manage cloud servers, keep SSH keys, read invoices and\
@@ -111,6 +111,10 @@ tags:
 - name: Panel users
   description: 'Sub-users: extra panel logins with limited permissions (accountant, technical staff). Scope `users`.'
   x-description-tr: 'Alt kullanıcılar: sınırlı izinli ek panel girişleri (muhasebe, teknik ekip). Kapsam `users`.'
+- name: Load balancers
+  description: 'Managed L4/L7 load balancer for your cloud servers: services, health checks, targets, free Let''s Encrypt certificates, metrics. EU regions.'
+  x-description-tr: 'Bulut sunucularınız için yönetilen L4/L7 yük dengeleyici: servisler, sağlık kontrolü, hedefler, ücretsiz Let''s Encrypt sertifikası, ölçümler.
+    AB bölgeleri.'
 - name: Reference data
   description: Countries, states, cities.
   x-description-tr: Ülke, il, ilçe.
@@ -2842,6 +2846,233 @@ paths:
           $ref: '#/components/responses/NotFound'
         '422':
           $ref: '#/components/responses/Validation'
+  /cloud/load-balancer-types:
+    get:
+      tags:
+      - Load balancers
+      operationId: listLoadBalancerTypes
+      summary: List load balancer sizes and prices
+      x-summary-tr: Yük dengeleyici boyutları ve fiyatları
+      x-scope: cloud_read
+      x-cli:
+        command: lb types
+      description: Orderable sizes (small/medium/large) with limits, regions and EUR prices per cycle (excl. VAT); `list_amount` is the strike-through list price.
+      x-description-tr: Sipariş edilebilir boyutlar, sınırlar, bölgeler ve dönem başına EUR fiyatlar (KDV hariç); `list_amount` üstü çizili liste fiyatıdır.
+      responses:
+        '200':
+          description: Sizes
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        product_id:
+                          type: integer
+                        size:
+                          type: string
+                        name:
+                          type: string
+                        limits:
+                          type: object
+                          additionalProperties: true
+                        regions:
+                          type: array
+                          items:
+                            type: string
+                        prices:
+                          type: array
+                          items:
+                            type: object
+                            additionalProperties: true
+        '401': &id003
+          $ref: '#/components/responses/Unauthorized'
+  /cloud/load-balancers:
+    get:
+      tags:
+      - Load balancers
+      operationId: listLoadBalancers
+      summary: List load balancers
+      x-summary-tr: Yük dengeleyicileri listele
+      x-scope: cloud_read
+      x-cli:
+        command: lb list
+      parameters:
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: status
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Load balancers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/LoadBalancer'
+                  meta:
+                    $ref: '#/components/schemas/PageMeta'
+        '401': *id003
+    post:
+      tags:
+      - Load balancers
+      operationId: createLoadBalancer
+      summary: Order a load balancer
+      x-summary-tr: Yük dengeleyici sipariş et
+      x-scope: cloud_order
+      x-cli:
+        command: lb create
+        money: true
+      description: 'Orders and pays from the account balance (same money rules as servers): `"confirm": true`, an `Idempotency-Key` header, `dry_run` for a quote.
+        Ready in about a minute; then add services and targets.'
+      x-description-tr: 'Bakiyeden sipariş + ödeme (sunucularla aynı para kuralları): `"confirm": true`, `Idempotency-Key` başlığı, teklif için `dry_run`. Yaklaşık
+        bir dakikada hazır; sonra servis ve hedef ekleyin.'
+      parameters:
+      - name: Idempotency-Key
+        in: header
+        required: false
+        schema:
+          type: string
+          minLength: 8
+          maxLength: 191
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                size:
+                  type: string
+                  enum:
+                  - small
+                  - medium
+                  - large
+                product_id:
+                  type: integer
+                region:
+                  type: string
+                  enum:
+                  - eu-de-1
+                  - eu-de-2
+                  - eu-fi-1
+                  default: eu-de-1
+                cycle:
+                  type: string
+                  default: monthly
+                end_customer_id:
+                  type: integer
+                dry_run:
+                  type: boolean
+                confirm:
+                  type: boolean
+      responses:
+        '201':
+          description: Ordered
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '200':
+          description: Quote (dry_run)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401': *id003
+        '422': &id005
+          $ref: '#/components/responses/Validation'
+  /cloud/load-balancers/{id}:
+    get:
+      tags:
+      - Load balancers
+      operationId: getLoadBalancer
+      summary: Get a load balancer
+      x-summary-tr: Yük dengeleyiciyi getir
+      x-scope: cloud_read
+      x-cli:
+        command: lb get
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Load balancer
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/LoadBalancer'
+        '401': *id003
+        '404': &id004
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags:
+      - Load balancers
+      operationId: deleteLoadBalancer
+      summary: Delete (cancel) a load balancer
+      x-summary-tr: Yük dengeleyiciyi sil (iptal)
+      x-scope: cloud_delete
+      x-cli:
+        command: lb delete
+        confirm: true
+      description: '`confirm=true` required. `immediate=true` cancels now: traffic and billing stop, the load balancer and its certificates are destroyed after the
+        grace period (3 days). Without immediate a cancellation request is filed.'
+      x-description-tr: '`confirm=true` gerekir. `immediate=true` hemen iptal eder: trafik ve faturalama durur, yük dengeleyici ve sertifikaları bekleme süresinden
+        (3 gün) sonra silinir. immediate yoksa iptal talebi açılır.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: confirm
+        in: query
+        schema:
+          type: boolean
+      - name: immediate
+        in: query
+        schema:
+          type: boolean
+      responses:
+        '202':
+          description: Cancelling
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '401': *id003
+        '404': *id004
+        '422': *id005
   /cloud/mail/{id}/mailboxes:
     get:
       tags:
@@ -5142,7 +5373,7 @@ paths:
         required: true
         schema:
           type: string
-        description: ''
+        description: Certificate id
       responses:
         '202':
           description: Tool data / result
@@ -5279,6 +5510,1021 @@ paths:
           $ref: '#/components/responses/Conflict'
         '422':
           $ref: '#/components/responses/Validation'
+  /cloud/load-balancers/{id}/services:
+    get:
+      tags:
+      - Load balancers
+      operationId: typed_get_load_balancers__id__services
+      summary: List services (ports) of a load balancer
+      x-summary-tr: Yük dengeleyicinin servislerini (portlarını) listele
+      x-scope: services_read
+      description: Services with health check and HTTP options, plus the certificates of this load balancer and its limits.
+      x-description-tr: Servisler, sağlık kontrolü ve HTTP seçenekleriyle; ayrıca sertifikalar ve sınırlar.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      responses:
+        '200':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      x-cli:
+        command: lb service list
+        confirm: false
+    post:
+      tags:
+      - Load balancers
+      operationId: typed_post_load_balancers__id__services
+      summary: Add a service
+      x-summary-tr: Servis ekle
+      x-scope: services_write
+      description: Adds a listener. HTTPS needs at least one certificate of this load balancer; TLS ends at the load balancer and targets get HTTP. Use TCP 443 for
+        passthrough.
+      x-description-tr: Dinleyici ekler. HTTPS en az bir sertifika ister; TLS yük dengeleyicide sonlanır, hedeflere HTTP gider. Şifreli geçiş için TCP 443.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                protocol:
+                  type: string
+                  enum:
+                  - tcp
+                  - http
+                  - https
+                listen_port:
+                  type: integer
+                  description: Port the load balancer listens on
+                destination_port: &id006
+                  type: integer
+                  description: Port on the targets
+                proxyprotocol: &id007
+                  type: boolean
+                  description: Send PROXY protocol header to targets
+                hc_protocol: &id008
+                  type: string
+                  enum:
+                  - tcp
+                  - http
+                  description: Health check type
+                hc_port: &id009
+                  type: integer
+                hc_interval: &id010
+                  type: integer
+                  description: 3-60 s
+                hc_timeout: &id011
+                  type: integer
+                  description: 1-30 s, below interval
+                hc_retries: &id012
+                  type: integer
+                  description: 0-5
+                hc_path: &id013
+                  type: string
+                  description: HTTP check path (starts with /)
+                hc_domain: &id014
+                  type: string
+                  description: HTTP check Host header
+                hc_status_codes: &id015
+                  type: string
+                  description: Comma separated, e.g. 2??,3??
+                hc_tls: &id016
+                  type: boolean
+                  description: HTTP check over TLS
+                sticky: &id017
+                  type: boolean
+                  description: Sticky sessions (cookie)
+                cookie_name: &id018
+                  type: string
+                cookie_lifetime: &id019
+                  type: integer
+                idle_timeout: &id020
+                  type: integer
+                  description: Idle timeout (s)
+                certificates: &id021
+                  type: string
+                  description: 'HTTPS: comma separated certificate ids of this load balancer'
+                redirect_http: &id022
+                  type: boolean
+                  description: 'HTTPS: redirect port 80 to HTTPS (port 80 must be free)'
+                confirm:
+                  type: boolean
+              required:
+              - protocol
+              - listen_port
+              - destination_port
+      x-cli:
+        command: lb service add
+        confirm: false
+  /cloud/load-balancers/{id}/services/{port}:
+    patch:
+      tags:
+      - Load balancers
+      operationId: typed_patch_load_balancers__id__services__port
+      summary: Update a service
+      x-summary-tr: Servisi güncelle
+      x-scope: services_write
+      description: Changes options of the service on {port}. The protocol cannot change (delete and add).
+      x-description-tr: '{port} servisinin seçeneklerini değiştirir. Protokol değişmez (silip ekleyin).'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: port
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Listen port
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                destination_port: *id006
+                proxyprotocol: *id007
+                hc_protocol: *id008
+                hc_port: *id009
+                hc_interval: *id010
+                hc_timeout: *id011
+                hc_retries: *id012
+                hc_path: *id013
+                hc_domain: *id014
+                hc_status_codes: *id015
+                hc_tls: *id016
+                sticky: *id017
+                cookie_name: *id018
+                cookie_lifetime: *id019
+                idle_timeout: *id020
+                certificates: *id021
+                redirect_http: *id022
+                confirm:
+                  type: boolean
+              required: []
+      x-cli:
+        command: lb service update
+        confirm: false
+    delete:
+      tags:
+      - Load balancers
+      operationId: typed_delete_load_balancers__id__services__port
+      summary: Delete a service
+      x-summary-tr: Servisi sil
+      x-scope: services_write
+      description: 'Stops listening on {port}. Needs `"confirm": true`.'
+      x-description-tr: '{port} portundaki dinlemeyi durdurur. `"confirm": true` gerekir.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: port
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Listen port
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+              properties:
+                confirm:
+                  type: boolean
+      x-cli:
+        command: lb service delete
+        confirm: true
+  /cloud/load-balancers/{id}/targets:
+    get:
+      tags:
+      - Load balancers
+      operationId: typed_get_load_balancers__id__targets
+      summary: List targets with health
+      x-summary-tr: Hedefleri sağlık durumuyla listele
+      x-scope: services_read
+      description: Targets, per-service health (healthy/unhealthy/unknown), and the cloud servers / dedicated IPs that can be added.
+      x-description-tr: Hedefler, servis başına sağlık durumu ve eklenebilecek bulut sunucular / fiziksel sunucu IP'leri.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      responses:
+        '200':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      x-cli:
+        command: lb target list
+        confirm: false
+    post:
+      tags:
+      - Load balancers
+      operationId: typed_post_load_balancers__id__targets
+      summary: Add a target
+      x-summary-tr: Hedef ekle
+      x-scope: services_write
+      description: type=server (server = your cloud server id, same region), type=all (all your cloud servers, new ones join automatically) or type=ip (your dedicated
+        server IP). use_private_ip needs a private network attached.
+      x-description-tr: type=server (server = bulut sunucu hizmet no, aynı bölge), type=all (tüm bulut sunucularınız, yeniler otomatik) ya da type=ip (fiziksel sunucu
+        IP'niz). use_private_ip için özel ağ bağlı olmalı.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type:
+                  type: string
+                  enum:
+                  - server
+                  - all
+                  - ip
+                server:
+                  type: integer
+                  description: Cloud server id (type=server)
+                ip:
+                  type: string
+                  description: Dedicated server IP (type=ip)
+                use_private_ip:
+                  type: boolean
+                confirm:
+                  type: boolean
+              required:
+              - type
+      x-cli:
+        command: lb target add
+        confirm: false
+    delete:
+      tags:
+      - Load balancers
+      operationId: typed_delete_load_balancers__id__targets
+      summary: Remove a target
+      x-summary-tr: Hedefi çıkar
+      x-scope: services_write
+      description: 'Same fields as add, in the query string (?type=server&server=123&confirm=true) or the JSON body. Needs `"confirm": true`.'
+      x-description-tr: 'Eklemedeki alanlar; sorguda (?type=server&server=123&confirm=true) ya da JSON gövdede. `"confirm": true` gerekir.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: type
+        in: query
+        required: false
+        schema:
+          type: string
+        description: server | all | ip
+      - name: server
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Cloud server id
+      - name: ip
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Dedicated server IP
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type:
+                  type: string
+                server:
+                  type: integer
+                ip:
+                  type: string
+                confirm:
+                  type: boolean
+              required: []
+      x-cli:
+        command: lb target remove
+        confirm: true
+  /cloud/load-balancers/{id}/certificates:
+    get:
+      tags:
+      - Load balancers
+      operationId: typed_get_load_balancers__id__certificates
+      summary: List certificates
+      x-summary-tr: Sertifikaları listele
+      x-scope: services_read
+      description: Uploaded and Let's Encrypt certificates (Let's Encrypt ones renew automatically), a pending Let's Encrypt request and the validation redirect base
+        URL.
+      x-description-tr: Yüklenen ve Let's Encrypt sertifikaları (Let's Encrypt kendiliğinden yenilenir), bekleyen istek ve doğrulama yönlendirme adresi.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      responses:
+        '200':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      x-cli:
+        command: lb cert list
+        confirm: false
+    post:
+      tags:
+      - Load balancers
+      operationId: typed_post_load_balancers__id__certificates
+      summary: Upload a certificate
+      x-summary-tr: Sertifika yükle
+      x-scope: services_write
+      description: PEM certificate chain + unencrypted private key. The key is sent to the load balancer only; it is never stored or logged by the panel.
+      x-description-tr: PEM sertifika zinciri + şifresiz özel anahtar. Anahtar yalnız yük dengeleyiciye gönderilir; panelde saklanmaz, loglanmaz.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                certificate:
+                  type: string
+                  description: PEM chain
+                private_key:
+                  type: string
+                  description: PEM key (unencrypted)
+                confirm:
+                  type: boolean
+              required:
+              - certificate
+              - private_key
+      x-cli:
+        command: lb cert upload
+        confirm: false
+  /cloud/load-balancers/{id}/certificates/letsencrypt:
+    post:
+      tags:
+      - Load balancers
+      operationId: typed_post_load_balancers__id__certificates_letsencrypt
+      summary: Request a free Let's Encrypt certificate
+      x-summary-tr: Ücretsiz Let's Encrypt sertifikası iste
+      x-scope: services_write
+      description: Up to 10 names whose A record points to this load balancer. Your targets must redirect /.well-known/acme-challenge/<token> to the redirect base
+        shown in GET certificates; answer `acme=waiting` lists the per-name check, fix the redirect and call verify.
+      x-description-tr: A kaydı bu yük dengeleyiciye yönlenmiş en çok 10 ad. Hedefleriniz /.well-known/acme-challenge/<token> isteklerini GET certificates'taki adrese
+        yönlendirmeli; `acme=waiting` yanıtı ad başına kontrolü verir, yönlendirmeyi düzeltip verify çağırın.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                domains:
+                  type: string
+                  description: Comma separated names
+                confirm:
+                  type: boolean
+              required:
+              - domains
+      x-cli:
+        command: lb cert letsencrypt
+        confirm: false
+    delete:
+      tags:
+      - Load balancers
+      operationId: typed_delete_load_balancers__id__certificates_letsencrypt
+      summary: Cancel a pending Let's Encrypt request
+      x-summary-tr: Bekleyen Let's Encrypt isteğini iptal et
+      x-scope: services_write
+      description: 'Drops the pending order. Needs `"confirm": true`.'
+      x-description-tr: 'Bekleyen isteği bırakır. `"confirm": true` gerekir.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+              properties:
+                confirm:
+                  type: boolean
+      x-cli:
+        command: lb cert cancel
+        confirm: true
+  /cloud/load-balancers/{id}/certificates/letsencrypt/verify:
+    post:
+      tags:
+      - Load balancers
+      operationId: typed_post_load_balancers__id__certificates_letsencrypt_verify
+      summary: Continue a pending Let's Encrypt request
+      x-summary-tr: Bekleyen Let's Encrypt isteğini sürdür
+      x-scope: services_write
+      description: Re-checks the redirect, lets the CA validate and uploads the certificate (`acme=issued`).
+      x-description-tr: Yönlendirmeyi yeniden dener, doğrulatır ve sertifikayı yükler (`acme=issued`).
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+              properties:
+                confirm:
+                  type: boolean
+      x-cli:
+        command: lb cert verify
+        confirm: false
+  /cloud/load-balancers/{id}/certificates/{cid}:
+    delete:
+      tags:
+      - Load balancers
+      operationId: typed_delete_load_balancers__id__certificates__cid
+      summary: Delete a certificate
+      x-summary-tr: Sertifikayı sil
+      x-scope: services_write
+      description: 'Only certificates not used by a service. Needs `"confirm": true`.'
+      x-description-tr: 'Yalnız bir serviste kullanılmayan sertifikalar. `"confirm": true` gerekir.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: cid
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Certificate id
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+              properties:
+                confirm:
+                  type: boolean
+      x-cli:
+        command: lb cert delete
+        confirm: true
+  /cloud/load-balancers/{id}/settings:
+    get:
+      tags:
+      - Load balancers
+      operationId: typed_get_load_balancers__id__settings
+      summary: Algorithm, reverse DNS, private network
+      x-summary-tr: Algoritma, ters DNS, özel ağ
+      x-scope: services_read
+      description: Current algorithm, PTR records, your private networks in the same region (attached or not) and limits.
+      x-description-tr: Algoritma, PTR kayıtları, aynı bölgedeki özel ağlarınız ve sınırlar.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      responses:
+        '200':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      x-cli:
+        command: lb settings
+        confirm: false
+  /cloud/load-balancers/{id}/algorithm:
+    put:
+      tags:
+      - Load balancers
+      operationId: typed_put_load_balancers__id__algorithm
+      summary: Change the balancing algorithm
+      x-summary-tr: Dağıtım algoritmasını değiştir
+      x-scope: services_write
+      description: round_robin or least_connections.
+      x-description-tr: round_robin ya da least_connections.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                algorithm:
+                  type: string
+                  enum:
+                  - round_robin
+                  - least_connections
+                confirm:
+                  type: boolean
+              required:
+              - algorithm
+      x-cli:
+        command: lb algorithm set
+        confirm: false
+  /cloud/load-balancers/{id}/rdns:
+    put:
+      tags:
+      - Load balancers
+      operationId: typed_put_load_balancers__id__rdns
+      summary: Set reverse DNS
+      x-summary-tr: Ters DNS ayarla
+      x-scope: services_write
+      description: PTR for one of the load balancer's IPs; empty ptr restores the default.
+      x-description-tr: Yük dengeleyici IP'lerinden biri için PTR; boş değer varsayılana döndürür.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ip:
+                  type: string
+                ptr:
+                  type: string
+                confirm:
+                  type: boolean
+              required:
+              - ip
+      x-cli:
+        command: lb rdns set
+        confirm: false
+  /cloud/load-balancers/{id}/network:
+    post:
+      tags:
+      - Load balancers
+      operationId: typed_post_load_balancers__id__network
+      summary: Attach to a private network
+      x-summary-tr: Özel ağa bağla
+      x-scope: services_write
+      description: One of your private networks in the same region (GET settings).
+      x-description-tr: Aynı bölgedeki özel ağlarınızdan biri (GET settings).
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                network:
+                  type: integer
+                confirm:
+                  type: boolean
+              required:
+              - network
+      x-cli:
+        command: lb network attach
+        confirm: false
+  /cloud/load-balancers/{id}/network/{nid}:
+    delete:
+      tags:
+      - Load balancers
+      operationId: typed_delete_load_balancers__id__network__nid
+      summary: Detach from a private network
+      x-summary-tr: Özel ağdan ayır
+      x-scope: services_write
+      description: 'Targets that use private IPs must be removed first. Needs `"confirm": true`.'
+      x-description-tr: 'Özel IP kullanan hedefler önce çıkarılmalı. `"confirm": true` gerekir.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: nid
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Private network id
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+              properties:
+                confirm:
+                  type: boolean
+      x-cli:
+        command: lb network detach
+        confirm: true
+  /cloud/load-balancers/{id}/metrics:
+    get:
+      tags:
+      - Load balancers
+      operationId: typed_get_load_balancers__id__metrics
+      summary: Load balancer metrics
+      x-summary-tr: Yük dengeleyici ölçümleri
+      x-scope: services_read
+      description: Open connections, new connections/s, requests/s, bandwidth in/out (Mbit/s).
+      x-description-tr: Açık bağlantı, yeni bağlantı/sn, istek/sn, bant genişliği (Mbit/s).
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: period
+        in: query
+        required: false
+        schema:
+          type: string
+        description: 24h | 7d | 30d
+      responses:
+        '200':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      x-cli:
+        command: lb metrics
+        confirm: false
   /cloud/licenses/{id}:
     get:
       tags:
@@ -12525,3 +13771,94 @@ components:
                 additionalProperties:
                   type: number
                 description: currency -> amount
+    LoadBalancer:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        status:
+          type: string
+        product_id:
+          type: integer
+        cycle:
+          type: string
+        price:
+          type: object
+          properties:
+            amount:
+              type: number
+            currency:
+              type:
+              - string
+              - 'null'
+        due_date:
+          type:
+          - string
+          - 'null'
+        nickname:
+          type:
+          - string
+          - 'null'
+        load_balancer:
+          type:
+          - object
+          - 'null'
+          description: Live state (detail only)
+          properties:
+            name:
+              type: string
+            status:
+              type: string
+              enum:
+              - running
+              - stopped
+              - suspended
+              - deleting
+            size:
+              type:
+              - string
+              - 'null'
+              enum:
+              - small
+              - medium
+              - large
+              - null
+            region:
+              type: string
+            location:
+              type: string
+            ipv4:
+              type:
+              - string
+              - 'null'
+            ipv6:
+              type:
+              - string
+              - 'null'
+            algorithm:
+              type: string
+            limits:
+              type: object
+              additionalProperties: true
+            traffic:
+              type: object
+              additionalProperties: true
+            services:
+              type: array
+              items:
+                type: object
+                additionalProperties: true
+            targets:
+              type: array
+              items:
+                type: object
+                additionalProperties: true
+            certificates:
+              type: array
+              items:
+                type: object
+                additionalProperties: true
+            private_network:
+              type: boolean

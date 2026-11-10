@@ -1,0 +1,113 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-lb-create - Order a load balancer
+
+
+.SH SYNOPSIS
+\fBgyro lb create [flags]\fP
+
+
+.SH DESCRIPTION
+Order a load balancer
+
+.PP
+Orders and pays from the account balance (same money rules as servers): \fB"confirm": true\fR, an \fBIdempotency-Key\fR header, \fBdry_run\fR for a quote. Ready in about a minute; then add services and targets.
+
+.PP
+API: POST /cloud/load-balancers (operationId createLoadBalancer, scope cloud_order)
+
+
+.SH OPTIONS
+\fB--cycle\fP=""
+	cycle
+
+.PP
+\fB--data\fP=""
+	request body as JSON, @file or @- (stdin)
+
+.PP
+\fB--dry-run\fP[=false]
+	show the price quote / request without changing anything
+
+.PP
+\fB--end-customer-id\fP=0
+	end_customer_id
+
+.PP
+\fB-h\fP, \fB--help\fP[=false]
+	help for create
+
+.PP
+\fB--idempotency-key\fP=""
+	idempotency key (automatic for money operations)
+
+.PP
+\fB--product-id\fP=0
+	product_id
+
+.PP
+\fB--region\fP=""
+	region (eu-de-1|eu-de-2|eu-fi-1)
+
+.PP
+\fB--set\fP=[]
+	extra body field key=value (repeatable)
+
+.PP
+\fB--size\fP=""
+	size (small|medium|large)
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH SEE ALSO
+\fBgyro-lb(1)\fP
