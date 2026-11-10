@@ -77,7 +77,7 @@ API: POST /cloud/servers/{id}/firewall/rules (operationId addFirewallRule, scope
 
 .PP
 \fB--source\fP=""
-	any | IPv4/CIDR list (comma separated) | country:TR | not-country:TR (country add-on). For direction out: the remote address.
+	any | IPv4/CIDR list (comma separated, max 10) | country:TR,DE | not-country:TR (country add-on; any ISO 3166-1 alpha-2 code with RIPE address space, max 10 per rule). For direction out: the remote address.
 
 .PP
 \fB--source-ips\fP=[]

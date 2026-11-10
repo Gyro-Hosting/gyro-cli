@@ -14958,7 +14958,8 @@ components:
           default: tcp
         source:
           type: string
-          description: 'any | IPv4/CIDR list (comma separated) | country:TR | not-country:TR (country add-on). For direction out: the remote address.'
+          description: 'any | IPv4/CIDR list (comma separated, max 10) | country:TR,DE | not-country:TR (country add-on; any ISO 3166-1 alpha-2 code with RIPE address
+            space, max 10 per rule). For direction out: the remote address.'
           example: 203.0.113.0/24
         destination:
           type: string

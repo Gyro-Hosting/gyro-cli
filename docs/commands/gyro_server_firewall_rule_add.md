@@ -31,7 +31,7 @@ gyro server firewall rule add <ID> [flags]
       --priority int             Position (1 = evaluated first). Default = last. First matching rule wins.
       --protocol string          protocol (tcp|udp|tcp_udp|icmp|all)
       --set stringArray          extra body field key=value (repeatable)
-      --source string            any | IPv4/CIDR list (comma separated) | country:TR | not-country:TR (country add-on). For direction out: the remote address.
+      --source string            any | IPv4/CIDR list (comma separated, max 10) | country:TR,DE | not-country:TR (country add-on; any ISO 3166-1 alpha-2 code with RIPE address space, max 10 per rule). For direction out: the remote address.
       --source-ips strings       Legacy - CIDRs (use source)
       --wait                     wait until the server is no longer busy
       --wait-timeout duration    maximum time for --wait (default 15m0s)
