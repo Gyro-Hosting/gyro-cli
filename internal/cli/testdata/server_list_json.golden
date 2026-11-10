@@ -11,12 +11,14 @@
     "ipv6": "2001:db8:1::/64",
     "location": "fsn1",
     "name": "Gyro Bulut Standart 2-4",
+    "plan": "standart-2-4",
     "price": {
       "amount": 1845.99,
       "currency": "TRY"
     },
     "product_id": 696,
     "provisioned": true,
+    "region": "eu-de-1",
     "server_type": "cpx22",
     "status": "active"
   },
@@ -32,12 +34,14 @@
     "ipv6": null,
     "location": "hel1",
     "name": "Gyro Bulut Pro 2-8",
+    "plan": "pro-2-8",
     "price": {
       "amount": 4015.99,
       "currency": "TRY"
     },
     "product_id": 656,
     "provisioned": true,
+    "region": "eu-fi-1",
     "server_type": "ccx13",
     "status": "cancelled"
   }

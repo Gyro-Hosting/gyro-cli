@@ -48,10 +48,10 @@ func errBody(code, msg string) map[string]any {
 
 var fxServers = []any{
 	map[string]any{"id": 47466, "name": "Gyro Bulut Standart 2-4", "hostname": "web-1.example.com", "status": "active", "product_id": 696,
-		"server_type": "cpx22", "location": "fsn1", "ipv4": "203.0.113.10", "ipv6": "2001:db8:1::/64", "provisioned": true, "cycle": "monthly",
+		"plan": "standart-2-4", "region": "eu-de-1", "server_type": "cpx22", "location": "fsn1", "ipv4": "203.0.113.10", "ipv6": "2001:db8:1::/64", "provisioned": true, "cycle": "monthly",
 		"price": map[string]any{"amount": 1845.99, "currency": "TRY"}, "auto_renew": true, "created_at": "2026-11-09T01:00:00+03:00", "due_date": "2026-12-09", "cancellation": nil},
 	map[string]any{"id": 47400, "name": "Gyro Bulut Pro 2-8", "hostname": "db-1.example.com", "status": "cancelled", "product_id": 656,
-		"server_type": "ccx13", "location": "hel1", "ipv4": "203.0.113.20", "ipv6": nil, "provisioned": true, "cycle": "monthly",
+		"plan": "pro-2-8", "region": "eu-fi-1", "server_type": "ccx13", "location": "hel1", "ipv4": "203.0.113.20", "ipv6": nil, "provisioned": true, "cycle": "monthly",
 		"price": map[string]any{"amount": 4015.99, "currency": "TRY"}, "auto_renew": false, "created_at": "2026-11-01T01:00:00+03:00", "due_date": "2026-12-01", "cancellation": nil},
 }
 
@@ -83,25 +83,25 @@ func newMock(t *testing.T) (*mock, *httptest.Server) {
 		j(w, 404, errBody("server_not_found", "Server not found."))
 	}
 	m.routes["GET /cloud/locations"] = func(w http.ResponseWriter, r *http.Request, b map[string]any) {
-		j(w, 200, map[string]any{"data": []any{map[string]any{"code": "fsn1", "city": "Falkenstein", "country": "DE", "zone": "eu-central", "products": 2},
-			map[string]any{"code": "hel1", "city": "Helsinki", "country": "FI", "zone": "eu-central", "products": 1}}})
+		j(w, 200, map[string]any{"data": []any{map[string]any{"region": "eu-de-1", "code": "fsn1", "city": "Falkenstein", "country": "DE", "zone": "eu-central", "products": 2},
+			map[string]any{"region": "eu-fi-1", "code": "hel1", "city": "Helsinki", "country": "FI", "zone": "eu-central", "products": 1}}})
 	}
 	m.routes["GET /cloud/images"] = func(w http.ResponseWriter, r *http.Request, b map[string]any) {
 		j(w, 200, map[string]any{"data": []any{map[string]any{"slug": "ubuntu-24.04", "name": "Ubuntu 24.04", "os_flavor": "ubuntu"}, map[string]any{"slug": "debian-12", "name": "Debian 12", "os_flavor": "debian"}}})
 	}
 	m.routes["GET /cloud/products"] = func(w http.ResponseWriter, r *http.Request, b map[string]any) {
 		all := []any{
-			map[string]any{"id": 696, "name": "Gyro Bulut Standart 2-4", "server_type": "cpx22", "location": "fsn1", "cores": 2, "memory_gb": 4, "disk_gb": 80, "cpu_type": "shared", "available": true,
+			map[string]any{"id": 696, "name": "Gyro Bulut Standart 2-4", "plan": "standart-2-4", "region": "eu-de-1", "server_type": "cpx22", "location": "fsn1", "cores": 2, "memory_gb": 4, "disk_gb": 80, "cpu_type": "shared", "available": true,
 				"prices": []any{map[string]any{"cycle": "monthly", "amount": 1845.99, "setup": 0, "currency": "TRY"}}},
-			map[string]any{"id": 656, "name": "Gyro Bulut Pro 2-8", "server_type": "ccx13", "location": "fsn1", "cores": 2, "memory_gb": 8, "disk_gb": 80, "cpu_type": "dedicated", "available": true,
+			map[string]any{"id": 656, "name": "Gyro Bulut Pro 2-8", "plan": "pro-2-8", "region": "eu-de-1", "server_type": "ccx13", "location": "fsn1", "cores": 2, "memory_gb": 8, "disk_gb": 80, "cpu_type": "dedicated", "available": true,
 				"prices": []any{map[string]any{"cycle": "monthly", "amount": 4015.99, "setup": 0, "currency": "TRY"}}},
-			map[string]any{"id": 657, "name": "Gyro Bulut Pro 2-8", "server_type": "ccx13", "location": "hel1", "cores": 2, "memory_gb": 8, "disk_gb": 80, "cpu_type": "dedicated", "available": true,
+			map[string]any{"id": 657, "name": "Gyro Bulut Pro 2-8", "plan": "pro-2-8", "region": "eu-fi-1", "server_type": "ccx13", "location": "hel1", "cores": 2, "memory_gb": 8, "disk_gb": 80, "cpu_type": "dedicated", "available": true,
 				"prices": []any{map[string]any{"cycle": "monthly", "amount": 4015.99, "setup": 0, "currency": "TRY"}}},
 		}
 		loc := r.URL.Query().Get("location")
 		var out []any
 		for _, p := range all {
-			if loc == "" || p.(map[string]any)["location"] == loc {
+			if loc == "" || p.(map[string]any)["location"] == loc || p.(map[string]any)["region"] == loc {
 				out = append(out, p)
 			}
 		}
@@ -379,7 +379,7 @@ func TestServerCreateDryRun(t *testing.T) {
 func TestServerCreateNeedsConfirmation(t *testing.T) {
 	setup(t)
 	m, srv := newMock(t)
-	r := run(t, srv, nil, "", false, "server", "create", "--plan", "cpx22", "--location", "fsn1", "--image", "debian-12")
+	r := run(t, srv, nil, "", false, "server", "create", "--plan", "standart-2-4", "--location", "eu-de-1", "--image", "debian-12")
 	if r.code != ExitAborted || !strings.Contains(r.err, "--yes") {
 		t.Fatalf("expected abort, got %d %q", r.code, r.err)
 	}
@@ -389,7 +389,7 @@ func TestServerCreateNeedsConfirmation(t *testing.T) {
 		}
 	}
 	// interactive "n"
-	r = run(t, srv, nil, "n\n", true, "server", "create", "--plan", "cpx22", "--location", "fsn1", "--image", "debian-12")
+	r = run(t, srv, nil, "n\n", true, "server", "create", "--plan", "standart-2-4", "--location", "eu-de-1", "--image", "debian-12")
 	if r.code != ExitAborted {
 		t.Fatalf("expected abort on n, got %d", r.code)
 	}

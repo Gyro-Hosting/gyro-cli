@@ -1,5 +1,5 @@
 Order summary
-  Plan:        pro-2-8 (ccx13, fsn1, 2 vCPU / 8 GB / 80 GB)
+  Plan:        pro-2-8 (eu-de-1, 2 vCPU / 8 GB / 80 GB)
   Image:       ubuntu-24.04
   Hostname:    web-2
   Price:       2215.19 TRY / monthly

@@ -40,7 +40,7 @@ gyro server ssh web-1
 ```text
 $ gyro server create web-1 --plan standart-1-1 --location falkenstein --image debian-12 --ssh-key laptop --wait
 Order summary
-  Plan:        standart-1-1 (cpx02, fsn1, 1 vCPU / 1 GB / 20 GB)
+  Plan:        standart-1-1 (eu-de-1, 1 vCPU / 1 GB / 20 GB)
   Image:       debian-12
   Hostname:    web-1
   Price:       719.39 TRY / monthly

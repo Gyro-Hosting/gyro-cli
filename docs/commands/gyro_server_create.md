@@ -8,8 +8,8 @@ Order a cloud server. The price is shown first (a quote from the API) and you ar
 the order is paid from your account balance, never from a card. An idempotency key is attached
 automatically, so a retried command never orders twice.
 
---plan accepts a plan name (standart-2-4, pro-2-8 ...), a server type (cpx22, ccx13 ...) or a product id
-(see 'gyro plan list'). --location accepts a code (fsn1) or a city (falkenstein).
+--plan accepts a plan name (standart-2-4, pro-2-8 ...) or a product id (see 'gyro plan list').
+--location accepts a region (eu-de-1, see 'gyro location list') or a city (falkenstein).
 
 ```
 gyro server create [HOSTNAME] [flags]
@@ -19,8 +19,8 @@ gyro server create [HOSTNAME] [flags]
 
 ```
   gyro server create web-1 --plan pro-2-8 --location falkenstein --image ubuntu-24.04 --ssh-key mykey --wait
-  gyro server create --plan cpx22 --location fsn1 --image debian-12 --ssh-key ~/.ssh/id_ed25519.pub --dry-run
-  gyro server create db-1 --plan standart-2-4 --location nbg1 --image ubuntu-24.04 --user-data @cloud-init.yaml --yes -o json
+  gyro server create --plan standart-2-4 --location eu-de-1 --image debian-12 --ssh-key ~/.ssh/id_ed25519.pub --dry-run
+  gyro server create db-1 --plan standart-2-4 --location eu-de-2 --image ubuntu-24.04 --user-data @cloud-init.yaml --yes -o json
 ```
 
 ### Options
@@ -34,8 +34,8 @@ gyro server create [HOSTNAME] [flags]
       --hostname string          host name (or give it as the argument)
       --idempotency-key string   idempotency key (default: random)
       --image string             OS image slug, e.g. ubuntu-24.04 (required)
-      --location string          location code or city
-      --plan string              plan name, server type or product id (required)
+      --location string          region (eu-de-1) or city
+      --plan string              plan name or product id (required)
       --set stringArray          extra body field key=value (repeatable)
       --ssh-key strings          SSH key id, name or .pub file (uploaded if new)
       --user-data string         cloud-init user data, inline or @file

@@ -11,7 +11,7 @@ gyro server list [flags]
 ```
   gyro server list
   gyro server list --status active -o json
-  gyro server list --query "[?location=='fsn1'].ipv4" -o text
+  gyro server list --query "[?region=='eu-de-1'].ipv4" -o text
 ```
 
 ### Options

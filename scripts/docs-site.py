@@ -35,7 +35,7 @@ gyro server ssh web-1</code></pre>
 <p>Sipariş komutu önce API'den fiyat teklifini gösterir, onayınızı ister ve bakiyeden öder. <code>--wait</code> sunucu çalışana kadar bekler.</p>"""),
    ("session", "Örnek oturum", """<pre><code>$ gyro server create web-1 --plan standart-1-1 --location falkenstein --image debian-12 --ssh-key laptop --wait
 Sipariş özeti
-  Plan:        standart-1-1 (cpx02, fsn1, 1 vCPU / 1 GB / 20 GB)
+  Plan:        standart-1-1 (eu-de-1, 1 vCPU / 1 GB / 20 GB)
   İmaj:        debian-12
   Fiyat:       719.39 TRY / monthly
   Bakiye:      4280.61 TRY
@@ -99,7 +99,7 @@ gyro server ssh web-1</code></pre>
 <p>Ordering shows the API price quote first, asks for confirmation and pays from your balance. <code>--wait</code> blocks until the server runs.</p>"""),
    ("session", "Sample session", """<pre><code>$ gyro server create web-1 --plan standart-1-1 --location falkenstein --image debian-12 --ssh-key laptop --wait
 Order summary
-  Plan:        standart-1-1 (cpx02, fsn1, 1 vCPU / 1 GB / 20 GB)
+  Plan:        standart-1-1 (eu-de-1, 1 vCPU / 1 GB / 20 GB)
   Image:       debian-12
   Price:       719.39 TRY / monthly
   Balance:     4280.61 TRY

@@ -41,7 +41,7 @@ gyro server ssh web-1
 ```text
 $ gyro server create web-1 --plan standart-1-1 --location falkenstein --image debian-12 --ssh-key laptop --wait
 Sipariş özeti
-  Plan:        standart-1-1 (cpx02, fsn1, 1 vCPU / 1 GB / 20 GB)
+  Plan:        standart-1-1 (eu-de-1, 1 vCPU / 1 GB / 20 GB)
   İmaj:        debian-12
   Ad:          web-1
   Fiyat:       719.39 TRY / monthly
@@ -54,8 +54,8 @@ Sunucu 47485 hazır.
 Bağlanın: gyro server ssh 47485   (ssh root@203.0.113.10)
 
 $ gyro server list
-ID      HOSTNAME   STATUS   TYPE    LOCATION   IPV4           PRICE        DUE
-47485   web-1      active   cpx02   fsn1       203.0.113.10   599.49 TRY   2026-12-09
+ID      HOSTNAME   STATUS   PLAN           REGION    IPV4           PRICE        DUE
+47485   web-1      active   standart-1-1   eu-de-1   203.0.113.10   599.49 TRY   2026-12-09
 
 $ gyro server power shutdown web-1 --wait && gyro server power on web-1 --wait
 $ gyro server delete web-1

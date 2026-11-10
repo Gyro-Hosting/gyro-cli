@@ -122,7 +122,7 @@ func addCatalog(a *App, root *cobra.Command) {
 				q.Set("location", code)
 			}
 			if typ != "" {
-				q.Set("server_type", typ)
+				q.Set("plan", typ)
 			}
 			items, err := c.All(ctx, "/cloud/products", q, "", 0)
 			if err != nil {
@@ -139,6 +139,9 @@ func addCatalog(a *App, root *cobra.Command) {
 					continue
 				}
 				m["plan"] = PlanSlug(fmt.Sprint(m["name"]))
+				if r, ok := m["region"]; !ok || r == nil || r == "" {
+					m["region"] = m["location"]
+				}
 				if prices, ok := m["prices"].([]any); ok {
 					for _, p := range prices {
 						pm, _ := p.(map[string]any)
@@ -156,10 +159,10 @@ func addCatalog(a *App, root *cobra.Command) {
 				if pi != pj {
 					return pi < pj
 				}
-				return fmt.Sprint(mi["location"]) < fmt.Sprint(mj["location"])
+				return fmt.Sprint(mi["region"]) < fmt.Sprint(mj["region"])
 			})
-			cols := []output.Column{{Header: "id", Path: "id"}, {Header: "plan", Path: "plan"}, {Header: "type", Path: "server_type"},
-				{Header: "location", Path: "location"}, {Header: "vcpu", Path: "cores"}, {Header: "ram_gb", Path: "memory_gb"},
+			cols := []output.Column{{Header: "id", Path: "id"}, {Header: "plan", Path: "plan"},
+				{Header: "region", Path: "region"}, {Header: "vcpu", Path: "cores"}, {Header: "ram_gb", Path: "memory_gb"},
 				{Header: "disk_gb", Path: "disk_gb"}, {Header: "cpu", Path: "cpu_type"}, {Header: "price/" + cycle, Path: "price"}}
 			if all {
 				cols = append(cols, output.Column{Header: "available", Path: "available"})
@@ -167,11 +170,13 @@ func addCatalog(a *App, root *cobra.Command) {
 			return a.Printer().Print(rows, cols, "id")
 		},
 	}
-	list.Flags().StringVar(&loc, "location", "", i18n.S("location code or city", "lokasyon kodu ya da şehir"))
-	list.Flags().StringVar(&typ, "server-type", "", i18n.S("server type, e.g. cx23", "sunucu tipi, ör. cx23"))
+	list.Flags().StringVar(&loc, "location", "", i18n.S("region (eu-de-1) or city", "bölge (eu-de-1) ya da şehir"))
+	list.Flags().StringVar(&typ, "plan", "", i18n.S("plan name, e.g. standart-2-4", "plan adı, ör. standart-2-4"))
+	list.Flags().StringVar(&typ, "server-type", "", "deprecated: use --plan")
+	_ = list.Flags().MarkHidden("server-type")
 	list.Flags().StringVar(&cycle, "cycle", "monthly", "monthly|quarterly|semiannually|annually")
 	list.Flags().BoolVar(&all, "all", false, i18n.S("include out-of-stock plans", "stokta olmayanları da göster"))
-	_ = list.RegisterFlagCompletionFunc("location", completeField(a, "/cloud/locations", "code"))
+	_ = list.RegisterFlagCompletionFunc("location", completeField(a, "/cloud/locations", "region"))
 	plan.AddCommand(list)
 	root.AddCommand(plan)
 }

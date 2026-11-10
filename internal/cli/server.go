@@ -25,8 +25,8 @@ var serverColumns = []output.Column{
 	{Header: "id", Path: "id"},
 	{Header: "hostname", Path: "hostname"},
 	{Header: "status", Path: "status"},
-	{Header: "type", Path: "server_type"},
-	{Header: "location", Path: "location"},
+	{Header: "plan", Path: "plan"},
+	{Header: "region", Path: "region"},
 	{Header: "ipv4", Path: "ipv4"},
 	{Header: "price", Path: "price"},
 	{Header: "due", Path: "due_date"},
@@ -57,7 +57,7 @@ func addServer(a *App, root *cobra.Command) {
 	list := &cobra.Command{
 		Use: "list", Aliases: []string{"ls"},
 		Short:   i18n.S("List your servers", "Sunucularınızı listeleyin"),
-		Example: "  gyro server list\n  gyro server list --status active -o json\n  gyro server list --query \"[?location=='fsn1'].ipv4\" -o text",
+		Example: "  gyro server list\n  gyro server list --status active -o json\n  gyro server list --query \"[?region=='eu-de-1'].ipv4\" -o text",
 		Args:    cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx, cancel := a.Ctx()
@@ -274,6 +274,8 @@ func (a *App) waitServer(ctx context.Context, id, power string, timeout time.Dur
 type product struct {
 	ID         int64   `json:"id"`
 	Name       string  `json:"name"`
+	Plan       string  `json:"plan"`
+	Region     string  `json:"region"`
 	ServerType string  `json:"server_type"`
 	Location   string  `json:"location"`
 	Available  bool    `json:"available"`
@@ -285,6 +287,14 @@ type product struct {
 		Amount   float64 `json:"amount"`
 		Currency string  `json:"currency"`
 	} `json:"prices"`
+}
+
+// where is the region shown to users (older APIs only had the location code).
+func (p product) where() string {
+	if p.Region != "" {
+		return p.Region
+	}
+	return p.Location
 }
 
 var slugRe = regexp.MustCompile(`[^a-z0-9]+`)
@@ -314,17 +324,24 @@ func (a *App) resolveLocation(ctx context.Context, arg string) (string, error) {
 		return "", err
 	}
 	var locs []struct {
-		Code, City, Country string
+		Region, Code, City, Country string
 	}
 	if _, err := c.Get(ctx, "/cloud/locations", nil, &locs); err != nil {
 		return "", err
 	}
 	var names []string
 	for _, l := range locs {
-		if strings.EqualFold(l.Code, arg) || Slug(l.City) == Slug(arg) {
+		if strings.EqualFold(l.Region, arg) || strings.EqualFold(l.Code, arg) || Slug(l.City) == Slug(arg) {
+			if l.Region != "" {
+				return l.Region, nil
+			}
 			return l.Code, nil
 		}
-		names = append(names, l.Code+" ("+l.City+")")
+		if l.Region != "" {
+			names = append(names, l.Region+" ("+l.City+")")
+		} else {
+			names = append(names, l.Code+" ("+l.City+")")
+		}
 	}
 	return "", &ExitErr{ExitUsage, fmt.Errorf("%s %q; %s: %s", i18n.S("unknown location", "bilinmeyen lokasyon"), arg, i18n.S("choose", "seçenekler"), strings.Join(names, ", "))}
 }
@@ -351,7 +368,7 @@ func (a *App) resolvePlan(ctx context.Context, plan, loc string) (*product, erro
 		}
 		all = append(all, p)
 		key := strings.ToLower(plan)
-		if fmt.Sprint(p.ID) == plan || strings.EqualFold(p.ServerType, plan) || PlanSlug(p.Name) == key || Slug(p.Name) == key {
+		if fmt.Sprint(p.ID) == plan || strings.EqualFold(p.ServerType, plan) || strings.EqualFold(p.Plan, plan) || PlanSlug(p.Name) == key || Slug(p.Name) == key {
 			hits = append(hits, p)
 		}
 	}
@@ -369,7 +386,7 @@ func (a *App) resolvePlan(ctx context.Context, plan, loc string) (*product, erro
 	switch len(hits) {
 	case 1:
 		if !hits[0].Available {
-			return nil, &ExitErr{ExitConflict, fmt.Errorf("%s: %s %s", i18n.S("temporarily out of stock", "geçici olarak stokta yok"), PlanSlug(hits[0].Name), hits[0].Location)}
+			return nil, &ExitErr{ExitConflict, fmt.Errorf("%s: %s %s", i18n.S("temporarily out of stock", "geçici olarak stokta yok"), PlanSlug(hits[0].Name), hits[0].where())}
 		}
 		return &hits[0], nil
 	case 0:
@@ -386,7 +403,7 @@ func (a *App) resolvePlan(ctx context.Context, plan, loc string) (*product, erro
 	}
 	var opts []string
 	for _, h := range hits {
-		opts = append(opts, fmt.Sprintf("%d=%s/%s", h.ID, h.ServerType, h.Location))
+		opts = append(opts, fmt.Sprintf("%d=%s/%s", h.ID, PlanSlug(h.Name), h.where()))
 	}
 	return nil, &ExitErr{ExitUsage, fmt.Errorf("%s %q: %s (%s)", i18n.S("several products match", "birden çok ürün uyuyor"), plan, strings.Join(opts, ", "),
 		i18n.S("add --location or use the product id", "--location ekleyin ya da ürün kimliğini kullanın"))}
@@ -504,22 +521,22 @@ func addServerCreate(a *App, srv *cobra.Command) {
 the order is paid from your account balance, never from a card. An idempotency key is attached
 automatically, so a retried command never orders twice.
 
---plan accepts a plan name (standart-2-4, pro-2-8 ...), a server type (cpx22, ccx13 ...) or a product id
-(see 'gyro plan list'). --location accepts a code (fsn1) or a city (falkenstein).`,
+--plan accepts a plan name (standart-2-4, pro-2-8 ...) or a product id (see 'gyro plan list').
+--location accepts a region (eu-de-1, see 'gyro location list') or a city (falkenstein).`,
 			`Bulut sunucu siparişi verir. Önce API'den fiyat teklifi gösterilir ve onay istenir; ödeme kart değil
 hesap bakiyesinden yapılır. Komuta otomatik tekrar güvenliği anahtarı eklenir, tekrar denenen komut
 iki kez sipariş vermez.
 
---plan: plan adı (standart-2-4, pro-2-8 ...), sunucu tipi (cpx22, ccx13 ...) ya da ürün kimliği
-('gyro plan list'). --location: kod (fsn1) ya da şehir (falkenstein).`),
+--plan: plan adı (standart-2-4, pro-2-8 ...) ya da ürün kimliği ('gyro plan list').
+--location: bölge (eu-de-1, 'gyro location list') ya da şehir (falkenstein).`),
 		Example: `  gyro server create web-1 --plan pro-2-8 --location falkenstein --image ubuntu-24.04 --ssh-key mykey --wait
-  gyro server create --plan cpx22 --location fsn1 --image debian-12 --ssh-key ~/.ssh/id_ed25519.pub --dry-run
-  gyro server create db-1 --plan standart-2-4 --location nbg1 --image ubuntu-24.04 --user-data @cloud-init.yaml --yes -o json`,
+  gyro server create --plan standart-2-4 --location eu-de-1 --image debian-12 --ssh-key ~/.ssh/id_ed25519.pub --dry-run
+  gyro server create db-1 --plan standart-2-4 --location eu-de-2 --image ubuntu-24.04 --user-data @cloud-init.yaml --yes -o json`,
 		Args: cobra.MaximumNArgs(1),
 	}
 	f := cmd.Flags()
-	f.StringVar(&plan, "plan", "", i18n.S("plan name, server type or product id (required)", "plan adı, sunucu tipi ya da ürün kimliği (zorunlu)"))
-	f.StringVar(&loc, "location", "", i18n.S("location code or city", "lokasyon kodu ya da şehir"))
+	f.StringVar(&plan, "plan", "", i18n.S("plan name or product id (required)", "plan adı ya da ürün kimliği (zorunlu)"))
+	f.StringVar(&loc, "location", "", i18n.S("region (eu-de-1) or city", "bölge (eu-de-1) ya da şehir"))
 	f.StringVar(&image, "image", "", i18n.S("OS image slug, e.g. ubuntu-24.04 (required)", "işletim sistemi imajı, ör. ubuntu-24.04 (zorunlu)"))
 	f.StringVar(&hostname, "hostname", "", i18n.S("host name (or give it as the argument)", "sunucu adı (ya da argüman olarak verin)"))
 	f.StringSliceVar(&keys, "ssh-key", nil, i18n.S("SSH key id, name or .pub file (uploaded if new)", "SSH anahtarı kimliği, adı ya da .pub dosyası (yeniyse yüklenir)"))
@@ -535,7 +552,7 @@ iki kez sipariş vermez.
 	_ = cmd.MarkFlagRequired("plan")
 	_ = cmd.MarkFlagRequired("image")
 	_ = cmd.RegisterFlagCompletionFunc("cycle", fixedCompletion("monthly", "quarterly", "semiannually", "annually"))
-	_ = cmd.RegisterFlagCompletionFunc("location", completeField(a, "/cloud/locations", "code"))
+	_ = cmd.RegisterFlagCompletionFunc("location", completeField(a, "/cloud/locations", "region"))
 	_ = cmd.RegisterFlagCompletionFunc("image", completeField(a, "/cloud/images", "slug"))
 	_ = cmd.RegisterFlagCompletionFunc("ssh-key", completeField(a, "/cloud/ssh-keys", "name"))
 	_ = cmd.RegisterFlagCompletionFunc("plan", func(*cobra.Command, []string, string) ([]string, cobra.ShellCompDirective) {
@@ -718,7 +735,7 @@ iki kez sipariş vermez.
 func printQuote(a *App, p *product, img, host string, total, tax, balance map[string]any, cycle string) {
 	w := a.Err
 	fmt.Fprintln(w, i18n.S("Order summary", "Sipariş özeti"))
-	fmt.Fprintf(w, "  %-12s %s (%s, %s, %g vCPU / %g GB / %g GB)\n", i18n.S("Plan", "Plan")+":", PlanSlug(p.Name), p.ServerType, p.Location, p.Cores, p.MemoryGB, p.DiskGB)
+	fmt.Fprintf(w, "  %-12s %s (%s, %g vCPU / %g GB / %g GB)\n", i18n.S("Plan", "Plan")+":", PlanSlug(p.Name), p.where(), p.Cores, p.MemoryGB, p.DiskGB)
 	fmt.Fprintf(w, "  %-12s %s\n", i18n.S("Image", "İmaj")+":", img)
 	if host != "" {
 		fmt.Fprintf(w, "  %-12s %s\n", i18n.S("Hostname", "Ad")+":", host)

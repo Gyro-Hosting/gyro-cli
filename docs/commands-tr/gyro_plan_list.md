@@ -16,11 +16,11 @@ gyro plan list [flags]
 ### Options
 
 ```
-      --all                  stokta olmayanları da göster
-      --cycle string         monthly|quarterly|semiannually|annually (default "monthly")
-  -h, --help                 help for list
-      --location string      lokasyon kodu ya da şehir
-      --server-type string   sunucu tipi, ör. cx23
+      --all               stokta olmayanları da göster
+      --cycle string      monthly|quarterly|semiannually|annually (default "monthly")
+  -h, --help              help for list
+      --location string   bölge (eu-de-1) ya da şehir
+      --plan string       plan adı, ör. standart-2-4
 ```
 
 ### Options inherited from parent commands

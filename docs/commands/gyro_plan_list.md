@@ -16,11 +16,11 @@ gyro plan list [flags]
 ### Options
 
 ```
-      --all                  include out-of-stock plans
-      --cycle string         monthly|quarterly|semiannually|annually (default "monthly")
-  -h, --help                 help for list
-      --location string      location code or city
-      --server-type string   server type, e.g. cx23
+      --all               include out-of-stock plans
+      --cycle string      monthly|quarterly|semiannually|annually (default "monthly")
+  -h, --help              help for list
+      --location string   region (eu-de-1) or city
+      --plan string       plan name, e.g. standart-2-4
 ```
 
 ### Options inherited from parent commands
