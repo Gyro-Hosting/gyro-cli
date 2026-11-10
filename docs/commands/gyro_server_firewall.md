@@ -33,5 +33,5 @@ gyro server firewall [flags]
 
 * [gyro server](gyro_server.md)	 - Cloud servers: create, power, snapshots, SSH ...
 * [gyro server firewall list](gyro_server_firewall_list.md)	 - Inbound firewall rules
-* [gyro server firewall rule](gyro_server_firewall_rule.md)	 - Add an inbound firewall rule
+* [gyro server firewall rule](gyro_server_firewall_rule.md)	 - Add a firewall rule
 

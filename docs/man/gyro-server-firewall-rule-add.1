@@ -2,7 +2,7 @@
 .TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
 
 .SH NAME
-gyro-server-firewall-rule-add - Add an inbound firewall rule
+gyro-server-firewall-rule-add - Add a firewall rule
 
 
 .SH SYNOPSIS
@@ -10,15 +10,38 @@ gyro-server-firewall-rule-add - Add an inbound firewall rule
 
 
 .SH DESCRIPTION
-Add an inbound firewall rule
+Add a firewall rule
+
+.PP
+Network firewall add-on: inserts at \fBpriority\fR (default last) and applies as a trial unless \fBpermanent\fR\&. Otherwise the cloud server's simple inbound allow list.
 
 .PP
 API: POST /cloud/servers/{id}/firewall/rules (operationId addFirewallRule, scope cloud_write)
 
 
 .SH OPTIONS
+\fB--action\fP=""
+	action (allow|deny)
+
+.PP
+\fB--confirm-warnings\fP[=false]
+	Apply even when the change has warnings (lock-out risk, shadowed or duplicate rules, private sources)
+
+.PP
 \fB--data\fP=""
 	request body as JSON, @file or @- (stdin)
+
+.PP
+\fB--description\fP=""
+	description
+
+.PP
+\fB--destination\fP=""
+	any (all IPs of the server) or one IP address of the server
+
+.PP
+\fB--direction\fP=""
+	in = inbound to the server, out = new outbound connections (network firewall only) (in|out)
 
 .PP
 \fB--dry-run\fP[=false]
@@ -33,20 +56,32 @@ API: POST /cloud/servers/{id}/firewall/rules (operationId addFirewallRule, scope
 	idempotency key (automatic for money operations)
 
 .PP
+\fB--permanent\fP[=false]
+	Network firewall - skip the 5 minute trial and make the change permanent at once
+
+.PP
 \fB--port\fP=""
-	N or N-M (empty = all ports)
+	any | 22 | 80,443 | 1000-2000 (not for icmp/all)
+
+.PP
+\fB--priority\fP=0
+	Position (1 = evaluated first). Default = last. First matching rule wins.
 
 .PP
 \fB--protocol\fP=""
-	protocol (tcp|udp|icmp)
+	protocol (tcp|udp|tcp_udp|icmp|all)
 
 .PP
 \fB--set\fP=[]
 	extra body field key=value (repeatable)
 
 .PP
+\fB--source\fP=""
+	any | IPv4/CIDR list (comma separated) | country:TR | not-country:TR (country add-on). For direction out: the remote address.
+
+.PP
 \fB--source-ips\fP=[]
-	CIDRs (default any)
+	Legacy - CIDRs (use source)
 
 .PP
 \fB--wait\fP[=false]

@@ -2,7 +2,7 @@
 openapi: 3.1.0
 info:
   title: Gyro Public API
-  version: 2.7.0
+  version: 2.8.0
   summary: Manage Gyro cloud servers, SSH keys and billing programmatically.
   x-summary-tr: Gyro bulut sunucularınızı, SSH anahtarlarınızı ve faturalarınızı programla yönetin.
   description: "The Gyro Public API lets you automate everything you do in the Gyro client area:\norder and manage cloud servers, keep SSH keys, read invoices and\
@@ -1524,7 +1524,9 @@ paths:
       tags:
       - Networking
       operationId: addFirewallRule
-      summary: Add an inbound firewall rule
+      summary: Add a firewall rule
+      description: 'Network firewall add-on: inserts at `priority` (default last) and applies as a trial unless `permanent`. Otherwise the cloud server''s simple
+        inbound allow list.'
       x-summary-tr: Gelen trafik kuralı ekle
       x-scope: cloud_write
       requestBody:
@@ -1588,6 +1590,127 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/FirewallRule'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/Validation'
+  /cloud/servers/{id}/firewall/policy:
+    parameters:
+    - $ref: '#/components/parameters/ServerId'
+    get:
+      tags:
+      - Networking
+      operationId: getFirewallPolicy
+      summary: Network firewall policy (rules, default action, status)
+      x-summary-tr: Ağ güvenlik duvarı politikası (kurallar, varsayılan kural, durum)
+      x-scope: cloud_read
+      x-cli:
+        command: firewall get
+      responses:
+        '200':
+          description: Policy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/FirewallPolicy'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: The network firewall add-on is not active on this server (firewall_not_enabled)
+    put:
+      tags:
+      - Networking
+      operationId: putFirewallPolicy
+      summary: Replace the network firewall policy
+      x-summary-tr: Ağ güvenlik duvarı politikasını değiştir
+      description: Applies as a 5 minute trial unless `permanent` is true; confirm with POST /firewall/policy/confirm. Warnings return 422 `confirm_warnings_required`
+        with `details.warnings`.
+      x-scope: cloud_write
+      x-cli:
+        command: firewall set
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FirewallPolicyInput'
+            example:
+              default_action: deny
+              rules:
+              - action: allow
+                protocol: tcp
+                port: 80,443
+                source: any
+              - action: allow
+                protocol: tcp
+                port: '22'
+                source: 203.0.113.10
+      responses:
+        '200':
+          description: Policy after the change
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/FirewallPolicy'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: firewall_not_enabled
+        '422':
+          $ref: '#/components/responses/Validation'
+    delete:
+      tags:
+      - Networking
+      operationId: deleteFirewallPolicy
+      summary: Remove your firewall rules
+      x-summary-tr: Güvenlik duvarı kurallarınızı kaldır
+      description: Removes every customer rule of the server (all traffic allowed). Rules applied by Gyro support stay.
+      x-scope: cloud_write
+      x-cli:
+        command: firewall delete
+        confirm: true
+      responses:
+        '200':
+          description: Policy after the change
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/FirewallPolicy'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: firewall_not_enabled
+  /cloud/servers/{id}/firewall/policy/confirm:
+    parameters:
+    - $ref: '#/components/parameters/ServerId'
+    post:
+      tags:
+      - Networking
+      operationId: confirmFirewallPolicy
+      summary: Make the running firewall trial permanent
+      x-summary-tr: Güvenlik duvarı denemesini kalıcı yap
+      x-scope: cloud_write
+      x-cli:
+        command: firewall confirm
+      responses:
+        '200':
+          description: Policy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/FirewallPolicy'
         '404':
           $ref: '#/components/responses/NotFound'
         '422':
@@ -14513,7 +14636,37 @@ components:
       properties:
         direction:
           type: string
-          const: in
+          enum:
+          - in
+          - out
+        priority:
+          type: integer
+          description: Position (first match wins) - network firewall
+        type:
+          type: string
+          enum:
+          - rule
+          - brute_force
+          - port_scan
+        action:
+          type: string
+          enum:
+          - allow
+          - deny
+        source:
+          type: string
+          description: any | CIDR list | country:XX | not-country:XX
+        destination:
+          type: string
+          description: any or one IP of the server
+        description:
+          type: string
+        threshold:
+          type:
+          - integer
+          - 'null'
+        read_only:
+          type: boolean
         protocol:
           type: string
           example: tcp
@@ -14774,25 +14927,139 @@ components:
                 type: boolean
     FirewallRuleInput:
       type: object
-      required:
-      - protocol
+      description: 'One firewall rule. New schema (v2.8, network firewall add-on): action, protocol, source, destination, port, priority, direction, description.
+        Legacy fields (protocol tcp|udp|icmp + port + source_ips) are still accepted.'
       properties:
+        priority:
+          type: integer
+          minimum: 1
+          description: Position (1 = evaluated first). Default = last. First matching rule wins.
+        direction:
+          type: string
+          enum:
+          - in
+          - out
+          default: in
+          description: in = inbound to the server, out = new outbound connections (network firewall only)
+        action:
+          type: string
+          enum:
+          - allow
+          - deny
+          default: allow
         protocol:
           type: string
           enum:
           - tcp
           - udp
+          - tcp_udp
           - icmp
+          - all
+          default: tcp
+        source:
+          type: string
+          description: 'any | IPv4/CIDR list (comma separated) | country:TR | not-country:TR (country add-on). For direction out: the remote address.'
+          example: 203.0.113.0/24
+        destination:
+          type: string
+          description: any (all IPs of the server) or one IP address of the server
+          default: any
         port:
           type: string
-          description: N or N-M (empty = all ports)
+          description: any | 22 | 80,443 | 1000-2000 (not for icmp/all)
           example: '22'
+        description:
+          type: string
+          maxLength: 60
         source_ips:
           type: array
           items:
             type: string
           maxItems: 20
-          description: CIDRs (default any)
+          description: Legacy - CIDRs (use source)
+        permanent:
+          type: boolean
+          description: Network firewall - skip the 5 minute trial and make the change permanent at once
+        confirm_warnings:
+          type: boolean
+          description: Apply even when the change has warnings (lock-out risk, shadowed or duplicate rules, private sources)
+    FirewallPolicy:
+      type: object
+      description: Network firewall of a server (AWS network ACL / ufw model). Rules are evaluated top to bottom, the first match wins; default_action applies to
+        inbound traffic that matches no rule.
+      properties:
+        server_id:
+          type: integer
+        engine:
+          type: string
+          enum:
+          - network
+          - cloud
+          description: network = Istanbul core router (allow + deny, inbound + outbound); cloud = provider firewall (allow rules only, default deny, inbound only,
+            no country)
+        default_action:
+          type: string
+          enum:
+          - allow
+          - deny
+        ping:
+          type: boolean
+        status:
+          type: string
+          enum:
+          - none
+          - applying
+          - trial
+          - active
+          - open
+          - removing
+        permanent:
+          type: boolean
+        trial_seconds_left:
+          type: integer
+        busy:
+          type: boolean
+        locked:
+          type: boolean
+          description: Settings locked by Gyro support
+        rules:
+          type: array
+          items:
+            $ref: '#/components/schemas/FirewallRule'
+        operator_rules:
+          type: array
+          description: Rules applied by Gyro (read only, evaluated before yours)
+          items:
+            $ref: '#/components/schemas/FirewallRule'
+        corrections:
+          type: array
+          items:
+            type: string
+          description: Network addresses corrected on save (e.g. 10.1.2.3/24 -> 10.1.2.0/24)
+    FirewallPolicyInput:
+      type: object
+      required:
+      - rules
+      properties:
+        default_action:
+          type: string
+          enum:
+          - allow
+          - deny
+          default: allow
+        ping:
+          type: boolean
+          default: true
+        rules:
+          type: array
+          maxItems: 70
+          items:
+            $ref: '#/components/schemas/FirewallRuleInput'
+        permanent:
+          type: boolean
+          description: Skip the 5 minute trial (otherwise call POST /firewall/policy/confirm within 5 minutes or the change is reverted)
+        confirm_warnings:
+          type: boolean
     BulkResult:
       type: object
       properties:

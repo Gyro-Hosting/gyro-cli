@@ -41,5 +41,5 @@ gyro server firewall rule delete <ID> <N> [flags]
 
 ### SEE ALSO
 
-* [gyro server firewall rule](gyro_server_firewall_rule.md)	 - Add an inbound firewall rule
+* [gyro server firewall rule](gyro_server_firewall_rule.md)	 - Add a firewall rule
 

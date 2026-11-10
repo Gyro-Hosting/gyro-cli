@@ -140,6 +140,10 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro domain whois-profile delete` | Delete whois profile (path: {pid}) | `DELETE /domains/whois-profiles/{pid}` |
 | `gyro domain whois-profile list` | List whois profiles | `GET /domains/whois-profiles` |
 | `gyro domain whois-profile set` | Update whois profile (path: {pid}) | `PUT /domains/whois-profiles/{pid}` |
+| `gyro firewall confirm` | Make the running firewall trial permanent | `POST /cloud/servers/{id}/firewall/policy/confirm` |
+| `gyro firewall delete` | Remove your firewall rules | `DELETE /cloud/servers/{id}/firewall/policy` |
+| `gyro firewall get` | Network firewall policy (rules, default action, status) | `GET /cloud/servers/{id}/firewall/policy` |
+| `gyro firewall set` | Replace the network firewall policy | `PUT /cloud/servers/{id}/firewall/policy` |
 | `gyro image list` | List operating system images | `GET /cloud/images` |
 | `gyro invoice coupon` | Apply invoice coupon (path: {id}) | `POST /invoices/{id}/coupon` |
 | `gyro invoice get` | Get an invoice | `GET /invoices/{id}` |
@@ -238,7 +242,7 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro server create` | Create (order) a cloud server | `POST /cloud/servers` |
 | `gyro server delete` | Delete (cancel) a server | `DELETE /cloud/servers/{id}` |
 | `gyro server firewall list` | Inbound firewall rules | `GET /cloud/servers/{id}/firewall` |
-| `gyro server firewall rule add` | Add an inbound firewall rule | `POST /cloud/servers/{id}/firewall/rules` |
+| `gyro server firewall rule add` | Add a firewall rule | `POST /cloud/servers/{id}/firewall/rules` |
 | `gyro server firewall rule delete` | Remove a firewall rule (the last one needs confirm) | `DELETE /cloud/servers/{id}/firewall/rules/{n}` |
 | `gyro server get` | Get a server with its live state | `GET /cloud/servers/{id}` |
 | `gyro server list` | List cloud servers | `GET /cloud/servers` |

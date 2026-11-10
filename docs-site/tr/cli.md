@@ -140,6 +140,10 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro domain whois-profile delete` | Profili Silme | `DELETE /domains/whois-profiles/{pid}` |
 | `gyro domain whois-profile list` | Kayıtlı Profilleri Listeleme | `GET /domains/whois-profiles` |
 | `gyro domain whois-profile set` | Profili Güncelleme | `PUT /domains/whois-profiles/{pid}` |
+| `gyro firewall confirm` | Güvenlik duvarı denemesini kalıcı yap | `POST /cloud/servers/{id}/firewall/policy/confirm` |
+| `gyro firewall delete` | Güvenlik duvarı kurallarınızı kaldır | `DELETE /cloud/servers/{id}/firewall/policy` |
+| `gyro firewall get` | Ağ güvenlik duvarı politikası (kurallar, varsayılan kural, durum) | `GET /cloud/servers/{id}/firewall/policy` |
+| `gyro firewall set` | Ağ güvenlik duvarı politikasını değiştir | `PUT /cloud/servers/{id}/firewall/policy` |
 | `gyro image list` | İşletim sistemi imajlarını listele | `GET /cloud/images` |
 | `gyro invoice coupon` | Faturaya Kupon Uygulama | `POST /invoices/{id}/coupon` |
 | `gyro invoice get` | Faturayı getir | `GET /invoices/{id}` |

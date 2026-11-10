@@ -1,6 +1,6 @@
 ## gyro server firewall rule
 
-Add an inbound firewall rule
+Add a firewall rule
 
 ```
 gyro server firewall rule [flags]
@@ -32,6 +32,6 @@ gyro server firewall rule [flags]
 ### SEE ALSO
 
 * [gyro server firewall](gyro_server_firewall.md)	 - Inbound firewall rules
-* [gyro server firewall rule add](gyro_server_firewall_rule_add.md)	 - Add an inbound firewall rule
+* [gyro server firewall rule add](gyro_server_firewall_rule_add.md)	 - Add a firewall rule
 * [gyro server firewall rule delete](gyro_server_firewall_rule_delete.md)	 - Remove a firewall rule (the last one needs confirm)
 

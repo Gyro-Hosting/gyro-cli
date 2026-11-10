@@ -1,10 +1,12 @@
 ## gyro server firewall rule add
 
-Add an inbound firewall rule
+Add a firewall rule
 
 ### Synopsis
 
-Add an inbound firewall rule
+Add a firewall rule
+
+Network firewall add-on: inserts at `priority` (default last) and applies as a trial unless `permanent`. Otherwise the cloud server's simple inbound allow list.
 
 API: POST /cloud/servers/{id}/firewall/rules (operationId addFirewallRule, scope cloud_write)
 
@@ -15,14 +17,22 @@ gyro server firewall rule add <ID> [flags]
 ### Options
 
 ```
+      --action string            action (allow|deny)
+      --confirm-warnings         Apply even when the change has warnings (lock-out risk, shadowed or duplicate rules, private sources)
       --data string              request body as JSON, @file or @- (stdin)
+      --description string       description
+      --destination string       any (all IPs of the server) or one IP address of the server
+      --direction string         in = inbound to the server, out = new outbound connections (network firewall only) (in|out)
       --dry-run                  show the price quote / request without changing anything
   -h, --help                     help for add
       --idempotency-key string   idempotency key (automatic for money operations)
-      --port string              N or N-M (empty = all ports)
-      --protocol string          protocol (tcp|udp|icmp)
+      --permanent                Network firewall - skip the 5 minute trial and make the change permanent at once
+      --port string              any | 22 | 80,443 | 1000-2000 (not for icmp/all)
+      --priority int             Position (1 = evaluated first). Default = last. First matching rule wins.
+      --protocol string          protocol (tcp|udp|tcp_udp|icmp|all)
       --set stringArray          extra body field key=value (repeatable)
-      --source-ips strings       CIDRs (default any)
+      --source string            any | IPv4/CIDR list (comma separated) | country:TR | not-country:TR (country add-on). For direction out: the remote address.
+      --source-ips strings       Legacy - CIDRs (use source)
       --wait                     wait until the server is no longer busy
       --wait-timeout duration    maximum time for --wait (default 15m0s)
 ```
@@ -46,5 +56,5 @@ gyro server firewall rule add <ID> [flags]
 
 ### SEE ALSO
 
-* [gyro server firewall rule](gyro_server_firewall_rule.md)	 - Add an inbound firewall rule
+* [gyro server firewall rule](gyro_server_firewall_rule.md)	 - Add a firewall rule
 
