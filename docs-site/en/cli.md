@@ -230,6 +230,8 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro server activity list` | Recent platform actions on the server | `GET /cloud/servers/{id}/activity` |
 | `gyro server app create` | Install an app (rebuilds the disk; confirm required; 3 per server per day) | `POST /cloud/servers/{id}/app` |
 | `gyro server app get` | App install status (credentials shown once when ready) | `GET /cloud/servers/{id}/app` |
+| `gyro server app log get` | Live progress log of the latest app install (step changes, server log tail) | `GET /cloud/servers/{id}/app/log` |
+| `gyro server app retry` | Retry a failed or silent app install (rebuilds the disk; confirm required; 3 per server per hour) | `POST /cloud/servers/{id}/app/retry` |
 | `gyro server backup create` | Take a manual backup (backup add-on required) | `POST /cloud/servers/{id}/backups` |
 | `gyro server backup list` | List automatic backups | `GET /cloud/servers/{id}/backups` |
 | `gyro server console` | Open a one-time VNC console ticket | `POST /cloud/servers/{id}/console` |

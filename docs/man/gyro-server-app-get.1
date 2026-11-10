@@ -13,6 +13,9 @@ gyro-server-app-get - App install status (credentials shown once when ready)
 App install status (credentials shown once when ready)
 
 .PP
+Since 2.7.0 also \fBstuck\fR (open but silent for too long), \fBstuck_reason\fR (\fBno_callback\fR = the server never reported back), \fBlast_update_at\fR, \fBattempt\fR, \fBcan_retry\fR, \fBerror_code\fR, \fBstep_text\fR\&. Live log: GET /cloud/servers/{id}/app/log.
+
+.PP
 API: GET /cloud/servers/{id}/app (operationId getAppInstall, scope cloud_read)
 
 

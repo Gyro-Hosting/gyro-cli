@@ -3,7 +3,7 @@
 package spec
 
 // APIVersion is info.version of the spec this table was generated from.
-const APIVersion = "2.6.0"
+const APIVersion = "2.7.0"
 
 // Ops lists every API operation.
 var Ops = []Op{
@@ -1454,6 +1454,7 @@ var Ops = []Op{
 	},
 	{ID: "getAppInstall", Method: "GET", Path: "/cloud/servers/{id}/app", Tag: "One-click apps",
 		Summary: "App install status (credentials shown once when ready)", SummaryTR: "Uygulama kurulum durumu (hazır olunca kimlik bir kez)",
+		Desc: "Since 2.7.0 also `stuck` (open but silent for too long), `stuck_reason` (`no_callback` = the server never reported back), `last_update_at`, `attempt`, `can_retry`, `error_code`, `step_text`. Live log: GET /cloud/servers/{id}/app/log.", DescTR: "2.7.0 ile ayrıca `stuck` (açık ama uzun süredir haber yok), `stuck_reason` (`no_callback` = sunucu hiç haber vermedi), `last_update_at`, `attempt`, `can_retry`, `error_code`, `step_text`. Canlı günlük: GET /cloud/servers/{id}/app/log.",
 		Scope: "cloud_read", Command: []string{"server", "app", "get"},
 		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
 		Params: []Param{
@@ -1472,6 +1473,30 @@ var Ops = []Op{
 			{Name: "os", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
 			{Name: "domain", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
 			{Name: "email", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
+			{Name: "confirm", Type: "boolean", Items: "", Enum: []string{"true"}, Default: "", Required: true, Desc: "", DescTR: ""},
+		},
+	},
+	{ID: "getAppInstallLog", Method: "GET", Path: "/cloud/servers/{id}/app/log", Tag: "One-click apps",
+		Summary: "Live progress log of the latest app install (step changes, server log tail)", SummaryTR: "Son uygulama kurulumunun canlı ilerleme günlüğü (adımlar, sunucu günlüğü)",
+		Desc: "Lines with `id` greater than `after`, oldest first (poll with the last id you have). `source` is step, server, system or staff. Server lines are untrusted text sent by the server (secrets masked); render them as plain text.", DescTR: "`after` değerinden büyük kimlikli satırlar, eskiden yeniye (elinizdeki son kimlikle sorgulayın). `source`: step, server, system, staff. Sunucu satırları sunucudan gelen güvenilmez metindir (sırlar maskelenir); düz metin olarak gösterin.",
+		Scope: "cloud_read", Command: []string{"server", "app", "log", "get"},
+		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
+		Columns: []string{"server_id", "install_id", "status"},
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Server id (= service id in the client area)", DescTR: ""},
+			{Name: "after", In: "query", Type: "integer", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
+			{Name: "limit", In: "query", Type: "integer", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
+		},
+	},
+	{ID: "retryAppInstall", Method: "POST", Path: "/cloud/servers/{id}/app/retry", Tag: "One-click apps",
+		Summary: "Retry a failed or silent app install (rebuilds the disk; confirm required; 3 per server per hour)", SummaryTR: "Hata veren ya da yanıt vermeyen kurulumu yeniden dene (diski yeniden kurar; confirm zorunlu; sunucu başına saatte 3)",
+		Desc: "Allowed when the latest install has `status` hata (failed) or `stuck` = true (no news for too long). On cloud servers the server is rebuilt with the same app, OS and domain; ALL data on the disk is deleted.", DescTR: "Son kurulum `hata` durumundaysa ya da `stuck` = true ise (uzun süre haber yok) kullanılabilir. Bulut sunucuda sunucu aynı uygulama, işletim sistemi ve alan adıyla yeniden kurulur; diskteki TÜM veriler silinir.",
+		Scope: "cloud_write", Command: []string{"server", "app", "retry"},
+		HasBody: true, BodyRequired: true, ListResponse: false, Paginated: false, Confirm: true, Money: false, Hidden: false,
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Server id (= service id in the client area)", DescTR: ""},
+		},
+		Body: []Field{
 			{Name: "confirm", Type: "boolean", Items: "", Enum: []string{"true"}, Default: "", Required: true, Desc: "", DescTR: ""},
 		},
 	},

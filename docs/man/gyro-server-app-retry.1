@@ -1,0 +1,101 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-server-app-retry - Retry a failed or silent app install (rebuilds the disk; confirm required; 3 per server per hour)
+
+
+.SH SYNOPSIS
+\fBgyro server app retry  [flags]\fP
+
+
+.SH DESCRIPTION
+Retry a failed or silent app install (rebuilds the disk; confirm required; 3 per server per hour)
+
+.PP
+Allowed when the latest install has \fBstatus\fR hata (failed) or \fBstuck\fR = true (no news for too long). On cloud servers the server is rebuilt with the same app, OS and domain; ALL data on the disk is deleted.
+
+.PP
+API: POST /cloud/servers/{id}/app/retry (operationId retryAppInstall, scope cloud_write)
+
+
+.SH OPTIONS
+\fB--data\fP=""
+	request body as JSON, @file or @- (stdin)
+
+.PP
+\fB--dry-run\fP[=false]
+	show the price quote / request without changing anything
+
+.PP
+\fB-h\fP, \fB--help\fP[=false]
+	help for retry
+
+.PP
+\fB--idempotency-key\fP=""
+	idempotency key (automatic for money operations)
+
+.PP
+\fB--set\fP=[]
+	extra body field key=value (repeatable)
+
+.PP
+\fB--wait\fP[=false]
+	wait until the server is no longer busy
+
+.PP
+\fB--wait-timeout\fP=15m0s
+	maximum time for --wait
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH SEE ALSO
+\fBgyro-server-app(1)\fP

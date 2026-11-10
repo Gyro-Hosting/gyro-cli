@@ -230,6 +230,8 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro server activity list` | Sunucudaki son platform işlemleri | `GET /cloud/servers/{id}/activity` |
 | `gyro server app create` | Uygulama kur (diski yeniden kurar; confirm zorunlu; sunucu başına günde 3) | `POST /cloud/servers/{id}/app` |
 | `gyro server app get` | Uygulama kurulum durumu (hazır olunca kimlik bir kez) | `GET /cloud/servers/{id}/app` |
+| `gyro server app log get` | Son uygulama kurulumunun canlı ilerleme günlüğü (adımlar, sunucu günlüğü) | `GET /cloud/servers/{id}/app/log` |
+| `gyro server app retry` | Hata veren ya da yanıt vermeyen kurulumu yeniden dene (diski yeniden kurar; confirm zorunlu; sunucu başına saatte 3) | `POST /cloud/servers/{id}/app/retry` |
 | `gyro server backup create` | Elle yedek al (yedekleme ek hizmeti gerekir) | `POST /cloud/servers/{id}/backups` |
 | `gyro server backup list` | Otomatik yedekleri listele | `GET /cloud/servers/{id}/backups` |
 | `gyro server console` | Tek seferlik VNC konsol bileti al | `POST /cloud/servers/{id}/console` |

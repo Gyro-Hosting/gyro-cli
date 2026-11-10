@@ -34,4 +34,6 @@ gyro server app [flags]
 * [gyro server](gyro_server.md)	 - Cloud servers: create, power, snapshots, SSH ...
 * [gyro server app create](gyro_server_app_create.md)	 - Install an app (rebuilds the disk; confirm required; 3 per server per day)
 * [gyro server app get](gyro_server_app_get.md)	 - App install status (credentials shown once when ready)
+* [gyro server app log](gyro_server_app_log.md)	 - Live progress log of the latest app install (step changes, server log tail)
+* [gyro server app retry](gyro_server_app_retry.md)	 - Retry a failed or silent app install (rebuilds the disk; confirm required; 3 per server per hour)
 

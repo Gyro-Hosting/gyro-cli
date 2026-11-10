@@ -6,6 +6,8 @@ Uygulama kurulum durumu (hazır olunca kimlik bir kez)
 
 Uygulama kurulum durumu (hazır olunca kimlik bir kez)
 
+2.7.0 ile ayrıca `stuck` (açık ama uzun süredir haber yok), `stuck_reason` (`no_callback` = sunucu hiç haber vermedi), `last_update_at`, `attempt`, `can_retry`, `error_code`, `step_text`. Canlı günlük: GET /cloud/servers/{id}/app/log.
+
 API: GET /cloud/servers/{id}/app (operationId getAppInstall, scope cloud_read)
 
 ```

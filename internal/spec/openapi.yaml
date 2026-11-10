@@ -2,7 +2,7 @@
 openapi: 3.1.0
 info:
   title: Gyro Public API
-  version: 2.6.0
+  version: 2.7.0
   summary: Manage Gyro cloud servers, SSH keys and billing programmatically.
   x-summary-tr: Gyro bulut sunucularınızı, SSH anahtarlarınızı ve faturalarınızı programla yönetin.
   description: "The Gyro Public API lets you automate everything you do in the Gyro client area:\norder and manage cloud servers, keep SSH keys, read invoices and\
@@ -2426,6 +2426,10 @@ paths:
       - One-click apps
       operationId: getAppInstall
       summary: App install status (credentials shown once when ready)
+      description: 'Since 2.7.0 also `stuck` (open but silent for too long), `stuck_reason` (`no_callback` = the server never reported back), `last_update_at`, `attempt`,
+        `can_retry`, `error_code`, `step_text`. Live log: GET /cloud/servers/{id}/app/log.'
+      x-description-tr: '2.7.0 ile ayrıca `stuck` (açık ama uzun süredir haber yok), `stuck_reason` (`no_callback` = sunucu hiç haber vermedi), `last_update_at`,
+        `attempt`, `can_retry`, `error_code`, `step_text`. Canlı günlük: GET /cloud/servers/{id}/app/log.'
       x-summary-tr: Uygulama kurulum durumu (hazır olunca kimlik bir kez)
       x-scope: cloud_read
       responses:
@@ -2477,6 +2481,114 @@ paths:
       responses:
         '202':
           description: Started
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+        '429':
+          description: install_limit
+  /cloud/servers/{id}/app/log:
+    parameters:
+    - $ref: '#/components/parameters/ServerId'
+    get:
+      tags:
+      - One-click apps
+      operationId: getAppInstallLog
+      summary: Live progress log of the latest app install (step changes, server log tail)
+      x-summary-tr: Son uygulama kurulumunun canlı ilerleme günlüğü (adımlar, sunucu günlüğü)
+      description: Lines with `id` greater than `after`, oldest first (poll with the last id you have). `source` is step, server, system or staff. Server lines are
+        untrusted text sent by the server (secrets masked); render them as plain text.
+      x-description-tr: '`after` değerinden büyük kimlikli satırlar, eskiden yeniye (elinizdeki son kimlikle sorgulayın). `source`: step, server, system, staff. Sunucu
+        satırları sunucudan gelen güvenilmez metindir (sırlar maskelenir); düz metin olarak gösterin.'
+      x-scope: cloud_read
+      parameters:
+      - name: after
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 0
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 300
+      responses:
+        '200':
+          description: Log lines
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      server_id:
+                        type: integer
+                      install_id:
+                        type:
+                        - integer
+                        - 'null'
+                      status:
+                        type: string
+                      lines:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                            time:
+                              type: string
+                            source:
+                              type: string
+                              enum:
+                              - step
+                              - server
+                              - system
+                              - staff
+                            text:
+                              type: string
+                            progress:
+                              type: integer
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /cloud/servers/{id}/app/retry:
+    parameters:
+    - $ref: '#/components/parameters/ServerId'
+    post:
+      tags:
+      - One-click apps
+      operationId: retryAppInstall
+      summary: Retry a failed or silent app install (rebuilds the disk; confirm required; 3 per server per hour)
+      x-summary-tr: Hata veren ya da yanıt vermeyen kurulumu yeniden dene (diski yeniden kurar; confirm zorunlu; sunucu başına saatte 3)
+      description: Allowed when the latest install has `status` hata (failed) or `stuck` = true (no news for too long). On cloud servers the server is rebuilt with
+        the same app, OS and domain; ALL data on the disk is deleted.
+      x-description-tr: Son kurulum `hata` durumundaysa ya da `stuck` = true ise (uzun süre haber yok) kullanılabilir. Bulut sunucuda sunucu aynı uygulama, işletim
+        sistemi ve alan adıyla yeniden kurulur; diskteki TÜM veriler silinir.
+      x-scope: cloud_write
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - confirm
+              properties:
+                confirm:
+                  type: boolean
+                  const: true
+            example:
+              confirm: true
+      responses:
+        '202':
+          description: Started (install_id, attempt)
         '404':
           $ref: '#/components/responses/NotFound'
         '409':

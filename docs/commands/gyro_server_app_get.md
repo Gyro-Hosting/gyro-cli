@@ -6,6 +6,8 @@ App install status (credentials shown once when ready)
 
 App install status (credentials shown once when ready)
 
+Since 2.7.0 also `stuck` (open but silent for too long), `stuck_reason` (`no_callback` = the server never reported back), `last_update_at`, `attempt`, `can_retry`, `error_code`, `step_text`. Live log: GET /cloud/servers/{id}/app/log.
+
 API: GET /cloud/servers/{id}/app (operationId getAppInstall, scope cloud_read)
 
 ```
