@@ -15,6 +15,7 @@ permissions:
   contents: write
   packages: write
   issues: write
+  actions: write
 concurrency:
   group: spec-sync
   cancel-in-progress: false
@@ -57,13 +58,24 @@ jobs:
       - name: Commit and tag
         id: bump
         if: steps.dl.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
+          # Yaris korumasi (2026-11-11): bu tur baslarken baska bir tur main'i ilerletmis/etiket atmis olabilir.
+          # O durumda bu turu atla ve guncel main uzerinden yeni bir tur baslat (ayni etiketi ikinci kez denemez).
+          git fetch --quiet --tags --force origin main
+          if ! git merge-base --is-ancestor origin/main HEAD; then
+            echo "main ilerledi; bu tur atlaniyor, yeni spec-sync turu baslatiliyor" | tee -a "$GITHUB_STEP_SUMMARY"
+            gh workflow run spec-sync.yml --ref main || echo "::warning::yeni tur baslatilamadi; 6 saatlik zamanlayici yakalar"
+            exit 0
+          fi
           last=$(git describe --tags --abbrev=0 --match 'v[0-9]*')
           IFS=. read -r MA MI PA <<< "${last#v}"
           added=$(comm -13 "$RUNNER_TEMP/old-ops" "$RUNNER_TEMP/new-ops" | wc -l)
           removed=$(comm -23 "$RUNNER_TEMP/old-ops" "$RUNNER_TEMP/new-ops" | wc -l)
           if [ "$added" -gt 0 ] || [ "$removed" -gt 0 ]; then MI=$((MI+1)); PA=0; else PA=$((PA+1)); fi
           tag="v$MA.$MI.$PA"
+          while git rev-parse -q --verify "refs/tags/$tag" >/dev/null; do PA=$((PA+1)); tag="v$MA.$MI.$PA"; done
           ver=$(grep -m1 '^  version:' internal/spec/openapi.yaml | awk '{print $2}')
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
