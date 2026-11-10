@@ -32,5 +32,9 @@ gyro dns [flags]
 ### SEE ALSO
 
 * [gyro](gyro.md)	 - Gyro Hosting command-line interface
+* [gyro dns dnssec](gyro_dns_dnssec.md)	 - Disable DNSSEC
+* [gyro dns health](gyro_dns_health.md)	 - List health-checked records
 * [gyro dns record](gyro_dns_record.md)	 - List, add, change and delete DNS records
+* [gyro dns rrset](gyro_dns_rrset.md)	 - List record sets
+* [gyro dns zone](gyro_dns_zone.md)	 - List DNS zones
 

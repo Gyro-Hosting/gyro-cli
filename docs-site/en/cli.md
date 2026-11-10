@@ -81,6 +81,22 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro core service tool get` | Get service tool data (path: {id}, {tool}) | `GET /services/{id}/tools/{tool}` |
 | `gyro core service tool list` | Get service tools (path: {id}) | `GET /services/{id}/tools` |
 | `gyro core service tool run` | Run service tool action (path: {id}, {tool}, {action}) | `POST /services/{id}/tools/{tool}/{action}` |
+| `gyro dns dnssec disable` | Disable DNSSEC | `DELETE /cloud/dns/{id}/zones/{zone}/dnssec` |
+| `gyro dns dnssec enable` | Enable DNSSEC | `POST /cloud/dns/{id}/zones/{zone}/dnssec` |
+| `gyro dns dnssec status` | DNSSEC status and DS records | `GET /cloud/dns/{id}/zones/{zone}/dnssec` |
+| `gyro dns health create` | Create a health-checked record | `POST /cloud/dns/{id}/health-checks` |
+| `gyro dns health delete` | Delete a health check | `DELETE /cloud/dns/{id}/health-checks/{hid}` |
+| `gyro dns health list` | List health-checked records | `GET /cloud/dns/{id}/health-checks` |
+| `gyro dns rrset delete` | Delete a record set | `DELETE /cloud/dns/{id}/zones/{zone}/records` |
+| `gyro dns rrset list` | List record sets | `GET /cloud/dns/{id}/zones/{zone}/records` |
+| `gyro dns rrset set` | Create or replace a record set | `PUT /cloud/dns/{id}/zones/{zone}/records` |
+| `gyro dns zone create` | Add a zone | `POST /cloud/dns/{id}/zones` |
+| `gyro dns zone delete` | Delete a zone | `DELETE /cloud/dns/{id}/zones/{zone}` |
+| `gyro dns zone export` | Export the zone file | `GET /cloud/dns/{id}/zones/{zone}/export` |
+| `gyro dns zone get` | Get a zone with its records | `GET /cloud/dns/{id}/zones/{zone}` |
+| `gyro dns zone import` | Import a BIND zone file | `POST /cloud/dns/{id}/zones/{zone}/import` |
+| `gyro dns zone list` | List DNS zones | `GET /cloud/dns/{id}/zones` |
+| `gyro dns zone verify` | Verify ownership now | `POST /cloud/dns/{id}/zones/{zone}/verify` |
 | `gyro domain addon buy` | Buy domain addon (path: {domain}, {key}) | `POST /domains/{domain}/addons/{key}` |
 | `gyro domain auth-code send` | Send auth code (path: {domain}) | `POST /domains/{domain}/auth-code` |
 | `gyro domain auth-code set` | Save auth code (path: {domain}) | `PUT /domains/{domain}/auth-code` |

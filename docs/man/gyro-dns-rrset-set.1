@@ -1,0 +1,109 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-dns-rrset-set - Create or replace a record set
+
+
+.SH SYNOPSIS
+\fBgyro dns rrset set   [flags]\fP
+
+
+.SH DESCRIPTION
+Create or replace a record set
+
+.PP
+Upserts one record set (name + type). CNAME and ALIAS take one value; no CNAME at the apex (use ALIAS); apex NS and SOA are managed by us.
+
+.PP
+API: PUT /cloud/dns/{id}/zones/{zone}/records (operationId typed_put_dns\fBid\fPzones\fBzone\fPrecords, scope services_write)
+
+
+.SH OPTIONS
+\fB--data\fP=""
+	request body as JSON, @file or @- (stdin)
+
+.PP
+\fB--dry-run\fP[=false]
+	show the price quote / request without changing anything
+
+.PP
+\fB-h\fP, \fB--help\fP[=false]
+	help for set
+
+.PP
+\fB--idempotency-key\fP=""
+	idempotency key (automatic for money operations)
+
+.PP
+\fB--name\fP=""
+	Record name relative to the zone (@ = apex, * = wildcard) or FQDN with trailing dot
+
+.PP
+\fB--records\fP=[]
+	Values in zone file syntax, one per item (TXT quotes optional)
+
+.PP
+\fB--set\fP=[]
+	extra body field key=value (repeatable)
+
+.PP
+\fB--ttl\fP=0
+	60-86400 s
+
+.PP
+\fB--type\fP=""
+	type (A|AAAA|CNAME|MX|TXT|SRV|CAA|ALIAS|NS|PTR)
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH SEE ALSO
+\fBgyro-dns-rrset(1)\fP

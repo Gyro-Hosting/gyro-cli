@@ -2,7 +2,7 @@
 openapi: 3.1.0
 info:
   title: Gyro Public API
-  version: 2.4.0
+  version: 2.5.0
   summary: Manage Gyro cloud servers, SSH keys and billing programmatically.
   x-summary-tr: Gyro bulut sunucularınızı, SSH anahtarlarınızı ve faturalarınızı programla yönetin.
   description: "The Gyro Public API lets you automate everything you do in the Gyro client area:\norder and manage cloud servers, keep SSH keys, read invoices and\
@@ -115,6 +115,11 @@ tags:
   description: 'Managed L4/L7 load balancer for your cloud servers: services, health checks, targets, free Let''s Encrypt certificates, metrics. EU regions.'
   x-description-tr: 'Bulut sunucularınız için yönetilen L4/L7 yük dengeleyici: servisler, sağlık kontrolü, hedefler, ücretsiz Let''s Encrypt sertifikası, ölçümler.
     AB bölgeleri.'
+- name: Managed DNS
+  description: 'Authoritative DNS on ns1.gyrodns.net (Istanbul) + ns2.gyrodns.net (Germany): zones, records (A/AAAA/CNAME/MX/TXT/SRV/CAA/ALIAS/NS/PTR), BIND import/export,
+    one-click DNSSEC, health-checked failover records.'
+  x-description-tr: 'ns1.gyrodns.net (İstanbul) + ns2.gyrodns.net (Almanya) yetkili DNS: zonlar, kayıtlar, BIND içe/dışa aktarma, tek tık DNSSEC, sağlık kontrollü
+    failover kayıtları.'
 - name: Reference data
   description: Countries, states, cities.
   x-description-tr: Ülke, il, ilçe.
@@ -6525,6 +6530,863 @@ paths:
       x-cli:
         command: lb metrics
         confirm: false
+  /cloud/dns/{id}/zones:
+    get:
+      tags:
+      - Managed DNS
+      operationId: typed_get_dns__id__zones
+      summary: List DNS zones
+      x-summary-tr: DNS zonlarını listele
+      x-scope: services_read
+      description: Zones of this DNS service (`items`, state active|pending with the TXT verification token), read-only zones copied from your cPanel hosting (`cpanel`),
+        plan limits and our name servers.
+      x-description-tr: Bu DNS hizmetinin zonları (`items`, durum active|pending ve TXT doğrulama değeri), cPanel hosting'inizden kopyalanan salt okunur zonlar (`cpanel`),
+        paket sınırları ve ad sunucularımız.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      responses:
+        '200':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      x-cli:
+        command: dns zone list
+        confirm: false
+    post:
+      tags:
+      - Managed DNS
+      operationId: typed_post_dns__id__zones
+      summary: Add a zone
+      x-summary-tr: Zon ekle
+      x-scope: services_write
+      description: 'Claims a domain. It is published on ns1/ns2.gyrodns.net after ownership is verified: delegation to our name servers (immediate when already delegated)
+        or the TXT record `_gyrodns-dogrulama.<zone>` = `txt_value` at your current DNS. Optional `bind` (zone file) is imported on activation (SOA and apex NS are
+        ignored).'
+      x-description-tr: 'Alan adını talep eder. Sahiplik doğrulanınca ns1/ns2.gyrodns.net''te yayınlanır: ad sunucularımıza devir (zaten devredilmişse hemen) ya da
+        mevcut DNS''inizde `_gyrodns-dogrulama.<zon>` = `txt_value` TXT kaydı. İsteğe bağlı `bind` (zon dosyası) etkinleşince içe aktarılır (SOA ve kök NS yok sayılır).'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Zone name (IDN allowed)
+                bind:
+                  type: string
+                  description: Optional BIND zone file (max 2 MB)
+                confirm:
+                  type: boolean
+              required:
+              - name
+      x-cli:
+        command: dns zone create
+        confirm: false
+  /cloud/dns/{id}/zones/{zone}:
+    get:
+      tags:
+      - Managed DNS
+      operationId: typed_get_dns__id__zones__zone
+      summary: Get a zone with its records
+      x-summary-tr: Zonu kayıtlarıyla getir
+      x-scope: services_read
+      description: Zone state, serial, DNSSEC flag (+DS) and all record sets. Pending zones return the verification details.
+      x-description-tr: Zon durumu, seri, DNSSEC (+DS) ve tüm kayıt kümeleri. Bekleyen zonlarda doğrulama bilgisi döner.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: zone
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Zone name
+      responses:
+        '200':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      x-cli:
+        command: dns zone get
+        confirm: false
+    delete:
+      tags:
+      - Managed DNS
+      operationId: typed_delete_dns__id__zones__zone
+      summary: Delete a zone
+      x-summary-tr: Zonu sil
+      x-scope: services_write
+      description: 'Removes the zone and its health checks from our name servers at once. Needs `"confirm": true`.'
+      x-description-tr: 'Zonu ve sağlık kontrollerini ad sunucularımızdan hemen kaldırır. `"confirm": true` gerekir.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: zone
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Zone name
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+              properties:
+                confirm:
+                  type: boolean
+      x-cli:
+        command: dns zone delete
+        confirm: true
+  /cloud/dns/{id}/zones/{zone}/verify:
+    post:
+      tags:
+      - Managed DNS
+      operationId: typed_post_dns__id__zones__zone__verify
+      summary: Verify ownership now
+      x-summary-tr: Sahipliği şimdi doğrula
+      x-scope: services_write
+      description: Checks delegation / TXT now (the system also re-checks automatically for 14 days).
+      x-description-tr: Devri / TXT'yi şimdi kontrol eder (sistem 14 gün boyunca kendiliğinden de kontrol eder).
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: zone
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Zone name
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+              properties:
+                confirm:
+                  type: boolean
+      x-cli:
+        command: dns zone verify
+        confirm: false
+  /cloud/dns/{id}/zones/{zone}/import:
+    post:
+      tags:
+      - Managed DNS
+      operationId: typed_post_dns__id__zones__zone__import
+      summary: Import a BIND zone file
+      x-summary-tr: BIND zon dosyası içe aktar
+      x-scope: services_write
+      description: '`merge` replaces record sets present in the file and keeps the others; `replace` also deletes record sets not in the file. SOA and apex NS are
+        ignored; unsupported types are listed in `skipped`.'
+      x-description-tr: '`merge` dosyadaki kayıt kümelerini değiştirir, diğerlerini korur; `replace` dosyada olmayanları da siler. SOA ve kök NS yok sayılır; desteklenmeyen
+        tipler `skipped` içinde.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: zone
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Zone name
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                bind:
+                  type: string
+                mode:
+                  type: string
+                  enum:
+                  - merge
+                  - replace
+                  default: merge
+                confirm:
+                  type: boolean
+              required:
+              - bind
+      x-cli:
+        command: dns zone import
+        confirm: false
+  /cloud/dns/{id}/zones/{zone}/export:
+    get:
+      tags:
+      - Managed DNS
+      operationId: typed_get_dns__id__zones__zone__export
+      summary: Export the zone file
+      x-summary-tr: Zon dosyasını dışa aktar
+      x-scope: services_read
+      description: Returns the zone in BIND format (`bind`).
+      x-description-tr: Zonu BIND biçiminde döner (`bind`).
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: zone
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Zone name
+      responses:
+        '200':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      x-cli:
+        command: dns zone export
+        confirm: false
+  /cloud/dns/{id}/zones/{zone}/records:
+    get:
+      tags:
+      - Managed DNS
+      operationId: typed_get_dns__id__zones__zone__records
+      summary: List record sets
+      x-summary-tr: Kayıt kümelerini listele
+      x-scope: services_read
+      description: 'All record sets (`rrsets`: name, type, ttl, records, read_only, health_check). `source=cpanel` reads a zone of your cPanel hosting (read only).'
+      x-description-tr: Tüm kayıt kümeleri (`rrsets`). `source=cpanel` cPanel hosting zonunuzu okur (salt okunur).
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: zone
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Zone name
+      - name: source
+        in: query
+        required: false
+        schema:
+          type: string
+        description: gyrodns (default) | cpanel
+      responses:
+        '200':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      x-cli:
+        command: dns rrset list
+        confirm: false
+    put:
+      tags:
+      - Managed DNS
+      operationId: typed_put_dns__id__zones__zone__records
+      summary: Create or replace a record set
+      x-summary-tr: Kayıt kümesi oluştur ya da değiştir
+      x-scope: services_write
+      description: Upserts one record set (name + type). CNAME and ALIAS take one value; no CNAME at the apex (use ALIAS); apex NS and SOA are managed by us.
+      x-description-tr: Bir kayıt kümesini (ad + tip) yazar. CNAME ve ALIAS tek değer alır; kökte CNAME olmaz (ALIAS kullanın); kök NS ve SOA bizde.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: zone
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Zone name
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Record name relative to the zone (@ = apex, * = wildcard) or FQDN with trailing dot
+                type:
+                  type: string
+                  enum:
+                  - A
+                  - AAAA
+                  - CNAME
+                  - MX
+                  - TXT
+                  - SRV
+                  - CAA
+                  - ALIAS
+                  - NS
+                  - PTR
+                ttl:
+                  type: integer
+                  description: 60-86400 s
+                records:
+                  type: array
+                  items:
+                    type: string
+                  description: Values in zone file syntax, one per item (TXT quotes optional)
+                confirm:
+                  type: boolean
+              required:
+              - name
+              - type
+              - records
+      x-cli:
+        command: dns rrset set
+        confirm: false
+    delete:
+      tags:
+      - Managed DNS
+      operationId: typed_delete_dns__id__zones__zone__records
+      summary: Delete a record set
+      x-summary-tr: Kayıt kümesini sil
+      x-scope: services_write
+      description: 'Deletes the record set given by `name` and `type` (query). Needs `"confirm": true`.'
+      x-description-tr: '`name` ve `type` (sorgu) ile verilen kayıt kümesini siler. `"confirm": true` gerekir.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: zone
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Zone name
+      - name: name
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Record name
+      - name: type
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Record type
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                confirm:
+                  type: boolean
+              required: []
+      x-cli:
+        command: dns rrset delete
+        confirm: true
+  /cloud/dns/{id}/zones/{zone}/dnssec:
+    get:
+      tags:
+      - Managed DNS
+      operationId: typed_get_dns__id__zones__zone__dnssec
+      summary: DNSSEC status and DS records
+      x-summary-tr: DNSSEC durumu ve DS kayıtları
+      x-scope: services_read
+      description: '`dnssec` flag and `ds` (enter at your registrar).'
+      x-description-tr: '`dnssec` ve `ds` (kayıt firmasına girilecek).'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: zone
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Zone name
+      responses:
+        '200':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      x-cli:
+        command: dns dnssec status
+        confirm: false
+    post:
+      tags:
+      - Managed DNS
+      operationId: typed_post_dns__id__zones__zone__dnssec
+      summary: Enable DNSSEC
+      x-summary-tr: DNSSEC aç
+      x-scope: services_write
+      description: Signs the zone (ECDSA P-256) and returns the DS records. No effect until the DS is at the registrar. Not with ALIAS records.
+      x-description-tr: Zonu imzalar (ECDSA P-256), DS kayıtlarını döner. DS kayıt firmasına girilene kadar etkisizdir. ALIAS ile kullanılamaz.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: zone
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Zone name
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+              properties:
+                confirm:
+                  type: boolean
+      x-cli:
+        command: dns dnssec enable
+        confirm: false
+    delete:
+      tags:
+      - Managed DNS
+      operationId: typed_delete_dns__id__zones__zone__dnssec
+      summary: Disable DNSSEC
+      x-summary-tr: DNSSEC kapat
+      x-scope: services_write
+      description: 'Remove the DS at your registrar and wait for its TTL first, otherwise validating resolvers fail. Needs `"confirm": true`.'
+      x-description-tr: 'Önce kayıt firmasındaki DS''yi silip TTL kadar bekleyin, yoksa doğrulayan çözümleyiciler hata verir. `"confirm": true` gerekir.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: zone
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Zone name
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                confirm:
+                  type: boolean
+              required: []
+      x-cli:
+        command: dns dnssec disable
+        confirm: true
+  /cloud/dns/{id}/health-checks:
+    get:
+      tags:
+      - Managed DNS
+      operationId: typed_get_dns__id__health_checks
+      summary: List health-checked records
+      x-summary-tr: Sağlık kontrollü kayıtları listele
+      x-scope: services_read
+      description: Checks with primary/backup IP, which one is active and the last state (gmon majority of 3 locations).
+      x-description-tr: Ana/yedek IP, etkin olan ve son durum (3 lokasyon çoğunluğu).
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      responses:
+        '200':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      x-cli:
+        command: dns health list
+        confirm: false
+    post:
+      tags:
+      - Managed DNS
+      operationId: typed_post_dns__id__health_checks
+      summary: Create a health-checked record
+      x-summary-tr: Sağlık kontrollü kayıt oluştur
+      x-scope: services_write
+      description: Points `name` (A/AAAA) to `primary`; when the check fails from the majority of locations the record switches to `backup`, and back after 3 good
+        passes. Uses one health-check add-on unit.
+      x-description-tr: '`name` kaydını `primary`''ye yönlendirir; kontrol çoğunluk lokasyondan düşerse `backup`''a geçer, 3 başarılı turdan sonra geri döner. Bir
+        sağlık kontrolü ek hizmet birimi kullanır.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                zone:
+                  type: string
+                name:
+                  type: string
+                type:
+                  type: string
+                  enum:
+                  - A
+                  - AAAA
+                primary:
+                  type: string
+                backup:
+                  type: string
+                check:
+                  type: string
+                  enum:
+                  - http
+                  - https
+                  - tcp
+                  - ping
+                port:
+                  type: integer
+                path:
+                  type: string
+                ttl:
+                  type: integer
+                  description: 30-300 s
+                confirm:
+                  type: boolean
+              required:
+              - zone
+              - name
+              - type
+              - primary
+              - backup
+              - check
+      x-cli:
+        command: dns health create
+        confirm: false
+  /cloud/dns/{id}/health-checks/{hid}:
+    delete:
+      tags:
+      - Managed DNS
+      operationId: typed_delete_dns__id__health_checks__hid
+      summary: Delete a health check
+      x-summary-tr: Sağlık kontrolünü sil
+      x-scope: services_write
+      description: 'Stops checking; the record keeps its current value. Needs `"confirm": true`.'
+      x-description-tr: 'Kontrol durur; kayıt mevcut değerinde kalır. `"confirm": true` gerekir.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: hid
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Health check id
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                confirm:
+                  type: boolean
+              required: []
+      x-cli:
+        command: dns health delete
+        confirm: true
   /cloud/licenses/{id}:
     get:
       tags:

@@ -81,6 +81,22 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro core service tool get` | Araç Verisini Okuma | `GET /services/{id}/tools/{tool}` |
 | `gyro core service tool list` | Araçları Listeleme | `GET /services/{id}/tools` |
 | `gyro core service tool run` | Araç Eylemi Çalıştırma | `POST /services/{id}/tools/{tool}/{action}` |
+| `gyro dns dnssec disable` | DNSSEC kapat | `DELETE /cloud/dns/{id}/zones/{zone}/dnssec` |
+| `gyro dns dnssec enable` | DNSSEC aç | `POST /cloud/dns/{id}/zones/{zone}/dnssec` |
+| `gyro dns dnssec status` | DNSSEC durumu ve DS kayıtları | `GET /cloud/dns/{id}/zones/{zone}/dnssec` |
+| `gyro dns health create` | Sağlık kontrollü kayıt oluştur | `POST /cloud/dns/{id}/health-checks` |
+| `gyro dns health delete` | Sağlık kontrolünü sil | `DELETE /cloud/dns/{id}/health-checks/{hid}` |
+| `gyro dns health list` | Sağlık kontrollü kayıtları listele | `GET /cloud/dns/{id}/health-checks` |
+| `gyro dns rrset delete` | Kayıt kümesini sil | `DELETE /cloud/dns/{id}/zones/{zone}/records` |
+| `gyro dns rrset list` | Kayıt kümelerini listele | `GET /cloud/dns/{id}/zones/{zone}/records` |
+| `gyro dns rrset set` | Kayıt kümesi oluştur ya da değiştir | `PUT /cloud/dns/{id}/zones/{zone}/records` |
+| `gyro dns zone create` | Zon ekle | `POST /cloud/dns/{id}/zones` |
+| `gyro dns zone delete` | Zonu sil | `DELETE /cloud/dns/{id}/zones/{zone}` |
+| `gyro dns zone export` | Zon dosyasını dışa aktar | `GET /cloud/dns/{id}/zones/{zone}/export` |
+| `gyro dns zone get` | Zonu kayıtlarıyla getir | `GET /cloud/dns/{id}/zones/{zone}` |
+| `gyro dns zone import` | BIND zon dosyası içe aktar | `POST /cloud/dns/{id}/zones/{zone}/import` |
+| `gyro dns zone list` | DNS zonlarını listele | `GET /cloud/dns/{id}/zones` |
+| `gyro dns zone verify` | Sahipliği şimdi doğrula | `POST /cloud/dns/{id}/zones/{zone}/verify` |
 | `gyro domain addon buy` | Alan Adı Ek Hizmeti Alma | `POST /domains/{domain}/addons/{key}` |
 | `gyro domain auth-code send` | Transfer Kodunu İsteme | `POST /domains/{domain}/auth-code` |
 | `gyro domain auth-code set` | Gelen Transfer Kodunu Kaydetme | `PUT /domains/{domain}/auth-code` |

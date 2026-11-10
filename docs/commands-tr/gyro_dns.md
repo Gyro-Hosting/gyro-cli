@@ -32,5 +32,9 @@ gyro dns [flags]
 ### SEE ALSO
 
 * [gyro](gyro.md)	 - Gyro Hosting komut satırı aracı
+* [gyro dns dnssec](gyro_dns_dnssec.md)	 - DNSSEC kapat
+* [gyro dns health](gyro_dns_health.md)	 - Sağlık kontrollü kayıtları listele
 * [gyro dns record](gyro_dns_record.md)	 - DNS kayıtlarını listele, ekle, değiştir, sil
+* [gyro dns rrset](gyro_dns_rrset.md)	 - Kayıt kümelerini listele
+* [gyro dns zone](gyro_dns_zone.md)	 - DNS zonlarını listele
 
