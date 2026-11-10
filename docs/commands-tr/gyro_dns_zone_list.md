@@ -1,12 +1,12 @@
 ## gyro dns zone list
 
-DNS zonlarını listele
+DNS zone'larını listele
 
 ### Synopsis
 
-DNS zonlarını listele
+DNS zone'larını listele
 
-Bu DNS hizmetinin zonları (`items`, durum active|pending ve TXT doğrulama değeri), cPanel hosting'inizden kopyalanan salt okunur zonlar (`cpanel`), paket sınırları ve ad sunucularımız.
+Bu DNS hizmetinin zone'ları (`items`, durum active|pending ve TXT doğrulama değeri), cPanel hosting'inizden kopyalanan salt okunur zone'lar (`cpanel`), paket sınırları ve ad sunucularımız.
 
 API: GET /cloud/dns/{id}/zones (operationId typed_get_dns__id__zones, scope services_read)
 
@@ -39,5 +39,5 @@ gyro dns zone list <ID> [flags]
 
 ### SEE ALSO
 
-* [gyro dns zone](gyro_dns_zone.md)	 - DNS zonlarını listele
+* [gyro dns zone](gyro_dns_zone.md)	 - DNS zone'larını listele
 

@@ -90,12 +90,12 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro dns rrset delete` | Kayıt kümesini sil | `DELETE /cloud/dns/{id}/zones/{zone}/records` |
 | `gyro dns rrset list` | Kayıt kümelerini listele | `GET /cloud/dns/{id}/zones/{zone}/records` |
 | `gyro dns rrset set` | Kayıt kümesi oluştur ya da değiştir | `PUT /cloud/dns/{id}/zones/{zone}/records` |
-| `gyro dns zone create` | Zon ekle | `POST /cloud/dns/{id}/zones` |
-| `gyro dns zone delete` | Zonu sil | `DELETE /cloud/dns/{id}/zones/{zone}` |
-| `gyro dns zone export` | Zon dosyasını dışa aktar | `GET /cloud/dns/{id}/zones/{zone}/export` |
-| `gyro dns zone get` | Zonu kayıtlarıyla getir | `GET /cloud/dns/{id}/zones/{zone}` |
-| `gyro dns zone import` | BIND zon dosyası içe aktar | `POST /cloud/dns/{id}/zones/{zone}/import` |
-| `gyro dns zone list` | DNS zonlarını listele | `GET /cloud/dns/{id}/zones` |
+| `gyro dns zone create` | Zone ekle | `POST /cloud/dns/{id}/zones` |
+| `gyro dns zone delete` | Zone'u sil | `DELETE /cloud/dns/{id}/zones/{zone}` |
+| `gyro dns zone export` | Zone dosyasını dışa aktar | `GET /cloud/dns/{id}/zones/{zone}/export` |
+| `gyro dns zone get` | Zone'u kayıtlarıyla getir | `GET /cloud/dns/{id}/zones/{zone}` |
+| `gyro dns zone import` | BIND zone dosyası içe aktar | `POST /cloud/dns/{id}/zones/{zone}/import` |
+| `gyro dns zone list` | DNS zone'larını listele | `GET /cloud/dns/{id}/zones` |
 | `gyro dns zone verify` | Sahipliği şimdi doğrula | `POST /cloud/dns/{id}/zones/{zone}/verify` |
 | `gyro domain addon buy` | Alan Adı Ek Hizmeti Alma | `POST /domains/{domain}/addons/{key}` |
 | `gyro domain auth-code send` | Transfer Kodunu İsteme | `POST /domains/{domain}/auth-code` |

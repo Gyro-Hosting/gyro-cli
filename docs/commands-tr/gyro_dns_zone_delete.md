@@ -1,12 +1,12 @@
 ## gyro dns zone delete
 
-Zonu sil
+Zone'u sil
 
 ### Synopsis
 
-Zonu sil
+Zone'u sil
 
-Zonu ve sağlık kontrollerini ad sunucularımızdan hemen kaldırır. `"confirm": true` gerekir.
+Zone'u ve sağlık kontrollerini ad sunucularımızdan hemen kaldırır. `"confirm": true` gerekir.
 
 API: DELETE /cloud/dns/{id}/zones/{zone} (operationId typed_delete_dns__id__zones__zone, scope services_write)
 
@@ -43,5 +43,5 @@ gyro dns zone delete <ID> <ZONE> [flags]
 
 ### SEE ALSO
 
-* [gyro dns zone](gyro_dns_zone.md)	 - DNS zonlarını listele
+* [gyro dns zone](gyro_dns_zone.md)	 - DNS zone'larını listele
 

@@ -6,7 +6,7 @@ DNSSEC aç
 
 DNSSEC aç
 
-Zonu imzalar (ECDSA P-256), DS kayıtlarını döner. DS kayıt firmasına girilene kadar etkisizdir. ALIAS ile kullanılamaz.
+Zone'u imzalar (ECDSA P-256), DS kayıtlarını döner. DS kayıt firmasına girilene kadar etkisizdir. ALIAS ile kullanılamaz.
 
 API: POST /cloud/dns/{id}/zones/{zone}/dnssec (operationId typed_post_dns__id__zones__zone__dnssec, scope services_write)
 

@@ -1,6 +1,6 @@
 ## gyro dns zone
 
-DNS zonlarını listele
+DNS zone'larını listele
 
 ```
 gyro dns zone [flags]
@@ -32,11 +32,11 @@ gyro dns zone [flags]
 ### SEE ALSO
 
 * [gyro dns](gyro_dns.md)	 - Alan adlarınızın DNS kayıtları
-* [gyro dns zone create](gyro_dns_zone_create.md)	 - Zon ekle
-* [gyro dns zone delete](gyro_dns_zone_delete.md)	 - Zonu sil
-* [gyro dns zone export](gyro_dns_zone_export.md)	 - Zon dosyasını dışa aktar
-* [gyro dns zone get](gyro_dns_zone_get.md)	 - Zonu kayıtlarıyla getir
-* [gyro dns zone import](gyro_dns_zone_import.md)	 - BIND zon dosyası içe aktar
-* [gyro dns zone list](gyro_dns_zone_list.md)	 - DNS zonlarını listele
+* [gyro dns zone create](gyro_dns_zone_create.md)	 - Zone ekle
+* [gyro dns zone delete](gyro_dns_zone_delete.md)	 - Zone'u sil
+* [gyro dns zone export](gyro_dns_zone_export.md)	 - Zone dosyasını dışa aktar
+* [gyro dns zone get](gyro_dns_zone_get.md)	 - Zone'u kayıtlarıyla getir
+* [gyro dns zone import](gyro_dns_zone_import.md)	 - BIND zone dosyası içe aktar
+* [gyro dns zone list](gyro_dns_zone_list.md)	 - DNS zone'larını listele
 * [gyro dns zone verify](gyro_dns_zone_verify.md)	 - Sahipliği şimdi doğrula
 

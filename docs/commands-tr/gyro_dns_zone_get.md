@@ -1,12 +1,12 @@
 ## gyro dns zone get
 
-Zonu kayıtlarıyla getir
+Zone'u kayıtlarıyla getir
 
 ### Synopsis
 
-Zonu kayıtlarıyla getir
+Zone'u kayıtlarıyla getir
 
-Zon durumu, seri, DNSSEC (+DS) ve tüm kayıt kümeleri. Bekleyen zonlarda doğrulama bilgisi döner.
+Zone durumu, seri, DNSSEC (+DS) ve tüm kayıt kümeleri. Bekleyen zone'larda doğrulama bilgisi döner.
 
 API: GET /cloud/dns/{id}/zones/{zone} (operationId typed_get_dns__id__zones__zone, scope services_read)
 
@@ -39,5 +39,5 @@ gyro dns zone get <ID> <ZONE> [flags]
 
 ### SEE ALSO
 
-* [gyro dns zone](gyro_dns_zone.md)	 - DNS zonlarını listele
+* [gyro dns zone](gyro_dns_zone.md)	 - DNS zone'larını listele
 

@@ -1,12 +1,12 @@
 ## gyro dns zone create
 
-Zon ekle
+Zone ekle
 
 ### Synopsis
 
-Zon ekle
+Zone ekle
 
-Alan adını talep eder. Sahiplik doğrulanınca ns1/ns2.gyrodns.net'te yayınlanır: ad sunucularımıza devir (zaten devredilmişse hemen) ya da mevcut DNS'inizde `_gyrodns-dogrulama.<zon>` = `txt_value` TXT kaydı. İsteğe bağlı `bind` (zon dosyası) etkinleşince içe aktarılır (SOA ve kök NS yok sayılır).
+Alan adını talep eder. Sahiplik doğrulanınca ns1/ns2.gyrodns.net'te yayınlanır: ad sunucularımıza devir (zaten devredilmişse hemen) ya da mevcut DNS'inizde `_gyrodns-dogrulama.<zone>` = `txt_value` TXT kaydı. İsteğe bağlı `bind` (zone dosyası) etkinleşince içe aktarılır (SOA ve kök NS yok sayılır).
 
 API: POST /cloud/dns/{id}/zones (operationId typed_post_dns__id__zones, scope services_write)
 
@@ -45,5 +45,5 @@ gyro dns zone create <ID> [flags]
 
 ### SEE ALSO
 
-* [gyro dns zone](gyro_dns_zone.md)	 - DNS zonlarını listele
+* [gyro dns zone](gyro_dns_zone.md)	 - DNS zone'larını listele
 

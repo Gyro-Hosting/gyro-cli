@@ -6,7 +6,7 @@ Kayıt kümelerini listele
 
 Kayıt kümelerini listele
 
-Tüm kayıt kümeleri (`rrsets`). `source=cpanel` cPanel hosting zonunuzu okur (salt okunur).
+Tüm kayıt kümeleri (`rrsets`). `source=cpanel` cPanel hosting zone'unuzu okur (salt okunur).
 
 API: GET /cloud/dns/{id}/zones/{zone}/records (operationId typed_get_dns__id__zones__zone__records, scope services_read)
 

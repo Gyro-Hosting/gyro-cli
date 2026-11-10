@@ -43,5 +43,5 @@ gyro dns zone verify <ID> <ZONE> [flags]
 
 ### SEE ALSO
 
-* [gyro dns zone](gyro_dns_zone.md)	 - DNS zonlarını listele
+* [gyro dns zone](gyro_dns_zone.md)	 - DNS zone'larını listele
 

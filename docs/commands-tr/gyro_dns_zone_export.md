@@ -1,12 +1,12 @@
 ## gyro dns zone export
 
-Zon dosyasını dışa aktar
+Zone dosyasını dışa aktar
 
 ### Synopsis
 
-Zon dosyasını dışa aktar
+Zone dosyasını dışa aktar
 
-Zonu BIND biçiminde döner (`bind`).
+Zone'u BIND biçiminde döner (`bind`).
 
 API: GET /cloud/dns/{id}/zones/{zone}/export (operationId typed_get_dns__id__zones__zone__export, scope services_read)
 
@@ -39,5 +39,5 @@ gyro dns zone export <ID> <ZONE> [flags]
 
 ### SEE ALSO
 
-* [gyro dns zone](gyro_dns_zone.md)	 - DNS zonlarını listele
+* [gyro dns zone](gyro_dns_zone.md)	 - DNS zone'larını listele
 

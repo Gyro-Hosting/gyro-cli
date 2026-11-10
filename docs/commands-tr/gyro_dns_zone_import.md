@@ -1,10 +1,10 @@
 ## gyro dns zone import
 
-BIND zon dosyası içe aktar
+BIND zone dosyası içe aktar
 
 ### Synopsis
 
-BIND zon dosyası içe aktar
+BIND zone dosyası içe aktar
 
 `merge` dosyadaki kayıt kümelerini değiştirir, diğerlerini korur; `replace` dosyada olmayanları da siler. SOA ve kök NS yok sayılır; desteklenmeyen tipler `skipped` içinde. `"confirm": true` gerekir.
 
@@ -45,5 +45,5 @@ gyro dns zone import <ID> <ZONE> [flags]
 
 ### SEE ALSO
 
-* [gyro dns zone](gyro_dns_zone.md)	 - DNS zonlarını listele
+* [gyro dns zone](gyro_dns_zone.md)	 - DNS zone'larını listele
 
