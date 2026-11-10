@@ -174,8 +174,8 @@ func (a *App) Client() (*api.Client, error) {
 	}
 	if tok == "" {
 		return nil, &ExitErr{ExitAuth, errors.New(i18n.S(
-			"no API key: run `gyro configure` or set GYRO_TOKEN (create keys in Client area → Account → API)",
-			"API anahtarı yok: `gyro configure` çalıştırın ya da GYRO_TOKEN ayarlayın (anahtar: Müşteri paneli → Hesabım → API)"))}
+			"no API key: run `gyro configure` or set GYRO_TOKEN (create keys in Client area → account menu (top right) → API Credentials)",
+			"API anahtarı yok: `gyro configure` çalıştırın ya da GYRO_TOKEN ayarlayın (anahtar: Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri)"))}
 	}
 	c := a.NewClient(a.APIURL(), tok)
 	c.Lang = i18n.Lang()
@@ -318,7 +318,7 @@ func rootLong() string {
 balance and everything else the Gyro Public API offers (API spec `+spec.APIVersion+`).
 
 Get started:
-  gyro configure                 # store an API key (Client area → Account → API)
+  gyro configure                 # store an API key (Client area → account menu (top right) → API Credentials)
   gyro server list
   gyro server create --plan standart-2-4 --location falkenstein --image ubuntu-24.04 --ssh-key mykey --wait
   gyro server ssh web-1
@@ -328,7 +328,7 @@ Money and destructive actions ask for confirmation (use --yes in scripts, --dry-
 bakiye ve Gyro Public API'nin sunduğu her şey (API sürümü `+spec.APIVersion+`).
 
 Başlarken:
-  gyro configure                 # API anahtarını kaydedin (Müşteri paneli → Hesabım → API)
+  gyro configure                 # API anahtarını kaydedin (Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri)
   gyro server list
   gyro server create --plan standart-2-4 --location falkenstein --image ubuntu-24.04 --ssh-key anahtarim --wait
   gyro server ssh web-1
@@ -414,11 +414,11 @@ func reportError(a *App, err error) int {
 func hint(e *api.Error) string {
 	switch e.Code {
 	case "missing_token", "invalid_token", "key_revoked":
-		return i18n.S("Check your key with `gyro context`, or create a new one in Client area → Account → API.",
-			"Anahtarı `gyro context` ile kontrol edin ya da Müşteri paneli → Hesabım → API'den yenisini oluşturun.")
+		return i18n.S("Check your key with `gyro context`, or create a new one in Client area → account menu (top right) → API Credentials.",
+			"Anahtarı `gyro context` ile kontrol edin ya da Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri'nden yenisini oluşturun.")
 	case "insufficient_scope":
-		return i18n.S("The key lacks this permission; edit its scopes in Client area → Account → API.",
-			"Anahtarın bu yetkisi yok; kapsamları Müşteri paneli → Hesabım → API'den düzenleyin.")
+		return i18n.S("The key lacks this permission; edit its scopes in Client area → account menu (top right) → API Credentials.",
+			"Anahtarın bu yetkisi yok; kapsamları Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri'nden düzenleyin.")
 	case "ip_not_allowed":
 		return i18n.S("Your IP is not in the key's allow list.", "IP adresiniz anahtarın izin listesinde değil.")
 	case "insufficient_balance":

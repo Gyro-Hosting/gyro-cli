@@ -27,7 +27,7 @@ The install script verifies the checksum and, when gpg is available, the signatu
 ## Getting started
 
 ```sh
-gyro configure                    # API key: Client area → Account → API (wck_...)
+gyro configure                    # API key: Client area → account menu (top right) → API Credentials (wck_...)
 gyro whoami
 gyro plan list --location falkenstein
 gyro server create web-1 --plan pro-2-8 --location falkenstein --image ubuntu-24.04 \

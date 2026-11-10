@@ -26,7 +26,7 @@ T = {
 </table>
 <p>Tek dosyalık program (Linux, macOS, Windows; amd64, arm64). Sürüm dosyalarının SHA-256 listesi Gyro sürüm anahtarıyla imzalıdır
 (<code>E96B E963 5E77 A0D9 119A C8C3 A798 6589 A154 B990</code>).</p>"""),
-   ("start", "Başlarken", """<pre><code>gyro configure                     # API anahtarı: Müşteri paneli → Hesabım → API
+   ("start", "Başlarken", """<pre><code>gyro configure                     # API anahtarı: Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri
 gyro whoami
 gyro plan list --location falkenstein
 gyro server create web-1 --plan pro-2-8 --location falkenstein --image ubuntu-24.04 \\
@@ -90,7 +90,7 @@ gyro service tool run 48001 &lt;araç&gt; &lt;eylem&gt; --set alan=değer</code>
 </table>
 <p>A single binary for Linux, macOS and Windows (amd64, arm64). Release checksums are signed with the Gyro release key
 (<code>E96B E963 5E77 A0D9 119A C8C3 A798 6589 A154 B990</code>).</p>"""),
-   ("start", "Getting started", """<pre><code>gyro configure                     # API key: Client area → Account → API
+   ("start", "Getting started", """<pre><code>gyro configure                     # API key: Client area → account menu (top right) → API Credentials
 gyro whoami
 gyro plan list --location falkenstein
 gyro server create web-1 --plan pro-2-8 --location falkenstein --image ubuntu-24.04 \\

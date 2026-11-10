@@ -8,7 +8,7 @@ gyro, Gyro Hosting hizmetlerinizi terminalden yönetir: bulut sunucular, SSH ana
 bakiye ve Gyro Public API'nin sunduğu her şey (API sürümü 2.3.0).
 
 Başlarken:
-  gyro configure                 # API anahtarını kaydedin (Müşteri paneli → Hesabım → API)
+  gyro configure                 # API anahtarını kaydedin (Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri)
   gyro server list
   gyro server create --plan standart-2-4 --location falkenstein --image ubuntu-24.04 --ssh-key anahtarim --wait
   gyro server ssh web-1

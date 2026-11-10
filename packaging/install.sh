@@ -93,4 +93,4 @@ ${SUDO:-} install -m 0755 "$tmp/gyro" "$INSTALL_DIR/gyro"
 say "installed $INSTALL_DIR/gyro"
 case ":$PATH:" in *":$INSTALL_DIR:"*) ;; *) say "add $INSTALL_DIR to your PATH" ;; esac
 "$INSTALL_DIR/gyro" version || true
-say "next: gyro configure   (create an API key in Client area -> Account -> API)"
+say "next: gyro configure   (create an API key: client area -> account menu (top right) -> API Credentials / API Kimlik Bilgileri)"

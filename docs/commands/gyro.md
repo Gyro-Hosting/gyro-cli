@@ -8,7 +8,7 @@ gyro manages your Gyro Hosting services from the terminal: cloud servers, SSH ke
 balance and everything else the Gyro Public API offers (API spec 2.3.0).
 
 Get started:
-  gyro configure                 # store an API key (Client area → Account → API)
+  gyro configure                 # store an API key (Client area → account menu (top right) → API Credentials)
   gyro server list
   gyro server create --plan standart-2-4 --location falkenstein --image ubuntu-24.04 --ssh-key mykey --wait
   gyro server ssh web-1

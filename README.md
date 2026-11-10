@@ -28,7 +28,7 @@ Kurulum betiği gpg varsa imzayı, her durumda sağlama toplamını doğrular.
 ## Başlarken
 
 ```sh
-gyro configure                    # API anahtarı: Müşteri paneli → Hesabım → API (wck_...)
+gyro configure                    # API anahtarı: Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri (wck_...)
 gyro whoami                       # anahtar ve yetkileri
 gyro plan list --location falkenstein
 gyro server create web-1 --plan pro-2-8 --location falkenstein --image ubuntu-24.04 \
