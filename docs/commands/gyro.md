@@ -5,7 +5,7 @@ Gyro Hosting command-line interface
 ### Synopsis
 
 gyro manages your Gyro Hosting services from the terminal: cloud servers, SSH keys, invoices,
-balance and everything else the Gyro Public API offers (API spec 2.8.0).
+balance and everything else the Gyro Public API offers (API spec 2.9.0).
 
 Get started:
   gyro configure                 # store an API key (Client area → account menu (top right) → API Credentials)
@@ -65,6 +65,7 @@ Money and destructive actions ask for confirmation (use --yes in scripts, --dry-
 * [gyro reference](gyro_reference.md)	 - Countries, states and cities
 * [gyro reseller](gyro_reseller.md)	 - Reseller: end-customers, assignments, keys, report
 * [gyro s3](gyro_s3.md)	 - S3 object storage: buckets and access keys
+* [gyro security-group](gyro_security-group.md)	 - List security groups
 * [gyro server](gyro_server.md)	 - Cloud servers: create, power, snapshots, SSH ...
 * [gyro service](gyro_service.md)	 - All services of every product line (generic bridge)
 * [gyro sms](gyro_sms.md)	 - SMS messages

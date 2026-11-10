@@ -2,7 +2,7 @@
 openapi: 3.1.0
 info:
   title: Gyro Public API
-  version: 2.8.0
+  version: 2.9.0
   summary: Manage Gyro cloud servers, SSH keys and billing programmatically.
   x-summary-tr: Gyro bulut sunucularınızı, SSH anahtarlarınızı ve faturalarınızı programla yönetin.
   description: "The Gyro Public API lets you automate everything you do in the Gyro client area:\norder and manage cloud servers, keep SSH keys, read invoices and\
@@ -120,6 +120,13 @@ tags:
     one-click DNSSEC, health-checked failover records.'
   x-description-tr: 'ns1.gyrodns.net (İstanbul) + ns2.gyrodns.net (Almanya) yetkili DNS: zone''lar, kayıtlar, BIND içe/dışa aktarma, tek tık DNSSEC, sağlık kontrollü
     failover kayıtları.'
+- name: Security groups
+  description: 'Reusable allow lists (AWS security group model) for servers with the network firewall add-on. Up to 5 groups per server, evaluated after Gyro rules
+    and your advanced ordered rules; with groups and no advanced rules inbound traffic is denied by default. Rules count against the server''s rule allowance. A change
+    that could cut SSH/RDP access runs as a 5 minute trial: confirm it.'
+  x-description-tr: 'Ağ güvenlik duvarı ek hizmeti olan sunucular için yeniden kullanılabilir izin listeleri (AWS security group modeli). Sunucu başına en çok 5 grup;
+    Gyro kuralları ve gelişmiş sıralı kurallarınızdan sonra değerlendirilir; grup olup gelişmiş kural yoksa gelen trafik varsayılan olarak kapalıdır. Kurallar sunucunun
+    kural hakkından düşer. SSH/RDP erişimini kesebilecek değişiklik 5 dakikalık deneme olarak uygulanır: onaylayın.'
 - name: Reference data
   description: Countries, states, cities.
   x-description-tr: Ülke, il, ilçe.
@@ -8032,6 +8039,357 @@ paths:
               properties:
                 confirm:
                   type: boolean
+  /cloud/security-groups:
+    get:
+      tags: &id023
+      - Security groups
+      operationId: listSecurityGroups
+      summary: List security groups
+      x-summary-tr: Güvenlik gruplarını listele
+      x-scope: cloud_read
+      x-cli:
+        command: security-group list
+      responses:
+        '200':
+          description: Groups
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SecurityGroup'
+        '401': *id003
+    post:
+      tags: *id023
+      operationId: createSecurityGroup
+      summary: Create a security group
+      x-summary-tr: Güvenlik grubu oluştur
+      x-scope: cloud_write
+      x-cli:
+        command: security-group create
+      description: Name unique per account (2-64 characters). Without `rules` the group has one outbound rule (all traffic) and no inbound rule.
+      x-description-tr: Ad hesap içinde benzersiz (2-64 karakter). `rules` verilmezse grupta tek giden kural (tüm trafik) olur, gelen kural olmaz.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                rules:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/SecurityGroupRule'
+              required:
+              - name
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/SecurityGroup'
+        '401': *id003
+        '422': *id005
+  /cloud/security-groups/{sg}:
+    parameters:
+    - &id024
+      name: sg
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: ^sg-[a-f0-9]{8}$
+    get:
+      tags: *id023
+      operationId: getSecurityGroup
+      summary: Get a security group
+      x-summary-tr: Güvenlik grubunu getir
+      x-scope: cloud_read
+      x-cli:
+        command: security-group get
+      responses:
+        '200':
+          description: Group
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/SecurityGroup'
+        '401': *id003
+        '404': *id004
+    patch:
+      tags: *id023
+      operationId: updateSecurityGroup
+      summary: Rename / describe a security group
+      x-summary-tr: Güvenlik grubunun adını / açıklamasını değiştir
+      x-scope: cloud_write
+      x-cli:
+        command: security-group update
+      description: Only the display name and description change; the group id and its rules stay.
+      x-description-tr: Yalnız görünen ad ve açıklama değişir; grup kimliği ve kuralları aynı kalır.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+      responses:
+        '200':
+          description: Group
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/SecurityGroup'
+        '401': *id003
+        '404': *id004
+        '422': *id005
+    delete:
+      tags: *id023
+      operationId: deleteSecurityGroup
+      summary: Delete a security group
+      x-summary-tr: Güvenlik grubunu sil
+      x-scope: cloud_write
+      x-cli:
+        command: security-group delete
+        confirm: true
+      description: Only a group that is attached to no server (422 err_sg_attached).
+      x-description-tr: Yalnız hiçbir sunucuya bağlı olmayan grup (422 err_sg_attached).
+      responses:
+        '200':
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      deleted:
+                        type: boolean
+                      id:
+                        type: string
+        '401': *id003
+        '404': *id004
+        '422': *id005
+  /cloud/security-groups/{sg}/rules:
+    parameters:
+    - *id024
+    put:
+      tags: *id023
+      operationId: putSecurityGroupRules
+      summary: Replace the rules of a security group
+      x-summary-tr: Güvenlik grubunun kurallarını değiştir
+      x-scope: cloud_write
+      x-cli:
+        command: security-group rules set
+      description: 'Full replace (inbound + outbound), max 60 rules. Applied to every attached server. If the change could cut SSH/RDP access on an attached server
+        it runs as a 5 minute trial (`trial: true`): confirm with POST .../confirm, otherwise the previous rules return. A server''s rules (own + all attached groups)
+        must fit its allowance (422 err_sg_quota).'
+      x-description-tr: 'Tam değiştirme (gelen + giden), en çok 60 kural. Bağlı tüm sunuculara uygulanır. Bağlı bir sunucuda SSH/RDP erişimini kesebilecekse 5 dakikalık
+        deneme olur (`trial: true`): .../confirm ile onaylayın, yoksa önceki kurallar döner. Sunucunun kuralları (kendi + bağlı tüm gruplar) hakkına sığmalı (422
+        err_sg_quota).'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - rules
+              properties:
+                rules:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/SecurityGroupRule'
+            example:
+              rules:
+              - type: https
+                source:
+                - 0.0.0.0/0
+              - type: ssh
+                source:
+                - 203.0.113.10/32
+                description: office
+              - direction: out
+                type: all
+                source:
+                - 0.0.0.0/0
+      responses:
+        '200':
+          description: Group (trial, corrections)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/SecurityGroup'
+        '401': *id003
+        '404': *id004
+        '422': *id005
+  /cloud/security-groups/{sg}/confirm:
+    parameters:
+    - *id024
+    post:
+      tags: *id023
+      operationId: confirmSecurityGroup
+      summary: Make the running rule trial permanent
+      x-summary-tr: Kural denemesini kalıcı yap
+      x-scope: cloud_write
+      x-cli:
+        command: security-group confirm
+      responses:
+        '200':
+          description: Group
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/SecurityGroup'
+        '401': *id003
+        '404': *id004
+        '422': *id005
+  /cloud/servers/{id}/security-groups:
+    parameters:
+    - &id025
+      $ref: '#/components/parameters/ServerId'
+    get:
+      tags: *id023
+      operationId: listServerSecurityGroups
+      summary: Security groups attached to a server
+      x-summary-tr: Sunucuya bağlı güvenlik grupları
+      x-scope: cloud_read
+      x-cli:
+        command: security-group server list
+      responses:
+        '200':
+          description: Attached groups
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ServerSecurityGroups'
+        '401': *id003
+        '404': *id004
+        '409':
+          description: firewall_not_enabled
+    put:
+      tags: *id023
+      operationId: setServerSecurityGroups
+      summary: Set the exact list of attached groups
+      x-summary-tr: Bağlı grupları tam liste olarak ayarla
+      x-scope: cloud_write
+      x-cli:
+        command: security-group server set
+      description: 'Attaches / detaches in one change (order = evaluation order, max 5). Answers 422 err_busy while the previous change of the server is being applied:
+        retry after a few seconds.'
+      x-description-tr: 'Tek değişiklikte bağlar / ayırır (sıra = değerlendirme sırası, en çok 5). Sunucunun önceki değişikliği uygulanırken 422 err_busy döner: birkaç
+        saniye sonra tekrar deneyin.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                security_groups:
+                  type: array
+                  maxItems: 5
+                  items:
+                    type: string
+              required:
+              - security_groups
+      responses:
+        '200':
+          description: Attached groups
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ServerSecurityGroups'
+        '401': *id003
+        '404': *id004
+        '409':
+          description: firewall_not_enabled
+        '422': *id005
+  /cloud/servers/{id}/security-groups/{sg}:
+    parameters:
+    - *id025
+    - *id024
+    post:
+      tags: *id023
+      operationId: attachSecurityGroup
+      summary: Attach a security group to a server
+      x-summary-tr: Güvenlik grubunu sunucuya bağla
+      x-scope: cloud_write
+      x-cli:
+        command: security-group attach
+      responses:
+        '200':
+          description: Attached groups
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ServerSecurityGroups'
+        '401': *id003
+        '404': *id004
+        '409':
+          description: firewall_not_enabled
+        '422': *id005
+    delete:
+      tags: *id023
+      operationId: detachSecurityGroup
+      summary: Detach a security group from a server
+      x-summary-tr: Güvenlik grubunu sunucudan ayır
+      x-scope: cloud_write
+      x-cli:
+        command: security-group detach
+      responses:
+        '200':
+          description: Attached groups
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ServerSecurityGroups'
+        '401': *id003
+        '404': *id004
+        '409':
+          description: firewall_not_enabled
+        '422': *id005
   /ping:
     get:
       tags:
@@ -15477,3 +15835,118 @@ components:
           type: integer
           minimum: 0
           maximum: 86400
+    SecurityGroupRule:
+      type: object
+      required:
+      - type
+      description: 'Allow rule (security groups never deny; stateful: replies pass automatically).'
+      x-description-tr: İzin kuralı (güvenlik grupları engellemez; bağlantı durumu izlenir, yanıtlar kendiliğinden geçer).
+      properties:
+        id:
+          type: string
+          pattern: ^gfr-[a-f0-9]{8}$
+          description: Rule id (keep it when you edit a rule; omit for a new rule)
+        direction:
+          type: string
+          enum:
+          - in
+          - out
+          default: in
+          description: in = to your servers; out = new connections from your servers (network servers only)
+        type:
+          type: string
+          enum:
+          - ssh
+          - http
+          - https
+          - rdp
+          - mysql
+          - postgresql
+          - mssql
+          - redis
+          - mongodb
+          - smtp
+          - smtps
+          - imaps
+          - dns_udp
+          - dns_tcp
+          - all_tcp
+          - all_udp
+          - all_icmp
+          - all
+          - custom_tcp
+          - custom_udp
+          description: Fixes protocol and port; custom_tcp / custom_udp take `port`
+        protocol:
+          type: string
+          readOnly: true
+          enum:
+          - tcp
+          - udp
+          - icmp
+          - all
+        port:
+          type: string
+          description: 'For custom_tcp / custom_udp: 8080 or 8000-8100. Read: the port of the type, `all` for all ports'
+          example: '8080'
+        source:
+          type: array
+          items:
+            type: string
+          maxItems: 50
+          description: 'IPv4 / CIDR list; ["0.0.0.0/0"] = anywhere. For out: the remote address'
+          example:
+          - 203.0.113.10/32
+        description:
+          type: string
+          maxLength: 60
+    SecurityGroup:
+      type: object
+      properties:
+        id:
+          type: string
+          example: sg-1a2b3c4d
+        name:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+          enum:
+          - unused
+          - applying
+          - active
+          - trial
+        trial_seconds_left:
+          type: integer
+        rules:
+          type: array
+          items:
+            $ref: '#/components/schemas/SecurityGroupRule'
+        servers:
+          type: array
+          items:
+            type: integer
+          description: Your servers the group is attached to
+        created_at:
+          type: string
+    ServerSecurityGroups:
+      type: object
+      properties:
+        server_id:
+          type: integer
+        max:
+          type: integer
+        rule_allowance:
+          type: integer
+        security_groups:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+        trial:
+          type: boolean

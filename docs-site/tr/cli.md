@@ -231,6 +231,17 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro reseller report get` | Uç-müşteri başına kullanım ve fatura raporu | `GET /cloud/reseller/report` |
 | `gyro reseller setting get` | Bayi ayarları | `GET /cloud/reseller/settings` |
 | `gyro reseller setting set` | Bayi ayarlarını kaydet (beyaz etiket) | `PUT /cloud/reseller/settings` |
+| `gyro security-group attach` | Güvenlik grubunu sunucuya bağla | `POST /cloud/servers/{id}/security-groups/{sg}` |
+| `gyro security-group confirm` | Kural denemesini kalıcı yap | `POST /cloud/security-groups/{sg}/confirm` |
+| `gyro security-group create` | Güvenlik grubu oluştur | `POST /cloud/security-groups` |
+| `gyro security-group delete` | Güvenlik grubunu sil | `DELETE /cloud/security-groups/{sg}` |
+| `gyro security-group detach` | Güvenlik grubunu sunucudan ayır | `DELETE /cloud/servers/{id}/security-groups/{sg}` |
+| `gyro security-group get` | Güvenlik grubunu getir | `GET /cloud/security-groups/{sg}` |
+| `gyro security-group list` | Güvenlik gruplarını listele | `GET /cloud/security-groups` |
+| `gyro security-group rules set` | Güvenlik grubunun kurallarını değiştir | `PUT /cloud/security-groups/{sg}/rules` |
+| `gyro security-group server list` | Sunucuya bağlı güvenlik grupları | `GET /cloud/servers/{id}/security-groups` |
+| `gyro security-group server set` | Bağlı grupları tam liste olarak ayarla | `PUT /cloud/servers/{id}/security-groups` |
+| `gyro security-group update` | Güvenlik grubunun adını / açıklamasını değiştir | `PATCH /cloud/security-groups/{sg}` |
 | `gyro server activity list` | Sunucudaki son platform işlemleri | `GET /cloud/servers/{id}/activity` |
 | `gyro server app create` | Uygulama kur (diski yeniden kurar; confirm zorunlu; sunucu başına günde 3) | `POST /cloud/servers/{id}/app` |
 | `gyro server app get` | Uygulama kurulum durumu (hazır olunca kimlik bir kez) | `GET /cloud/servers/{id}/app` |

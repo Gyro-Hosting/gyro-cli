@@ -231,6 +231,17 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro reseller report get` | Usage and billing report per end-customer | `GET /cloud/reseller/report` |
 | `gyro reseller setting get` | Reseller settings | `GET /cloud/reseller/settings` |
 | `gyro reseller setting set` | Save reseller settings (white label) | `PUT /cloud/reseller/settings` |
+| `gyro security-group attach` | Attach a security group to a server | `POST /cloud/servers/{id}/security-groups/{sg}` |
+| `gyro security-group confirm` | Make the running rule trial permanent | `POST /cloud/security-groups/{sg}/confirm` |
+| `gyro security-group create` | Create a security group | `POST /cloud/security-groups` |
+| `gyro security-group delete` | Delete a security group | `DELETE /cloud/security-groups/{sg}` |
+| `gyro security-group detach` | Detach a security group from a server | `DELETE /cloud/servers/{id}/security-groups/{sg}` |
+| `gyro security-group get` | Get a security group | `GET /cloud/security-groups/{sg}` |
+| `gyro security-group list` | List security groups | `GET /cloud/security-groups` |
+| `gyro security-group rules set` | Replace the rules of a security group | `PUT /cloud/security-groups/{sg}/rules` |
+| `gyro security-group server list` | Security groups attached to a server | `GET /cloud/servers/{id}/security-groups` |
+| `gyro security-group server set` | Set the exact list of attached groups | `PUT /cloud/servers/{id}/security-groups` |
+| `gyro security-group update` | Rename / describe a security group | `PATCH /cloud/security-groups/{sg}` |
 | `gyro server activity list` | Recent platform actions on the server | `GET /cloud/servers/{id}/activity` |
 | `gyro server app create` | Install an app (rebuilds the disk; confirm required; 3 per server per day) | `POST /cloud/servers/{id}/app` |
 | `gyro server app get` | App install status (credentials shown once when ready) | `GET /cloud/servers/{id}/app` |

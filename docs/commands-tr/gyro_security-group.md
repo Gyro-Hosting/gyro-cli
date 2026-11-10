@@ -1,0 +1,45 @@
+## gyro security-group
+
+Güvenlik gruplarını listele
+
+```
+gyro security-group [flags]
+```
+
+### Options
+
+```
+  -h, --help   help for security-group
+```
+
+### Options inherited from parent commands
+
+```
+      --api-url string     API taban adresi (ortam GYRO_API_URL)
+      --debug              HTTP isteklerini stderr'e yaz (sırlar maskeli)
+      --lang string        mesaj dili: tr ya da en (varsayılan yerel ayar)
+      --no-color           renkleri kapat (NO_COLOR da olur)
+      --no-header          tablo başlığını yazma
+  -o, --output string      çıktı biçimi: table, json, yaml, text
+  -p, --profile string     kullanılacak profil (ortam GYRO_PROFILE)
+      --query string       sonuca uygulanacak JMESPath sorgusu
+  -q, --quiet              yalnız kimlikleri yaz
+      --timeout duration   toplam zaman aşımı, ör. 30s, 10m
+      --wide               tüm tablo sütunlarını göster
+  -y, --yes                onay sorma
+```
+
+### SEE ALSO
+
+* [gyro](gyro.md)	 - Gyro Hosting komut satırı aracı
+* [gyro security-group attach](gyro_security-group_attach.md)	 - Güvenlik grubunu sunucuya bağla
+* [gyro security-group confirm](gyro_security-group_confirm.md)	 - Kural denemesini kalıcı yap
+* [gyro security-group create](gyro_security-group_create.md)	 - Güvenlik grubu oluştur
+* [gyro security-group delete](gyro_security-group_delete.md)	 - Güvenlik grubunu sil
+* [gyro security-group detach](gyro_security-group_detach.md)	 - Güvenlik grubunu sunucudan ayır
+* [gyro security-group get](gyro_security-group_get.md)	 - Güvenlik grubunu getir
+* [gyro security-group list](gyro_security-group_list.md)	 - Güvenlik gruplarını listele
+* [gyro security-group rules](gyro_security-group_rules.md)	 - Güvenlik grubunun kurallarını değiştir
+* [gyro security-group server](gyro_security-group_server.md)	 - Sunucuya bağlı güvenlik grupları
+* [gyro security-group update](gyro_security-group_update.md)	 - Güvenlik grubunun adını / açıklamasını değiştir
+
