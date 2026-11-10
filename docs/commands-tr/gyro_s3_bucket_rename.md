@@ -6,7 +6,7 @@ Kova adını değiştir
 
 Kova adını değiştir
 
-Veri taşınmaz; eski ad hemen çalışmayı durdurur (S3, web sitesi, paylaşım bağlantıları). Kova başına günde en çok 5; bırakılan ad 40 gün rezerve kalır. `"confirm": true` gerekir.
+Kova adları hizmete özeldir (aynı adı başka müşteriler de kullanabilir). Veri taşınmaz. Eski adla S3 erişimi hemen durur; web sitesi `<yeni>-<hizmet kodu>.web.gyro-s3.com` olur, eski web adresi 40 gün 301 ile yönlendirilir; paylaşım bağlantıları çalışır. Kova başına günde en çok 5; eski ad 40 gün bu hizmette yeniden kullanılamaz. `"confirm": true` gerekir.
 
 API: POST /cloud/storage/{id}/buckets/{bucket}/rename (operationId typed_post_storage__id__buckets__bucket__rename, scope services_write)
 

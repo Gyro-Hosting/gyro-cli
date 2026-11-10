@@ -6,7 +6,7 @@ Rename a bucket
 
 Rename a bucket
 
-Data is not moved; the old name stops working at once (S3, website, share links). Max 5 renames per bucket per day; a released name stays reserved for 40 days. Needs `"confirm": true`.
+Bucket names are private to the service (other customers may use the same name). Data is not moved. S3 access by the old name stops at once; the website moves to `<new>-<service code>.web.gyro-s3.com` and the old website address redirects (301) for 40 days; share links keep working. Max 5 renames per bucket per day; the old name cannot be reused inside the service for 40 days. Needs `"confirm": true`.
 
 API: POST /cloud/storage/{id}/buckets/{bucket}/rename (operationId typed_post_storage__id__buckets__bucket__rename, scope services_write)
 

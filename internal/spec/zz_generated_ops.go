@@ -3,7 +3,7 @@
 package spec
 
 // APIVersion is info.version of the spec this table was generated from.
-const APIVersion = "2.2.0"
+const APIVersion = "2.2.1"
 
 // Ops lists every API operation.
 var Ops = []Op{
@@ -1379,7 +1379,7 @@ var Ops = []Op{
 	},
 	{ID: "typed_post_storage__id__buckets__bucket__rename", Method: "POST", Path: "/cloud/storage/{id}/buckets/{bucket}/rename", Tag: "Object storage",
 		Summary: "Rename a bucket", SummaryTR: "Kova adını değiştir",
-		Desc: "Data is not moved; the old name stops working at once (S3, website, share links). Max 5 renames per bucket per day; a released name stays reserved for 40 days. Needs `\"confirm\": true`.", DescTR: "Veri taşınmaz; eski ad hemen çalışmayı durdurur (S3, web sitesi, paylaşım bağlantıları). Kova başına günde en çok 5; bırakılan ad 40 gün rezerve kalır. `\"confirm\": true` gerekir.",
+		Desc: "Bucket names are private to the service (other customers may use the same name). Data is not moved. S3 access by the old name stops at once; the website moves to `<new>-<service code>.web.gyro-s3.com` and the old website address redirects (301) for 40 days; share links keep working. Max 5 renames per bucket per day; the old name cannot be reused inside the service for 40 days. Needs `\"confirm\": true`.", DescTR: "Kova adları hizmete özeldir (aynı adı başka müşteriler de kullanabilir). Veri taşınmaz. Eski adla S3 erişimi hemen durur; web sitesi `<yeni>-<hizmet kodu>.web.gyro-s3.com` olur, eski web adresi 40 gün 301 ile yönlendirilir; paylaşım bağlantıları çalışır. Kova başına günde en çok 5; eski ad 40 gün bu hizmette yeniden kullanılamaz. `\"confirm\": true` gerekir.",
 		Scope: "services_write", Command: []string{"storage", "bucket", "rename"},
 		HasBody: true, BodyRequired: true, ListResponse: false, Paginated: false, Confirm: true, Money: false, Hidden: false,
 		Params: []Param{

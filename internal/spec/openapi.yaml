@@ -2,7 +2,7 @@
 openapi: 3.1.0
 info:
   title: Gyro Public API
-  version: 2.2.0
+  version: 2.2.1
   summary: Manage Gyro cloud servers, SSH keys and billing programmatically.
   x-summary-tr: Gyro bulut sunucularınızı, SSH anahtarlarınızı ve faturalarınızı programla yönetin.
   description: "The Gyro Public API lets you automate everything you do in the Gyro client area:\norder and manage cloud servers, keep SSH keys, read invoices and\
@@ -4262,10 +4262,12 @@ paths:
       summary: Rename a bucket
       x-summary-tr: Kova adını değiştir
       x-scope: services_write
-      description: 'Data is not moved; the old name stops working at once (S3, website, share links). Max 5 renames per bucket per day; a released name stays reserved
-        for 40 days. Needs `"confirm": true`.'
-      x-description-tr: 'Veri taşınmaz; eski ad hemen çalışmayı durdurur (S3, web sitesi, paylaşım bağlantıları). Kova başına günde en çok 5; bırakılan ad 40 gün
-        rezerve kalır. `"confirm": true` gerekir.'
+      description: 'Bucket names are private to the service (other customers may use the same name). Data is not moved. S3 access by the old name stops at once; the
+        website moves to `<new>-<service code>.web.gyro-s3.com` and the old website address redirects (301) for 40 days; share links keep working. Max 5 renames per
+        bucket per day; the old name cannot be reused inside the service for 40 days. Needs `"confirm": true`.'
+      x-description-tr: 'Kova adları hizmete özeldir (aynı adı başka müşteriler de kullanabilir). Veri taşınmaz. Eski adla S3 erişimi hemen durur; web sitesi `<yeni>-<hizmet
+        kodu>.web.gyro-s3.com` olur, eski web adresi 40 gün 301 ile yönlendirilir; paylaşım bağlantıları çalışır. Kova başına günde en çok 5; eski ad 40 gün bu hizmette
+        yeniden kullanılamaz. `"confirm": true` gerekir.'
       parameters:
       - name: id
         in: path
