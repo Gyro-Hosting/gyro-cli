@@ -181,9 +181,9 @@ var Ops = []Op{
 	},
 	{ID: "typed_post_dns__id__zones__zone__import", Method: "POST", Path: "/cloud/dns/{id}/zones/{zone}/import", Tag: "Managed DNS",
 		Summary: "Import a BIND zone file", SummaryTR: "BIND zon dosyası içe aktar",
-		Desc: "`merge` replaces record sets present in the file and keeps the others; `replace` also deletes record sets not in the file. SOA and apex NS are ignored; unsupported types are listed in `skipped`.", DescTR: "`merge` dosyadaki kayıt kümelerini değiştirir, diğerlerini korur; `replace` dosyada olmayanları da siler. SOA ve kök NS yok sayılır; desteklenmeyen tipler `skipped` içinde.",
+		Desc: "`merge` replaces record sets present in the file and keeps the others; `replace` also deletes record sets not in the file. SOA and apex NS are ignored; unsupported types are listed in `skipped`. Needs `\"confirm\": true`.", DescTR: "`merge` dosyadaki kayıt kümelerini değiştirir, diğerlerini korur; `replace` dosyada olmayanları da siler. SOA ve kök NS yok sayılır; desteklenmeyen tipler `skipped` içinde. `\"confirm\": true` gerekir.",
 		Scope: "services_write", Command: []string{"dns", "zone", "import"},
-		HasBody: true, BodyRequired: true, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
+		HasBody: true, BodyRequired: true, ListResponse: false, Paginated: false, Confirm: true, Money: false, Hidden: false,
 		Params: []Param{
 			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Service id", DescTR: ""},
 			{Name: "zone", In: "path", Type: "string", Items: "", Enum: nil, Default: "", Required: true, Desc: "Zone name", DescTR: ""},

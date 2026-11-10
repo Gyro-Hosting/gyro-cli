@@ -6780,9 +6780,9 @@ paths:
       x-summary-tr: BIND zon dosyası içe aktar
       x-scope: services_write
       description: '`merge` replaces record sets present in the file and keeps the others; `replace` also deletes record sets not in the file. SOA and apex NS are
-        ignored; unsupported types are listed in `skipped`.'
+        ignored; unsupported types are listed in `skipped`. Needs `"confirm": true`.'
       x-description-tr: '`merge` dosyadaki kayıt kümelerini değiştirir, diğerlerini korur; `replace` dosyada olmayanları da siler. SOA ve kök NS yok sayılır; desteklenmeyen
-        tipler `skipped` içinde.'
+        tipler `skipped` içinde. `"confirm": true` gerekir.'
       parameters:
       - name: id
         in: path
@@ -6834,7 +6834,7 @@ paths:
               - bind
       x-cli:
         command: dns zone import
-        confirm: false
+        confirm: true
   /cloud/dns/{id}/zones/{zone}/export:
     get:
       tags:

@@ -6,7 +6,7 @@ BIND zon dosyası içe aktar
 
 BIND zon dosyası içe aktar
 
-`merge` dosyadaki kayıt kümelerini değiştirir, diğerlerini korur; `replace` dosyada olmayanları da siler. SOA ve kök NS yok sayılır; desteklenmeyen tipler `skipped` içinde.
+`merge` dosyadaki kayıt kümelerini değiştirir, diğerlerini korur; `replace` dosyada olmayanları da siler. SOA ve kök NS yok sayılır; desteklenmeyen tipler `skipped` içinde. `"confirm": true` gerekir.
 
 API: POST /cloud/dns/{id}/zones/{zone}/import (operationId typed_post_dns__id__zones__zone__import, scope services_write)
 

@@ -6,7 +6,7 @@ Import a BIND zone file
 
 Import a BIND zone file
 
-`merge` replaces record sets present in the file and keeps the others; `replace` also deletes record sets not in the file. SOA and apex NS are ignored; unsupported types are listed in `skipped`.
+`merge` replaces record sets present in the file and keeps the others; `replace` also deletes record sets not in the file. SOA and apex NS are ignored; unsupported types are listed in `skipped`. Needs `"confirm": true`.
 
 API: POST /cloud/dns/{id}/zones/{zone}/import (operationId typed_post_dns__id__zones__zone__import, scope services_write)
 

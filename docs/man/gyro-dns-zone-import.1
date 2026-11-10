@@ -13,7 +13,7 @@ gyro-dns-zone-import - Import a BIND zone file
 Import a BIND zone file
 
 .PP
-\fBmerge\fR replaces record sets present in the file and keeps the others; \fBreplace\fR also deletes record sets not in the file. SOA and apex NS are ignored; unsupported types are listed in \fBskipped\fR\&.
+\fBmerge\fR replaces record sets present in the file and keeps the others; \fBreplace\fR also deletes record sets not in the file. SOA and apex NS are ignored; unsupported types are listed in \fBskipped\fR\&. Needs \fB"confirm": true\fR\&.
 
 .PP
 API: POST /cloud/dns/{id}/zones/{zone}/import (operationId typed_post_dns\fBid\fPzones\fBzone\fPimport, scope services_write)
