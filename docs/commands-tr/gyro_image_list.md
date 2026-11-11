@@ -15,7 +15,10 @@ gyro image list [flags]
 ### Options
 
 ```
-  -h, --help   help for list
+  -h, --help             help for list
+      --plan string      region ile: bu bölgedeki bu planın imajları.
+      --product-id int   Yalnız bu üründe sunulan imajlar (ürünün bölgesini de seçer).
+      --region string    Yalnız bu bölgede sunulan imajlar (ör. tr-ist-1). Verilmezse küresel bulut kataloğunun imajları (değişmedi).
 ```
 
 ### Options inherited from parent commands

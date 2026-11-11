@@ -6,7 +6,7 @@ Inbound firewall rules
 
 Inbound firewall rules
 
-Read-only in v1. An empty list means no Gyro firewall is applied (all inbound traffic reaches the server).
+Read-only in v1. An empty list means no Gyro firewall is applied (all inbound traffic reaches the server). tr-ist-1: rules come from the network firewall add-on (security groups); without the add-on the list is empty and writes answer 409 `firewall_not_enabled`.
 
 API: GET /cloud/servers/{id}/firewall (operationId getFirewall, scope cloud_read)
 

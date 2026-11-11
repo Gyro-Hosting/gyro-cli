@@ -6,6 +6,8 @@ Elle yedek al (yedekleme ek hizmeti gerekir)
 
 Elle yedek al (yedekleme ek hizmeti gerekir)
 
+Not available in tr-ist-1 (422 `not_supported_in_region`; use snapshots).
+
 API: POST /cloud/servers/{id}/backups (operationId createBackup, scope cloud_write)
 
 ```

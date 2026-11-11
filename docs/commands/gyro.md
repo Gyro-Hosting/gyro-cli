@@ -5,7 +5,7 @@ Gyro Hosting command-line interface
 ### Synopsis
 
 gyro manages your Gyro Hosting services from the terminal: cloud servers, SSH keys, invoices,
-balance and everything else the Gyro Public API offers (API spec 2.9.0).
+balance and everything else the Gyro Public API offers (API spec 2.11.0).
 
 Get started:
   gyro configure                 # store an API key (Client area → account menu (top right) → API Credentials)
@@ -41,9 +41,11 @@ Money and destructive actions ask for confirmation (use --yes in scripts, --dry-
 * [gyro api](gyro_api.md)	 - Call any API endpoint directly (like 'gh api')
 * [gyro app](gyro_app.md)	 - One-click applications
 * [gyro balance](gyro_balance.md)	 - Account balance (bare command) and transactions
+* [gyro billing](gyro_billing.md)	 - Prepaid hourly usage (Istanbul cloud, containers): balance, usage, estimate, statement
 * [gyro bulk](gyro_bulk.md)	 - Run one action on up to 50 servers
 * [gyro completion](gyro_completion.md)	 - Generate a shell completion script
 * [gyro configure](gyro_configure.md)	 - Store an API key and preferences in a named profile
+* [gyro container](gyro_container.md)	 - Gyro Containers (ECS), Istanbul: services, versions, logs, domains
 * [gyro context](gyro_context.md)	 - Show the active profile, API URL and key (and check the key)
 * [gyro dedicated](gyro_dedicated.md)	 - Dedicated servers
 * [gyro dns](gyro_dns.md)	 - DNS records of your domains

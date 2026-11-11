@@ -6,6 +6,8 @@ Otomatik yedekleri listele
 
 Otomatik yedekleri listele
 
+tr-ist-1: always `enabled: false`.
+
 API: GET /cloud/servers/{id}/backups (operationId listBackups, scope cloud_read)
 
 ```

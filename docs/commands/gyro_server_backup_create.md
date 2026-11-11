@@ -6,6 +6,8 @@ Take a manual backup (backup add-on required)
 
 Take a manual backup (backup add-on required)
 
+Not available in tr-ist-1 (422 `not_supported_in_region`; use snapshots).
+
 API: POST /cloud/servers/{id}/backups (operationId createBackup, scope cloud_write)
 
 ```

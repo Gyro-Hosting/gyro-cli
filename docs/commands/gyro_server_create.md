@@ -9,7 +9,8 @@ the order is paid from your account balance, never from a card. An idempotency k
 automatically, so a retried command never orders twice.
 
 --plan accepts a plan name (standart-2-4, pro-2-8 ...) or a product id (see 'gyro plan list').
---location accepts a region (eu-de-1, see 'gyro location list') or a city (falkenstein).
+--region (or --location) accepts a region (eu-de-1, tr-ist-1, see 'gyro location list') or a city (falkenstein, istanbul).
+In tr-ist-1 (Istanbul) up to 10 --ssh-key values are installed for root shortly after the server first boots.
 
 ```
 gyro server create [HOSTNAME] [flags]
@@ -21,6 +22,7 @@ gyro server create [HOSTNAME] [flags]
   gyro server create web-1 --plan pro-2-8 --location falkenstein --image ubuntu-24.04 --ssh-key mykey --wait
   gyro server create --plan standart-2-4 --location eu-de-1 --image debian-12 --ssh-key ~/.ssh/id_ed25519.pub --dry-run
   gyro server create db-1 --plan standart-2-4 --location eu-de-2 --image ubuntu-24.04 --user-data @cloud-init.yaml --yes -o json
+  gyro server create ist-1 --plan standart-2-4 --region tr-ist-1 --image ubuntu-24.04 --ssh-key mykey --wait
 ```
 
 ### Options
@@ -36,6 +38,7 @@ gyro server create [HOSTNAME] [flags]
       --image string             OS image slug, e.g. ubuntu-24.04 (required)
       --location string          region (eu-de-1) or city
       --plan string              plan name or product id (required)
+      --region string            region (eu-de-1, tr-ist-1); same as --location
       --set stringArray          extra body field key=value (repeatable)
       --ssh-key strings          SSH key id, name or .pub file (uploaded if new)
       --user-data string         cloud-init user data, inline or @file

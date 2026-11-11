@@ -6,6 +6,8 @@ List snapshots and the snapshot quota
 
 List snapshots and the snapshot quota
 
+tr-ist-1: `quota` = number of snapshots allowed on the plan (add-on), snapshot ids are stable numbers derived by the API.
+
 API: GET /cloud/servers/{id}/snapshots (operationId listSnapshots, scope cloud_read)
 
 ```

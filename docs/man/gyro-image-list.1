@@ -20,6 +20,18 @@ API: GET /cloud/images (operationId listImages, scope cloud_read)
 \fB-h\fP, \fB--help\fP[=false]
 	help for list
 
+.PP
+\fB--plan\fP=""
+	With region: only the images of this plan in that region.
+
+.PP
+\fB--product-id\fP=0
+	Only the images offered on this product (implies its region).
+
+.PP
+\fB--region\fP=""
+	Only images offered in this region (e.g. tr-ist-1). Without it: the images of the global cloud catalogue (unchanged).
+
 
 .SH OPTIONS INHERITED FROM PARENT COMMANDS
 \fB--api-url\fP=""

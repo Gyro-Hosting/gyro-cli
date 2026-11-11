@@ -53,6 +53,9 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro api request DELETE /cloud/storage/{id}/buckets/{bucket}` | buckets:delete (GyroDepolama) | `DELETE /cloud/storage/{id}/buckets/{bucket}` |
 | `gyro api request DELETE /cloud/storage/{id}/keys/{key}` | access-keys:delete (GyroDepolama) | `DELETE /cloud/storage/{id}/keys/{key}` |
 | `gyro api request GET /cloud/apps` | Kurulabilir uygulamaları listele | `GET /cloud/apps` |
+| `gyro api request GET /cloud/billing/balance` | Balance, hourly cost of running prepaid services and estimated time left | `GET /cloud/billing/balance` |
+| `gyro api request GET /cloud/billing/statement/{month}` | Monthly usage statement (not an invoice); JSON, PDF or CSV | `GET /cloud/billing/statement/{month}` |
+| `gyro api request GET /cloud/billing/usage` | Hour-by-hour usage ledger (or daily/monthly totals). Times are Europe/Istanbul. | `GET /cloud/billing/usage` |
 | `gyro api request GET /cloud/mail/{id}/aliases` | aliases (GyroMail) | `GET /cloud/mail/{id}/aliases` |
 | `gyro api request GET /cloud/mail/{id}/autoresponders` | autoresponder (GyroMail) | `GET /cloud/mail/{id}/autoresponders` |
 | `gyro api request GET /cloud/mail/{id}/catch-all` | catch-all (GyroMail) | `GET /cloud/mail/{id}/catch-all` |
@@ -63,6 +66,7 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro api request GET /cloud/storage/{id}/keys` | access-keys (GyroDepolama) | `GET /cloud/storage/{id}/keys` |
 | `gyro api request PATCH /cloud/mail/{id}/aliases/{aid}` | aliases:edit (GyroMail) | `PATCH /cloud/mail/{id}/aliases/{aid}` |
 | `gyro api request PATCH /cloud/mail/{id}/mailboxes/{local}` | mailboxes:edit (GyroMail) | `PATCH /cloud/mail/{id}/mailboxes/{local}` |
+| `gyro api request POST /cloud/billing/estimate` | Hourly / daily / monthly (capped at 672 h) cost of prepaid plans and how long the balance lasts | `POST /cloud/billing/estimate` |
 | `gyro api request POST /cloud/licenses/{id}/change-ip` | method change_ip (LisansAPP) | `POST /cloud/licenses/{id}/change-ip` |
 | `gyro api request POST /cloud/mail/{id}/aliases` | aliases:create (GyroMail) | `POST /cloud/mail/{id}/aliases` |
 | `gyro api request POST /cloud/mail/{id}/mailboxes` | mailboxes:create (GyroMail) | `POST /cloud/mail/{id}/mailboxes` |
@@ -73,7 +77,36 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro balance setting update` | Cüzdan Ayarlarını Değiştirme | `PATCH /balance/settings` |
 | `gyro balance top-up` | Bakiye yükleme faturası oluştur, ödeme linkini al | `POST /cloud/balance/top-up` |
 | `gyro balance transaction list` | Bakiye hareketleri | `GET /balance/transactions` |
+| `gyro billing topup-url get` | Browser link of the balance top-up page (top-ups are invoiced with VAT; usage is not) | `GET /cloud/billing/topup-url` |
 | `gyro bulk` | Bir eylemi 50 sunucuya kadar toplu çalıştır | `POST /cloud/bulk` |
+| `gyro container domain add` | Alan adı bağla | `POST /cloud/containers/{id}/services/{name}/domains` |
+| `gyro container domain list` | Servisin alan adları | `GET /cloud/containers/{id}/services/{name}/domains` |
+| `gyro container domain remove` | Alan adını kaldır | `DELETE /cloud/containers/{id}/services/{name}/domains/{domain}` |
+| `gyro container domain verify` | Bekleyen alan adlarını kontrol et | `POST /cloud/containers/{id}/services/{name}/domains/verify` |
+| `gyro container env set` | Ortam değişkenlerini ayarla | `PUT /cloud/containers/{id}/services/{name}/env` |
+| `gyro container events` | Son uyarılar | `GET /cloud/containers/{id}/events` |
+| `gyro container external-registry delete` | Özel depo bilgisini sil | `DELETE /cloud/containers/{id}/external-registry` |
+| `gyro container external-registry set` | Harici özel depo bilgisi | `PUT /cloud/containers/{id}/external-registry` |
+| `gyro container logs` | Servis logları | `GET /cloud/containers/{id}/services/{name}/logs` |
+| `gyro container metrics` | Servis işlemci / bellek | `GET /cloud/containers/{id}/services/{name}/metrics` |
+| `gyro container nodes` | Düğüm havuzu | `GET /cloud/containers/{id}/nodes` |
+| `gyro container registry credentials` | Depo parolası | `POST /cloud/containers/{id}/registry/credentials` |
+| `gyro container registry get` | Ortamın Gyro imaj deposu | `GET /cloud/containers/{id}/registry` |
+| `gyro container registry image-delete` | İmaj etiketini sil | `DELETE /cloud/containers/{id}/registry/images` |
+| `gyro container registry images` | Depodaki imajlar | `GET /cloud/containers/{id}/registry/images` |
+| `gyro container registry policy` | İmaj temizlik ayarı | `PUT /cloud/containers/{id}/registry/policy` |
+| `gyro container registry rotate` | Depo parolasını yenile | `POST /cloud/containers/{id}/registry/rotate` |
+| `gyro container secret delete` | Gizli değer sil | `DELETE /cloud/containers/{id}/services/{name}/secrets` |
+| `gyro container secret set` | Gizli değer ayarla | `PUT /cloud/containers/{id}/services/{name}/secrets` |
+| `gyro container service create` | Kapsayıcı servisi oluştur | `POST /cloud/containers/{id}/services` |
+| `gyro container service delete` | Kapsayıcı servisini sil | `DELETE /cloud/containers/{id}/services/{name}` |
+| `gyro container service get` | Kapsayıcı servisini getir | `GET /cloud/containers/{id}/services/{name}` |
+| `gyro container service list` | Kapsayıcı servislerini listele | `GET /cloud/containers/{id}/services` |
+| `gyro container service restart` | Servisi yeniden başlat | `POST /cloud/containers/{id}/services/{name}/restart` |
+| `gyro container service revisions` | Sürüm geçmişi | `GET /cloud/containers/{id}/services/{name}/revisions` |
+| `gyro container service rollback` | Önceki sürüme dön | `POST /cloud/containers/{id}/services/{name}/rollback` |
+| `gyro container service scale` | Servisi ölçekle | `POST /cloud/containers/{id}/services/{name}/scale` |
+| `gyro container service update` | Yeni sürüm dağıt / ayar değiştir | `PATCH /cloud/containers/{id}/services/{name}` |
 | `gyro core invoice pay` | Faturayı Ödeme | `POST /invoices/{id}/pay` |
 | `gyro core product list` | Ürünleri Listeleme | `GET /products` |
 | `gyro core service get` | Hizmeti Okuma | `GET /services/{id}` |

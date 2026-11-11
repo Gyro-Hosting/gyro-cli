@@ -53,6 +53,9 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro api request DELETE /cloud/storage/{id}/buckets/{bucket}` | DELETE buckets:delete (GyroDepolama) | `DELETE /cloud/storage/{id}/buckets/{bucket}` |
 | `gyro api request DELETE /cloud/storage/{id}/keys/{key}` | DELETE access-keys:delete (GyroDepolama) | `DELETE /cloud/storage/{id}/keys/{key}` |
 | `gyro api request GET /cloud/apps` | List installable apps | `GET /cloud/apps` |
+| `gyro api request GET /cloud/billing/balance` | Balance, hourly cost of running prepaid services and estimated time left | `GET /cloud/billing/balance` |
+| `gyro api request GET /cloud/billing/statement/{month}` | Monthly usage statement (not an invoice); JSON, PDF or CSV | `GET /cloud/billing/statement/{month}` |
+| `gyro api request GET /cloud/billing/usage` | Hour-by-hour usage ledger (or daily/monthly totals). Times are Europe/Istanbul. | `GET /cloud/billing/usage` |
 | `gyro api request GET /cloud/mail/{id}/aliases` | GET aliases (GyroMail) | `GET /cloud/mail/{id}/aliases` |
 | `gyro api request GET /cloud/mail/{id}/autoresponders` | GET autoresponder (GyroMail) | `GET /cloud/mail/{id}/autoresponders` |
 | `gyro api request GET /cloud/mail/{id}/catch-all` | GET catch-all (GyroMail) | `GET /cloud/mail/{id}/catch-all` |
@@ -63,6 +66,7 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro api request GET /cloud/storage/{id}/keys` | GET access-keys (GyroDepolama) | `GET /cloud/storage/{id}/keys` |
 | `gyro api request PATCH /cloud/mail/{id}/aliases/{aid}` | PATCH aliases:edit (GyroMail) | `PATCH /cloud/mail/{id}/aliases/{aid}` |
 | `gyro api request PATCH /cloud/mail/{id}/mailboxes/{local}` | PATCH mailboxes:edit (GyroMail) | `PATCH /cloud/mail/{id}/mailboxes/{local}` |
+| `gyro api request POST /cloud/billing/estimate` | Hourly / daily / monthly (capped at 672 h) cost of prepaid plans and how long the balance lasts | `POST /cloud/billing/estimate` |
 | `gyro api request POST /cloud/licenses/{id}/change-ip` | POST method change_ip (LisansAPP) | `POST /cloud/licenses/{id}/change-ip` |
 | `gyro api request POST /cloud/mail/{id}/aliases` | POST aliases:create (GyroMail) | `POST /cloud/mail/{id}/aliases` |
 | `gyro api request POST /cloud/mail/{id}/mailboxes` | POST mailboxes:create (GyroMail) | `POST /cloud/mail/{id}/mailboxes` |
@@ -73,7 +77,36 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro balance setting update` | Update balance settings | `PATCH /balance/settings` |
 | `gyro balance top-up` | Create a balance top-up invoice and get its payment link | `POST /cloud/balance/top-up` |
 | `gyro balance transaction list` | Balance ledger | `GET /balance/transactions` |
+| `gyro billing topup-url get` | Browser link of the balance top-up page (top-ups are invoiced with VAT; usage is not) | `GET /cloud/billing/topup-url` |
 | `gyro bulk` | Run one action on up to 50 servers | `POST /cloud/bulk` |
+| `gyro container domain add` | Attach a domain | `POST /cloud/containers/{id}/services/{name}/domains` |
+| `gyro container domain list` | Domains of a service | `GET /cloud/containers/{id}/services/{name}/domains` |
+| `gyro container domain remove` | Detach a domain | `DELETE /cloud/containers/{id}/services/{name}/domains/{domain}` |
+| `gyro container domain verify` | Re-check pending domains | `POST /cloud/containers/{id}/services/{name}/domains/verify` |
+| `gyro container env set` | Set environment variables | `PUT /cloud/containers/{id}/services/{name}/env` |
+| `gyro container events` | Recent warnings | `GET /cloud/containers/{id}/events` |
+| `gyro container external-registry delete` | Remove external registry credentials | `DELETE /cloud/containers/{id}/external-registry` |
+| `gyro container external-registry set` | External private registry credentials | `PUT /cloud/containers/{id}/external-registry` |
+| `gyro container logs` | Service logs | `GET /cloud/containers/{id}/services/{name}/logs` |
+| `gyro container metrics` | Service CPU / memory | `GET /cloud/containers/{id}/services/{name}/metrics` |
+| `gyro container nodes` | Node pool | `GET /cloud/containers/{id}/nodes` |
+| `gyro container registry credentials` | Registry password | `POST /cloud/containers/{id}/registry/credentials` |
+| `gyro container registry get` | Gyro image registry of the environment | `GET /cloud/containers/{id}/registry` |
+| `gyro container registry image-delete` | Delete an image tag | `DELETE /cloud/containers/{id}/registry/images` |
+| `gyro container registry images` | Images in the registry | `GET /cloud/containers/{id}/registry/images` |
+| `gyro container registry policy` | Image clean-up policy | `PUT /cloud/containers/{id}/registry/policy` |
+| `gyro container registry rotate` | Rotate the registry password | `POST /cloud/containers/{id}/registry/rotate` |
+| `gyro container secret delete` | Delete secret values | `DELETE /cloud/containers/{id}/services/{name}/secrets` |
+| `gyro container secret set` | Set secret values | `PUT /cloud/containers/{id}/services/{name}/secrets` |
+| `gyro container service create` | Create a container service | `POST /cloud/containers/{id}/services` |
+| `gyro container service delete` | Delete a container service | `DELETE /cloud/containers/{id}/services/{name}` |
+| `gyro container service get` | Get a container service | `GET /cloud/containers/{id}/services/{name}` |
+| `gyro container service list` | List container services | `GET /cloud/containers/{id}/services` |
+| `gyro container service restart` | Restart a service | `POST /cloud/containers/{id}/services/{name}/restart` |
+| `gyro container service revisions` | Revision history | `GET /cloud/containers/{id}/services/{name}/revisions` |
+| `gyro container service rollback` | Roll back to an earlier revision | `POST /cloud/containers/{id}/services/{name}/rollback` |
+| `gyro container service scale` | Scale a service | `POST /cloud/containers/{id}/services/{name}/scale` |
+| `gyro container service update` | Deploy a new version / change settings | `PATCH /cloud/containers/{id}/services/{name}` |
 | `gyro core invoice pay` | Pay invoice (path: {id}) | `POST /invoices/{id}/pay` |
 | `gyro core product list` | List products | `GET /products` |
 | `gyro core service get` | Get service (path: {id}) | `GET /services/{id}` |

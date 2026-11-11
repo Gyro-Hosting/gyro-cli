@@ -6,7 +6,7 @@ Tek seferlik VNC konsol bileti al
 
 Tek seferlik VNC konsol bileti al
 
-Yaklaşık bir dakika geçerli websocket adresi ve parola döner. Idempotency-Key göndermeyin (400).
+Yaklaşık bir dakika geçerli websocket adresi ve parola döner. Idempotency-Key göndermeyin (400). tr-ist-1'de bilet WebMKS websocket'idir (`protocol: webmks`, parola boş: adresin kendisi tek seferlik sırdır).
 
 API: POST /cloud/servers/{id}/console (operationId openConsole, scope cloud_write)
 

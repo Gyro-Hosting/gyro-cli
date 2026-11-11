@@ -1,0 +1,98 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-billing-estimate - Hourly, daily and monthly (capped) cost of plans; how long your balance lasts
+
+
+.SH SYNOPSIS
+\fBgyro billing estimate [flags]\fP
+
+
+.SH DESCRIPTION
+Hourly, daily and monthly (capped) cost of plans; how long your balance lasts
+
+
+.SH OPTIONS
+\fB--count\fP=1
+	how many
+
+.PP
+\fB-h\fP, \fB--help\fP[=false]
+	help for estimate
+
+.PP
+\fB--item\fP=[]
+	plan:count, repeatable
+
+.PP
+\fB--plan\fP=""
+	plan name, e.g. standart-2-4
+
+.PP
+\fB--product-id\fP=0
+	or the product id
+
+.PP
+\fB--region\fP="tr-ist-1"
+	region (prepaid: tr-ist-1)
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH EXAMPLE
+.EX
+  gyro billing estimate --plan standart-2-4 --region tr-ist-1 --count 3
+  gyro billing estimate --item standart-2-4:2 --item standart-4-8:1
+.EE
+
+
+.SH SEE ALSO
+\fBgyro-billing(1)\fP

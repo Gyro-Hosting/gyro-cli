@@ -755,7 +755,8 @@ paths:
 
 
         **Region tr-ist-1**: poweron, shutdown, reboot, poweroff (same as shutdown), rebuild and reset_password are available; reset, enable_rescue and disable_rescue
-        answer 422 `action_not_supported`. rebuild accepts the images of the server''s own product (GET /cloud/images?region=tr-ist-1).
+        answer 422 `action_not_supported`. rebuild accepts the images of the server''s own product (GET /cloud/images?region=tr-ist-1); the SSH keys given at creation
+        are installed again once the rebuilt server is ready (follow `ssh_keys.state`). Prepaid servers: DELETE always cancels at once (no cancellation request).
 
         '
       x-description-tr: 'Ağır işlemler (yeniden kurulum, reset, kurtarma, snapshot''tan dönüş, parola sıfırlama) sunucu başına günlük sınırlıdır.

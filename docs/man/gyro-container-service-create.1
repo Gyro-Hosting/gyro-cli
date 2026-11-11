@@ -1,0 +1,141 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-container-service-create - Create a container service
+
+
+.SH SYNOPSIS
+\fBgyro container service create  [flags]\fP
+
+
+.SH DESCRIPTION
+Create a container service
+
+.PP
+Starts a new service on your dedicated node pool. Name: lowercase letters, digits and '-', max 40. Fails with 409 \fBquota_exceeded\fR when the pool has no room. Secret values are set separately (PUT .../secrets).
+
+.PP
+API: POST /cloud/containers/{id}/services (operationId typed_post_containers\fBid\fPservices, scope services_write)
+
+
+.SH OPTIONS
+\fB--args\fP=[]
+	Arguments for the image's default command
+
+.PP
+\fB--command\fP=[]
+	Override the image entrypoint
+
+.PP
+\fB--cpu-m\fP=0
+	CPU per instance in millicores (250 = 0.25 vCPU)
+
+.PP
+\fB--data\fP=""
+	request body as JSON, @file or @- (stdin)
+
+.PP
+\fB--dry-run\fP[=false]
+	show the price quote / request without changing anything
+
+.PP
+\fB--env\fP=""
+	Plain environment variables (replaces the whole set on update) (JSON)
+
+.PP
+\fB--health-path\fP=""
+	HTTP health check path (empty = TCP check)
+
+.PP
+\fB-h\fP, \fB--help\fP[=false]
+	help for create
+
+.PP
+\fB--idempotency-key\fP=""
+	idempotency key (automatic for money operations)
+
+.PP
+\fB--image\fP=""
+	Image reference, e.g. ghcr.io/acme/web:1.4 (public registries or your private registry)
+
+.PP
+\fB--memory-mi\fP=0
+	Memory per instance in MiB
+
+.PP
+\fB--name\fP=""
+	Service name
+
+.PP
+\fB--port\fP=0
+	Container port (0 = no network port). Containers run as a non-root user: use a port >= 1024
+
+.PP
+\fB--public\fP[=false]
+	HTTPS address -\&.gyroapp.net (and your domains)
+
+.PP
+\fB--replicas\fP=0
+	Number of instances (default 1)
+
+.PP
+\fB--run-as-user\fP=0
+	User id inside the container (default 10001)
+
+.PP
+\fB--set\fP=[]
+	extra body field key=value (repeatable)
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH SEE ALSO
+\fBgyro-container-service(1)\fP

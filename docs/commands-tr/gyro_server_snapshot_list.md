@@ -6,6 +6,8 @@ Snapshot'ları ve kotayı listele
 
 Snapshot'ları ve kotayı listele
 
+tr-ist-1: `quota` = number of snapshots allowed on the plan (add-on), snapshot ids are stable numbers derived by the API.
+
 API: GET /cloud/servers/{id}/snapshots (operationId listSnapshots, scope cloud_read)
 
 ```

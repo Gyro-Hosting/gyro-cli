@@ -1,0 +1,112 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-billing-usage - Hour-by-hour usage (or daily/monthly totals)
+
+
+.SH SYNOPSIS
+\fBgyro billing usage [flags]\fP
+
+
+.SH DESCRIPTION
+Hour-by-hour usage (or daily/monthly totals)
+
+
+.SH OPTIONS
+\fB--all\fP[=false]
+	fetch every page
+
+.PP
+\fB--csv\fP=""
+	save the hours as CSV (file, '.' = server name, '-' = stdout)
+
+.PP
+\fB--daily\fP[=false]
+	daily totals
+
+.PP
+\fB--from\fP=""
+	first day YYYY-MM-DD (default: 1st of this month)
+
+.PP
+\fB-h\fP, \fB--help\fP[=false]
+	help for usage
+
+.PP
+\fB--monthly\fP[=false]
+	monthly totals
+
+.PP
+\fB--service\fP=0
+	only this service id
+
+.PP
+\fB--status\fP=""
+	ucretli|tavan|kismi|odenmedi|ucretsiz
+
+.PP
+\fB--to\fP=""
+	last day YYYY-MM-DD (default: today)
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH EXAMPLE
+.EX
+  gyro billing usage --from 2026-11-01 --to 2026-11-30
+  gyro billing usage --service 17501 --daily
+  gyro billing usage --monthly -o json
+  gyro billing usage --csv kullanim.csv
+.EE
+
+
+.SH SEE ALSO
+\fBgyro-billing(1)\fP

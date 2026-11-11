@@ -6,6 +6,8 @@ List automatic backups
 
 List automatic backups
 
+tr-ist-1: always `enabled: false`.
+
 API: GET /cloud/servers/{id}/backups (operationId listBackups, scope cloud_read)
 
 ```

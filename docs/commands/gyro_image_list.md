@@ -15,7 +15,10 @@ gyro image list [flags]
 ### Options
 
 ```
-  -h, --help   help for list
+  -h, --help             help for list
+      --plan string      With region: only the images of this plan in that region.
+      --product-id int   Only the images offered on this product (implies its region).
+      --region string    Only images offered in this region (e.g. tr-ist-1). Without it: the images of the global cloud catalogue (unchanged).
 ```
 
 ### Options inherited from parent commands

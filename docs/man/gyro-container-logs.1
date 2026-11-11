@@ -1,0 +1,93 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-container-logs - Service logs
+
+
+.SH SYNOPSIS
+\fBgyro container logs   [flags]\fP
+
+
+.SH DESCRIPTION
+Service logs
+
+.PP
+Lines \fB{time, instance, text}\fR oldest first. \fBsince_minutes\fR (default 60, max 10080), \fBfilter\fR (plain text), \fBlimit\fR (max 2000), \fBprevious=1\fR = last crashed instance.
+
+.PP
+API: GET /cloud/containers/{id}/services/{name}/logs (operationId typed_get_containers\fBid\fPservices\fBname\fPlogs, scope services_read)
+
+
+.SH OPTIONS
+\fB--filter\fP=""
+	Plain text filter
+
+.PP
+\fB-h\fP, \fB--help\fP[=false]
+	help for logs
+
+.PP
+\fB--param-limit\fP=""
+	Max lines
+
+.PP
+\fB--previous\fP=""
+	1 = previous (crashed) instance
+
+.PP
+\fB--since-minutes\fP=""
+	Time range in minutes
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH SEE ALSO
+\fBgyro-container(1)\fP
