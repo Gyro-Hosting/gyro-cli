@@ -1,0 +1,101 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-dns-acme-challenge-add - Add an ACME challenge TXT value
+
+
+.SH SYNOPSIS
+\fBgyro dns acme-challenge add [flags]\fP
+
+
+.SH DESCRIPTION
+Add an ACME challenge TXT value
+
+.PP
+Adds \fBvalue\fR to the TXT record set at \fBname\fR (TTL 60); other values stay, so the apex and the wildcard of one certificate can be validated together (max 10 values per name). The service and the zone are found from the name (longest Gyro DNS zone of yours that covers it; hosting/cPanel zones are not supported). Idempotent.
+
+.PP
+API: POST /cloud/dns/acme-challenge (operationId acmeChallengeAdd, scope dns_acme)
+
+
+.SH OPTIONS
+\fB--data\fP=""
+	request body as JSON, @file or @- (stdin)
+
+.PP
+\fB--dry-run\fP[=false]
+	show the price quote / request without changing anything
+
+.PP
+\fB-h\fP, \fB--help\fP[=false]
+	help for add
+
+.PP
+\fB--idempotency-key\fP=""
+	idempotency key (automatic for money operations)
+
+.PP
+\fB--name\fP=""
+	_acme-challenge. (for *.example.com: _acme-challenge.example.com)
+
+.PP
+\fB--set\fP=[]
+	extra body field key=value (repeatable)
+
+.PP
+\fB--value\fP=""
+	Challenge value (base64url, 16-128 characters)
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH SEE ALSO
+\fBgyro-dns-acme-challenge(1)\fP

@@ -114,6 +114,15 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro core service tool get` | Get service tool data (path: {id}, {tool}) | `GET /services/{id}/tools/{tool}` |
 | `gyro core service tool list` | Get service tools (path: {id}) | `GET /services/{id}/tools` |
 | `gyro core service tool run` | Run service tool action (path: {id}, {tool}, {action}) | `POST /services/{id}/tools/{tool}/{action}` |
+| `gyro dns acme-challenge add` | Add an ACME challenge TXT value | `POST /cloud/dns/acme-challenge` |
+| `gyro dns acme-challenge add-in-service` | Add an ACME challenge TXT value (service) | `POST /cloud/dns/{id}/acme-challenge` |
+| `gyro dns acme-challenge remove` | Remove an ACME challenge TXT value | `DELETE /cloud/dns/acme-challenge` |
+| `gyro dns acme-challenge remove-in-service` | Remove an ACME challenge TXT value (service) | `DELETE /cloud/dns/{id}/acme-challenge` |
+| `gyro dns acme-challenge status` | Is the challenge record live? | `GET /cloud/dns/acme-challenge` |
+| `gyro dns acme-challenge status-in-service` | Is the challenge record live? (service) | `GET /cloud/dns/{id}/acme-challenge` |
+| `gyro dns acme-key create` | Create an ACME key | `POST /cloud/dns/{id}/acme-keys` |
+| `gyro dns acme-key delete` | Delete an ACME key | `DELETE /cloud/dns/{id}/acme-keys/{kid}` |
+| `gyro dns acme-key list` | List ACME keys | `GET /cloud/dns/{id}/acme-keys` |
 | `gyro dns dnssec disable` | Disable DNSSEC | `DELETE /cloud/dns/{id}/zones/{zone}/dnssec` |
 | `gyro dns dnssec enable` | Enable DNSSEC | `POST /cloud/dns/{id}/zones/{zone}/dnssec` |
 | `gyro dns dnssec status` | DNSSEC status and DS records | `GET /cloud/dns/{id}/zones/{zone}/dnssec` |

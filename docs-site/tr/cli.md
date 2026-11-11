@@ -114,6 +114,15 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro core service tool get` | Araç Verisini Okuma | `GET /services/{id}/tools/{tool}` |
 | `gyro core service tool list` | Araçları Listeleme | `GET /services/{id}/tools` |
 | `gyro core service tool run` | Araç Eylemi Çalıştırma | `POST /services/{id}/tools/{tool}/{action}` |
+| `gyro dns acme-challenge add` | ACME doğrulama TXT değeri ekle | `POST /cloud/dns/acme-challenge` |
+| `gyro dns acme-challenge add-in-service` | ACME doğrulama TXT değeri ekle | `POST /cloud/dns/{id}/acme-challenge` |
+| `gyro dns acme-challenge remove` | ACME doğrulama TXT değerini sil | `DELETE /cloud/dns/acme-challenge` |
+| `gyro dns acme-challenge remove-in-service` | ACME doğrulama TXT değerini sil | `DELETE /cloud/dns/{id}/acme-challenge` |
+| `gyro dns acme-challenge status` | Doğrulama kaydı yayında mı? | `GET /cloud/dns/acme-challenge` |
+| `gyro dns acme-challenge status-in-service` | Doğrulama kaydı yayında mı? | `GET /cloud/dns/{id}/acme-challenge` |
+| `gyro dns acme-key create` | ACME anahtarı oluştur | `POST /cloud/dns/{id}/acme-keys` |
+| `gyro dns acme-key delete` | ACME anahtarını sil | `DELETE /cloud/dns/{id}/acme-keys/{kid}` |
+| `gyro dns acme-key list` | ACME anahtarlarını listele | `GET /cloud/dns/{id}/acme-keys` |
 | `gyro dns dnssec disable` | DNSSEC kapat | `DELETE /cloud/dns/{id}/zones/{zone}/dnssec` |
 | `gyro dns dnssec enable` | DNSSEC aç | `POST /cloud/dns/{id}/zones/{zone}/dnssec` |
 | `gyro dns dnssec status` | DNSSEC durumu ve DS kayıtları | `GET /cloud/dns/{id}/zones/{zone}/dnssec` |

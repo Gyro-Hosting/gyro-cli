@@ -2,7 +2,7 @@
 openapi: 3.1.0
 info:
   title: Gyro Public API
-  version: 2.11.0
+  version: 2.13.0
   summary: Manage Gyro cloud servers, SSH keys and billing programmatically.
   x-summary-tr: Gyro bulut sunucularınızı, SSH anahtarlarınızı ve faturalarınızı programla yönetin.
   description: "The Gyro Public API lets you automate everything you do in the Gyro client area:\norder and manage cloud servers, keep SSH keys, read invoices and\
@@ -3376,6 +3376,348 @@ paths:
         '401': *id003
         '404': *id004
         '422': *id005
+  /cloud/dns/acme-challenge:
+    get:
+      x-scope: dns_acme
+      tags: &id006
+      - Managed DNS
+      operationId: acmeChallengeStatus
+      summary: Is the challenge record live?
+      x-summary-tr: Doğrulama kaydı yayında mı?
+      x-cli:
+        command: dns acme-challenge status
+      parameters:
+      - &id007
+        name: name
+        in: query
+        required: true
+        schema:
+          type: string
+        description: _acme-challenge.<domain>
+        example: _acme-challenge.example.com
+      - &id008
+        name: value
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Challenge value (key authorization digest)
+      description: Asks both authoritative name servers (ns1/ns2.gyrodns.net) directly. `ready` is true when both publish `value`. Poll every few seconds after adding
+        (usually < 1 minute).
+      x-description-tr: İki yetkili ad sunucusuna (ns1/ns2.gyrodns.net) doğrudan sorar. İkisi de `value` değerini yayınlıyorsa `ready` true. Ekledikten sonra birkaç
+        saniyede bir sorun (genelde < 1 dk).
+      responses:
+        '200':
+          description: Status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/AcmeChallenge'
+        '401': *id003
+        '403':
+          description: zone_not_allowed / action_not_allowed
+        '404': *id004
+        '422': *id005
+    post:
+      x-scope: dns_acme
+      tags: *id006
+      operationId: acmeChallengeAdd
+      summary: Add an ACME challenge TXT value
+      x-summary-tr: ACME doğrulama TXT değeri ekle
+      x-cli:
+        command: dns acme-challenge add
+      parameters: []
+      description: Adds `value` to the TXT record set at `name` (TTL 60); other values stay, so the apex and the wildcard of one certificate can be validated together
+        (max 10 values per name). The service and the zone are found from the name (longest Gyro DNS zone of yours that covers it; hosting/cPanel zones are not supported).
+        Idempotent.
+      x-description-tr: '`value` değerini `name` adındaki TXT kümesine ekler (TTL 60); diğer değerler kalır, böylece bir sertifikanın kök ve joker adları birlikte
+        doğrulanır (ad başına en çok 10 değer). Hizmet ve zone addan bulunur (adı kapsayan en uzun Gyro DNS zone''unuz; hosting/cPanel zone''ları desteklenmez). Tekrarlanabilir.'
+      requestBody: &id010
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: '_acme-challenge.<domain> (for *.example.com: _acme-challenge.example.com)'
+                  x-description-tr: '_acme-challenge.<alan adı> (*.ornek.com için: _acme-challenge.ornek.com)'
+                  example: _acme-challenge.example.com
+                value:
+                  type: string
+                  description: Challenge value (base64url, 16-128 characters)
+                  x-description-tr: Doğrulama değeri (base64url, 16-128 karakter)
+              required:
+              - name
+              - value
+      responses:
+        '202':
+          description: Added
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/AcmeChallenge'
+        '401': *id003
+        '403':
+          description: zone_not_allowed
+        '404': *id004
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422': *id005
+    delete:
+      x-scope: dns_acme
+      tags: *id006
+      operationId: acmeChallengeRemove
+      summary: Remove an ACME challenge TXT value
+      x-summary-tr: ACME doğrulama TXT değerini sil
+      x-cli:
+        command: dns acme-challenge remove
+      parameters:
+      - *id007
+      - *id008
+      description: Removes only `value` (query or JSON body); the record set is deleted when it becomes empty.
+      x-description-tr: Yalnız `value` değerini siler (sorgu ya da JSON gövde); küme boşalınca kayıt silinir.
+      responses:
+        '202':
+          description: Removed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/AcmeChallenge'
+        '401': *id003
+        '403':
+          description: zone_not_allowed
+        '404': *id004
+        '422': *id005
+  /cloud/dns/{id}/acme-challenge:
+    get:
+      x-scope: dns_acme
+      tags: *id006
+      operationId: acmeChallengeStatusS
+      summary: Is the challenge record live? (service)
+      x-summary-tr: Doğrulama kaydı yayında mı?
+      x-cli:
+        command: dns acme-challenge status-in-service
+        hidden: true
+      parameters:
+      - &id009
+        name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Gyro DNS service id
+      - *id007
+      - *id008
+      description: Asks both authoritative name servers (ns1/ns2.gyrodns.net) directly. `ready` is true when both publish `value`. Poll every few seconds after adding
+        (usually < 1 minute).
+      x-description-tr: İki yetkili ad sunucusuna (ns1/ns2.gyrodns.net) doğrudan sorar. İkisi de `value` değerini yayınlıyorsa `ready` true. Ekledikten sonra birkaç
+        saniyede bir sorun (genelde < 1 dk).
+      responses:
+        '200':
+          description: Status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/AcmeChallenge'
+        '401': *id003
+        '403':
+          description: zone_not_allowed / action_not_allowed
+        '404': *id004
+        '422': *id005
+    post:
+      x-scope: dns_acme
+      tags: *id006
+      operationId: acmeChallengeAddS
+      summary: Add an ACME challenge TXT value (service)
+      x-summary-tr: ACME doğrulama TXT değeri ekle
+      x-cli:
+        command: dns acme-challenge add-in-service
+        hidden: true
+      parameters:
+      - *id009
+      description: Adds `value` to the TXT record set at `name` (TTL 60); other values stay, so the apex and the wildcard of one certificate can be validated together
+        (max 10 values per name). The service and the zone are found from the name (longest Gyro DNS zone of yours that covers it; hosting/cPanel zones are not supported).
+        Idempotent.
+      x-description-tr: '`value` değerini `name` adındaki TXT kümesine ekler (TTL 60); diğer değerler kalır, böylece bir sertifikanın kök ve joker adları birlikte
+        doğrulanır (ad başına en çok 10 değer). Hizmet ve zone addan bulunur (adı kapsayan en uzun Gyro DNS zone''unuz; hosting/cPanel zone''ları desteklenmez). Tekrarlanabilir.'
+      requestBody: *id010
+      responses:
+        '202':
+          description: Added
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/AcmeChallenge'
+        '401': *id003
+        '403':
+          description: zone_not_allowed
+        '404': *id004
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422': *id005
+    delete:
+      x-scope: dns_acme
+      tags: *id006
+      operationId: acmeChallengeRemoveS
+      summary: Remove an ACME challenge TXT value (service)
+      x-summary-tr: ACME doğrulama TXT değerini sil
+      x-cli:
+        command: dns acme-challenge remove-in-service
+        hidden: true
+      parameters:
+      - *id009
+      - *id007
+      - *id008
+      description: Removes only `value` (query or JSON body); the record set is deleted when it becomes empty.
+      x-description-tr: Yalnız `value` değerini siler (sorgu ya da JSON gövde); küme boşalınca kayıt silinir.
+      responses:
+        '202':
+          description: Removed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/AcmeChallenge'
+        '401': *id003
+        '403':
+          description: zone_not_allowed
+        '404': *id004
+        '422': *id005
+  /cloud/dns/{id}/acme-keys:
+    parameters:
+    - &id011
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: Gyro DNS service id
+    get:
+      tags: *id006
+      operationId: listAcmeKeys
+      summary: List ACME keys
+      x-summary-tr: ACME anahtarlarını listele
+      x-scope: services_read
+      x-cli:
+        command: dns acme-key list
+      responses:
+        '200':
+          description: Keys
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AcmeKey'
+        '401': *id003
+        '404': *id004
+    post:
+      tags: *id006
+      operationId: createAcmeKey
+      summary: Create an ACME key
+      x-summary-tr: ACME anahtarı oluştur
+      x-scope: services_write
+      x-cli:
+        command: dns acme-key create
+      description: A key for certificate automation that can only add/remove `_acme-challenge` TXT records (scope `dns_acme`), optionally only in `zones` and only
+        from `ips`. It cannot read zones, change other records or reach any other endpoint. The token is returned once. Max 10 per service.
+      x-description-tr: Sertifika otomasyonu için yalnız `_acme-challenge` TXT kaydı ekleyip silebilen anahtar (kapsam `dns_acme`); isteğe bağlı yalnız `zones` içinde
+        ve yalnız `ips` adreslerinden. Zone okuyamaz, başka kayıt değiştiremez, başka uca erişemez. Anahtar bir kez döner. Hizmet başına en çok 10.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  maxLength: 40
+                  description: Label (e.g. web-01)
+                zones:
+                  type: array
+                  items:
+                    type: string
+                  description: Allowed zones (empty = all zones of the service)
+                ips:
+                  type: array
+                  items:
+                    type: string
+                  description: Allowed client IPs (empty = any)
+      responses:
+        '201':
+          description: Created (token shown once)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/AcmeKey'
+        '401': *id003
+        '403':
+          description: subkey_forbidden
+        '404': *id004
+        '422': *id005
+  /cloud/dns/{id}/acme-keys/{kid}:
+    parameters:
+    - *id011
+    - name: kid
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: ACME key id
+    delete:
+      tags: *id006
+      operationId: deleteAcmeKey
+      summary: Delete an ACME key
+      x-summary-tr: ACME anahtarını sil
+      x-scope: services_write
+      x-cli:
+        command: dns acme-key delete
+        confirm: true
+      description: Revokes the key at once.
+      x-description-tr: Anahtarı hemen iptal eder.
+      responses:
+        '200':
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      deleted:
+                        type: boolean
+                      id:
+                        type: integer
+        '401': *id003
+        '404': *id004
   /cloud/mail/{id}/mailboxes:
     get:
       tags:
@@ -6233,55 +6575,55 @@ paths:
                 listen_port:
                   type: integer
                   description: Port the load balancer listens on
-                destination_port: &id006
+                destination_port: &id012
                   type: integer
                   description: Port on the targets
-                proxyprotocol: &id007
+                proxyprotocol: &id013
                   type: boolean
                   description: Send PROXY protocol header to targets
-                hc_protocol: &id008
+                hc_protocol: &id014
                   type: string
                   enum:
                   - tcp
                   - http
                   description: Health check type
-                hc_port: &id009
+                hc_port: &id015
                   type: integer
-                hc_interval: &id010
+                hc_interval: &id016
                   type: integer
                   description: 3-60 s
-                hc_timeout: &id011
+                hc_timeout: &id017
                   type: integer
                   description: 1-30 s, below interval
-                hc_retries: &id012
+                hc_retries: &id018
                   type: integer
                   description: 0-5
-                hc_path: &id013
+                hc_path: &id019
                   type: string
                   description: HTTP check path (starts with /)
-                hc_domain: &id014
+                hc_domain: &id020
                   type: string
                   description: HTTP check Host header
-                hc_status_codes: &id015
+                hc_status_codes: &id021
                   type: string
                   description: Comma separated, e.g. 2??,3??
-                hc_tls: &id016
+                hc_tls: &id022
                   type: boolean
                   description: HTTP check over TLS
-                sticky: &id017
+                sticky: &id023
                   type: boolean
                   description: Sticky sessions (cookie)
-                cookie_name: &id018
+                cookie_name: &id024
                   type: string
-                cookie_lifetime: &id019
+                cookie_lifetime: &id025
                   type: integer
-                idle_timeout: &id020
+                idle_timeout: &id026
                   type: integer
                   description: Idle timeout (s)
-                certificates: &id021
+                certificates: &id027
                   type: string
                   description: 'HTTPS: comma separated certificate ids of this load balancer'
-                redirect_http: &id022
+                redirect_http: &id028
                   type: boolean
                   description: 'HTTPS: redirect port 80 to HTTPS (port 80 must be free)'
                 confirm:
@@ -6340,23 +6682,23 @@ paths:
             schema:
               type: object
               properties:
-                destination_port: *id006
-                proxyprotocol: *id007
-                hc_protocol: *id008
-                hc_port: *id009
-                hc_interval: *id010
-                hc_timeout: *id011
-                hc_retries: *id012
-                hc_path: *id013
-                hc_domain: *id014
-                hc_status_codes: *id015
-                hc_tls: *id016
-                sticky: *id017
-                cookie_name: *id018
-                cookie_lifetime: *id019
-                idle_timeout: *id020
-                certificates: *id021
-                redirect_http: *id022
+                destination_port: *id012
+                proxyprotocol: *id013
+                hc_protocol: *id014
+                hc_port: *id015
+                hc_interval: *id016
+                hc_timeout: *id017
+                hc_retries: *id018
+                hc_path: *id019
+                hc_domain: *id020
+                hc_status_codes: *id021
+                hc_tls: *id022
+                sticky: *id023
+                cookie_name: *id024
+                cookie_lifetime: *id025
+                idle_timeout: *id026
+                certificates: *id027
+                redirect_http: *id028
                 confirm:
                   type: boolean
               required: []
@@ -8101,53 +8443,53 @@ paths:
                   type: string
                   description: Service name
                   x-description-tr: Servis adı
-                image: &id023
+                image: &id029
                   type: string
                   description: Image reference, e.g. ghcr.io/acme/web:1.4 (public registries or your private registry)
                   x-description-tr: İmaj, ör. ghcr.io/firma/web:1.4
-                port: &id024
+                port: &id030
                   type: integer
                   description: 'Container port (0 = no network port). Containers run as a non-root user: use a port >= 1024'
                   x-description-tr: 'Kapsayıcı portu (0 = port yok). Kök olmayan kullanıcı: 1024 üstü port'
-                replicas: &id025
+                replicas: &id031
                   type: integer
                   description: Number of instances (default 1)
                   x-description-tr: Örnek sayısı (varsayılan 1)
-                cpu_m: &id026
+                cpu_m: &id032
                   type: integer
                   description: CPU per instance in millicores (250 = 0.25 vCPU)
                   x-description-tr: Örnek başına işlemci (milicore, 250 = 0,25 vCPU)
-                memory_mi: &id027
+                memory_mi: &id033
                   type: integer
                   description: Memory per instance in MiB
                   x-description-tr: Örnek başına bellek (MiB)
-                public: &id028
+                public: &id034
                   type: boolean
                   description: HTTPS address <name>-<code>.gyroapp.net (and your domains)
                   x-description-tr: HTTPS adres <ad>-<kod>.gyroapp.net
-                health_path: &id029
+                health_path: &id035
                   type: string
                   description: HTTP health check path (empty = TCP check)
                   x-description-tr: HTTP sağlık yolu (boş = TCP)
-                args: &id030
+                args: &id036
                   type: array
                   items:
                     type: string
                   description: Arguments for the image's default command
                   x-description-tr: İmajın komutuna argümanlar
-                command: &id031
+                command: &id037
                   type: array
                   items:
                     type: string
                   description: Override the image entrypoint
                   x-description-tr: İmajın giriş komutunu değiştir
-                env: &id032
+                env: &id038
                   type: object
                   additionalProperties:
                     type: string
                   description: Plain environment variables (replaces the whole set on update)
                   x-description-tr: Ortam değişkenleri (güncellemede tamamı değişir)
-                run_as_user: &id033
+                run_as_user: &id039
                   type: integer
                   description: User id inside the container (default 10001)
                   x-description-tr: Kapsayıcı içi kullanıcı kimliği (varsayılan 10001)
@@ -8250,17 +8592,17 @@ paths:
             schema:
               type: object
               properties:
-                image: *id023
-                port: *id024
-                replicas: *id025
-                cpu_m: *id026
-                memory_mi: *id027
-                public: *id028
-                health_path: *id029
-                args: *id030
-                command: *id031
-                env: *id032
-                run_as_user: *id033
+                image: *id029
+                port: *id030
+                replicas: *id031
+                cpu_m: *id032
+                memory_mi: *id033
+                public: *id034
+                health_path: *id035
+                args: *id036
+                command: *id037
+                env: *id038
+                run_as_user: *id039
                 reason:
                   type: string
                   description: Free text shown in the revision history (e.g. a git sha)
@@ -9582,7 +9924,7 @@ paths:
                   type: boolean
   /cloud/security-groups:
     get:
-      tags: &id034
+      tags: &id040
       - Security groups
       operationId: listSecurityGroups
       summary: List security groups
@@ -9604,7 +9946,7 @@ paths:
                       $ref: '#/components/schemas/SecurityGroup'
         '401': *id003
     post:
-      tags: *id034
+      tags: *id040
       operationId: createSecurityGroup
       summary: Create a security group
       x-summary-tr: Güvenlik grubu oluştur
@@ -9644,7 +9986,7 @@ paths:
         '422': *id005
   /cloud/security-groups/{sg}:
     parameters:
-    - &id035
+    - &id041
       name: sg
       in: path
       required: true
@@ -9652,7 +9994,7 @@ paths:
         type: string
         pattern: ^sg-[a-f0-9]{8}$
     get:
-      tags: *id034
+      tags: *id040
       operationId: getSecurityGroup
       summary: Get a security group
       x-summary-tr: Güvenlik grubunu getir
@@ -9672,7 +10014,7 @@ paths:
         '401': *id003
         '404': *id004
     patch:
-      tags: *id034
+      tags: *id040
       operationId: updateSecurityGroup
       summary: Rename / describe a security group
       x-summary-tr: Güvenlik grubunun adını / açıklamasını değiştir
@@ -9706,7 +10048,7 @@ paths:
         '404': *id004
         '422': *id005
     delete:
-      tags: *id034
+      tags: *id040
       operationId: deleteSecurityGroup
       summary: Delete a security group
       x-summary-tr: Güvenlik grubunu sil
@@ -9736,9 +10078,9 @@ paths:
         '422': *id005
   /cloud/security-groups/{sg}/rules:
     parameters:
-    - *id035
+    - *id041
     put:
-      tags: *id034
+      tags: *id040
       operationId: putSecurityGroupRules
       summary: Replace the rules of a security group
       x-summary-tr: Güvenlik grubunun kurallarını değiştir
@@ -9792,9 +10134,9 @@ paths:
         '422': *id005
   /cloud/security-groups/{sg}/confirm:
     parameters:
-    - *id035
+    - *id041
     post:
-      tags: *id034
+      tags: *id040
       operationId: confirmSecurityGroup
       summary: Make the running rule trial permanent
       x-summary-tr: Kural denemesini kalıcı yap
@@ -9816,10 +10158,10 @@ paths:
         '422': *id005
   /cloud/servers/{id}/security-groups:
     parameters:
-    - &id036
+    - &id042
       $ref: '#/components/parameters/ServerId'
     get:
-      tags: *id034
+      tags: *id040
       operationId: listServerSecurityGroups
       summary: Security groups attached to a server
       x-summary-tr: Sunucuya bağlı güvenlik grupları
@@ -9841,7 +10183,7 @@ paths:
         '409':
           description: firewall_not_enabled
     put:
-      tags: *id034
+      tags: *id040
       operationId: setServerSecurityGroups
       summary: Set the exact list of attached groups
       x-summary-tr: Bağlı grupları tam liste olarak ayarla
@@ -9883,10 +10225,10 @@ paths:
         '422': *id005
   /cloud/servers/{id}/security-groups/{sg}:
     parameters:
-    - *id036
-    - *id035
+    - *id042
+    - *id041
     post:
-      tags: *id034
+      tags: *id040
       operationId: attachSecurityGroup
       summary: Attach a security group to a server
       x-summary-tr: Güvenlik grubunu sunucuya bağla
@@ -9909,7 +10251,7 @@ paths:
           description: firewall_not_enabled
         '422': *id005
     delete:
-      tags: *id034
+      tags: *id040
       operationId: detachSecurityGroup
       summary: Detach a security group from a server
       x-summary-tr: Güvenlik grubunu sunucudan ayır
@@ -16144,7 +16486,7 @@ components:
       description: "Client API key. Scopes: `Module:Addons/GyroAPI/cloud_read`, `.../cloud_write`, `.../cloud_order` (spends balance),\n`.../cloud_delete`, plus core\
         \ scopes such as `Invoices/GetInvoices`, `Balance/GetBalance`. Optional IP allow list per key.\nDefault limit 60 requests per minute per key (`X-RateLimit-*`\
         \ headers, `429` with `Retry-After`).\n v2 scopes: `services_read`, `services_write`, `webhooks`, `keys`, `reseller`, `billing_pay`, `billing_read`, `users`\
-        \ (all under `Module:Addons/GyroAPI/`)."
+        \ (all under `Module:Addons/GyroAPI/`). ACME keys carry only `dns_acme`."
   parameters:
     ServerId:
       name: id
@@ -17586,6 +17928,70 @@ components:
                 additionalProperties: true
             private_network:
               type: boolean
+    AcmeKey:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        token_prefix:
+          type: string
+        service_id:
+          type: integer
+        zones:
+          type:
+          - array
+          - 'null'
+          items:
+            type: string
+          description: Allowed zones (null = every zone of the service)
+        ips:
+          type: array
+          items:
+            type: string
+        status:
+          type: string
+        created_at:
+          type: string
+        last_used_at:
+          type:
+          - string
+          - 'null'
+        token:
+          type: string
+          description: Only in the create answer, shown once
+          x-description-tr: Yalnız oluşturma yanıtında, bir kez
+    AcmeChallenge:
+      type: object
+      properties:
+        service_id:
+          type: integer
+        zone:
+          type: string
+        name:
+          type: string
+        status:
+          type: string
+          description: accepted (add/remove)
+        values:
+          type: integer
+          description: Values now at the name
+        changed:
+          type: boolean
+        ready:
+          type: boolean
+          description: 'Status: both name servers publish `value`'
+        nameservers:
+          type: object
+          additionalProperties:
+            type:
+            - array
+            - 'null'
+            items:
+              type: string
+        ttl:
+          type: integer
     StorageCorsRule:
       type: object
       additionalProperties: false

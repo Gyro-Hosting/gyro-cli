@@ -32,6 +32,8 @@ gyro dns [flags]
 ### SEE ALSO
 
 * [gyro](gyro.md)	 - Gyro Hosting command-line interface
+* [gyro dns acme-challenge](gyro_dns_acme-challenge.md)	 - Add an ACME challenge TXT value
+* [gyro dns acme-key](gyro_dns_acme-key.md)	 - List ACME keys
 * [gyro dns dnssec](gyro_dns_dnssec.md)	 - Disable DNSSEC
 * [gyro dns health](gyro_dns_health.md)	 - List health-checked records
 * [gyro dns record](gyro_dns_record.md)	 - List, add, change and delete DNS records

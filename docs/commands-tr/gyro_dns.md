@@ -32,6 +32,8 @@ gyro dns [flags]
 ### SEE ALSO
 
 * [gyro](gyro.md)	 - Gyro Hosting komut satırı aracı
+* [gyro dns acme-challenge](gyro_dns_acme-challenge.md)	 - ACME doğrulama TXT değeri ekle
+* [gyro dns acme-key](gyro_dns_acme-key.md)	 - ACME anahtarlarını listele
 * [gyro dns dnssec](gyro_dns_dnssec.md)	 - DNSSEC kapat
 * [gyro dns health](gyro_dns_health.md)	 - Sağlık kontrollü kayıtları listele
 * [gyro dns record](gyro_dns_record.md)	 - DNS kayıtlarını listele, ekle, değiştir, sil
