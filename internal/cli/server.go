@@ -158,6 +158,8 @@ type serverDoc struct {
 	IPv4        *string `json:"ipv4"`
 	IPv6        *string `json:"ipv6"`
 	Provisioned bool    `json:"provisioned"`
+	Region      string  `json:"region"`
+	ProductID   int64   `json:"product_id"`
 	Live        *struct {
 		PowerState string  `json:"power_state"`
 		Locked     bool    `json:"locked"`
@@ -416,13 +418,22 @@ func locText(l string) string {
 	return l
 }
 
-func (a *App) resolveImage(ctx context.Context, img string) (string, error) {
+// resolveImage checks an image slug against GET /cloud/images; with region / product (API 2.10.0+) only the images
+// offered there (older APIs ignore the filters and return the global list).
+func (a *App) resolveImage(ctx context.Context, img, region string, productID int64) (string, error) {
 	c, err := a.Client()
 	if err != nil {
 		return "", err
 	}
+	q := url.Values{}
+	if region != "" {
+		q.Set("region", region)
+	}
+	if productID > 0 {
+		q.Set("product_id", fmt.Sprint(productID))
+	}
 	var imgs []struct{ Slug, Name string }
-	if _, err := c.Get(ctx, "/cloud/images", nil, &imgs); err != nil {
+	if _, err := c.Get(ctx, "/cloud/images", q, &imgs); err != nil {
 		return "", err
 	}
 	var slugs []string
@@ -510,7 +521,7 @@ func appField(op *spec.Op) string {
 }
 
 func addServerCreate(a *App, srv *cobra.Command) {
-	var plan, loc, image, hostname, cycle, userData, app, data, idem string
+	var plan, loc, region, image, hostname, cycle, userData, app, data, idem string
 	var keys, set []string
 	var wait, dry bool
 	var waitFor time.Duration
@@ -522,21 +533,25 @@ the order is paid from your account balance, never from a card. An idempotency k
 automatically, so a retried command never orders twice.
 
 --plan accepts a plan name (standart-2-4, pro-2-8 ...) or a product id (see 'gyro plan list').
---location accepts a region (eu-de-1, see 'gyro location list') or a city (falkenstein).`,
+--region (or --location) accepts a region (eu-de-1, tr-ist-1, see 'gyro location list') or a city (falkenstein, istanbul).
+In tr-ist-1 (Istanbul) up to 10 --ssh-key values are installed for root shortly after the server first boots.`,
 			`Bulut sunucu siparişi verir. Önce API'den fiyat teklifi gösterilir ve onay istenir; ödeme kart değil
 hesap bakiyesinden yapılır. Komuta otomatik tekrar güvenliği anahtarı eklenir, tekrar denenen komut
 iki kez sipariş vermez.
 
 --plan: plan adı (standart-2-4, pro-2-8 ...) ya da ürün kimliği ('gyro plan list').
---location: bölge (eu-de-1, 'gyro location list') ya da şehir (falkenstein).`),
+--region (ya da --location): bölge (eu-de-1, tr-ist-1, 'gyro location list') ya da şehir (falkenstein, istanbul).
+tr-ist-1'de (İstanbul) en çok 10 --ssh-key, sunucu ilk açıldıktan kısa süre sonra root için yüklenir.`),
 		Example: `  gyro server create web-1 --plan pro-2-8 --location falkenstein --image ubuntu-24.04 --ssh-key mykey --wait
   gyro server create --plan standart-2-4 --location eu-de-1 --image debian-12 --ssh-key ~/.ssh/id_ed25519.pub --dry-run
-  gyro server create db-1 --plan standart-2-4 --location eu-de-2 --image ubuntu-24.04 --user-data @cloud-init.yaml --yes -o json`,
+  gyro server create db-1 --plan standart-2-4 --location eu-de-2 --image ubuntu-24.04 --user-data @cloud-init.yaml --yes -o json
+  gyro server create ist-1 --plan standart-2-4 --region tr-ist-1 --image ubuntu-24.04 --ssh-key mykey --wait`,
 		Args: cobra.MaximumNArgs(1),
 	}
 	f := cmd.Flags()
 	f.StringVar(&plan, "plan", "", i18n.S("plan name or product id (required)", "plan adı ya da ürün kimliği (zorunlu)"))
 	f.StringVar(&loc, "location", "", i18n.S("region (eu-de-1) or city", "bölge (eu-de-1) ya da şehir"))
+	f.StringVar(&region, "region", "", i18n.S("region (eu-de-1, tr-ist-1); same as --location", "bölge (eu-de-1, tr-ist-1); --location ile aynı"))
 	f.StringVar(&image, "image", "", i18n.S("OS image slug, e.g. ubuntu-24.04 (required)", "işletim sistemi imajı, ör. ubuntu-24.04 (zorunlu)"))
 	f.StringVar(&hostname, "hostname", "", i18n.S("host name (or give it as the argument)", "sunucu adı (ya da argüman olarak verin)"))
 	f.StringSliceVar(&keys, "ssh-key", nil, i18n.S("SSH key id, name or .pub file (uploaded if new)", "SSH anahtarı kimliği, adı ya da .pub dosyası (yeniyse yüklenir)"))
@@ -553,6 +568,7 @@ iki kez sipariş vermez.
 	_ = cmd.MarkFlagRequired("image")
 	_ = cmd.RegisterFlagCompletionFunc("cycle", fixedCompletion("monthly", "quarterly", "semiannually", "annually"))
 	_ = cmd.RegisterFlagCompletionFunc("location", completeField(a, "/cloud/locations", "region"))
+	_ = cmd.RegisterFlagCompletionFunc("region", completeField(a, "/cloud/locations", "region"))
 	_ = cmd.RegisterFlagCompletionFunc("image", completeField(a, "/cloud/images", "slug"))
 	_ = cmd.RegisterFlagCompletionFunc("ssh-key", completeField(a, "/cloud/ssh-keys", "name"))
 	_ = cmd.RegisterFlagCompletionFunc("plan", func(*cobra.Command, []string, string) ([]string, cobra.ShellCompDirective) {
@@ -572,6 +588,12 @@ iki kez sipariş vermez.
 			hostname = args[0]
 		}
 		op := spec.ByID("createServer")
+		if region != "" {
+			if loc != "" && !strings.EqualFold(loc, region) {
+				return &ExitErr{ExitUsage, fmt.Errorf("%s", i18n.S("give the region once (--region or --location)", "bölgeyi bir kez verin (--region ya da --location)"))}
+			}
+			loc = region
+		}
 		code, err := a.resolveLocation(ctx, loc)
 		if err != nil {
 			return err
@@ -580,7 +602,7 @@ iki kez sipariş vermez.
 		if err != nil {
 			return err
 		}
-		img, err := a.resolveImage(ctx, image)
+		img, err := a.resolveImage(ctx, image, code, prod.ID)
 		if err != nil {
 			return err
 		}
@@ -651,6 +673,10 @@ iki kez sipariş vermez.
 			Tax     map[string]any `json:"tax"`
 			Balance map[string]any `json:"balance"`
 			Cycle   string         `json:"cycle"`
+			Prepaid *struct {
+				Hourly float64 `json:"hourly_eur"`
+				Cap    float64 `json:"monthly_cap_eur"`
+			} `json:"prepaid"`
 		}
 		var wrapped struct {
 			Quote *json.RawMessage `json:"quote"`
@@ -660,18 +686,32 @@ iki kez sipariş vermez.
 		} else {
 			_ = json.Unmarshal(qresp.Data, &quote)
 		}
+		if quote.Prepaid != nil {
+			cycle = "prepaid" // no billing cycle: printQuote skips the order price line
+		}
 		if dry {
 			if a.Machine() || a.Opt.Query != "" {
 				return a.PrintRaw(qresp.Data, nil, "")
 			}
 			printQuote(a, prod, img, hostname, quote.Total, quote.Tax, quote.Balance, cycle)
+			if quote.Prepaid != nil {
+				fmt.Fprintf(a.Err, "  %-12s %.4f EUR / %s (%s %.2f EUR)\n", i18n.S("Prepaid", "Ön ödemeli")+":", quote.Prepaid.Hourly, i18n.S("hour", "saat"), i18n.S("monthly at most", "aylık en çok"), quote.Prepaid.Cap)
+			}
 			a.Info("%s", i18n.S("Dry run: nothing was ordered.", "Deneme: sipariş verilmedi."))
 			return nil
 		}
 		if !a.Machine() {
 			printQuote(a, prod, img, hostname, quote.Total, quote.Tax, quote.Balance, cycle)
 		}
-		if err := a.Confirm(i18n.F("Order this server and pay %s from your balance?", "Bu sunucu sipariş edilip bakiyenizden %s ödensin mi?", output.Scalar(quote.Total))); err != nil {
+		if quote.Prepaid != nil {
+			// prepaid (e.g. tr-ist-1): no order total, usage is charged hourly from the balance
+			if !a.Machine() {
+				fmt.Fprintf(a.Err, "  %-12s %.4f EUR / %s (%s %.2f EUR)\n", i18n.S("Prepaid", "Ön ödemeli")+":", quote.Prepaid.Hourly, i18n.S("hour", "saat"), i18n.S("monthly at most", "aylık en çok"), quote.Prepaid.Cap)
+			}
+			if err := a.Confirm(i18n.F("Order this server? It is charged hourly from your balance (%.4f EUR/hour, at most %.2f EUR a month).", "Bu sunucu sipariş edilsin mi? Bakiyenizden saatlik düşülür (%.4f EUR/saat, ayda en çok %.2f EUR).", quote.Prepaid.Hourly, quote.Prepaid.Cap)); err != nil {
+				return err
+			}
+		} else if err := a.Confirm(i18n.F("Order this server and pay %s from your balance?", "Bu sunucu sipariş edilip bakiyenizden %s ödensin mi?", output.Scalar(quote.Total))); err != nil {
 			return err
 		}
 		body["confirm"] = true
@@ -740,8 +780,10 @@ func printQuote(a *App, p *product, img, host string, total, tax, balance map[st
 	if host != "" {
 		fmt.Fprintf(w, "  %-12s %s\n", i18n.S("Hostname", "Ad")+":", host)
 	}
-	fmt.Fprintf(w, "  %-12s %s / %s\n", i18n.S("Price", "Fiyat")+":", output.Scalar(total), cycle)
-	if tax != nil {
+	if cycle != "prepaid" {
+		fmt.Fprintf(w, "  %-12s %s / %s\n", i18n.S("Price", "Fiyat")+":", output.Scalar(total), cycle)
+	}
+	if tax != nil && cycle != "prepaid" {
 		fmt.Fprintf(w, "  %-12s %s\n", i18n.S("Tax", "Vergi")+":", output.Scalar(tax))
 	}
 	if balance != nil {
@@ -1001,7 +1043,11 @@ func addServerMaintenance(a *App, srv *cobra.Command) {
 		Args:  cobra.ExactArgs(1), ValidArgsFunction: completeServers(a),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx, cancel := a.Ctx()
-			img, err := a.resolveImage(ctx, image)
+			reg, pid := "", int64(0)
+			if s, err := a.fetchServer(ctx, args[0]); err == nil && s != nil {
+				reg, pid = s.Region, s.ProductID
+			}
+			img, err := a.resolveImage(ctx, image, reg, pid)
 			cancel()
 			if err != nil {
 				return err

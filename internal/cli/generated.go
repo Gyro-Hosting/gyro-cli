@@ -168,6 +168,7 @@ var groupShorts = map[string][2]string{
 	"activity":  {"Write log of your API keys", "API anahtarlarınızın yazma kaydı"},
 	"image":     {"Operating system images", "İşletim sistemi imajları"},
 	"location":  {"Locations", "Lokasyonlar"},
+	"container": {"Gyro Containers (ECS), Istanbul: services, versions, logs, domains", "Gyro Kapsayıcı (ECS), İstanbul: servisler, sürümler, loglar, alan adları"},
 }
 
 // fillGroupShorts gives auto-created groups a description taken from their list/get child.

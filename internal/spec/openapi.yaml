@@ -2,7 +2,7 @@
 openapi: 3.1.0
 info:
   title: Gyro Public API
-  version: 2.9.0
+  version: 2.11.0
   summary: Manage Gyro cloud servers, SSH keys and billing programmatically.
   x-summary-tr: Gyro bulut sunucularınızı, SSH anahtarlarınızı ve faturalarınızı programla yönetin.
   description: "The Gyro Public API lets you automate everything you do in the Gyro client area:\norder and manage cloud servers, keep SSH keys, read invoices and\
@@ -10,13 +10,19 @@ info:
     * **Authentication** `Authorization: Bearer wck_...` (create keys in *Client area → account menu (top right) → API Credentials*)\n* **Format** JSON in, JSON out.\
     \ Successful answers are `{\"data\": ..., \"meta\": ...}`; errors are\n  `{\"error\": {\"code\", \"message\", \"details\"}}`.\n\n**v2**: every product line through\
     \ the generic service bridge (`/cloud/services`), webhooks, sub-account keys, reseller (bayi) end-customers, and the complete core client API (domains, DNS, tickets,\
-    \ orders, invoices, account) under the same key.\n"
+    \ orders, invoices, account) under the same key.\n\n**2.10.0**: region `tr-ist-1` (Gyro Cloud Istanbul) on the same `/cloud/servers` endpoints, CLI commands and\
+    \ Terraform resources; `GET /cloud/images?region=`; SSH keys installed after first boot in tr-ist-1 (`ssh_keys` on the server).\n\n**2.11.0**: prepaid hourly\
+    \ billing from the account balance for Gyro Containers (ECS) and Gyro Cloud Istanbul (`billing: prepaid` on products and servers; `/cloud/billing/balance|usage|statement/{month}|estimate|topup-url`);\
+    \ `/cloud/containers` (Gyro Containers).\n"
   x-description-tr: "Gyro Public API, müşteri panelinde yaptığınız her işi otomatikleştirmenizi sağlar:\nbulut sunucu siparişi ve yönetimi, SSH anahtarları, fatura\
     \ ve bakiye okuma.\nResmi Terraform sağlayıcısı (`gyro-hosting/gyro`) ve `gyroctl` bu API'yi kullanır.\n\n* **Taban adres** `https://www.gyrohosting.com/api/v1/client`\n\
     * **Kimlik** `Authorization: Bearer wck_...` (anahtarı *Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri* bölümünden oluşturun)\n* **Biçim** JSON\
     \ gönderilir, JSON döner. Başarılı yanıt `{\"data\": ..., \"meta\": ...}`, hata\n  `{\"error\": {\"code\", \"message\", \"details\"}}` biçimindedir.\n\n**v2**:\
     \ genel hizmet köprüsüyle tüm ürün hatları (`/cloud/services`), webhook'lar, alt hesap anahtarları, bayi uç-müşterileri ve aynı anahtarla çekirdek müşteri API'sinin\
-    \ tamamı (alan adı, DNS, destek, sipariş, fatura, hesap).\n"
+    \ tamamı (alan adı, DNS, destek, sipariş, fatura, hesap).\n\n**2.10.0**: aynı `/cloud/servers` uçları, CLI komutları ve Terraform kaynaklarıyla `tr-ist-1` bölgesi\
+    \ (Gyro Bulut İstanbul); `GET /cloud/images?region=`; tr-ist-1'de SSH anahtarları ilk açılıştan sonra yüklenir (sunucuda `ssh_keys`).\n\n**2.11.0**: Gyro Kapsayıcı\
+    \ (ECS) ve Gyro Bulut İstanbul için bakiyeden saatlik ön ödemeli faturalama (ürün ve sunucularda `billing: prepaid`; `/cloud/billing/balance|usage|statement/{month}|estimate|topup-url`);\
+    \ `/cloud/containers` (Gyro Kapsayıcı).\n"
   contact:
     name: Gyro Hosting
     url: https://www.gyrohosting.com
@@ -115,6 +121,12 @@ tags:
   description: 'Managed L4/L7 load balancer for your cloud servers: services, health checks, targets, free Let''s Encrypt certificates, metrics. EU regions.'
   x-description-tr: 'Bulut sunucularınız için yönetilen L4/L7 yük dengeleyici: servisler, sağlık kontrolü, hedefler, ücretsiz Let''s Encrypt sertifikası, ölçümler.
     AB bölgeleri.'
+- name: Containers
+  description: 'Gyro Containers (ECS), Istanbul tr-ist-1: run Docker images on a node pool dedicated to you (no other customer''s containers on your nodes). Services
+    with zero-downtime deploys, revision history and rollback, scaling, environment variables and encrypted secrets, HTTPS address <name>-<code>.gyroapp.net plus
+    your own domains (free certificates), logs and metrics. Order the environment like any product (`/cloud/services` lists it); manage it here.'
+  x-description-tr: 'Gyro Kapsayıcı (ECS), İstanbul tr-ist-1: Docker imajlarını size ayrılmış düğüm havuzunda çalıştırın. Kesintisiz dağıtım, sürüm geçmişi ve geri
+    alma, ölçekleme, ortam değişkenleri ve şifreli gizli değerler, <ad>-<kod>.gyroapp.net HTTPS adresi ve kendi alan adlarınız (ücretsiz sertifika), loglar ve grafikler.'
 - name: Managed DNS
   description: 'Authoritative DNS on ns1.gyrodns.net (Istanbul) + ns2.gyrodns.net (Germany): zones, records (A/AAAA/CNAME/MX/TXT/SRV/CAA/ALIAS/NS/PTR), BIND import/export,
     one-click DNSSEC, health-checked failover records.'
@@ -321,6 +333,32 @@ paths:
                       $ref: '#/components/schemas/Image'
         '401':
           $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/Validation'
+      parameters:
+      - name: region
+        in: query
+        required: false
+        schema:
+          type: string
+          example: tr-ist-1
+        description: 'Only images offered in this region (e.g. tr-ist-1). Without it: the images of the global cloud catalogue (unchanged).'
+        x-description-tr: Yalnız bu bölgede sunulan imajlar (ör. tr-ist-1). Verilmezse küresel bulut kataloğunun imajları (değişmedi).
+      - name: product_id
+        in: query
+        required: false
+        schema:
+          type: integer
+        description: Only the images offered on this product (implies its region).
+        x-description-tr: Yalnız bu üründe sunulan imajlar (ürünün bölgesini de seçer).
+      - name: plan
+        in: query
+        required: false
+        schema:
+          type: string
+          example: standart-2-4
+        description: 'With region: only the images of this plan in that region.'
+        x-description-tr: 'region ile: bu bölgedeki bu planın imajları.'
   /cloud/ssh-keys:
     get:
       tags:
@@ -499,7 +537,10 @@ paths:
       description: "Places an order and pays it **from your account balance** (never from a stored card).\nSafety rules:\n* send `\"dry_run\": true` first to get\
         \ a price quote; nothing is created;\n* a real order needs `\"confirm\": true` **and** an `Idempotency-Key` header — retrying with the\n  same key and body\
         \ returns the first answer (`Idempotency-Replayed: true`) instead of a second order;\n* the operator may cap the number of servers per account (`409 server_limit`).\n\
-        Provisioning is asynchronous (typically under a minute): poll `GET /cloud/servers/{id}` until\n`status` is `active` and `live.power_state` is `running`.\n"
+        Provisioning is asynchronous (typically under a minute): poll `GET /cloud/servers/{id}` until\n`status` is `active` and `live.power_state` is `running`.\n\
+        \n**Prepaid products** (`billing: prepaid`, e.g. tr-ist-1): `cycle` is ignored; the order total is 0 and usage is charged hourly from the balance (at most\
+        \ the monthly price per month). The balance must cover the first 24 hours, otherwise 422 with the amount to top up (GET /cloud/billing/topup-url). During\
+        \ the first 7 days a new account may run at most 2 prepaid servers and 1 container environment."
       x-description-tr: "Sipariş oluşturur ve **hesap bakiyenizden** öder (kayıtlı karttan asla çekmez).\nGüvenlik kuralları:\n* önce `\"dry_run\": true` ile fiyat\
         \ teklifi alın; hiçbir şey oluşturulmaz;\n* gerçek sipariş için `\"confirm\": true` **ve** `Idempotency-Key` başlığı zorunludur — aynı anahtar ve\n  gövdeyle\
         \ tekrar denemek ikinci sipariş yerine ilk yanıtı döndürür (`Idempotency-Replayed: true`);\n* yönetici hesap başına sunucu sınırı koyabilir (`409 server_limit`).\n\
@@ -712,12 +753,20 @@ paths:
 
         (idempotent answers are stored for replay, secrets never are; you then get `root_password_withheld: true`).
 
+
+        **Region tr-ist-1**: poweron, shutdown, reboot, poweroff (same as shutdown), rebuild and reset_password are available; reset, enable_rescue and disable_rescue
+        answer 422 `action_not_supported`. rebuild accepts the images of the server''s own product (GET /cloud/images?region=tr-ist-1).
+
         '
       x-description-tr: 'Ağır işlemler (yeniden kurulum, reset, kurtarma, snapshot''tan dönüş, parola sıfırlama) sunucu başına günlük sınırlıdır.
 
         Tek seferlik `root_password` yalnız istekte `Idempotency-Key` **yoksa** döner (tekrar için saklanan yanıtlara sır yazılmaz;
 
         bu durumda `root_password_withheld: true` görürsünüz).
+
+
+        **tr-ist-1 bölgesi**: poweron, shutdown, reboot, poweroff (shutdown ile aynı), rebuild ve reset_password var; reset, enable_rescue ve disable_rescue 422 `action_not_supported`
+        döner. rebuild sunucunun kendi ürününün imajlarını kabul eder.
 
         '
       x-scope: cloud_write
@@ -780,6 +829,7 @@ paths:
                         description: Snapshot space bought as an add-on (0 = none)
         '404':
           $ref: '#/components/responses/NotFound'
+      description: 'tr-ist-1: `quota` = number of snapshots allowed on the plan (add-on), snapshot ids are stable numbers derived by the API.'
     post:
       tags:
       - Snapshots and backups
@@ -892,6 +942,7 @@ paths:
                           $ref: '#/components/schemas/Snapshot'
         '404':
           $ref: '#/components/responses/NotFound'
+      description: 'tr-ist-1: always `enabled: false`.'
     post:
       tags:
       - Snapshots and backups
@@ -906,6 +957,7 @@ paths:
           $ref: '#/components/responses/NotFound'
         '422':
           $ref: '#/components/responses/Validation'
+      description: Not available in tr-ist-1 (422 `not_supported_in_region`; use snapshots).
   /cloud/servers/{id}/metrics:
     parameters:
     - $ref: '#/components/parameters/ServerId'
@@ -1046,7 +1098,8 @@ paths:
       operationId: getFirewall
       summary: Inbound firewall rules
       x-summary-tr: Gelen trafik güvenlik duvarı kuralları
-      description: Read-only in v1. An empty list means no Gyro firewall is applied (all inbound traffic reaches the server).
+      description: 'Read-only in v1. An empty list means no Gyro firewall is applied (all inbound traffic reaches the server). tr-ist-1: rules come from the network
+        firewall add-on (security groups); without the add-on the list is empty and writes answer 409 `firewall_not_enabled`.'
       x-description-tr: v1'de salt okunur. Boş liste Gyro güvenlik duvarı uygulanmadığı (tüm gelen trafiğin sunucuya ulaştığı) anlamına gelir.
       x-scope: cloud_read
       responses:
@@ -1731,8 +1784,10 @@ paths:
       operationId: openConsole
       summary: Open a one-time VNC console ticket
       x-summary-tr: Tek seferlik VNC konsol bileti al
-      description: Returns a websocket URL and password valid for about a minute. Never send an Idempotency-Key here (400).
-      x-description-tr: Yaklaşık bir dakika geçerli websocket adresi ve parola döner. Idempotency-Key göndermeyin (400).
+      description: 'Returns a websocket URL and password valid for about a minute. Never send an Idempotency-Key here (400). In tr-ist-1 the ticket is a WebMKS websocket
+        (`protocol: webmks`, empty password: the URL is the one-time secret).'
+      x-description-tr: 'Yaklaşık bir dakika geçerli websocket adresi ve parola döner. Idempotency-Key göndermeyin (400). tr-ist-1''de bilet WebMKS websocket''idir
+        (`protocol: webmks`, parola boş: adresin kendisi tek seferlik sırdır).'
       x-scope: cloud_write
       responses:
         '201':
@@ -7962,6 +8017,1491 @@ paths:
       x-cli:
         command: dns health delete
         confirm: true
+  /cloud/containers/{id}/services:
+    get:
+      tags:
+      - Containers
+      operationId: typed_get_containers__id__services
+      summary: List container services
+      x-summary-tr: Kapsayıcı servislerini listele
+      x-scope: services_read
+      description: Services of the environment with state (running, deploying, failing, pending, stopped, suspended), ready/desired instances, size and public URL.
+      x-description-tr: 'Ortamdaki servisler: durum, hazır/istenen örnek, boyut, genel adres.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      responses:
+        '200':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      x-cli:
+        command: container service list
+        confirm: false
+    post:
+      tags:
+      - Containers
+      operationId: typed_post_containers__id__services
+      summary: Create a container service
+      x-summary-tr: Kapsayıcı servisi oluştur
+      x-scope: services_write
+      description: 'Starts a new service on your dedicated node pool. Name: lowercase letters, digits and ''-'', max 40. Fails with 409 `quota_exceeded` when the
+        pool has no room. Secret values are set separately (PUT .../secrets).'
+      x-description-tr: 'Size ayrılmış düğüm havuzunda yeni servis başlatır. Ad: küçük harf, rakam, ''-'', en çok 40. Havuzda yer yoksa 409 `quota_exceeded`. Gizli
+        değerler ayrıca (PUT .../secrets).'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Service name
+                  x-description-tr: Servis adı
+                image: &id023
+                  type: string
+                  description: Image reference, e.g. ghcr.io/acme/web:1.4 (public registries or your private registry)
+                  x-description-tr: İmaj, ör. ghcr.io/firma/web:1.4
+                port: &id024
+                  type: integer
+                  description: 'Container port (0 = no network port). Containers run as a non-root user: use a port >= 1024'
+                  x-description-tr: 'Kapsayıcı portu (0 = port yok). Kök olmayan kullanıcı: 1024 üstü port'
+                replicas: &id025
+                  type: integer
+                  description: Number of instances (default 1)
+                  x-description-tr: Örnek sayısı (varsayılan 1)
+                cpu_m: &id026
+                  type: integer
+                  description: CPU per instance in millicores (250 = 0.25 vCPU)
+                  x-description-tr: Örnek başına işlemci (milicore, 250 = 0,25 vCPU)
+                memory_mi: &id027
+                  type: integer
+                  description: Memory per instance in MiB
+                  x-description-tr: Örnek başına bellek (MiB)
+                public: &id028
+                  type: boolean
+                  description: HTTPS address <name>-<code>.gyroapp.net (and your domains)
+                  x-description-tr: HTTPS adres <ad>-<kod>.gyroapp.net
+                health_path: &id029
+                  type: string
+                  description: HTTP health check path (empty = TCP check)
+                  x-description-tr: HTTP sağlık yolu (boş = TCP)
+                args: &id030
+                  type: array
+                  items:
+                    type: string
+                  description: Arguments for the image's default command
+                  x-description-tr: İmajın komutuna argümanlar
+                command: &id031
+                  type: array
+                  items:
+                    type: string
+                  description: Override the image entrypoint
+                  x-description-tr: İmajın giriş komutunu değiştir
+                env: &id032
+                  type: object
+                  additionalProperties:
+                    type: string
+                  description: Plain environment variables (replaces the whole set on update)
+                  x-description-tr: Ortam değişkenleri (güncellemede tamamı değişir)
+                run_as_user: &id033
+                  type: integer
+                  description: User id inside the container (default 10001)
+                  x-description-tr: Kapsayıcı içi kullanıcı kimliği (varsayılan 10001)
+                confirm:
+                  type: boolean
+              required:
+              - name
+              - image
+      x-cli:
+        command: container service create
+        confirm: false
+  /cloud/containers/{id}/services/{name}:
+    get:
+      tags:
+      - Containers
+      operationId: typed_get_containers__id__services__name
+      summary: Get a container service
+      x-summary-tr: Kapsayıcı servisini getir
+      x-scope: services_read
+      description: Spec, state, problem code (ImagePullBackOff, CrashLoopBackOff, OOMKilled, Unschedulable ...), instances, revision, domains and the names of secrets
+        (values are never returned).
+      x-description-tr: Tanım, durum, sorun kodu, örnekler, sürüm, alan adları ve gizli değer adları (değerler asla dönmez).
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Service name
+      responses:
+        '200':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      x-cli:
+        command: container service get
+        confirm: false
+    patch:
+      tags:
+      - Containers
+      operationId: typed_patch_containers__id__services__name
+      summary: Deploy a new version / change settings
+      x-summary-tr: Yeni sürüm dağıt / ayar değiştir
+      x-scope: services_write
+      description: Send only the fields to change (e.g. `image`). Every change except `replicas` creates a new revision and rolls out instance by instance without
+        downtime.
+      x-description-tr: Yalnız değişecek alanları gönderin (ör. `image`). `replicas` dışındaki her değişiklik yeni sürüm oluşturur ve kesintisiz dağıtılır.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Service name
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                image: *id023
+                port: *id024
+                replicas: *id025
+                cpu_m: *id026
+                memory_mi: *id027
+                public: *id028
+                health_path: *id029
+                args: *id030
+                command: *id031
+                env: *id032
+                run_as_user: *id033
+                reason:
+                  type: string
+                  description: Free text shown in the revision history (e.g. a git sha)
+                confirm:
+                  type: boolean
+              required: []
+      x-cli:
+        command: container service update
+        confirm: false
+    delete:
+      tags:
+      - Containers
+      operationId: typed_delete_containers__id__services__name
+      summary: Delete a container service
+      x-summary-tr: Kapsayıcı servisini sil
+      x-scope: services_write
+      description: 'Deletes the service, its address, secrets, revision history and certificates. Needs `"confirm": true`.'
+      x-description-tr: 'Servisi, adresini, gizli değerlerini, sürüm geçmişini ve sertifikalarını siler. `"confirm": true` gerekir.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Service name
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                confirm:
+                  type: boolean
+              required: []
+      x-cli:
+        command: container service delete
+        confirm: true
+  /cloud/containers/{id}/services/{name}/scale:
+    post:
+      tags:
+      - Containers
+      operationId: typed_post_containers__id__services__name__scale
+      summary: Scale a service
+      x-summary-tr: Servisi ölçekle
+      x-scope: services_write
+      description: Sets the number of instances (0 = stop, settings kept). Does not create a revision.
+      x-description-tr: Örnek sayısını ayarlar (0 = durdur). Sürüm oluşturmaz.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Service name
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                replicas:
+                  type: integer
+                confirm:
+                  type: boolean
+              required:
+              - replicas
+      x-cli:
+        command: container service scale
+        confirm: false
+  /cloud/containers/{id}/services/{name}/restart:
+    post:
+      tags:
+      - Containers
+      operationId: typed_post_containers__id__services__name__restart
+      summary: Restart a service
+      x-summary-tr: Servisi yeniden başlat
+      x-scope: services_write
+      description: Replaces the instances one by one (rolling restart).
+      x-description-tr: Örnekleri tek tek yeniler.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Service name
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+              properties:
+                confirm:
+                  type: boolean
+      x-cli:
+        command: container service restart
+        confirm: false
+  /cloud/containers/{id}/services/{name}/rollback:
+    post:
+      tags:
+      - Containers
+      operationId: typed_post_containers__id__services__name__rollback
+      summary: Roll back to an earlier revision
+      x-summary-tr: Önceki sürüme dön
+      x-scope: services_write
+      description: 'Restores image, size, command and variables of `revision` (default: the previous one) as a new revision. Replicas and secrets stay as they are.
+        Needs `"confirm": true`.'
+      x-description-tr: '`revision` sürümünün (varsayılan bir önceki) imaj, boyut, komut ve değişkenlerini yeni sürüm olarak geri getirir. Kopya sayısı ve gizli değerler
+        değişmez. `"confirm": true` gerekir.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Service name
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                revision:
+                  type: integer
+                  description: Revision number (empty = previous)
+                confirm:
+                  type: boolean
+              required: []
+      x-cli:
+        command: container service rollback
+        confirm: true
+  /cloud/containers/{id}/services/{name}/revisions:
+    get:
+      tags:
+      - Containers
+      operationId: typed_get_containers__id__services__name__revisions
+      summary: Revision history
+      x-summary-tr: Sürüm geçmişi
+      x-scope: services_read
+      description: Last 15 revisions, newest first, with image, size, variable names and reason.
+      x-description-tr: 'Son 15 sürüm (yeniden eskiye): imaj, boyut, değişken adları, neden.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Service name
+      responses:
+        '200':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      x-cli:
+        command: container service revisions
+        confirm: false
+  /cloud/containers/{id}/services/{name}/env:
+    put:
+      tags:
+      - Containers
+      operationId: typed_put_containers__id__services__name__env
+      summary: Set environment variables
+      x-summary-tr: Ortam değişkenlerini ayarla
+      x-scope: services_write
+      description: '`set` merges variables (`{"KEY": "value"}` or KEY=VALUE lines), `unset` removes names, `replace: 1` replaces the whole set. Creates a revision
+        and restarts the service.'
+      x-description-tr: '`set` değişken ekler/günceller (`{"KEY":"değer"}` ya da KEY=VALUE satırları), `unset` siler, `replace: 1` tümünü değiştirir. Sürüm oluşturur,
+        servis yeniden başlar.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Service name
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                set:
+                  type: object
+                  additionalProperties:
+                    type: string
+                unset:
+                  type: array
+                  items:
+                    type: string
+                replace:
+                  type: integer
+                  enum:
+                  - 0
+                  - 1
+                confirm:
+                  type: boolean
+              required: []
+      x-cli:
+        command: container env set
+        confirm: false
+  /cloud/containers/{id}/services/{name}/secrets:
+    put:
+      tags:
+      - Containers
+      operationId: typed_put_containers__id__services__name__secrets
+      summary: Set secret values
+      x-summary-tr: Gizli değer ayarla
+      x-scope: services_write
+      description: Stored encrypted, passed to the container as environment variables, never returned. The service restarts.
+      x-description-tr: Şifreli saklanır, ortam değişkeni olarak verilir, asla geri dönmez. Servis yeniden başlar.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Service name
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                set:
+                  type: object
+                  additionalProperties:
+                    type: string
+                confirm:
+                  type: boolean
+              required:
+              - set
+      x-cli:
+        command: container secret set
+        confirm: false
+    delete:
+      tags:
+      - Containers
+      operationId: typed_delete_containers__id__services__name__secrets
+      summary: Delete secret values
+      x-summary-tr: Gizli değer sil
+      x-scope: services_write
+      description: '`keys` (comma separated in the query). The service restarts. Needs `"confirm": true`.'
+      x-description-tr: '`keys` (sorguda virgülle). Servis yeniden başlar. `"confirm": true` gerekir.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Service name
+      - name: keys
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Secret names, comma separated
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                confirm:
+                  type: boolean
+              required: []
+      x-cli:
+        command: container secret delete
+        confirm: true
+  /cloud/containers/{id}/services/{name}/logs:
+    get:
+      tags:
+      - Containers
+      operationId: typed_get_containers__id__services__name__logs
+      summary: Service logs
+      x-summary-tr: Servis logları
+      x-scope: services_read
+      description: Lines `{time, instance, text}` oldest first. `since_minutes` (default 60, max 10080), `filter` (plain text), `limit` (max 2000), `previous=1` =
+        last crashed instance.
+      x-description-tr: Satırlar `{time, instance, text}` eskiden yeniye. `since_minutes` (varsayılan 60), `filter`, `limit` (en çok 2000), `previous=1` = son çöken
+        örnek.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Service name
+      - name: since_minutes
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Time range in minutes
+      - name: filter
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Plain text filter
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Max lines
+      - name: previous
+        in: query
+        required: false
+        schema:
+          type: string
+        description: 1 = previous (crashed) instance
+      responses:
+        '200':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      x-cli:
+        command: container logs
+        confirm: false
+  /cloud/containers/{id}/services/{name}/metrics:
+    get:
+      tags:
+      - Containers
+      operationId: typed_get_containers__id__services__name__metrics
+      summary: Service CPU / memory
+      x-summary-tr: Servis işlemci / bellek
+      x-scope: services_read
+      description: '`source=history`: series (cpu_m, memory_mi, restarts) for `hours`; `source=current`: current usage only.'
+      x-description-tr: '`source=history`: `hours` boyunca seriler; `source=current`: anlık kullanım.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Service name
+      - name: hours
+        in: query
+        required: false
+        schema:
+          type: string
+        description: History length in hours (default 24)
+      responses:
+        '200':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      x-cli:
+        command: container metrics
+        confirm: false
+  /cloud/containers/{id}/services/{name}/domains:
+    get:
+      tags:
+      - Containers
+      operationId: typed_get_containers__id__services__name__domains
+      summary: Domains of a service
+      x-summary-tr: Servisin alan adları
+      x-scope: services_read
+      description: Status `active` or `pending` (waiting for DNS).
+      x-description-tr: Durum `active` ya da `pending` (DNS bekleniyor).
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Service name
+      responses:
+        '200':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      x-cli:
+        command: container domain list
+        confirm: false
+    post:
+      tags:
+      - Containers
+      operationId: typed_post_containers__id__services__name__domains
+      summary: Attach a domain
+      x-summary-tr: Alan adı bağla
+      x-scope: services_write
+      description: Point a CNAME to the service host (`<name>-<code>.gyroapp.net`) first; the domain is activated (with a free certificate) once its DNS points to
+        us, checked hourly or with .../domains/verify.
+      x-description-tr: Önce CNAME kaydını servis adresine (`<ad>-<kod>.gyroapp.net`) yönlendirin; DNS bize gösterince ücretsiz sertifikayla etkinleşir (saatlik ya
+        da .../domains/verify ile).
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Service name
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                domain:
+                  type: string
+                confirm:
+                  type: boolean
+              required:
+              - domain
+      x-cli:
+        command: container domain add
+        confirm: false
+  /cloud/containers/{id}/services/{name}/domains/verify:
+    post:
+      tags:
+      - Containers
+      operationId: typed_post_containers__id__services__name__domains_verify
+      summary: Re-check pending domains
+      x-summary-tr: Bekleyen alan adlarını kontrol et
+      x-scope: services_write
+      description: Checks DNS now and activates domains that point here.
+      x-description-tr: DNS'i şimdi kontrol eder, bize gösterenleri etkinleştirir.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Service name
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+              properties:
+                confirm:
+                  type: boolean
+      x-cli:
+        command: container domain verify
+        confirm: false
+  /cloud/containers/{id}/services/{name}/domains/{domain}:
+    delete:
+      tags:
+      - Containers
+      operationId: typed_delete_containers__id__services__name__domains__domain
+      summary: Detach a domain
+      x-summary-tr: Alan adını kaldır
+      x-scope: services_write
+      description: 'Removes the domain and its certificate. Needs `"confirm": true`.'
+      x-description-tr: 'Alan adını ve sertifikasını kaldırır. `"confirm": true` gerekir.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Service name
+      - name: domain
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Domain name
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                confirm:
+                  type: boolean
+              required: []
+      x-cli:
+        command: container domain remove
+        confirm: true
+  /cloud/containers/{id}/nodes:
+    get:
+      tags:
+      - Containers
+      operationId: typed_get_containers__id__nodes
+      summary: Node pool
+      x-summary-tr: Düğüm havuzu
+      x-scope: services_read
+      description: Your dedicated nodes (aliases node-1..n), pool capacity and usage, ingress IPs for apex A records, private registry (user only).
+      x-description-tr: Size ayrılmış düğümler, havuz kapasitesi/kullanımı, kök alan adı A kaydı için IP'ler, özel depo (yalnız kullanıcı).
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      responses:
+        '200':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      x-cli:
+        command: container nodes
+        confirm: false
+  /cloud/containers/{id}/events:
+    get:
+      tags:
+      - Containers
+      operationId: typed_get_containers__id__events
+      summary: Recent warnings
+      x-summary-tr: Son uyarılar
+      x-scope: services_read
+      description: Last 50 platform warnings of the environment (pull errors, crashes, capacity).
+      x-description-tr: Ortamın son 50 platform uyarısı.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      responses:
+        '200':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      x-cli:
+        command: container events
+        confirm: false
+  /cloud/containers/{id}/external-registry:
+    put:
+      tags:
+      - Containers
+      operationId: typed_put_containers__id__external_registry
+      summary: External private registry credentials
+      x-summary-tr: Harici özel depo bilgisi
+      x-scope: services_write
+      description: One private registry per environment (e.g. ghcr.io + a pull-only token). The token is stored encrypted and never returned.
+      x-description-tr: Ortam başına bir özel depo (ör. ghcr.io + yalnız çekme izinli token). Token şifreli saklanır, geri dönmez.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                server:
+                  type: string
+                username:
+                  type: string
+                password:
+                  type: string
+                  format: password
+                confirm:
+                  type: boolean
+              required:
+              - server
+              - username
+              - password
+      x-cli:
+        command: container external-registry set
+        confirm: false
+    delete:
+      tags:
+      - Containers
+      operationId: typed_delete_containers__id__external_registry
+      summary: Remove external registry credentials
+      x-summary-tr: Özel depo bilgisini sil
+      x-scope: services_write
+      description: 'Private images can no longer be pulled. Needs `"confirm": true`.'
+      x-description-tr: 'Özel imajlar artık çekilemez. `"confirm": true` gerekir.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                confirm:
+                  type: boolean
+              required: []
+      x-cli:
+        command: container external-registry delete
+        confirm: true
+  /cloud/containers/{id}/registry:
+    get:
+      tags:
+      - Containers
+      operationId: typed_get_containers__id__registry
+      summary: Gyro image registry of the environment
+      x-summary-tr: Ortamın Gyro imaj deposu
+      x-scope: services_read
+      description: 'Host, image prefix `<host>/<code>/`, username, usage (`used_gb`, `free_gb` = 2, `billable_gb`, `cap_gb` = 50), `push_allowed` and the clean-up
+        policy. Only this environment can push/pull its repositories. Above 2 GB: €0.05 per GB per month, charged hourly from the prepaid balance. The password is
+        returned only by POST .../registry/credentials.'
+      x-description-tr: Depo adresi, imaj öneki `<host>/<kod>/`, kullanıcı adı, kullanım (2 GB ücretsiz, üst sınır 50 GB), gönderim izni ve temizlik ayarı. Yalnız
+        bu ortam kendi depolarına erişir. 2 GB üstü GB başına aylık 0,05 € (saatlik bakiyeden). Parola yalnız POST .../registry/credentials ile döner.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      responses:
+        '200':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      x-cli:
+        command: container registry get
+        confirm: false
+  /cloud/containers/{id}/registry/credentials:
+    post:
+      tags:
+      - Containers
+      operationId: typed_post_containers__id__registry_credentials
+      summary: Registry password
+      x-summary-tr: Depo parolası
+      x-scope: services_write
+      description: Returns username and password for `docker login` (not returned when the request carries an Idempotency-Key).
+      x-description-tr: '`docker login` için kullanıcı adı ve parola.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+              properties:
+                confirm:
+                  type: boolean
+      x-cli:
+        command: container registry credentials
+        confirm: false
+  /cloud/containers/{id}/registry/rotate:
+    post:
+      tags:
+      - Containers
+      operationId: typed_post_containers__id__registry_rotate
+      summary: Rotate the registry password
+      x-summary-tr: Depo parolasını yenile
+      x-scope: services_write
+      description: 'The old password stops working at once; running services are not affected (their pull secret is updated). Needs `"confirm": true`.'
+      x-description-tr: 'Eski parola hemen geçersiz olur; çalışan servisler etkilenmez. `"confirm": true` gerekir.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                confirm:
+                  type: boolean
+              required: []
+      x-cli:
+        command: container registry rotate
+        confirm: true
+  /cloud/containers/{id}/registry/policy:
+    put:
+      tags:
+      - Containers
+      operationId: typed_put_containers__id__registry_policy
+      summary: Image clean-up policy
+      x-summary-tr: İmaj temizlik ayarı
+      x-scope: services_write
+      description: '`enabled` (default true), `keep` 1-50 (images of the last N revisions of every service are kept, default 10), `untagged_days` 1-90 (images used
+        by no revision are deleted after, default 7).'
+      x-description-tr: '`enabled`, `keep` 1-50 (varsayılan 10), `untagged_days` 1-90 (varsayılan 7).'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                enabled:
+                  type: boolean
+                keep:
+                  type: integer
+                untagged_days:
+                  type: integer
+                confirm:
+                  type: boolean
+              required: []
+      x-cli:
+        command: container registry policy
+        confirm: false
+  /cloud/containers/{id}/registry/images:
+    get:
+      tags:
+      - Containers
+      operationId: typed_get_containers__id__registry_images
+      summary: Images in the registry
+      x-summary-tr: Depodaki imajlar
+      x-scope: services_read
+      description: '`images`: repo, tag, digest, bytes, created, in_use; `total_bytes` (unique layers).'
+      x-description-tr: '`images`: depo, etiket, boyut, tarih, kullanımda mı; `total_bytes`.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      responses:
+        '200':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      x-cli:
+        command: container registry images
+        confirm: false
+    delete:
+      tags:
+      - Containers
+      operationId: typed_delete_containers__id__registry_images
+      summary: Delete an image tag
+      x-summary-tr: İmaj etiketini sil
+      x-scope: services_write
+      description: 'Query `repo` (without the code prefix) and `tag`. Images used by a service are refused (409 image_in_use). Needs `"confirm": true`.'
+      x-description-tr: 'Sorgu `repo` ve `tag`. Bir servisin kullandığı imaj silinemez. `"confirm": true` gerekir.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: repo
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Repository, e.g. web
+      - name: tag
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Tag, e.g. 1.4
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                confirm:
+                  type: boolean
+              required: []
+      x-cli:
+        command: container registry image-delete
+        confirm: true
   /cloud/licenses/{id}:
     get:
       tags:
@@ -8041,7 +9581,7 @@ paths:
                   type: boolean
   /cloud/security-groups:
     get:
-      tags: &id023
+      tags: &id034
       - Security groups
       operationId: listSecurityGroups
       summary: List security groups
@@ -8063,7 +9603,7 @@ paths:
                       $ref: '#/components/schemas/SecurityGroup'
         '401': *id003
     post:
-      tags: *id023
+      tags: *id034
       operationId: createSecurityGroup
       summary: Create a security group
       x-summary-tr: Güvenlik grubu oluştur
@@ -8103,7 +9643,7 @@ paths:
         '422': *id005
   /cloud/security-groups/{sg}:
     parameters:
-    - &id024
+    - &id035
       name: sg
       in: path
       required: true
@@ -8111,7 +9651,7 @@ paths:
         type: string
         pattern: ^sg-[a-f0-9]{8}$
     get:
-      tags: *id023
+      tags: *id034
       operationId: getSecurityGroup
       summary: Get a security group
       x-summary-tr: Güvenlik grubunu getir
@@ -8131,7 +9671,7 @@ paths:
         '401': *id003
         '404': *id004
     patch:
-      tags: *id023
+      tags: *id034
       operationId: updateSecurityGroup
       summary: Rename / describe a security group
       x-summary-tr: Güvenlik grubunun adını / açıklamasını değiştir
@@ -8165,7 +9705,7 @@ paths:
         '404': *id004
         '422': *id005
     delete:
-      tags: *id023
+      tags: *id034
       operationId: deleteSecurityGroup
       summary: Delete a security group
       x-summary-tr: Güvenlik grubunu sil
@@ -8195,9 +9735,9 @@ paths:
         '422': *id005
   /cloud/security-groups/{sg}/rules:
     parameters:
-    - *id024
+    - *id035
     put:
-      tags: *id023
+      tags: *id034
       operationId: putSecurityGroupRules
       summary: Replace the rules of a security group
       x-summary-tr: Güvenlik grubunun kurallarını değiştir
@@ -8251,9 +9791,9 @@ paths:
         '422': *id005
   /cloud/security-groups/{sg}/confirm:
     parameters:
-    - *id024
+    - *id035
     post:
-      tags: *id023
+      tags: *id034
       operationId: confirmSecurityGroup
       summary: Make the running rule trial permanent
       x-summary-tr: Kural denemesini kalıcı yap
@@ -8275,10 +9815,10 @@ paths:
         '422': *id005
   /cloud/servers/{id}/security-groups:
     parameters:
-    - &id025
+    - &id036
       $ref: '#/components/parameters/ServerId'
     get:
-      tags: *id023
+      tags: *id034
       operationId: listServerSecurityGroups
       summary: Security groups attached to a server
       x-summary-tr: Sunucuya bağlı güvenlik grupları
@@ -8300,7 +9840,7 @@ paths:
         '409':
           description: firewall_not_enabled
     put:
-      tags: *id023
+      tags: *id034
       operationId: setServerSecurityGroups
       summary: Set the exact list of attached groups
       x-summary-tr: Bağlı grupları tam liste olarak ayarla
@@ -8342,10 +9882,10 @@ paths:
         '422': *id005
   /cloud/servers/{id}/security-groups/{sg}:
     parameters:
-    - *id025
-    - *id024
+    - *id036
+    - *id035
     post:
-      tags: *id023
+      tags: *id034
       operationId: attachSecurityGroup
       summary: Attach a security group to a server
       x-summary-tr: Güvenlik grubunu sunucuya bağla
@@ -8368,7 +9908,7 @@ paths:
           description: firewall_not_enabled
         '422': *id005
     delete:
-      tags: *id023
+      tags: *id034
       operationId: detachSecurityGroup
       summary: Detach a security group from a server
       x-summary-tr: Güvenlik grubunu sunucudan ayır
@@ -14368,6 +15908,232 @@ paths:
                   description: Hedef bilgisi. Boş göndermek kaydı siler.
               required:
               - gateway
+  /cloud/billing/balance:
+    get:
+      operationId: getPrepaidBalance
+      tags:
+      - Billing
+      summary: Balance, hourly cost of running prepaid services and estimated time left
+      x-gyro-cli:
+      - billing
+      - balance
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/PrepaidBalance'
+        '403':
+          description: insufficient_scope | subkey_forbidden
+      x-scope: billing_read
+      x-provided-by: GyroKredi
+      description: 'Prepaid (hourly, from the account balance) services: Gyro Containers (ECS) and Gyro Cloud Istanbul (tr-ist-1). Times are Europe/Istanbul. Usage
+        is never invoiced: invoices are issued for balance top-ups.'
+  /cloud/billing/usage:
+    get:
+      operationId: listPrepaidUsage
+      tags:
+      - Billing
+      summary: Hour-by-hour usage ledger (or daily/monthly totals). Times are Europe/Istanbul.
+      x-gyro-cli:
+      - billing
+      - usage
+      parameters:
+      - name: from
+        in: query
+        schema:
+          type: string
+          format: date
+        description: 'first day (default: 1st of this month)'
+      - name: to
+        in: query
+        schema:
+          type: string
+          format: date
+        description: 'last day (default: today); at most 400 days'
+      - name: service_id
+        in: query
+        schema:
+          type: integer
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum:
+          - ucretli
+          - tavan
+          - kismi
+          - odenmedi
+          - ucretsiz
+      - name: granularity
+        in: query
+        schema:
+          type: string
+          enum:
+          - hour
+          - day
+          - month
+          default: hour
+      - name: format
+        in: query
+        schema:
+          type: string
+          enum:
+          - json
+          - csv
+        description: csv = base64 file in data.content_base64 (max 5000 rows)
+      - name: page
+        in: query
+        schema:
+          type: integer
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          default: 100
+          maximum: 100
+      responses:
+        '200':
+          description: OK (meta = total, page, limit, next_page)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          oneOf:
+                          - $ref: '#/components/schemas/UsageHour'
+                          - $ref: '#/components/schemas/UsagePeriod'
+                      filters:
+                        type: object
+                      totals:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/MoneyEur'
+                      by_service:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ServiceTotal'
+                  meta:
+                    type: object
+      x-scope: billing_read
+      x-provided-by: GyroKredi
+      description: 'Prepaid (hourly, from the account balance) services: Gyro Containers (ECS) and Gyro Cloud Istanbul (tr-ist-1). Times are Europe/Istanbul. Usage
+        is never invoiced: invoices are issued for balance top-ups.'
+  /cloud/billing/statement/{month}:
+    get:
+      operationId: getPrepaidStatement
+      tags:
+      - Billing
+      summary: Monthly usage statement (not an invoice); JSON, PDF or CSV
+      x-gyro-cli:
+      - billing
+      - statement
+      parameters:
+      - name: month
+        in: path
+        required: true
+        schema:
+          type: string
+          pattern: ^\d{4}-(0[1-9]|1[0-2])$
+      - name: format
+        in: query
+        schema:
+          type: string
+          enum:
+          - json
+          - pdf
+          - csv
+          default: json
+      - name: lang
+        in: query
+        schema:
+          type: string
+          enum:
+          - tr
+          - en
+          default: en
+      responses:
+        '200':
+          description: 'json: totals/by_service/by_day; pdf|csv: filename, content_type, content_base64'
+        '422':
+          description: invalid_month
+      x-scope: billing_read
+      x-provided-by: GyroKredi
+      description: 'Prepaid (hourly, from the account balance) services: Gyro Containers (ECS) and Gyro Cloud Istanbul (tr-ist-1). Times are Europe/Istanbul. Usage
+        is never invoiced: invoices are issued for balance top-ups.'
+  /cloud/billing/estimate:
+    post:
+      operationId: estimatePrepaidCost
+      tags:
+      - Billing
+      summary: Hourly / daily / monthly (capped at 672 h) cost of prepaid plans and how long the balance lasts
+      x-gyro-cli:
+      - billing
+      - estimate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                items:
+                  type: array
+                  maxItems: 50
+                  items:
+                    type: object
+                    properties:
+                      plan:
+                        type: string
+                        example: standart-2-4
+                      product_id:
+                        type: integer
+                      region:
+                        type: string
+                        example: tr-ist-1
+                        description: prepaid is tr-ist-1 only
+                      count:
+                        type: integer
+                        default: 1
+                        maximum: 100
+                plan:
+                  type: string
+                  description: single-item shortcut
+                count:
+                  type: integer
+      responses:
+        '200':
+          description: items[], hourly, daily, monthly_cap, eur_rate, balance, hours_covered, order_requires (first 24 h), can_order
+        '422':
+          description: unknown_plan | region_not_prepaid | too_many_items
+      x-scope: billing_read
+      x-provided-by: GyroKredi
+      description: 'Prepaid (hourly, from the account balance) services: Gyro Containers (ECS) and Gyro Cloud Istanbul (tr-ist-1). Times are Europe/Istanbul. Usage
+        is never invoiced: invoices are issued for balance top-ups.'
+  /cloud/billing/topup-url:
+    get:
+      operationId: getPrepaidTopupUrl
+      tags:
+      - Billing
+      summary: Browser link of the balance top-up page (top-ups are invoiced with VAT; usage is not)
+      responses:
+        '200':
+          description: url, minimum
+      x-scope: billing_read
+      x-provided-by: GyroKredi
+      description: 'Prepaid (hourly, from the account balance) services: Gyro Containers (ECS) and Gyro Cloud Istanbul (tr-ist-1). Times are Europe/Istanbul. Usage
+        is never invoiced: invoices are issued for balance top-ups.'
 components:
   securitySchemes:
     bearerAuth:
@@ -14518,6 +16284,14 @@ components:
           type: number
         currency:
           type: string
+        monthly_cap:
+          type: number
+          description: 'prepaid only: most charged per calendar month (Europe/Istanbul)'
+        billing:
+          type: string
+          enum:
+          - prepaid
+          description: prepaid only
     Product:
       type: object
       properties:
@@ -14587,7 +16361,14 @@ components:
           enum:
           - cloud_server
           - vds
-          description: cloud_server (global cloud) or vds (Istanbul VDS)
+          description: 'cloud_server (Gyro Cloud: global regions and tr-ist-1) or vds (Istanbul VDS line)'
+        billing:
+          type: string
+          enum:
+          - invoice
+          - prepaid
+          description: invoice = paid per billing cycle (invoice). prepaid = charged hourly from the account balance (no invoice); `prices` then holds one `hourly`
+            entry with `monthly_cap` (at most this much per calendar month).
     Location:
       type: object
       properties:
@@ -14730,6 +16511,12 @@ components:
           enum:
           - cloud_server
           - vds
+        billing:
+          type: string
+          enum:
+          - invoice
+          - prepaid
+          description: 'prepaid: `cycle` is `hourly`, `price.amount` is the hourly EUR price, `due_date` is null.'
     ServerLive:
       type:
       - object
@@ -14803,6 +16590,8 @@ components:
         properties:
           live:
             $ref: '#/components/schemas/ServerLive'
+          ssh_keys:
+            $ref: '#/components/schemas/ServerSshKeys'
     CreateServerRequest:
       type: object
       properties:
@@ -14840,15 +16629,16 @@ components:
           type: array
           items:
             type: integer
-          maxItems: 1
-          description: Ids from /cloud/ssh-keys (one key at creation in v1)
+          maxItems: 10
+          description: 'Ids from /cloud/ssh-keys. Global regions: one key, installed at creation. tr-ist-1: up to 10 keys, installed for root once the server is ready
+            (usually a few minutes after it is running); follow `ssh_keys.state` on GET /cloud/servers/{id}.'
         hostname:
           type: string
           example: web-1.example.com
         user_data:
           type: string
           maxLength: 32768
-          description: cloud-init user data
+          description: 'cloud-init user data (global regions; not accepted in tr-ist-1: 422)'
         dry_run:
           type: boolean
           default: false
@@ -15950,3 +17740,152 @@ components:
                 type: string
         trial:
           type: boolean
+    ServerSshKeys:
+      type:
+      - object
+      - 'null'
+      description: 'tr-ist-1 only: install state of the SSH keys given at creation (null = none requested).'
+      properties:
+        state:
+          type: string
+          enum:
+          - pending
+          - sent
+          - installed
+          - failed
+          - cancelled
+        fingerprints:
+          type: array
+          items:
+            type: string
+        attempts:
+          type: integer
+        message:
+          type:
+          - string
+          - 'null'
+        updated_at:
+          type: string
+          format: date-time
+    MoneyEur:
+      allOf:
+      - $ref: '#/components/schemas/Money'
+      - type: object
+        properties:
+          amount_eur:
+            type: number
+    PrepaidBalance:
+      type: object
+      properties:
+        balance:
+          $ref: '#/components/schemas/Money'
+        hourly_cost:
+          $ref: '#/components/schemas/Money'
+        daily_cost:
+          $ref: '#/components/schemas/Money'
+        upcoming_invoices_7d:
+          $ref: '#/components/schemas/Money'
+        hours_left:
+          type: number
+          nullable: true
+        runs_out_at:
+          type: string
+          format: date-time
+          nullable: true
+        level:
+          type: string
+          enum:
+          - ok
+          - low
+          - critical
+        services:
+          type: object
+          properties:
+            active:
+              type: integer
+            suspended:
+              type: integer
+            deleted:
+              type: integer
+        suspended_hourly_cost:
+          $ref: '#/components/schemas/Money'
+        eur_rate:
+          type: number
+        computed_at:
+          type: string
+          format: date-time
+        topup_url:
+          type: string
+        note:
+          type: string
+    UsageHour:
+      type: object
+      properties:
+        hour:
+          type: string
+          format: date-time
+        service_id:
+          type: integer
+        item:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+          enum:
+          - ucretli
+          - tavan
+          - kismi
+          - odenmedi
+          - ucretsiz
+        power:
+          type: string
+          nullable: true
+          enum:
+          - calisiyor
+          - kapali
+          - bilinmiyor
+        quantity:
+          type: object
+          nullable: true
+          properties:
+            used:
+              type: number
+            free:
+              type: number
+            unit:
+              type: string
+        unit_price_eur:
+          type: number
+        eur_rate:
+          type: number
+        unit_price:
+          $ref: '#/components/schemas/Money'
+        amount:
+          $ref: '#/components/schemas/Money'
+        amount_eur:
+          type: number
+    UsagePeriod:
+      type: object
+      properties:
+        period:
+          type: string
+        hours:
+          type: integer
+        amount:
+          $ref: '#/components/schemas/Money'
+        amount_eur:
+          type: number
+    ServiceTotal:
+      type: object
+      properties:
+        service_id:
+          type: integer
+        description:
+          type: string
+        hours:
+          type: integer
+        line_items:
+          type: integer
+        amount:
+          $ref: '#/components/schemas/Money'

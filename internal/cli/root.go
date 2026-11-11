@@ -293,6 +293,7 @@ func NewRoot(a *App) *cobra.Command {
 	addSSHKeys(a, root)
 	addCatalog(a, root)
 	addBilling(a, root)
+	addPrepaidBilling(a, root)
 	addProductLines(a, root)
 	addDNS(a, root)
 	addGenerated(a, root)
