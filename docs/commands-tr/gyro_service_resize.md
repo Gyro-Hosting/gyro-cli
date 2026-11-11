@@ -6,7 +6,7 @@ Paketi yükselt (bakiyeden ödenir)
 
 Paketi yükselt (bakiyeden ödenir)
 
-dry_run fiyatı döndürür; gerçek değişiklik `"confirm": true` + Idempotency-Key ister. Yükseltme faturası oluşturulur ve bakiyeden ödenir; bakiye yetmezse `awaiting_payment` ve pay_url döner. Sunucuyu yeniden kuracak değişiklikler reddedilir (`recreate_required`).
+dry_run fiyatı döndürür; gerçek değişiklik `"confirm": true` + Idempotency-Key ister. Yükseltme faturası oluşturulur ve bakiyeden ödenir; bakiye yetmezse `awaiting_payment` ve pay_url döner. Sunucuyu yeniden kuracak değişiklikler reddedilir (`recreate_required`). **Ön ödemeli hizmetler** (Gyro Kapsayıcı, Gyro Bulut İstanbul): fatura yok, confirm/Idempotency-Key gerekmez; resize-options'tan `product_id` ya da `plan` seçin. Yeni saatlik ücret bir sonraki saatten; disk küçülmez; daha büyük plan için bakiye 24 saatlik farkı karşılamalı.
 
 API: POST /cloud/services/{id}/resize (operationId resizeService, scope cloud_order)
 
@@ -21,8 +21,9 @@ gyro service resize <ID> [flags]
       --dry-run                  hiçbir şeyi değiştirmeden teklifi / isteği göster
   -h, --help                     help for resize
       --idempotency-key string   tekrar güvenliği anahtarı (para işlemlerinde otomatik)
+      --plan string              prepaid services: plan name from resize-options (alternative to product_id)
       --price-id int             price_id
-      --product-id int           product_id
+      --product-id int           target product from resize-options (or give plan for prepaid services)
       --set stringArray          ek gövde alanı anahtar=değer (tekrarlanabilir)
 ```
 

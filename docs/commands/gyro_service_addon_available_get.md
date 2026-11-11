@@ -6,6 +6,8 @@ Add-ons offered for this service (with options and prices)
 
 Add-ons offered for this service (with options and prices)
 
+Prepaid add-on options show `cycle: hourly`, `billing: prepaid` and `price {amount (EUR/hour), monthly_cap}`.
+
 API: GET /cloud/services/{id}/addons/available (operationId listAvailableAddons, scope services_read)
 
 ```

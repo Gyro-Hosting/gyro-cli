@@ -1,14 +1,14 @@
 ## gyro service addon list
 
-List service addons (path: {id})
+Add-ons the service holds
 
 ### Synopsis
 
-List service addons (path: {id})
+Add-ons the service holds
 
-List service addons (path: {id}). Service of the calling account (any product line). Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/sahip-olunan-hizmetler).
+Prepaid add-ons (billing: prepaid) carry the hourly price and removable: true.
 
-API: GET /services/{id}/addons (operationId coreGetServiceAddons, scope Services/GetServiceAddons)
+API: GET /cloud/services/{id}/addons (operationId listServiceAddons, scope services_read)
 
 ```
 gyro service addon list <ID> [flags]
@@ -39,5 +39,5 @@ gyro service addon list <ID> [flags]
 
 ### SEE ALSO
 
-* [gyro service addon](gyro_service_addon.md)	 - List service addons (path: {id})
+* [gyro service addon](gyro_service_addon.md)	 - Add-ons the service holds
 

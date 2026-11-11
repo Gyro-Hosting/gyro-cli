@@ -32,8 +32,7 @@ gyro service [flags]
 ### SEE ALSO
 
 * [gyro](gyro.md)	 - Gyro Hosting command-line interface
-* [gyro service addon](gyro_service_addon.md)	 - List service addons (path: {id})
-* [gyro service addons](gyro_service_addons.md)	 - Buy an add-on (paid from balance)
+* [gyro service addon](gyro_service_addon.md)	 - Add-ons the service holds
 * [gyro service cancellation](gyro_service_cancellation.md)	 - Create cancellation (path: {id})
 * [gyro service dashboard](gyro_service_dashboard.md)	 - Get service dashboard (path: {id})
 * [gyro service get](gyro_service_get.md)	 - Get a service (renewal, cancellation, access details)

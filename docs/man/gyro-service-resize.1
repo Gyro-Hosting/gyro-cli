@@ -13,7 +13,7 @@ gyro-service-resize - Upgrade the plan (paid from balance)
 Upgrade the plan (paid from balance)
 
 .PP
-dry_run returns the price; a real change needs \fB"confirm": true\fR + Idempotency-Key. Creates the upgrade invoice and pays it from the balance; if the balance does not cover it the answer is \fBawaiting_payment\fR with a pay_url. Plan changes that would re-create the server are refused (\fBrecreate_required\fR).
+dry_run returns the price; a real change needs \fB"confirm": true\fR + Idempotency-Key. Creates the upgrade invoice and pays it from the balance; if the balance does not cover it the answer is \fBawaiting_payment\fR with a pay_url. Plan changes that would re-create the server are refused (\fBrecreate_required\fR). \fBPrepaid services\fP (\fBbilling: prepaid\fR: Gyro Containers, Gyro Cloud Istanbul): no invoice and no confirm/Idempotency-Key; pick \fBproduct_id\fR (or \fBplan\fR, e.g. \fBstandart-4-8\fR, \fBecs-pro\fR) from resize-options (same product family). The module resizes the server / node pool (Istanbul servers: disks never shrink; containers: nodes of another size are replaced one by one, running services must fit a smaller plan). The new hourly price applies from the next hour; answer \fBstatus: completed\fR, \fBeffective: next_hour\fR, \fBinvoice: null\fR\&. A bigger plan needs 24 hours of the price difference in the balance.
 
 .PP
 API: POST /cloud/services/{id}/resize (operationId resizeService, scope cloud_order)
@@ -36,12 +36,16 @@ API: POST /cloud/services/{id}/resize (operationId resizeService, scope cloud_or
 	idempotency key (automatic for money operations)
 
 .PP
+\fB--plan\fP=""
+	prepaid services: plan name from resize-options (alternative to product_id)
+
+.PP
 \fB--price-id\fP=0
 	price_id
 
 .PP
 \fB--product-id\fP=0
-	product_id
+	target product from resize-options (or give plan for prepaid services)
 
 .PP
 \fB--set\fP=[]

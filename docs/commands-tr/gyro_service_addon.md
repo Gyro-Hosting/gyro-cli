@@ -1,6 +1,6 @@
 ## gyro service addon
 
-Hizmet Eklentilerini Okuma
+Hizmetin ek hizmetleri
 
 ```
 gyro service addon [flags]
@@ -33,5 +33,7 @@ gyro service addon [flags]
 
 * [gyro service](gyro_service.md)	 - Tüm ürün hatlarındaki hizmetler (genel köprü)
 * [gyro service addon available](gyro_service_addon_available.md)	 - Bu hizmete alınabilecek ek hizmetler
-* [gyro service addon list](gyro_service_addon_list.md)	 - Hizmet Eklentilerini Okuma
+* [gyro service addon create](gyro_service_addon_create.md)	 - Ek hizmet satın al (bakiyeden ödenir)
+* [gyro service addon delete](gyro_service_addon_delete.md)	 - Ön ödemeli ek hizmeti hemen kaldır
+* [gyro service addon list](gyro_service_addon_list.md)	 - Hizmetin ek hizmetleri
 
