@@ -43,4 +43,5 @@ gyro container [flags]
 * [gyro container registry](gyro_container_registry.md)	 - Gyro image registry of the environment
 * [gyro container secret](gyro_container_secret.md)	 - Delete secret values
 * [gyro container service](gyro_container_service.md)	 - List container services
+* [gyro container sizes](gyro_container_sizes.md)	 - Serverless container sizes (vCPU / memory pairs) and prices
 

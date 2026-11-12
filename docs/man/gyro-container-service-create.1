@@ -13,7 +13,7 @@ gyro-container-service-create - Create a container service
 Create a container service
 
 .PP
-Starts a new service on your dedicated node pool. Name: lowercase letters, digits and '-', max 40. Fails with 409 \fBquota_exceeded\fR when the pool has no room. Secret values are set separately (PUT .../secrets).
+Starts a new service on your dedicated node pool. Name: lowercase letters, digits and '-', max 40. Fails with 409 \fBquota_exceeded\fR when the pool has no room. Secret values are set separately (PUT .../secrets). \fBServerless environments:\fP \fBcpu_m\fR / \fBmemory_mi\fR must be one of the pairs from \fBGET /cloud/billing/container-sizes\fR (0.25-4 vCPU); billing is per running copy per hour (\fBPOST /cloud/billing/estimate\fR with \fBtype: serverless\fR).
 
 .PP
 API: POST /cloud/containers/{id}/services (operationId typed_post_containers\fBid\fPservices, scope services_write)

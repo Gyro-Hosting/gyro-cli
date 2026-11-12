@@ -2,7 +2,7 @@
 openapi: 3.1.0
 info:
   title: Gyro Public API
-  version: 2.17.3
+  version: 2.17.4
   summary: Manage Gyro cloud servers, SSH keys and billing programmatically.
   x-summary-tr: Gyro bulut sunucularınızı, SSH anahtarlarınızı ve faturalarınızı programla yönetin.
   description: "The Gyro Public API lets you automate everything you do in the Gyro client area:\norder and manage cloud servers, keep SSH keys, read invoices and\
@@ -28,7 +28,9 @@ info:
     \ e-mail, SMS, Telegram, signed webhook). Additive.\n\n**2.17.1**: additional IPv4: each added address is billed at least 6 hours (`pricing.minimum_hours`), per-server\
     \ add limit per hour (`adds_per_hour`, `adds_left_this_hour`). Additive.\n\n**2.17.2**: tr-ist-1 reverse DNS is published automatically: default PTR `<a-b-c-d>.ip.gyrohosting.com`\
     \ on every address, custom PTR live within seconds (`status: active`, new `default` flag), removed when the server/IP is released. Additive.\n\n**2.17.3**: tr-ist-1\
-    \ snapshots: every additional snapshot is billed at least 1 hour (a snapshot created and deleted between two hourly counts is billed too). Text only.\n"
+    \ snapshots: every additional snapshot is billed at least 1 hour (a snapshot created and deleted between two hourly counts is billed too). Text only.\n\n**2.17.4**:\
+    \ Gyro Containers Serverless: `GET /cloud/billing/container-sizes` (vCPU / memory pairs and prices), `POST /cloud/billing/estimate` accepts `{\"type\": \"serverless\"\
+    , \"cpu_m\", \"memory_mi\", \"count\", \"hours\"}` (no monthly cap, `capped` flag on every item). Additive.\n"
   x-description-tr: "Gyro Public API, müşteri panelinde yaptığınız her işi otomatikleştirmenizi sağlar:\nbulut sunucu siparişi ve yönetimi, SSH anahtarları, fatura\
     \ ve bakiye okuma.\nResmi Terraform sağlayıcısı (`gyro-hosting/gyro`) ve `gyroctl` bu API'yi kullanır.\n\n* **Taban adres** `https://www.gyrohosting.com/api/v1/client`\n\
     * **Kimlik** `Authorization: Bearer wck_...` (anahtarı *Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri* bölümünden oluşturun)\n* **Biçim** JSON\
@@ -53,7 +55,8 @@ info:
     \ en az 6 saat ücretlendirilir (`pricing.minimum_hours`), sunucu başına saatlik ekleme sınırı (`adds_per_hour`, `adds_left_this_hour`). Geriye uyumlu.\n\n**2.17.2**:\
     \ tr-ist-1 ters DNS otomatik yayında: her adreste varsayılan PTR `<a-b-c-d>.ip.gyrohosting.com`, özel PTR saniyeler içinde (`status: active`, yeni `default` alanı),\
     \ sunucu/IP bırakılınca silinir. Geriye uyumlu.\n\n**2.17.3**: tr-ist-1 snapshot: her ek snapshot en az 1 saat ücretlenir (iki saatlik sayım arasında oluşturulup\
-    \ silinen de). Yalnız metin.\n"
+    \ silinen de). Yalnız metin.\n\n**2.17.4**: Gyro Kapsayıcı Sunucusuz: `GET /cloud/billing/container-sizes` (vCPU / bellek çiftleri ve fiyatlar), `POST /cloud/billing/estimate`\
+    \ `{\"type\": \"serverless\", \"cpu_m\", \"memory_mi\", \"count\", \"hours\"}` kabul eder (aylık tavan yok, her kalemde `capped`). Geriye uyumlu.\n"
   contact:
     name: Gyro Hosting
     url: https://www.gyrohosting.com
@@ -8559,9 +8562,11 @@ paths:
       x-summary-tr: Kapsayıcı servisi oluştur
       x-scope: services_write
       description: 'Starts a new service on your dedicated node pool. Name: lowercase letters, digits and ''-'', max 40. Fails with 409 `quota_exceeded` when the
-        pool has no room. Secret values are set separately (PUT .../secrets).'
+        pool has no room. Secret values are set separately (PUT .../secrets). **Serverless environments:** `cpu_m` / `memory_mi` must be one of the pairs from `GET
+        /cloud/billing/container-sizes` (0.25-4 vCPU); billing is per running copy per hour (`POST /cloud/billing/estimate` with `type: serverless`).'
       x-description-tr: 'Size ayrılmış düğüm havuzunda yeni servis başlatır. Ad: küçük harf, rakam, ''-'', en çok 40. Havuzda yer yoksa 409 `quota_exceeded`. Gizli
-        değerler ayrıca (PUT .../secrets).'
+        değerler ayrıca (PUT .../secrets). **Sunucusuz ortam:** `cpu_m` / `memory_mi` `GET /cloud/billing/container-sizes` çiftlerinden biri olmalı (0,25-4 vCPU);
+        ücret çalışan kopya başına saatliktir (`POST /cloud/billing/estimate`, `type: serverless`).'
       parameters:
       - name: id
         in: path
@@ -8736,9 +8741,13 @@ paths:
       summary: Deploy a new version / change settings
       x-summary-tr: Yeni sürüm dağıt / ayar değiştir
       x-scope: services_write
-      description: Send only the fields to change (e.g. `image`). Every change except `replicas` creates a new revision and rolls out instance by instance without
-        downtime. With autoscaling on, `replicas` is ignored (the autoscaler owns it). `autoscaling` / `alerts` are settings, not revisions.
-      x-description-tr: Yalnız değişecek alanları gönderin (ör. `image`). `replicas` dışındaki her değişiklik yeni sürüm oluşturur ve kesintisiz dağıtılır.
+      description: 'Send only the fields to change (e.g. `image`). Every change except `replicas` creates a new revision and rolls out instance by instance without
+        downtime. With autoscaling on, `replicas` is ignored (the autoscaler owns it). `autoscaling` / `alerts` are settings, not revisions. **Serverless environments:**
+        `cpu_m` / `memory_mi` must be one of the pairs from `GET /cloud/billing/container-sizes` (0.25-4 vCPU); billing is per running copy per hour (`POST /cloud/billing/estimate`
+        with `type: serverless`).'
+      x-description-tr: 'Yalnız değişecek alanları gönderin (ör. `image`). `replicas` dışındaki her değişiklik yeni sürüm oluşturur ve kesintisiz dağıtılır. **Sunucusuz
+        ortam:** `cpu_m` / `memory_mi` `GET /cloud/billing/container-sizes` çiftlerinden biri olmalı (0,25-4 vCPU); ücret çalışan kopya başına saatliktir (`POST /cloud/billing/estimate`,
+        `type: serverless`).'
       parameters:
       - name: id
         in: path
@@ -16875,7 +16884,7 @@ paths:
       operationId: estimatePrepaidCost
       tags:
       - Billing
-      summary: Hourly / daily / monthly (capped at 672 h) cost of prepaid plans and how long the balance lasts
+      summary: Hourly / daily / monthly cost of prepaid plans and serverless containers, and how long the balance lasts
       x-gyro-cli:
       - billing
       - estimate
@@ -16905,20 +16914,59 @@ paths:
                         type: integer
                         default: 1
                         maximum: 100
+                      type:
+                        type: string
+                        enum:
+                        - serverless
+                        description: serverless = a Gyro Containers Serverless container copy (send cpu_m + memory_mi instead of plan)
+                      cpu_m:
+                        type: integer
+                        enum:
+                        - 250
+                        - 500
+                        - 1000
+                        - 2000
+                        - 4000
+                        description: 'serverless: CPU per copy in millicores'
+                      memory_mi:
+                        type: integer
+                        example: 512
+                        description: 'serverless: memory per copy in MiB (allowed values per cpu_m: GET /cloud/billing/container-sizes)'
+                      hours:
+                        type: integer
+                        minimum: 1
+                        maximum: 744
+                        default: 730
+                        description: 'serverless: running hours for `total` (default 730 = full month)'
                 plan:
                   type: string
                   description: single-item shortcut
                 count:
                   type: integer
+                cpu_m:
+                  type: integer
+                  description: serverless single-item shortcut
+                memory_mi:
+                  type: integer
+                hours:
+                  type: integer
+                type:
+                  type: string
+                  enum:
+                  - serverless
       responses:
         '200':
           description: items[], hourly, daily, monthly_cap, eur_rate, balance, hours_covered, order_requires (first 24 h), can_order
         '422':
-          description: unknown_plan | region_not_prepaid | too_many_items
+          description: unknown_plan | region_not_prepaid | too_many_items | invalid_cpu | invalid_memory | serverless_not_available
       x-scope: billing_read
       x-provided-by: GyroKredi
       description: 'Prepaid (hourly, from the account balance) services: Gyro Containers (ECS) and Gyro Cloud Istanbul (tr-ist-1). Times are Europe/Istanbul. Usage
-        is never invoiced: invoices are issued for balance top-ups.'
+        is never invoiced: invoices are issued for balance top-ups. Server and dedicated-node plans: hourly = monthly / 672, capped at the monthly price (`capped:
+        true`). Serverless containers (`{"type": "serverless", "cpu_m": 250, "memory_mi": 512, "count": 2, "hours": 730}`): no cap (`capped: false`), `monthly_cap`
+        = 730 hours, `total` = `hours` x hourly. Errors 422: `unknown_plan`, `region_not_prepaid`, `too_many_items`, `invalid_cpu`, `invalid_memory`, `serverless_not_available`.'
+      x-description-tr: ' Sunucu ve ayrılmış düğüm planları: saatlik = aylık / 672, aylık fiyatla sınırlı (`capped: true`). Sunucusuz kapsayıcı (`type: serverless`,
+        `cpu_m`, `memory_mi`, `count`, `hours`): tavan yok (`capped: false`), `monthly_cap` = 730 saat, `total` = `hours` x saatlik.'
   /cloud/billing/topup-url:
     get:
       operationId: getPrepaidTopupUrl
@@ -18254,6 +18302,39 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /cloud/billing/container-sizes:
+    get:
+      operationId: getContainerSizes
+      tags:
+      - Billing
+      summary: Serverless container sizes (vCPU / memory pairs) and prices
+      x-summary-tr: Sunucusuz kapsayıcı boyutları (vCPU / bellek) ve fiyatları
+      description: 'Gyro Containers Serverless bills each running container copy per hour: `cpu_m/1000` x vCPU-hour + `memory_mi/1024` x GB-hour, from the prepaid
+        balance, no monthly cap. Only the `cpu_m` / `memory_mi` pairs listed here are accepted on `POST /cloud/containers/{id}/services` of a serverless environment
+        (422 `invalid_cpu` / `invalid_memory`). 404 `serverless_not_available` when the product is not offered.'
+      x-description-tr: 'Gyro Kapsayıcı Sunucusuz her çalışan kopyayı saatlik ücretlendirir: `cpu_m/1000` x vCPU-saat + `memory_mi/1024` x GB-saat, ön ödemeli bakiyeden,
+        aylık tavan yok. Sunucusuz ortamda `POST /cloud/containers/{id}/services` yalnız burada listelenen `cpu_m` / `memory_mi` çiftlerini kabul eder (422 `invalid_cpu`
+        / `invalid_memory`).'
+      x-scope: billing_read
+      x-provided-by: GyroKredi
+      x-cli:
+        command: container sizes
+      responses:
+        '200':
+          description: Sizes
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ContainerSizes'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
 components:
   securitySchemes:
     bearerAuth:
@@ -20445,3 +20526,74 @@ components:
           type:
           - integer
           - 'null'
+    ContainerSizes:
+      type: object
+      properties:
+        product_id:
+          type: integer
+        plan:
+          type:
+          - string
+          - 'null'
+          example: ecs-sunucusuz
+        billing:
+          type: string
+          example: prepaid
+        currency:
+          type: string
+          example: EUR
+        vcpu_hour_eur:
+          type: number
+          example: 0.0298
+        gb_hour_eur:
+          type: number
+          example: 0.0024
+        vcpu_hour_list_eur:
+          type: number
+        gb_hour_list_eur:
+          type: number
+        environment_limit:
+          type: object
+          properties:
+            vcpu:
+              type: integer
+            memory_gb:
+              type: integer
+          description: Default limit of containers running at once per environment (account limits may differ)
+        eur_rate:
+          type: number
+        local_currency:
+          type: string
+        sizes:
+          type: array
+          items:
+            type: object
+            properties:
+              cpu_m:
+                type: integer
+              vcpu:
+                type: number
+              memory_mi:
+                type: array
+                items:
+                  type: integer
+              hourly_eur_min:
+                type: number
+              hourly_eur_max:
+                type: number
+              hourly_min:
+                type: object
+                properties:
+                  amount:
+                    type: number
+                  currency:
+                    type: string
+              hourly_max:
+                type: object
+                properties:
+                  amount:
+                    type: number
+                  currency:
+                    type: string
+        note:
+          type: string

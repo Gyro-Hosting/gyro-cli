@@ -66,7 +66,7 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro api request GET /cloud/storage/{id}/keys` | GET access-keys (GyroDepolama) | `GET /cloud/storage/{id}/keys` |
 | `gyro api request PATCH /cloud/mail/{id}/aliases/{aid}` | PATCH aliases:edit (GyroMail) | `PATCH /cloud/mail/{id}/aliases/{aid}` |
 | `gyro api request PATCH /cloud/mail/{id}/mailboxes/{local}` | PATCH mailboxes:edit (GyroMail) | `PATCH /cloud/mail/{id}/mailboxes/{local}` |
-| `gyro api request POST /cloud/billing/estimate` | Hourly / daily / monthly (capped at 672 h) cost of prepaid plans and how long the balance lasts | `POST /cloud/billing/estimate` |
+| `gyro api request POST /cloud/billing/estimate` | Hourly / daily / monthly cost of prepaid plans and serverless containers, and how long the balance lasts | `POST /cloud/billing/estimate` |
 | `gyro api request POST /cloud/licenses/{id}/change-ip` | POST method change_ip (LisansAPP) | `POST /cloud/licenses/{id}/change-ip` |
 | `gyro api request POST /cloud/mail/{id}/aliases` | POST aliases:create (GyroMail) | `POST /cloud/mail/{id}/aliases` |
 | `gyro api request POST /cloud/mail/{id}/mailboxes` | POST mailboxes:create (GyroMail) | `POST /cloud/mail/{id}/mailboxes` |
@@ -112,6 +112,7 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro container service rollback` | Roll back to an earlier revision | `POST /cloud/containers/{id}/services/{name}/rollback` |
 | `gyro container service scale` | Scale a service | `POST /cloud/containers/{id}/services/{name}/scale` |
 | `gyro container service update` | Deploy a new version / change settings | `PATCH /cloud/containers/{id}/services/{name}` |
+| `gyro container sizes` | Serverless container sizes (vCPU / memory pairs) and prices | `GET /cloud/billing/container-sizes` |
 | `gyro core invoice pay` | Pay invoice (path: {id}) | `POST /invoices/{id}/pay` |
 | `gyro core product list` | List products | `GET /products` |
 | `gyro core service addon list` | List service addons (path: {id}) | `GET /services/{id}/addons` |

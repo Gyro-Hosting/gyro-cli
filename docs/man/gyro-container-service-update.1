@@ -13,7 +13,7 @@ gyro-container-service-update - Deploy a new version / change settings
 Deploy a new version / change settings
 
 .PP
-Send only the fields to change (e.g. \fBimage\fR). Every change except \fBreplicas\fR creates a new revision and rolls out instance by instance without downtime. With autoscaling on, \fBreplicas\fR is ignored (the autoscaler owns it). \fBautoscaling\fR / \fBalerts\fR are settings, not revisions.
+Send only the fields to change (e.g. \fBimage\fR). Every change except \fBreplicas\fR creates a new revision and rolls out instance by instance without downtime. With autoscaling on, \fBreplicas\fR is ignored (the autoscaler owns it). \fBautoscaling\fR / \fBalerts\fR are settings, not revisions. \fBServerless environments:\fP \fBcpu_m\fR / \fBmemory_mi\fR must be one of the pairs from \fBGET /cloud/billing/container-sizes\fR (0.25-4 vCPU); billing is per running copy per hour (\fBPOST /cloud/billing/estimate\fR with \fBtype: serverless\fR).
 
 .PP
 API: PATCH /cloud/containers/{id}/services/{name} (operationId typed_patch_containers\fBid\fPservices__name, scope services_write)

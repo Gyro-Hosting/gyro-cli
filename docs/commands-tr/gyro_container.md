@@ -43,4 +43,5 @@ gyro container [flags]
 * [gyro container registry](gyro_container_registry.md)	 - Ortamın Gyro imaj deposu
 * [gyro container secret](gyro_container_secret.md)	 - Gizli değer sil
 * [gyro container service](gyro_container_service.md)	 - Kapsayıcı servislerini listele
+* [gyro container sizes](gyro_container_sizes.md)	 - Sunucusuz kapsayıcı boyutları (vCPU / bellek) ve fiyatları
 

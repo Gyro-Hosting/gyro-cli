@@ -1,0 +1,77 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-container-sizes - Serverless container sizes (vCPU / memory pairs) and prices
+
+
+.SH SYNOPSIS
+\fBgyro container sizes [flags]\fP
+
+
+.SH DESCRIPTION
+Serverless container sizes (vCPU / memory pairs) and prices
+
+.PP
+Gyro Containers Serverless bills each running container copy per hour: \fBcpu_m/1000\fR x vCPU-hour + \fBmemory_mi/1024\fR x GB-hour, from the prepaid balance, no monthly cap. Only the \fBcpu_m\fR / \fBmemory_mi\fR pairs listed here are accepted on \fBPOST /cloud/containers/{id}/services\fR of a serverless environment (422 \fBinvalid_cpu\fR / \fBinvalid_memory\fR). 404 \fBserverless_not_available\fR when the product is not offered.
+
+.PP
+API: GET /cloud/billing/container-sizes (operationId getContainerSizes, scope billing_read)
+
+
+.SH OPTIONS
+\fB-h\fP, \fB--help\fP[=false]
+	help for sizes
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH SEE ALSO
+\fBgyro-container(1)\fP

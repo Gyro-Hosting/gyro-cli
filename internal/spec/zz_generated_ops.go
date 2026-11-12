@@ -3,7 +3,7 @@
 package spec
 
 // APIVersion is info.version of the spec this table was generated from.
-const APIVersion = "2.17.3"
+const APIVersion = "2.17.4"
 
 // Ops lists every API operation.
 var Ops = []Op{
@@ -40,15 +40,26 @@ var Ops = []Op{
 		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
 		Columns: []string{"balance", "hourly_cost", "daily_cost", "upcoming_invoices_7d", "hours_left", "runs_out_at", "level", "suspended_hourly_cost", "eur_rate", "computed_at", "topup_url", "note"},
 	},
+	{ID: "getContainerSizes", Method: "GET", Path: "/cloud/billing/container-sizes", Tag: "Billing",
+		Summary: "Serverless container sizes (vCPU / memory pairs) and prices", SummaryTR: "Sunucusuz kapsayıcı boyutları (vCPU / bellek) ve fiyatları",
+		Desc: "Gyro Containers Serverless bills each running container copy per hour: `cpu_m/1000` x vCPU-hour + `memory_mi/1024` x GB-hour, from the prepaid balance, no monthly cap. Only the `cpu_m` / `memory_mi` pairs listed here are accepted on `POST /cloud/containers/{id}/services` of a serverless environment (422 `invalid_cpu` / `invalid_memory`). 404 `serverless_not_available` when the product is not offered.", DescTR: "Gyro Kapsayıcı Sunucusuz her çalışan kopyayı saatlik ücretlendirir: `cpu_m/1000` x vCPU-saat + `memory_mi/1024` x GB-saat, ön ödemeli bakiyeden, aylık tavan yok. Sunucusuz ortamda `POST /cloud/containers/{id}/services` yalnız burada listelenen `cpu_m` / `memory_mi` çiftlerini kabul eder (422 `invalid_cpu` / `invalid_memory`).",
+		Scope: "billing_read", Command: []string{"container", "sizes"},
+		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
+		Columns: []string{"product_id", "plan", "billing", "currency", "vcpu_hour_eur", "gb_hour_eur", "vcpu_hour_list_eur", "gb_hour_list_eur", "eur_rate", "local_currency", "note"},
+	},
 	{ID: "estimatePrepaidCost", Method: "POST", Path: "/cloud/billing/estimate", Tag: "Billing",
-		Summary: "Hourly / daily / monthly (capped at 672 h) cost of prepaid plans and how long the balance lasts", SummaryTR: "",
-		Desc: "Prepaid (hourly, from the account balance) services: Gyro Containers (ECS) and Gyro Cloud Istanbul (tr-ist-1). Times are Europe/Istanbul. Usage is never invoiced: invoices are issued for balance top-ups.", DescTR: "",
+		Summary: "Hourly / daily / monthly cost of prepaid plans and serverless containers, and how long the balance lasts", SummaryTR: "",
+		Desc: "Prepaid (hourly, from the account balance) services: Gyro Containers (ECS) and Gyro Cloud Istanbul (tr-ist-1). Times are Europe/Istanbul. Usage is never invoiced: invoices are issued for balance top-ups. Server and dedicated-node plans: hourly = monthly / 672, capped at the monthly price (`capped: true`). Serverless containers (`{\"type\": \"serverless\", \"cpu_m\": 250, \"memory_mi\": 512, \"count\": 2, \"hours\": 730}`): no cap (`capped: false`), `monthly_cap` = 730 hours, `total` = `hours` x hourly. Errors 422: `unknown_plan`, `region_not_prepaid`, `too_many_items`, `invalid_cpu`, `invalid_memory`, `serverless_not_available`.", DescTR: "Sunucu ve ayrılmış düğüm planları: saatlik = aylık / 672, aylık fiyatla sınırlı (`capped: true`). Sunucusuz kapsayıcı (`type: serverless`, `cpu_m`, `memory_mi`, `count`, `hours`): tavan yok (`capped: false`), `monthly_cap` = 730 saat, `total` = `hours` x saatlik.",
 		Scope: "billing_read", Command: []string{"billing", "estimate"},
 		HasBody: true, BodyRequired: true, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
 		Body: []Field{
 			{Name: "items", Type: "array", Items: "object", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
 			{Name: "plan", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "single-item shortcut", DescTR: ""},
 			{Name: "count", Type: "integer", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
+			{Name: "cpu_m", Type: "integer", Items: "", Enum: nil, Default: "", Required: false, Desc: "serverless single-item shortcut", DescTR: ""},
+			{Name: "memory_mi", Type: "integer", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
+			{Name: "hours", Type: "integer", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
+			{Name: "type", Type: "string", Items: "", Enum: []string{"serverless"}, Default: "", Required: false, Desc: "", DescTR: ""},
 		},
 	},
 	{ID: "getPrepaidStatement", Method: "GET", Path: "/cloud/billing/statement/{month}", Tag: "Billing",
@@ -277,7 +288,7 @@ var Ops = []Op{
 	},
 	{ID: "typed_post_containers__id__services", Method: "POST", Path: "/cloud/containers/{id}/services", Tag: "Containers",
 		Summary: "Create a container service", SummaryTR: "Kapsayıcı servisi oluştur",
-		Desc: "Starts a new service on your dedicated node pool. Name: lowercase letters, digits and '-', max 40. Fails with 409 `quota_exceeded` when the pool has no room. Secret values are set separately (PUT .../secrets).", DescTR: "Size ayrılmış düğüm havuzunda yeni servis başlatır. Ad: küçük harf, rakam, '-', en çok 40. Havuzda yer yoksa 409 `quota_exceeded`. Gizli değerler ayrıca (PUT .../secrets).",
+		Desc: "Starts a new service on your dedicated node pool. Name: lowercase letters, digits and '-', max 40. Fails with 409 `quota_exceeded` when the pool has no room. Secret values are set separately (PUT .../secrets). **Serverless environments:** `cpu_m` / `memory_mi` must be one of the pairs from `GET /cloud/billing/container-sizes` (0.25-4 vCPU); billing is per running copy per hour (`POST /cloud/billing/estimate` with `type: serverless`).", DescTR: "Size ayrılmış düğüm havuzunda yeni servis başlatır. Ad: küçük harf, rakam, '-', en çok 40. Havuzda yer yoksa 409 `quota_exceeded`. Gizli değerler ayrıca (PUT .../secrets). **Sunucusuz ortam:** `cpu_m` / `memory_mi` `GET /cloud/billing/container-sizes` çiftlerinden biri olmalı (0,25-4 vCPU); ücret çalışan kopya başına saatliktir (`POST /cloud/billing/estimate`, `type: serverless`).",
 		Scope: "services_write", Command: []string{"container", "service", "create"},
 		HasBody: true, BodyRequired: true, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
 		Params: []Param{
@@ -313,7 +324,7 @@ var Ops = []Op{
 	},
 	{ID: "typed_patch_containers__id__services__name", Method: "PATCH", Path: "/cloud/containers/{id}/services/{name}", Tag: "Containers",
 		Summary: "Deploy a new version / change settings", SummaryTR: "Yeni sürüm dağıt / ayar değiştir",
-		Desc: "Send only the fields to change (e.g. `image`). Every change except `replicas` creates a new revision and rolls out instance by instance without downtime. With autoscaling on, `replicas` is ignored (the autoscaler owns it). `autoscaling` / `alerts` are settings, not revisions.", DescTR: "Yalnız değişecek alanları gönderin (ör. `image`). `replicas` dışındaki her değişiklik yeni sürüm oluşturur ve kesintisiz dağıtılır.",
+		Desc: "Send only the fields to change (e.g. `image`). Every change except `replicas` creates a new revision and rolls out instance by instance without downtime. With autoscaling on, `replicas` is ignored (the autoscaler owns it). `autoscaling` / `alerts` are settings, not revisions. **Serverless environments:** `cpu_m` / `memory_mi` must be one of the pairs from `GET /cloud/billing/container-sizes` (0.25-4 vCPU); billing is per running copy per hour (`POST /cloud/billing/estimate` with `type: serverless`).", DescTR: "Yalnız değişecek alanları gönderin (ör. `image`). `replicas` dışındaki her değişiklik yeni sürüm oluşturur ve kesintisiz dağıtılır. **Sunucusuz ortam:** `cpu_m` / `memory_mi` `GET /cloud/billing/container-sizes` çiftlerinden biri olmalı (0,25-4 vCPU); ücret çalışan kopya başına saatliktir (`POST /cloud/billing/estimate`, `type: serverless`).",
 		Scope: "services_write", Command: []string{"container", "service", "update"},
 		HasBody: true, BodyRequired: true, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
 		Params: []Param{

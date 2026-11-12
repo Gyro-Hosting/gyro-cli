@@ -66,7 +66,7 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro api request GET /cloud/storage/{id}/keys` | access-keys (GyroDepolama) | `GET /cloud/storage/{id}/keys` |
 | `gyro api request PATCH /cloud/mail/{id}/aliases/{aid}` | aliases:edit (GyroMail) | `PATCH /cloud/mail/{id}/aliases/{aid}` |
 | `gyro api request PATCH /cloud/mail/{id}/mailboxes/{local}` | mailboxes:edit (GyroMail) | `PATCH /cloud/mail/{id}/mailboxes/{local}` |
-| `gyro api request POST /cloud/billing/estimate` | Hourly / daily / monthly (capped at 672 h) cost of prepaid plans and how long the balance lasts | `POST /cloud/billing/estimate` |
+| `gyro api request POST /cloud/billing/estimate` | Hourly / daily / monthly cost of prepaid plans and serverless containers, and how long the balance lasts | `POST /cloud/billing/estimate` |
 | `gyro api request POST /cloud/licenses/{id}/change-ip` | method change_ip (LisansAPP) | `POST /cloud/licenses/{id}/change-ip` |
 | `gyro api request POST /cloud/mail/{id}/aliases` | aliases:create (GyroMail) | `POST /cloud/mail/{id}/aliases` |
 | `gyro api request POST /cloud/mail/{id}/mailboxes` | mailboxes:create (GyroMail) | `POST /cloud/mail/{id}/mailboxes` |
@@ -112,6 +112,7 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro container service rollback` | Önceki sürüme dön | `POST /cloud/containers/{id}/services/{name}/rollback` |
 | `gyro container service scale` | Servisi ölçekle | `POST /cloud/containers/{id}/services/{name}/scale` |
 | `gyro container service update` | Yeni sürüm dağıt / ayar değiştir | `PATCH /cloud/containers/{id}/services/{name}` |
+| `gyro container sizes` | Sunucusuz kapsayıcı boyutları (vCPU / bellek) ve fiyatları | `GET /cloud/billing/container-sizes` |
 | `gyro core invoice pay` | Faturayı Ödeme | `POST /invoices/{id}/pay` |
 | `gyro core product list` | Ürünleri Listeleme | `GET /products` |
 | `gyro core service addon list` | Hizmet Eklentilerini Okuma | `GET /services/{id}/addons` |

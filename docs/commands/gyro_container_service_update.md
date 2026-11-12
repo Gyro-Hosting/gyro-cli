@@ -6,7 +6,7 @@ Deploy a new version / change settings
 
 Deploy a new version / change settings
 
-Send only the fields to change (e.g. `image`). Every change except `replicas` creates a new revision and rolls out instance by instance without downtime. With autoscaling on, `replicas` is ignored (the autoscaler owns it). `autoscaling` / `alerts` are settings, not revisions.
+Send only the fields to change (e.g. `image`). Every change except `replicas` creates a new revision and rolls out instance by instance without downtime. With autoscaling on, `replicas` is ignored (the autoscaler owns it). `autoscaling` / `alerts` are settings, not revisions. **Serverless environments:** `cpu_m` / `memory_mi` must be one of the pairs from `GET /cloud/billing/container-sizes` (0.25-4 vCPU); billing is per running copy per hour (`POST /cloud/billing/estimate` with `type: serverless`).
 
 API: PATCH /cloud/containers/{id}/services/{name} (operationId typed_patch_containers__id__services__name, scope services_write)
 
