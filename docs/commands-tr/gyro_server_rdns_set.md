@@ -6,7 +6,7 @@ Bir adresin PTR kaydını ayarla (veya sıfırla)
 
 Bir adresin PTR kaydını ayarla (veya sıfırla)
 
-`dns_ptr` and `ptr` are accepted as aliases of `hostname`. tr-ist-1: a PTR on an address without a record is created (request; goes live after approval, `status: pending`); resetting an address without a record is a no-op.
+**tr-ist-1 (Gyro Bulut İstanbul):** her adres (birincil ve ek IPv4) için otomatik PTR `<a-b-c-d>.ip.gyrohosting.com` ve eşleşen A kaydı vardır. `hostname` ile kendi tam alan adınızı yazın (saniyeler içinde yayında); boş değer varsayılana döndürür. Gyro alan adları altı ve korunan marka adları reddedilir (`hostname_reserved`, `hostname_blocked`); sunucu başına saatte en çok 30 değişiklik (`rate_limited`). E-posta teslimi için adınızın A kaydı bu adresi göstermeli (zorunlu değil). Sunucu silinince ya da ek IP bırakılınca PTR kaldırılır.
 
 API: PUT /cloud/servers/{id}/rdns (operationId setRdns, scope cloud_write)
 

@@ -2,7 +2,7 @@
 openapi: 3.1.0
 info:
   title: Gyro Public API
-  version: 2.17.1
+  version: 2.17.2
   summary: Manage Gyro cloud servers, SSH keys and billing programmatically.
   x-summary-tr: Gyro bulut sunucularınızı, SSH anahtarlarınızı ve faturalarınızı programla yönetin.
   description: "The Gyro Public API lets you automate everything you do in the Gyro client area:\norder and manage cloud servers, keep SSH keys, read invoices and\
@@ -26,7 +26,8 @@ info:
     \ app. Additive change.\n\n**2.17.0**: Gyro Containers: per-service autoscaling (`PUT /cloud/containers/{id}/services/{name}/autoscaling`, also `autoscaling`\
     \ / `alerts` on create and update), notification channels (`GET/PUT /cloud/containers/{id}/notifications`, `.../notifications/test`, `.../notifications/webhook-secret`:\
     \ e-mail, SMS, Telegram, signed webhook). Additive.\n\n**2.17.1**: additional IPv4: each added address is billed at least 6 hours (`pricing.minimum_hours`), per-server\
-    \ add limit per hour (`adds_per_hour`, `adds_left_this_hour`). Additive.\n"
+    \ add limit per hour (`adds_per_hour`, `adds_left_this_hour`). Additive.\n\n**2.17.2**: tr-ist-1 reverse DNS is published automatically: default PTR `<a-b-c-d>.ip.gyrohosting.com`\
+    \ on every address, custom PTR live within seconds (`status: active`, new `default` flag), removed when the server/IP is released. Additive.\n"
   x-description-tr: "Gyro Public API, müşteri panelinde yaptığınız her işi otomatikleştirmenizi sağlar:\nbulut sunucu siparişi ve yönetimi, SSH anahtarları, fatura\
     \ ve bakiye okuma.\nResmi Terraform sağlayıcısı (`gyro-hosting/gyro`) ve `gyroctl` bu API'yi kullanır.\n\n* **Taban adres** `https://www.gyrohosting.com/api/v1/client`\n\
     * **Kimlik** `Authorization: Bearer wck_...` (anahtarı *Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri* bölümünden oluşturun)\n* **Biçim** JSON\
@@ -48,7 +49,9 @@ info:
     \ `popular_tr` (Türkiye'de popüler), `version`, `license` ve `description` döndürür. Geriye uyumlu ekleme.\n\n**2.17.0**: Gyro Kapsayıcı: servis başına otomatik\
     \ ölçekleme (`PUT /cloud/containers/{id}/services/{name}/autoscaling`, oluştur/güncellemede `autoscaling` / `alerts`), bildirim kanalları (`GET/PUT /cloud/containers/{id}/notifications`,\
     \ `.../notifications/test`, `.../notifications/webhook-secret`: e-posta, SMS, Telegram, imzalı webhook). Geriye uyumlu.\n\n**2.17.1**: ek IPv4: her eklenen adres\
-    \ en az 6 saat ücretlendirilir (`pricing.minimum_hours`), sunucu başına saatlik ekleme sınırı (`adds_per_hour`, `adds_left_this_hour`). Geriye uyumlu.\n"
+    \ en az 6 saat ücretlendirilir (`pricing.minimum_hours`), sunucu başına saatlik ekleme sınırı (`adds_per_hour`, `adds_left_this_hour`). Geriye uyumlu.\n\n**2.17.2**:\
+    \ tr-ist-1 ters DNS otomatik yayında: her adreste varsayılan PTR `<a-b-c-d>.ip.gyrohosting.com`, özel PTR saniyeler içinde (`status: active`, yeni `default` alanı),\
+    \ sunucu/IP bırakılınca silinir. Geriye uyumlu.\n"
   contact:
     name: Gyro Hosting
     url: https://www.gyrohosting.com
@@ -1089,6 +1092,15 @@ paths:
                       $ref: '#/components/schemas/RdnsEntry'
         '404':
           $ref: '#/components/responses/NotFound'
+      description: '**tr-ist-1 (Gyro Bulut İstanbul):** every address (primary and additional IPv4) gets an automatic PTR `<a-b-c-d>.ip.gyrohosting.com` with a matching
+        A record. Set `hostname` to your own FQDN to replace it (published within seconds); an empty value restores the default. Names under Gyro domains and protected
+        brand names are refused (`hostname_reserved`, `hostname_blocked`); at most 30 changes per server per hour (`rate_limited`). The A record of your name should
+        point to the address (forward-confirmed reverse DNS) for e-mail delivery; it is not enforced. When the server is deleted or an additional IP is released,
+        its PTR is removed. '
+      x-description-tr: '**tr-ist-1 (Gyro Bulut İstanbul):** her adres (birincil ve ek IPv4) için otomatik PTR `<a-b-c-d>.ip.gyrohosting.com` ve eşleşen A kaydı vardır.
+        `hostname` ile kendi tam alan adınızı yazın (saniyeler içinde yayında); boş değer varsayılana döndürür. Gyro alan adları altı ve korunan marka adları reddedilir
+        (`hostname_reserved`, `hostname_blocked`); sunucu başına saatte en çok 30 değişiklik (`rate_limited`). E-posta teslimi için adınızın A kaydı bu adresi göstermeli
+        (zorunlu değil). Sunucu silinince ya da ek IP bırakılınca PTR kaldırılır. '
     put:
       tags:
       - Networking
@@ -1127,8 +1139,16 @@ paths:
           $ref: '#/components/responses/NotFound'
         '422':
           $ref: '#/components/responses/Validation'
-      description: '`dns_ptr` and `ptr` are accepted as aliases of `hostname`. tr-ist-1: a PTR on an address without a record is created (request; goes live after
-        approval, `status: pending`); resetting an address without a record is a no-op.'
+      description: '**tr-ist-1 (Gyro Bulut İstanbul):** every address (primary and additional IPv4) gets an automatic PTR `<a-b-c-d>.ip.gyrohosting.com` with a matching
+        A record. Set `hostname` to your own FQDN to replace it (published within seconds); an empty value restores the default. Names under Gyro domains and protected
+        brand names are refused (`hostname_reserved`, `hostname_blocked`); at most 30 changes per server per hour (`rate_limited`). The A record of your name should
+        point to the address (forward-confirmed reverse DNS) for e-mail delivery; it is not enforced. When the server is deleted or an additional IP is released,
+        its PTR is removed. `dns_ptr` and `ptr` are accepted as aliases of `hostname`. tr-ist-1: a PTR on an address without a record is created (request; goes live
+        after approval, `status: pending`); resetting an address without a record is a no-op.'
+      x-description-tr: '**tr-ist-1 (Gyro Bulut İstanbul):** her adres (birincil ve ek IPv4) için otomatik PTR `<a-b-c-d>.ip.gyrohosting.com` ve eşleşen A kaydı vardır.
+        `hostname` ile kendi tam alan adınızı yazın (saniyeler içinde yayında); boş değer varsayılana döndürür. Gyro alan adları altı ve korunan marka adları reddedilir
+        (`hostname_reserved`, `hostname_blocked`); sunucu başına saatte en çok 30 değişiklik (`rate_limited`). E-posta teslimi için adınızın A kaydı bu adresi göstermeli
+        (zorunlu değil). Sunucu silinince ya da ek IP bırakılınca PTR kaldırılır. '
   /cloud/servers/{id}/firewall:
     parameters:
     - $ref: '#/components/parameters/ServerId'
@@ -18877,7 +18897,10 @@ components:
           - pending
           - active
           - rejected
-          description: 'tr-ist-1 only: state of the PTR request (a reset also stays pending until applied)'
+          description: 'tr-ist-1: `active` = published on our name servers (Gyro Bulut İstanbul publishes within seconds); `pending` only on legacy VDS servers'
+        default:
+          type: boolean
+          description: 'tr-ist-1: true when the address uses the automatic default name `<a-b-c-d>.ip.gyrohosting.com` (forward A record exists, FCrDNS passes)'
     FirewallRule:
       type: object
       properties:

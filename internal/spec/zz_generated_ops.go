@@ -3,7 +3,7 @@
 package spec
 
 // APIVersion is info.version of the spec this table was generated from.
-const APIVersion = "2.17.1"
+const APIVersion = "2.17.2"
 
 // Ops lists every API operation.
 var Ops = []Op{
@@ -2345,19 +2345,20 @@ var Ops = []Op{
 	},
 	{ID: "listRdns", Method: "GET", Path: "/cloud/servers/{id}/rdns", Tag: "Networking",
 		Summary: "List reverse DNS entries", SummaryTR: "Ters DNS kayıtlarını listele",
+		Desc: "**tr-ist-1 (Gyro Bulut İstanbul):** every address (primary and additional IPv4) gets an automatic PTR `<a-b-c-d>.ip.gyrohosting.com` with a matching A record. Set `hostname` to your own FQDN to replace it (published within seconds); an empty value restores the default. Names under Gyro domains and protected brand names are refused (`hostname_reserved`, `hostname_blocked`); at most 30 changes per server per hour (`rate_limited`). The A record of your name should point to the address (forward-confirmed reverse DNS) for e-mail delivery; it is not enforced. When the server is deleted or an additional IP is released, its PTR is removed.", DescTR: "**tr-ist-1 (Gyro Bulut İstanbul):** her adres (birincil ve ek IPv4) için otomatik PTR `<a-b-c-d>.ip.gyrohosting.com` ve eşleşen A kaydı vardır. `hostname` ile kendi tam alan adınızı yazın (saniyeler içinde yayında); boş değer varsayılana döndürür. Gyro alan adları altı ve korunan marka adları reddedilir (`hostname_reserved`, `hostname_blocked`); sunucu başına saatte en çok 30 değişiklik (`rate_limited`). E-posta teslimi için adınızın A kaydı bu adresi göstermeli (zorunlu değil). Sunucu silinince ya da ek IP bırakılınca PTR kaldırılır.",
 		Scope: "cloud_read", Command: []string{"server", "rdns", "list"},
 		HasBody: false, BodyRequired: false, ListResponse: true, Paginated: false, Confirm: false, Money: false, Hidden: false,
-		Columns: []string{"ip", "hostname", "version", "status"},
+		Columns: []string{"ip", "hostname", "version", "status", "default"},
 		Params: []Param{
 			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Server id (= service id in the client area)", DescTR: ""},
 		},
 	},
 	{ID: "setRdns", Method: "PUT", Path: "/cloud/servers/{id}/rdns", Tag: "Networking",
 		Summary: "Set (or reset) the PTR record of one address", SummaryTR: "Bir adresin PTR kaydını ayarla (veya sıfırla)",
-		Desc: "`dns_ptr` and `ptr` are accepted as aliases of `hostname`. tr-ist-1: a PTR on an address without a record is created (request; goes live after approval, `status: pending`); resetting an address without a record is a no-op.", DescTR: "",
+		Desc: "**tr-ist-1 (Gyro Bulut İstanbul):** every address (primary and additional IPv4) gets an automatic PTR `<a-b-c-d>.ip.gyrohosting.com` with a matching A record. Set `hostname` to your own FQDN to replace it (published within seconds); an empty value restores the default. Names under Gyro domains and protected brand names are refused (`hostname_reserved`, `hostname_blocked`); at most 30 changes per server per hour (`rate_limited`). The A record of your name should point to the address (forward-confirmed reverse DNS) for e-mail delivery; it is not enforced. When the server is deleted or an additional IP is released, its PTR is removed. `dns_ptr` and `ptr` are accepted as aliases of `hostname`. tr-ist-1: a PTR on an address without a record is created (request; goes live after approval, `status: pending`); resetting an address without a record is a no-op.", DescTR: "**tr-ist-1 (Gyro Bulut İstanbul):** her adres (birincil ve ek IPv4) için otomatik PTR `<a-b-c-d>.ip.gyrohosting.com` ve eşleşen A kaydı vardır. `hostname` ile kendi tam alan adınızı yazın (saniyeler içinde yayında); boş değer varsayılana döndürür. Gyro alan adları altı ve korunan marka adları reddedilir (`hostname_reserved`, `hostname_blocked`); sunucu başına saatte en çok 30 değişiklik (`rate_limited`). E-posta teslimi için adınızın A kaydı bu adresi göstermeli (zorunlu değil). Sunucu silinince ya da ek IP bırakılınca PTR kaldırılır.",
 		Scope: "cloud_write", Command: []string{"server", "rdns", "set"},
 		HasBody: true, BodyRequired: true, ListResponse: true, Paginated: false, Confirm: false, Money: false, Hidden: false,
-		Columns: []string{"ip", "hostname", "version", "status"},
+		Columns: []string{"ip", "hostname", "version", "status", "default"},
 		Params: []Param{
 			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Server id (= service id in the client area)", DescTR: ""},
 		},
