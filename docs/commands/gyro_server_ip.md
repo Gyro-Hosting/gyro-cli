@@ -33,4 +33,7 @@ gyro server ip <SERVER> [flags]
 ### SEE ALSO
 
 * [gyro server](gyro_server.md)	 - Cloud servers: create, power, snapshots, SSH ...
+* [gyro server ip add](gyro_server_ip_add.md)	 - Add additional IPv4 addresses
+* [gyro server ip list](gyro_server_ip_list.md)	 - List the server's IPv4 addresses
+* [gyro server ip remove](gyro_server_ip_remove.md)	 - Release an additional IPv4 address
 

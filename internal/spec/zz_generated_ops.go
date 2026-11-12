@@ -3,7 +3,7 @@
 package spec
 
 // APIVersion is info.version of the spec this table was generated from.
-const APIVersion = "2.15.0"
+const APIVersion = "2.16.0"
 
 // Ops lists every API operation.
 var Ops = []Op{
@@ -2224,6 +2224,41 @@ var Ops = []Op{
 			{Name: "confirm", In: "query", Type: "boolean", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
 		},
 	},
+	{ID: "listServerIps", Method: "GET", Path: "/cloud/servers/{id}/ips", Tag: "Networking",
+		Summary: "List the server's IPv4 addresses", SummaryTR: "Sunucunun IPv4 adresleri",
+		Desc: "Additional IPv4 addresses are billed per address hourly from the prepaid balance (default 2 EUR per address-month, `pricing` shows the current price), from the hour they are added until they are released. Up to `max` per server (default 5). Each address is configured on the server automatically (/32 on the primary interface, kept across reboots and reinstalls); reverse DNS: PUT /cloud/servers/{id}/rdns.", DescTR: "Ek IPv4 adresleri adres başına ön ödemeli bakiyeden saatlik ücretlendirilir (varsayılan adres başına aylık 2 €, güncel fiyat `pricing` alanında); eklendiği saatten çıkarıldığı saate kadar. Sunucu başına en çok `max` (varsayılan 5). Adres sunucuya otomatik tanımlanır (birincil arayüze /32, yeniden başlatma ve yeniden kurulumda korunur); ters DNS: PUT /cloud/servers/{id}/rdns.",
+		Scope: "cloud_read", Command: []string{"server", "ip", "list"},
+		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
+		Columns: []string{"server_id", "primary_ip", "count", "max", "available", "applied_on_server", "released"},
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Server id (tr-ist-1)", DescTR: ""},
+		},
+	},
+	{ID: "addServerIps", Method: "POST", Path: "/cloud/servers/{id}/ips", Tag: "Networking",
+		Summary: "Add additional IPv4 addresses", SummaryTR: "Ek IPv4 adresi ekle",
+		Desc: "Additional IPv4 addresses are billed per address hourly from the prepaid balance (default 2 EUR per address-month, `pricing` shows the current price), from the hour they are added until they are released. Up to `max` per server (default 5). Each address is configured on the server automatically (/32 on the primary interface, kept across reboots and reinstalls); reverse DNS: PUT /cloud/servers/{id}/rdns. Prepaid tr-ist-1 servers only; not while the server is suspended.", DescTR: "Ek IPv4 adresleri adres başına ön ödemeli bakiyeden saatlik ücretlendirilir (varsayılan adres başına aylık 2 €, güncel fiyat `pricing` alanında); eklendiği saatten çıkarıldığı saate kadar. Sunucu başına en çok `max` (varsayılan 5). Adres sunucuya otomatik tanımlanır (birincil arayüze /32, yeniden başlatma ve yeniden kurulumda korunur); ters DNS: PUT /cloud/servers/{id}/rdns. Yalnız ön ödemeli tr-ist-1 sunucuları; askıdayken eklenemez.",
+		Scope: "cloud_write", Command: []string{"server", "ip", "add"},
+		HasBody: true, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: true, Hidden: false,
+		Columns: []string{"server_id", "primary_ip", "count", "max", "available", "applied_on_server", "released"},
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Server id (tr-ist-1)", DescTR: ""},
+		},
+		Body: []Field{
+			{Name: "count", Type: "integer", Items: "", Enum: nil, Default: "1", Required: false, Desc: "", DescTR: ""},
+		},
+	},
+	{ID: "removeServerIp", Method: "DELETE", Path: "/cloud/servers/{id}/ips/{ip}", Tag: "Networking",
+		Summary: "Release an additional IPv4 address", SummaryTR: "Ek IPv4 adresini bırak",
+		Desc: "The address is removed from the server and returns to the pool (getting the same address back is not guaranteed); billing stops after the current hour. Needs `confirm=true`.", DescTR: "Adres sunucudan kaldırılır ve havuza döner (aynı adresi geri alma garantisi yok); ücret içinde bulunulan saatten sonra durur. `confirm=true` gerekir.",
+		Scope: "cloud_write", Command: []string{"server", "ip", "remove"},
+		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: true, Money: false, Hidden: false,
+		Columns: []string{"server_id", "primary_ip", "count", "max", "available", "applied_on_server", "released"},
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Server id (tr-ist-1)", DescTR: ""},
+			{Name: "ip", In: "path", Type: "string", Items: "", Enum: nil, Default: "", Required: true, Desc: "", DescTR: ""},
+			{Name: "confirm", In: "query", Type: "boolean", Items: "", Enum: nil, Default: "", Required: true, Desc: "", DescTR: ""},
+		},
+	},
 	{ID: "getMetrics", Method: "GET", Path: "/cloud/servers/{id}/metrics", Tag: "Monitoring",
 		Summary: "CPU, disk and network time series", SummaryTR: "CPU, disk ve ağ zaman serileri",
 		Desc: "tr-ist-1 (Gyro Compute): instant values (one point per series: cpu %, memory active/total MB, uptime s) and `instant: true`.", DescTR: "",
@@ -3042,7 +3077,7 @@ var Ops = []Op{
 		Desc: "Billed 0.05 EUR per GB-month of the space the template really uses, hourly from the prepaid balance (through the account's template storage service, opened with the first template). Deleting a template stops its charge. At most 10 templates; visible only in your account. `meta` carries count, max, total_gb and pricing.", DescTR: "Şablonun gerçekten kullandığı alan üzerinden GB başına aylık 0,05 € (ön ödemeli bakiyeden saatlik; ilk şablonla açılan şablon deposu hizmeti üzerinden). Silince ücret durur. En çok 10 şablon; yalnız sizin hesabınızda görünür. `meta`: adet, sınır, toplam GB, fiyat.",
 		Scope: "cloud_read", Command: []string{"template", "list"},
 		HasBody: false, BodyRequired: false, ListResponse: true, Paginated: true, Confirm: false, Money: false, Hidden: false,
-		Columns: []string{"id", "image", "name", "description", "status", "size_gb", "size_bytes", "min_disk_gb", "base_image", "base_image_name", "source_server_id", "region", "created_at", "ready_at"},
+		Columns: []string{"id", "image", "name", "description", "status", "size_gb", "size_bytes", "min_disk_gb", "base_image", "base_image_name", "source_server_id", "region", "mode", "created_at", "ready_at"},
 		Params: []Param{
 			{Name: "page", In: "query", Type: "integer", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
 			{Name: "limit", In: "query", Type: "integer", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
@@ -3053,7 +3088,7 @@ var Ops = []Op{
 		Desc: "Another account's template answers 404.", DescTR: "Başka hesabın şablonu 404 döner.",
 		Scope: "cloud_read", Command: []string{"template", "get"},
 		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
-		Columns: []string{"id", "image", "name", "description", "status", "size_gb", "size_bytes", "min_disk_gb", "base_image", "base_image_name", "source_server_id", "region", "created_at", "ready_at"},
+		Columns: []string{"id", "image", "name", "description", "status", "size_gb", "size_bytes", "min_disk_gb", "base_image", "base_image_name", "source_server_id", "region", "mode", "created_at", "ready_at"},
 		Params: []Param{
 			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Template id", DescTR: ""},
 		},
@@ -3063,7 +3098,7 @@ var Ops = []Op{
 		Desc: "Name 1-60 characters (letters, digits, space . _ -).", DescTR: "Ad 1-60 karakter (harf, rakam, boşluk . _ -).",
 		Scope: "cloud_write", Command: []string{"template", "update"},
 		HasBody: true, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
-		Columns: []string{"id", "image", "name", "description", "status", "size_gb", "size_bytes", "min_disk_gb", "base_image", "base_image_name", "source_server_id", "region", "created_at", "ready_at"},
+		Columns: []string{"id", "image", "name", "description", "status", "size_gb", "size_bytes", "min_disk_gb", "base_image", "base_image_name", "source_server_id", "region", "mode", "created_at", "ready_at"},
 		Params: []Param{
 			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Template id", DescTR: ""},
 		},

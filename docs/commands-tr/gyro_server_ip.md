@@ -33,4 +33,7 @@ gyro server ip <SERVER> [flags]
 ### SEE ALSO
 
 * [gyro server](gyro_server.md)	 - Bulut sunucular: oluşturma, güç, snapshot, SSH ...
+* [gyro server ip add](gyro_server_ip_add.md)	 - Ek IPv4 adresi ekle
+* [gyro server ip list](gyro_server_ip_list.md)	 - Sunucunun IPv4 adresleri
+* [gyro server ip remove](gyro_server_ip_remove.md)	 - Ek IPv4 adresini bırak
 

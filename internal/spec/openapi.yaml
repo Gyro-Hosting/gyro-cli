@@ -2,7 +2,7 @@
 openapi: 3.1.0
 info:
   title: Gyro Public API
-  version: 2.15.0
+  version: 2.16.0
   summary: Manage Gyro cloud servers, SSH keys and billing programmatically.
   x-summary-tr: Gyro bulut sunucularınızı, SSH anahtarlarınızı ve faturalarınızı programla yönetin.
   description: "The Gyro Public API lets you automate everything you do in the Gyro client area:\norder and manage cloud servers, keep SSH keys, read invoices and\
@@ -21,7 +21,8 @@ info:
     \ ids, metrics (instant), browser console URL. Request / response shapes unchanged.\n\n**2.14.1**: `GET /cloud/apps` returns `min_ram_gb` (fixed), `min_disk_gb`,\
     \ `min_cpu`, `popular_tr`, `version`, `license` and `description` for each one-click app. Additive change.\n\n**2.15.0**: custom templates for tr-ist-1 servers:\
     \ capture a server (`POST /cloud/servers/{id}/templates`), list / rename / delete, new server (`POST /cloud/templates/{id}/servers`) or reinstall (`POST /cloud/templates/{id}/rebuild`)\
-    \ from it. 0.05 EUR per GB-month (prepaid, hourly). No image upload.\n"
+    \ from it. 0.05 EUR per GB-month (prepaid, hourly). No image upload.\n\n**2.16.0**: additional IPv4 addresses for tr-ist-1 servers: `GET/POST /cloud/servers/{id}/ips`,\
+    \ `DELETE /cloud/servers/{id}/ips/{ip}` (hourly from the prepaid balance, default 2 EUR per address-month, up to 5 per server; configured on the server automatically).\n"
   x-description-tr: "Gyro Public API, müşteri panelinde yaptığınız her işi otomatikleştirmenizi sağlar:\nbulut sunucu siparişi ve yönetimi, SSH anahtarları, fatura\
     \ ve bakiye okuma.\nResmi Terraform sağlayıcısı (`gyro-hosting/gyro`) ve `gyroctl` bu API'yi kullanır.\n\n* **Taban adres** `https://www.gyrohosting.com/api/v1/client`\n\
     * **Kimlik** `Authorization: Bearer wck_...` (anahtarı *Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri* bölümünden oluşturun)\n* **Biçim** JSON\
@@ -39,7 +40,8 @@ info:
     \ için `min_ram_gb` (düzeltildi), `min_disk_gb`, `min_cpu`, `popular_tr` (Türkiye'de popüler), `version`, `license` ve `description` döndürür. Geriye uyumlu ekleme.\n\
     \n**2.15.0**: tr-ist-1 sunucuları için özel şablonlar: sunucudan şablon (`POST /cloud/servers/{id}/templates`), listele / adlandır / sil, şablondan yeni sunucu\
     \ (`POST /cloud/templates/{id}/servers`) ya da yeniden kurulum (`POST /cloud/templates/{id}/rebuild`). GB başına aylık 0,05 € (ön ödemeli, saatlik). Dışarıdan\
-    \ imaj yüklenmez.\n"
+    \ imaj yüklenmez.\n\n**2.16.0**: tr-ist-1 sunucularına ek IPv4: `GET/POST /cloud/servers/{id}/ips`, `DELETE /cloud/servers/{id}/ips/{ip}` (ön ödemeli bakiyeden\
+    \ saatlik, varsayılan adres başına aylık 2 €, sunucu başına en çok 5; sunucuya otomatik tanımlanır).\n"
   contact:
     name: Gyro Hosting
     url: https://www.gyrohosting.com
@@ -17742,6 +17744,166 @@ paths:
               required:
               - server_id
               - confirm
+  /cloud/servers/{id}/ips:
+    get:
+      tags:
+      - Networking
+      operationId: listServerIps
+      summary: List the server's IPv4 addresses
+      x-summary-tr: Sunucunun IPv4 adresleri
+      x-scope: cloud_read
+      x-cli:
+        command: server ip list
+      description: 'Additional IPv4 addresses are billed per address hourly from the prepaid balance (default 2 EUR per address-month, `pricing` shows the current
+        price), from the hour they are added until they are released. Up to `max` per server (default 5). Each address is configured on the server automatically (/32
+        on the primary interface, kept across reboots and reinstalls); reverse DNS: PUT /cloud/servers/{id}/rdns. '
+      x-description-tr: 'Ek IPv4 adresleri adres başına ön ödemeli bakiyeden saatlik ücretlendirilir (varsayılan adres başına aylık 2 €, güncel fiyat `pricing` alanında);
+        eklendiği saatten çıkarıldığı saate kadar. Sunucu başına en çok `max` (varsayılan 5). Adres sunucuya otomatik tanımlanır (birincil arayüze /32, yeniden başlatma
+        ve yeniden kurulumda korunur); ters DNS: PUT /cloud/servers/{id}/rdns. '
+      parameters:
+      - &id049
+        name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Server id (tr-ist-1)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ServerIps'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: not_actionable (suspended / busy)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          $ref: '#/components/responses/Validation'
+        '501':
+          description: not_supported (not a tr-ist-1 Gyro Compute server)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags:
+      - Networking
+      operationId: addServerIps
+      summary: Add additional IPv4 addresses
+      x-summary-tr: Ek IPv4 adresi ekle
+      x-scope: cloud_write
+      x-cli:
+        command: server ip add
+        money: true
+      description: 'Additional IPv4 addresses are billed per address hourly from the prepaid balance (default 2 EUR per address-month, `pricing` shows the current
+        price), from the hour they are added until they are released. Up to `max` per server (default 5). Each address is configured on the server automatically (/32
+        on the primary interface, kept across reboots and reinstalls); reverse DNS: PUT /cloud/servers/{id}/rdns. Prepaid tr-ist-1 servers only; not while the server
+        is suspended.'
+      x-description-tr: 'Ek IPv4 adresleri adres başına ön ödemeli bakiyeden saatlik ücretlendirilir (varsayılan adres başına aylık 2 €, güncel fiyat `pricing` alanında);
+        eklendiği saatten çıkarıldığı saate kadar. Sunucu başına en çok `max` (varsayılan 5). Adres sunucuya otomatik tanımlanır (birincil arayüze /32, yeniden başlatma
+        ve yeniden kurulumda korunur); ters DNS: PUT /cloud/servers/{id}/rdns. Yalnız ön ödemeli tr-ist-1 sunucuları; askıdayken eklenemez.'
+      parameters:
+      - *id049
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                count:
+                  type: integer
+                  minimum: 1
+                  maximum: 16
+                  default: 1
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ServerIps'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: not_actionable (suspended / busy)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          $ref: '#/components/responses/Validation'
+        '501':
+          description: not_supported (not a tr-ist-1 Gyro Compute server)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /cloud/servers/{id}/ips/{ip}:
+    delete:
+      tags:
+      - Networking
+      operationId: removeServerIp
+      summary: Release an additional IPv4 address
+      x-summary-tr: Ek IPv4 adresini bırak
+      x-scope: cloud_write
+      x-cli:
+        command: server ip remove
+        confirm: true
+      description: The address is removed from the server and returns to the pool (getting the same address back is not guaranteed); billing stops after the current
+        hour. Needs `confirm=true`.
+      x-description-tr: Adres sunucudan kaldırılır ve havuza döner (aynı adresi geri alma garantisi yok); ücret içinde bulunulan saatten sonra durur. `confirm=true`
+        gerekir.
+      parameters:
+      - *id049
+      - name: ip
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: confirm
+        in: query
+        required: true
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ServerIps'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: not_actionable (suspended / busy)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          $ref: '#/components/responses/Validation'
+        '501':
+          description: not_supported (not a tr-ist-1 Gyro Compute server)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 components:
   securitySchemes:
     bearerAuth:
@@ -19822,6 +19984,12 @@ components:
           - 'null'
         region:
           type: string
+        mode:
+          type: string
+          enum:
+          - snapshot
+          - shutdown
+          description: How the template was copied
         warnings:
           type: array
           items:
@@ -19848,3 +20016,64 @@ components:
               type: number
             hourly_eur:
               type: number
+    ServerIps:
+      type: object
+      properties:
+        server_id:
+          type: integer
+        primary_ip:
+          type:
+          - string
+          - 'null'
+        extra_ips:
+          type: array
+          items:
+            type: object
+            properties:
+              ip:
+                type: string
+              prefix:
+                type: integer
+                description: always 32 (configured as /32 on the primary interface)
+              added_at:
+                type:
+                - string
+                - 'null'
+              reverse_dns:
+                type:
+                - string
+                - 'null'
+        count:
+          type: integer
+        max:
+          type: integer
+          description: per-server limit (default 5)
+        available:
+          type: integer
+        applied_on_server:
+          type: boolean
+          description: false = the server's guest agent did not confirm yet (see manual_commands)
+        manual_commands:
+          type: array
+          items:
+            type: string
+        pricing:
+          type: object
+          properties:
+            billing:
+              type: string
+            per_ip_monthly_eur:
+              type: number
+            per_ip_hourly_eur:
+              type: number
+            per_ip_monthly_text:
+              type:
+              - string
+              - 'null'
+              description: TL (EUR) at the panel rate
+        added:
+          type: array
+          items:
+            type: string
+        released:
+          type: string

@@ -299,6 +299,9 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro server firewall rule add` | Gelen trafik kuralı ekle | `POST /cloud/servers/{id}/firewall/rules` |
 | `gyro server firewall rule delete` | Güvenlik duvarı kuralı sil (son kural confirm ister) | `DELETE /cloud/servers/{id}/firewall/rules/{n}` |
 | `gyro server get` | Sunucuyu canlı durumuyla getir | `GET /cloud/servers/{id}` |
+| `gyro server ip add` | Ek IPv4 adresi ekle | `POST /cloud/servers/{id}/ips` |
+| `gyro server ip list` | Sunucunun IPv4 adresleri | `GET /cloud/servers/{id}/ips` |
+| `gyro server ip remove` | Ek IPv4 adresini bırak | `DELETE /cloud/servers/{id}/ips/{ip}` |
 | `gyro server list` | Bulut sunucuları listele | `GET /cloud/servers` |
 | `gyro server metrics` | CPU, disk ve ağ zaman serileri | `GET /cloud/servers/{id}/metrics` |
 | `gyro server power off` | Sunucu işlemi çalıştır | `POST /cloud/servers/{id}/actions/{action}` |

@@ -299,6 +299,9 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro server firewall rule add` | Add a firewall rule | `POST /cloud/servers/{id}/firewall/rules` |
 | `gyro server firewall rule delete` | Remove a firewall rule (the last one needs confirm) | `DELETE /cloud/servers/{id}/firewall/rules/{n}` |
 | `gyro server get` | Get a server with its live state | `GET /cloud/servers/{id}` |
+| `gyro server ip add` | Add additional IPv4 addresses | `POST /cloud/servers/{id}/ips` |
+| `gyro server ip list` | List the server's IPv4 addresses | `GET /cloud/servers/{id}/ips` |
+| `gyro server ip remove` | Release an additional IPv4 address | `DELETE /cloud/servers/{id}/ips/{ip}` |
 | `gyro server list` | List cloud servers | `GET /cloud/servers` |
 | `gyro server metrics` | CPU, disk and network time series | `GET /cloud/servers/{id}/metrics` |
 | `gyro server power off` | Run a server action | `POST /cloud/servers/{id}/actions/{action}` |

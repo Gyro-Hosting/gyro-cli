@@ -1,0 +1,43 @@
+## gyro server ip list
+
+List the server's IPv4 addresses
+
+### Synopsis
+
+List the server's IPv4 addresses
+
+Additional IPv4 addresses are billed per address hourly from the prepaid balance (default 2 EUR per address-month, `pricing` shows the current price), from the hour they are added until they are released. Up to `max` per server (default 5). Each address is configured on the server automatically (/32 on the primary interface, kept across reboots and reinstalls); reverse DNS: PUT /cloud/servers/{id}/rdns.
+
+API: GET /cloud/servers/{id}/ips (operationId listServerIps, scope cloud_read)
+
+```
+gyro server ip list <ID> [flags]
+```
+
+### Options
+
+```
+  -h, --help   help for list
+```
+
+### Options inherited from parent commands
+
+```
+      --api-url string     API base URL (env GYRO_API_URL)
+      --debug              log HTTP requests to stderr (secrets masked)
+      --lang string        message language: tr or en (default from locale)
+      --no-color           disable colours (also NO_COLOR)
+      --no-header          omit the table header
+  -o, --output string      output format: table, json, yaml, text
+  -p, --profile string     profile to use (env GYRO_PROFILE)
+      --query string       JMESPath query applied to the result
+  -q, --quiet              print only ids
+      --timeout duration   overall timeout, e.g. 30s, 10m
+      --wide               show all table columns
+  -y, --yes                do not ask for confirmation
+```
+
+### SEE ALSO
+
+* [gyro server ip](gyro_server_ip.md)	 - Print the public IPv4 (or --ipv6) of a server
+
