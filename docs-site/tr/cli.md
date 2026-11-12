@@ -109,6 +109,7 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro container service update` | Yeni sürüm dağıt / ayar değiştir | `PATCH /cloud/containers/{id}/services/{name}` |
 | `gyro core invoice pay` | Faturayı Ödeme | `POST /invoices/{id}/pay` |
 | `gyro core product list` | Ürünleri Listeleme | `GET /products` |
+| `gyro core service addon list` | Hizmet Eklentilerini Okuma | `GET /services/{id}/addons` |
 | `gyro core service get` | Hizmeti Okuma | `GET /services/{id}` |
 | `gyro core service list` | Hizmetleri Listeleme | `GET /services` |
 | `gyro core service tool get` | Araç Verisini Okuma | `GET /services/{id}/tools/{tool}` |
@@ -317,8 +318,9 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro server snapshot restore` | Snapshot'ı sunucuya geri yükle (diski ezer) | `POST /cloud/servers/{id}/snapshots/{sid}/restore` |
 | `gyro server update | rename` | Sunucu adını değiştir veya otomatik yenilemeyi aç/kapat | `PATCH /cloud/servers/{id}` |
 | `gyro service addon available get` | Bu hizmete alınabilecek ek hizmetler | `GET /cloud/services/{id}/addons/available` |
-| `gyro service addon list` | Hizmet Eklentilerini Okuma | `GET /services/{id}/addons` |
-| `gyro service addons` | Ek hizmet satın al (bakiyeden ödenir) | `POST /cloud/services/{id}/addons` |
+| `gyro service addon create` | Ek hizmet satın al (bakiyeden ödenir) | `POST /cloud/services/{id}/addons` |
+| `gyro service addon delete` | Ön ödemeli ek hizmeti hemen kaldır | `DELETE /cloud/services/{id}/addons/{aid}` |
+| `gyro service addon list` | Hizmetin ek hizmetleri | `GET /cloud/services/{id}/addons` |
 | `gyro service cancellation create` | İptal Talebi Açma | `POST /services/{id}/cancellation` |
 | `gyro service cancellation delete` | İptal Talebini Geri Çekme | `DELETE /services/{id}/cancellation` |
 | `gyro service dashboard get` | Panel Özetini Okuma | `GET /services/{id}/dashboard` |

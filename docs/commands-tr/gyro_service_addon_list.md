@@ -1,14 +1,14 @@
 ## gyro service addon list
 
-Hizmet Eklentilerini Okuma
+Hizmetin ek hizmetleri
 
 ### Synopsis
 
-Hizmet Eklentilerini Okuma
+Hizmetin ek hizmetleri
 
-Hizmete bağlı ek hizmetleri döndürür. — anahtarın sahibi
+Prepaid add-ons (billing: prepaid) carry the hourly price and removable: true.
 
-API: GET /services/{id}/addons (operationId coreGetServiceAddons, scope Services/GetServiceAddons)
+API: GET /cloud/services/{id}/addons (operationId listServiceAddons, scope services_read)
 
 ```
 gyro service addon list <ID> [flags]
@@ -39,5 +39,5 @@ gyro service addon list <ID> [flags]
 
 ### SEE ALSO
 
-* [gyro service addon](gyro_service_addon.md)	 - Hizmet Eklentilerini Okuma
+* [gyro service addon](gyro_service_addon.md)	 - Hizmetin ek hizmetleri
 
