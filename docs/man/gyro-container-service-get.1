@@ -13,7 +13,7 @@ gyro-container-service-get - Get a container service
 Get a container service
 
 .PP
-Spec, state, problem code (ImagePullBackOff, CrashLoopBackOff, OOMKilled, Unschedulable ...), instances, revision, domains and the names of secrets (values are never returned).
+Spec, state, problem code (ImagePullBackOff, CrashLoopBackOff, OOMKilled, Unschedulable ...), instances, revision, domains and the names of secrets (values are never returned). \fBautoscaling\fR = settings + live status (current/desired replicas, current CPU/memory %, at_max), \fBcapacity\fR = {blocked, fits}.
 
 .PP
 API: GET /cloud/containers/{id}/services/{name} (operationId typed_get_containers\fBid\fPservices__name, scope services_read)

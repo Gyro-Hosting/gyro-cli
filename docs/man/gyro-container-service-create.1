@@ -20,8 +20,16 @@ API: POST /cloud/containers/{id}/services (operationId typed_post_containers\fBi
 
 
 .SH OPTIONS
+\fB--alerts\fP=""
+	Alert threshold: notify when fewer replicas are ready (0 = off). Channels: PUT /cloud/containers/{id}/notifications. (JSON)
+
+.PP
 \fB--args\fP=[]
 	Arguments for the image's default command
+
+.PP
+\fB--autoscaling\fP=""
+	Autoscaling (horizontal): replicas follow the average CPU (and optionally memory) use of the reserved size. \fBenabled:false\fR = off (fixed replicas). (JSON)
 
 .PP
 \fB--command\fP=[]

@@ -90,6 +90,10 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro container logs` | Service logs | `GET /cloud/containers/{id}/services/{name}/logs` |
 | `gyro container metrics` | Service CPU / memory | `GET /cloud/containers/{id}/services/{name}/metrics` |
 | `gyro container nodes` | Node pool | `GET /cloud/containers/{id}/nodes` |
+| `gyro container notifications get` | Notification settings and current alerts | `GET /cloud/containers/{id}/notifications` |
+| `gyro container notifications set` | Set notification channels | `PUT /cloud/containers/{id}/notifications` |
+| `gyro container notifications test` | Send a test notification | `POST /cloud/containers/{id}/notifications/test` |
+| `gyro container notifications webhook-secret` | Webhook signing secret | `POST /cloud/containers/{id}/notifications/webhook-secret` |
 | `gyro container registry credentials` | Registry password | `POST /cloud/containers/{id}/registry/credentials` |
 | `gyro container registry get` | Gyro image registry of the environment | `GET /cloud/containers/{id}/registry` |
 | `gyro container registry image-delete` | Delete an image tag | `DELETE /cloud/containers/{id}/registry/images` |
@@ -98,6 +102,7 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro container registry rotate` | Rotate the registry password | `POST /cloud/containers/{id}/registry/rotate` |
 | `gyro container secret delete` | Delete secret values | `DELETE /cloud/containers/{id}/services/{name}/secrets` |
 | `gyro container secret set` | Set secret values | `PUT /cloud/containers/{id}/services/{name}/secrets` |
+| `gyro container service autoscale` | Autoscaling / alert threshold of a service | `PUT /cloud/containers/{id}/services/{name}/autoscaling` |
 | `gyro container service create` | Create a container service | `POST /cloud/containers/{id}/services` |
 | `gyro container service delete` | Delete a container service | `DELETE /cloud/containers/{id}/services/{name}` |
 | `gyro container service get` | Get a container service | `GET /cloud/containers/{id}/services/{name}` |

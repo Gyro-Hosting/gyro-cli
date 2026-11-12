@@ -6,7 +6,7 @@ Get a container service
 
 Get a container service
 
-Spec, state, problem code (ImagePullBackOff, CrashLoopBackOff, OOMKilled, Unschedulable ...), instances, revision, domains and the names of secrets (values are never returned).
+Spec, state, problem code (ImagePullBackOff, CrashLoopBackOff, OOMKilled, Unschedulable ...), instances, revision, domains and the names of secrets (values are never returned). `autoscaling` = settings + live status (current/desired replicas, current CPU/memory %, at_max), `capacity` = {blocked, fits}.
 
 API: GET /cloud/containers/{id}/services/{name} (operationId typed_get_containers__id__services__name, scope services_read)
 

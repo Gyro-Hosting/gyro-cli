@@ -1,0 +1,105 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-container-service-autoscale - Autoscaling / alert threshold of a service
+
+
+.SH SYNOPSIS
+\fBgyro container service autoscale   [flags]\fP
+
+
+.SH DESCRIPTION
+Autoscaling / alert threshold of a service
+
+.PP
+Body \fB{"autoscaling": {"enabled": true, "min": 1, "max": 5, "cpu_percent": 70, "memory_percent": 0}, "alerts": {"min_ready": 2}}\fR\&. Replicas are added when the average use exceeds the target (at most double per 30 s) and removed one per minute after 3 calm minutes. Max cannot exceed the plan replica limit; replicas that do not fit in the node pool wait (\fBwarnings: max_exceeds_capacity\fR, alert \fBcapacity\fR). Not a revision. Switching off keeps the current replica count (or \fBreplicas\fR).
+
+.PP
+API: PUT /cloud/containers/{id}/services/{name}/autoscaling (operationId typed_put_containers\fBid\fPservices\fBname\fPautoscaling, scope services_write)
+
+
+.SH OPTIONS
+\fB--alerts\fP=""
+	Alert threshold: notify when fewer replicas are ready (0 = off). Channels: PUT /cloud/containers/{id}/notifications. (JSON)
+
+.PP
+\fB--autoscaling\fP=""
+	Autoscaling (horizontal): replicas follow the average CPU (and optionally memory) use of the reserved size. \fBenabled:false\fR = off (fixed replicas). (JSON)
+
+.PP
+\fB--data\fP=""
+	request body as JSON, @file or @- (stdin)
+
+.PP
+\fB--dry-run\fP[=false]
+	show the price quote / request without changing anything
+
+.PP
+\fB-h\fP, \fB--help\fP[=false]
+	help for autoscale
+
+.PP
+\fB--idempotency-key\fP=""
+	idempotency key (automatic for money operations)
+
+.PP
+\fB--replicas\fP=0
+	Fixed replicas when switching autoscaling off
+
+.PP
+\fB--set\fP=[]
+	extra body field key=value (repeatable)
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH SEE ALSO
+\fBgyro-container-service(1)\fP

@@ -1,0 +1,121 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-container-notifications-set - Set notification channels
+
+
+.SH SYNOPSIS
+\fBgyro container notifications set  [flags]\fP
+
+
+.SH DESCRIPTION
+Set notification channels
+
+.PP
+Send only the fields to change. A webhook secret is generated when a webhook URL is first set (POST .../notifications/webhook-secret returns it). No WhatsApp.
+
+.PP
+API: PUT /cloud/containers/{id}/notifications (operationId typed_put_containers\fBid\fPnotifications, scope services_write)
+
+
+.SH OPTIONS
+\fB--cooldown\fP=0
+	Minutes between two announcements of the same service + event (5-1440, default 30)
+
+.PP
+\fB--data\fP=""
+	request body as JSON, @file or @- (stdin)
+
+.PP
+\fB--dry-run\fP[=false]
+	show the price quote / request without changing anything
+
+.PP
+\fB--email\fP[=false]
+	Account e-mail (default on)
+
+.PP
+\fB--events\fP=""
+	Comma separated: down, crashloop, replicas_low, scale_max, capacity
+
+.PP
+\fB-h\fP, \fB--help\fP[=false]
+	help for set
+
+.PP
+\fB--idempotency-key\fP=""
+	idempotency key (automatic for money operations)
+
+.PP
+\fB--resolved\fP[=false]
+	Send a 'resolved' message (default on)
+
+.PP
+\fB--set\fP=[]
+	extra body field key=value (repeatable)
+
+.PP
+\fB--sms\fP[=false]
+	Account phone
+
+.PP
+\fB--telegram\fP=""
+	Telegram chat id (send /start to the platform bot, e.g. @gyrouptime_bot); empty = off
+
+.PP
+\fB--webhook-url\fP=""
+	https URL of a public server; JSON POST signed with X-Gyro-Signature: sha256=HMAC(secret, X-Gyro-Timestamp + '.' + body)
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH SEE ALSO
+\fBgyro-container-notifications(1)\fP

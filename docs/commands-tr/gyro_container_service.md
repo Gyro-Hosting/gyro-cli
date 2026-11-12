@@ -32,6 +32,7 @@ gyro container service [flags]
 ### SEE ALSO
 
 * [gyro container](gyro_container.md)	 - Gyro Kapsayıcı (ECS), İstanbul: servisler, sürümler, loglar, alan adları
+* [gyro container service autoscale](gyro_container_service_autoscale.md)	 - Servisin otomatik ölçekleme / uyarı eşiği
 * [gyro container service create](gyro_container_service_create.md)	 - Kapsayıcı servisi oluştur
 * [gyro container service delete](gyro_container_service_delete.md)	 - Kapsayıcı servisini sil
 * [gyro container service get](gyro_container_service_get.md)	 - Kapsayıcı servisini getir

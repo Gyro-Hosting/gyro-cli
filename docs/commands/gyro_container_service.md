@@ -32,6 +32,7 @@ gyro container service [flags]
 ### SEE ALSO
 
 * [gyro container](gyro_container.md)	 - Gyro Containers (ECS), Istanbul: services, versions, logs, domains
+* [gyro container service autoscale](gyro_container_service_autoscale.md)	 - Autoscaling / alert threshold of a service
 * [gyro container service create](gyro_container_service_create.md)	 - Create a container service
 * [gyro container service delete](gyro_container_service_delete.md)	 - Delete a container service
 * [gyro container service get](gyro_container_service_get.md)	 - Get a container service

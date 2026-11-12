@@ -90,6 +90,10 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro container logs` | Servis logları | `GET /cloud/containers/{id}/services/{name}/logs` |
 | `gyro container metrics` | Servis işlemci / bellek | `GET /cloud/containers/{id}/services/{name}/metrics` |
 | `gyro container nodes` | Düğüm havuzu | `GET /cloud/containers/{id}/nodes` |
+| `gyro container notifications get` | Bildirim ayarları ve süren uyarılar | `GET /cloud/containers/{id}/notifications` |
+| `gyro container notifications set` | Bildirim kanallarını ayarla | `PUT /cloud/containers/{id}/notifications` |
+| `gyro container notifications test` | Test bildirimi gönder | `POST /cloud/containers/{id}/notifications/test` |
+| `gyro container notifications webhook-secret` | Webhook imza anahtarı | `POST /cloud/containers/{id}/notifications/webhook-secret` |
 | `gyro container registry credentials` | Depo parolası | `POST /cloud/containers/{id}/registry/credentials` |
 | `gyro container registry get` | Ortamın Gyro imaj deposu | `GET /cloud/containers/{id}/registry` |
 | `gyro container registry image-delete` | İmaj etiketini sil | `DELETE /cloud/containers/{id}/registry/images` |
@@ -98,6 +102,7 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro container registry rotate` | Depo parolasını yenile | `POST /cloud/containers/{id}/registry/rotate` |
 | `gyro container secret delete` | Gizli değer sil | `DELETE /cloud/containers/{id}/services/{name}/secrets` |
 | `gyro container secret set` | Gizli değer ayarla | `PUT /cloud/containers/{id}/services/{name}/secrets` |
+| `gyro container service autoscale` | Servisin otomatik ölçekleme / uyarı eşiği | `PUT /cloud/containers/{id}/services/{name}/autoscaling` |
 | `gyro container service create` | Kapsayıcı servisi oluştur | `POST /cloud/containers/{id}/services` |
 | `gyro container service delete` | Kapsayıcı servisini sil | `DELETE /cloud/containers/{id}/services/{name}` |
 | `gyro container service get` | Kapsayıcı servisini getir | `GET /cloud/containers/{id}/services/{name}` |

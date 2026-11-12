@@ -2,7 +2,7 @@
 openapi: 3.1.0
 info:
   title: Gyro Public API
-  version: 2.16.1
+  version: 2.17.0
   summary: Manage Gyro cloud servers, SSH keys and billing programmatically.
   x-summary-tr: Gyro bulut sunucularınızı, SSH anahtarlarınızı ve faturalarınızı programla yönetin.
   description: "The Gyro Public API lets you automate everything you do in the Gyro client area:\norder and manage cloud servers, keep SSH keys, read invoices and\
@@ -23,7 +23,9 @@ info:
     \ from it. 0.05 EUR per GB-month (prepaid, hourly). No image upload.\n\n**2.16.0**: additional IPv4 addresses for tr-ist-1 servers: `GET/POST /cloud/servers/{id}/ips`,\
     \ `DELETE /cloud/servers/{id}/ips/{ip}` (hourly from the prepaid balance, default 2 EUR per address-month, up to 5 per server; configured on the server automatically).\n\
     \n**2.16.1**: `GET /cloud/apps` returns `min_ram_gb` (fixed), `min_disk_gb`, `min_cpu`, `popular_tr`, `version`, `license` and `description` for each one-click\
-    \ app. Additive change.\n"
+    \ app. Additive change.\n\n**2.17.0**: Gyro Containers: per-service autoscaling (`PUT /cloud/containers/{id}/services/{name}/autoscaling`, also `autoscaling`\
+    \ / `alerts` on create and update), notification channels (`GET/PUT /cloud/containers/{id}/notifications`, `.../notifications/test`, `.../notifications/webhook-secret`:\
+    \ e-mail, SMS, Telegram, signed webhook). Additive.\n"
   x-description-tr: "Gyro Public API, müşteri panelinde yaptığınız her işi otomatikleştirmenizi sağlar:\nbulut sunucu siparişi ve yönetimi, SSH anahtarları, fatura\
     \ ve bakiye okuma.\nResmi Terraform sağlayıcısı (`gyro-hosting/gyro`) ve `gyroctl` bu API'yi kullanır.\n\n* **Taban adres** `https://www.gyrohosting.com/api/v1/client`\n\
     * **Kimlik** `Authorization: Bearer wck_...` (anahtarı *Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri* bölümünden oluşturun)\n* **Biçim** JSON\
@@ -42,7 +44,9 @@ info:
     \ kurulum (`POST /cloud/templates/{id}/rebuild`). GB başına aylık 0,05 € (ön ödemeli, saatlik). Dışarıdan imaj yüklenmez.\n\n**2.16.0**: tr-ist-1 sunucularına\
     \ ek IPv4: `GET/POST /cloud/servers/{id}/ips`, `DELETE /cloud/servers/{id}/ips/{ip}` (ön ödemeli bakiyeden saatlik, varsayılan adres başına aylık 2 €, sunucu\
     \ başına en çok 5; sunucuya otomatik tanımlanır).\n\n**2.16.1**: `GET /cloud/apps` her tek tık uygulama için `min_ram_gb` (düzeltildi), `min_disk_gb`, `min_cpu`,\
-    \ `popular_tr` (Türkiye'de popüler), `version`, `license` ve `description` döndürür. Geriye uyumlu ekleme.\n"
+    \ `popular_tr` (Türkiye'de popüler), `version`, `license` ve `description` döndürür. Geriye uyumlu ekleme.\n\n**2.17.0**: Gyro Kapsayıcı: servis başına otomatik\
+    \ ölçekleme (`PUT /cloud/containers/{id}/services/{name}/autoscaling`, oluştur/güncellemede `autoscaling` / `alerts`), bildirim kanalları (`GET/PUT /cloud/containers/{id}/notifications`,\
+    \ `.../notifications/test`, `.../notifications/webhook-secret`: e-posta, SMS, Telegram, imzalı webhook). Geriye uyumlu.\n"
   contact:
     name: Gyro Hosting
     url: https://www.gyrohosting.com
@@ -8609,6 +8613,36 @@ paths:
                   type: integer
                   description: User id inside the container (default 10001)
                   x-description-tr: Kapsayıcı içi kullanıcı kimliği (varsayılan 10001)
+                autoscaling: &id040
+                  type: object
+                  description: 'Autoscaling (horizontal): replicas follow the average CPU (and optionally memory) use of the reserved size. `enabled:false` = off
+                    (fixed replicas).'
+                  x-description-tr: 'Otomatik ölçekleme: kopya sayısı ayrılan boyutun ortalama CPU (isteğe bağlı bellek) kullanımına göre değişir. `enabled:false`
+                    = kapalı.'
+                  properties:
+                    enabled:
+                      type: boolean
+                    min:
+                      type: integer
+                      minimum: 1
+                    max:
+                      type: integer
+                      description: <= plan replica limit
+                    cpu_percent:
+                      type: integer
+                      minimum: 10
+                      maximum: 95
+                      default: 70
+                    memory_percent:
+                      type: integer
+                      description: 0 = off, else 10-95
+                alerts: &id041
+                  type: object
+                  description: 'Alert threshold: notify when fewer replicas are ready (0 = off). Channels: PUT /cloud/containers/{id}/notifications.'
+                  x-description-tr: 'Uyarı eşiği: hazır kopya bu sayının altına düşerse bildirim (0 = kapalı).'
+                  properties:
+                    min_ready:
+                      type: integer
                 confirm:
                   type: boolean
               required:
@@ -8626,7 +8660,7 @@ paths:
       x-summary-tr: Kapsayıcı servisini getir
       x-scope: services_read
       description: Spec, state, problem code (ImagePullBackOff, CrashLoopBackOff, OOMKilled, Unschedulable ...), instances, revision, domains and the names of secrets
-        (values are never returned).
+        (values are never returned). `autoscaling` = settings + live status (current/desired replicas, current CPU/memory %, at_max), `capacity` = {blocked, fits}.
       x-description-tr: Tanım, durum, sorun kodu, örnekler, sürüm, alan adları ve gizli değer adları (değerler asla dönmez).
       parameters:
       - name: id
@@ -8669,7 +8703,7 @@ paths:
       x-summary-tr: Yeni sürüm dağıt / ayar değiştir
       x-scope: services_write
       description: Send only the fields to change (e.g. `image`). Every change except `replicas` creates a new revision and rolls out instance by instance without
-        downtime.
+        downtime. With autoscaling on, `replicas` is ignored (the autoscaler owns it). `autoscaling` / `alerts` are settings, not revisions.
       x-description-tr: Yalnız değişecek alanları gönderin (ör. `image`). `replicas` dışındaki her değişiklik yeni sürüm oluşturur ve kesintisiz dağıtılır.
       parameters:
       - name: id
@@ -8722,6 +8756,8 @@ paths:
                 reason:
                   type: string
                   description: Free text shown in the revision history (e.g. a git sha)
+                autoscaling: *id040
+                alerts: *id041
                 confirm:
                   type: boolean
               required: []
@@ -8788,7 +8824,8 @@ paths:
       summary: Scale a service
       x-summary-tr: Servisi ölçekle
       x-scope: services_write
-      description: Sets the number of instances (0 = stop, settings kept). Does not create a revision.
+      description: Sets the number of instances (0 = stop, settings kept). Does not create a revision. Refused with 409 `autoscaling_enabled` while autoscaling is
+        on (change min/max instead).
       x-description-tr: Örnek sayısını ayarlar (0 = durdur). Sürüm oluşturmaz.
       parameters:
       - name: id
@@ -9502,6 +9539,274 @@ paths:
       x-cli:
         command: container domain remove
         confirm: true
+  /cloud/containers/{id}/services/{name}/autoscaling:
+    put:
+      tags:
+      - Containers
+      operationId: typed_put_containers__id__services__name__autoscaling
+      summary: Autoscaling / alert threshold of a service
+      x-summary-tr: Servisin otomatik ölçekleme / uyarı eşiği
+      x-scope: services_write
+      description: 'Body `{"autoscaling": {"enabled": true, "min": 1, "max": 5, "cpu_percent": 70, "memory_percent": 0}, "alerts": {"min_ready": 2}}`. Replicas are
+        added when the average use exceeds the target (at most double per 30 s) and removed one per minute after 3 calm minutes. Max cannot exceed the plan replica
+        limit; replicas that do not fit in the node pool wait (`warnings: max_exceeds_capacity`, alert `capacity`). Not a revision. Switching off keeps the current
+        replica count (or `replicas`).'
+      x-description-tr: 'Gövde `{"autoscaling": {...}, "alerts": {"min_ready": 2}}`. Ortalama kullanım hedefi aşınca kopya eklenir (30 sn''de en çok iki katı), 3
+        dakika sakin kalınca dakikada bir azaltılır. En çok kopya paket sınırını aşamaz; havuza sığmayan kopyalar bekler. Sürüm oluşturmaz. Kapatınca mevcut kopya
+        sayısı (ya da `replicas`) kalır.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Service name
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                autoscaling: *id040
+                alerts: *id041
+                replicas:
+                  type: integer
+                  description: Fixed replicas when switching autoscaling off
+                confirm:
+                  type: boolean
+              required: []
+      x-cli:
+        command: container service autoscale
+        confirm: false
+  /cloud/containers/{id}/notifications:
+    get:
+      tags:
+      - Containers
+      operationId: typed_get_containers__id__notifications
+      summary: Notification settings and current alerts
+      x-summary-tr: Bildirim ayarları ve süren uyarılar
+      x-scope: services_read
+      description: '`settings` (channels, events, cooldown; the webhook secret is never returned), `conditions` = what is wrong right now, `history` = last 30 alerts.
+        Events: down (no ready replica for >3 min), crashloop (keeps restarting / image pull fails / out of memory), replicas_low (below alerts.min_ready), scale_max
+        (autoscaling wants more than max), capacity (replicas wait for room in the node pool). An event is announced after ~2 minutes, at most once per cooldown per
+        service + event (flapping included), with a ''resolved'' message.'
+      x-description-tr: '`settings` (kanallar, olaylar, tekrar aralığı; webhook anahtarı dönmez), `conditions` = şu an süren sorunlar, `history` = son 30 uyarı. Olaylar:
+        down, crashloop, replicas_low, scale_max, capacity. Olay ~2 dakika sürünce bildirilir; aynı servis + olay tekrar aralığında bir kez (gidip gelenler dahil),
+        düzelince ''düzeldi'' mesajı.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      responses:
+        '200':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      x-cli:
+        command: container notifications get
+        confirm: false
+    put:
+      tags:
+      - Containers
+      operationId: typed_put_containers__id__notifications
+      summary: Set notification channels
+      x-summary-tr: Bildirim kanallarını ayarla
+      x-scope: services_write
+      description: Send only the fields to change. A webhook secret is generated when a webhook URL is first set (POST .../notifications/webhook-secret returns it).
+        No WhatsApp.
+      x-description-tr: Yalnız değişecek alanları gönderin. Webhook adresi ilk kez girilince imza anahtarı üretilir (POST .../notifications/webhook-secret ile alınır).
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: boolean
+                  description: Account e-mail (default on)
+                sms:
+                  type: boolean
+                  description: Account phone
+                telegram:
+                  type: string
+                  description: Telegram chat id (send /start to the platform bot, e.g. @gyrouptime_bot); empty = off
+                webhook_url:
+                  type: string
+                  description: 'https URL of a public server; JSON POST signed with X-Gyro-Signature: sha256=HMAC(secret, X-Gyro-Timestamp + ''.'' + body)'
+                events:
+                  type: string
+                  description: 'Comma separated: down, crashloop, replicas_low, scale_max, capacity'
+                cooldown:
+                  type: integer
+                  description: Minutes between two announcements of the same service + event (5-1440, default 30)
+                resolved:
+                  type: boolean
+                  description: Send a 'resolved' message (default on)
+                confirm:
+                  type: boolean
+              required: []
+      x-cli:
+        command: container notifications set
+        confirm: false
+  /cloud/containers/{id}/notifications/test:
+    post:
+      tags:
+      - Containers
+      operationId: typed_post_containers__id__notifications_test
+      summary: Send a test notification
+      x-summary-tr: Test bildirimi gönder
+      x-scope: services_write
+      description: Sends a test message to every enabled channel; `channels` = per channel result. At most 5 per 10 minutes.
+      x-description-tr: Açık her kanala test mesajı; `channels` kanal başına sonuç. 10 dakikada en çok 5.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+              properties:
+                confirm:
+                  type: boolean
+      x-cli:
+        command: container notifications test
+        confirm: false
+  /cloud/containers/{id}/notifications/webhook-secret:
+    post:
+      tags:
+      - Containers
+      operationId: typed_post_containers__id__notifications_webhook_secret
+      summary: Webhook signing secret
+      x-summary-tr: Webhook imza anahtarı
+      x-scope: services_write
+      description: 'Returns the signing secret (`rotate: true` makes a new one; not returned when the request carries an Idempotency-Key).'
+      x-description-tr: 'İmza anahtarını döndürür (`rotate: true` yenisini üretir).'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                rotate:
+                  type: boolean
+                confirm:
+                  type: boolean
+              required: []
+      x-cli:
+        command: container notifications webhook-secret
+        confirm: false
   /cloud/containers/{id}/nodes:
     get:
       tags:
@@ -10040,7 +10345,7 @@ paths:
                   type: boolean
   /cloud/security-groups:
     get:
-      tags: &id040
+      tags: &id042
       - Security groups
       operationId: listSecurityGroups
       summary: List security groups
@@ -10062,7 +10367,7 @@ paths:
                       $ref: '#/components/schemas/SecurityGroup'
         '401': *id003
     post:
-      tags: *id040
+      tags: *id042
       operationId: createSecurityGroup
       summary: Create a security group
       x-summary-tr: Güvenlik grubu oluştur
@@ -10102,7 +10407,7 @@ paths:
         '422': *id005
   /cloud/security-groups/{sg}:
     parameters:
-    - &id041
+    - &id043
       name: sg
       in: path
       required: true
@@ -10110,7 +10415,7 @@ paths:
         type: string
         pattern: ^sg-[a-f0-9]{8}$
     get:
-      tags: *id040
+      tags: *id042
       operationId: getSecurityGroup
       summary: Get a security group
       x-summary-tr: Güvenlik grubunu getir
@@ -10130,7 +10435,7 @@ paths:
         '401': *id003
         '404': *id004
     patch:
-      tags: *id040
+      tags: *id042
       operationId: updateSecurityGroup
       summary: Rename / describe a security group
       x-summary-tr: Güvenlik grubunun adını / açıklamasını değiştir
@@ -10164,7 +10469,7 @@ paths:
         '404': *id004
         '422': *id005
     delete:
-      tags: *id040
+      tags: *id042
       operationId: deleteSecurityGroup
       summary: Delete a security group
       x-summary-tr: Güvenlik grubunu sil
@@ -10194,9 +10499,9 @@ paths:
         '422': *id005
   /cloud/security-groups/{sg}/rules:
     parameters:
-    - *id041
+    - *id043
     put:
-      tags: *id040
+      tags: *id042
       operationId: putSecurityGroupRules
       summary: Replace the rules of a security group
       x-summary-tr: Güvenlik grubunun kurallarını değiştir
@@ -10250,9 +10555,9 @@ paths:
         '422': *id005
   /cloud/security-groups/{sg}/confirm:
     parameters:
-    - *id041
+    - *id043
     post:
-      tags: *id040
+      tags: *id042
       operationId: confirmSecurityGroup
       summary: Make the running rule trial permanent
       x-summary-tr: Kural denemesini kalıcı yap
@@ -10274,10 +10579,10 @@ paths:
         '422': *id005
   /cloud/servers/{id}/security-groups:
     parameters:
-    - &id042
+    - &id044
       $ref: '#/components/parameters/ServerId'
     get:
-      tags: *id040
+      tags: *id042
       operationId: listServerSecurityGroups
       summary: Security groups attached to a server
       x-summary-tr: Sunucuya bağlı güvenlik grupları
@@ -10299,7 +10604,7 @@ paths:
         '409':
           description: firewall_not_enabled
     put:
-      tags: *id040
+      tags: *id042
       operationId: setServerSecurityGroups
       summary: Set the exact list of attached groups
       x-summary-tr: Bağlı grupları tam liste olarak ayarla
@@ -10341,10 +10646,10 @@ paths:
         '422': *id005
   /cloud/servers/{id}/security-groups/{sg}:
     parameters:
-    - *id042
-    - *id041
+    - *id044
+    - *id043
     post:
-      tags: *id040
+      tags: *id042
       operationId: attachSecurityGroup
       summary: Attach a security group to a server
       x-summary-tr: Güvenlik grubunu sunucuya bağla
@@ -10367,7 +10672,7 @@ paths:
           description: firewall_not_enabled
         '422': *id005
     delete:
-      tags: *id040
+      tags: *id042
       operationId: detachSecurityGroup
       summary: Detach a security group from a server
       x-summary-tr: Güvenlik grubunu sunucudan ayır
@@ -16645,8 +16950,8 @@ paths:
         / legal hold versions and the latest end date). Protected Storage only: a standard Object Storage service answers 409 `feature_not_available`.'
       x-description-tr: 'Kilitli kova hakkı (Nesne Kilidi ek hizmeti) ve kullanımı, kovaların varsayılan saklaması ve son kilit taraması (COMPLIANCE / GOVERNANCE
         / legal hold sürüm sayısı, en geç bitiş). Yalnız Korumalı Depolama: standart Nesne Depolama hizmeti 409 `feature_not_available` döner.'
-      parameters: &id043
-      - &id044
+      parameters: &id045
+      - &id046
         name: id
         in: path
         required: true
@@ -16686,7 +16991,7 @@ paths:
         confirm: false
       description: 'Counts locked versions in every locked bucket (up to 25 s / 5000 versions; `complete: false` when cut short).'
       x-description-tr: 'Kilitli kovalardaki kilitli sürümleri sayar (en çok 25 sn / 5000 sürüm; yarım kalırsa `complete: false`).'
-      parameters: *id043
+      parameters: *id045
       responses:
         '202':
           description: OK
@@ -16728,8 +17033,8 @@ paths:
       x-description-tr: Bir klasördeki sürümler ve silme işaretleri (sayfa 50, ayraç `/`; alt klasörler `folders`). `truncated` true iken önceki sayfanın `key_marker`
         + `version_id_marker` değerleriyle devam edin. Kilitli kovalarda her sürümde `lock_mode`, `retain_until`, `legal_hold` bulunur.
       parameters:
-      - *id044
-      - &id045
+      - *id046
+      - &id047
         name: bucket
         in: path
         required: true
@@ -16789,8 +17094,8 @@ paths:
       x-description-tr: Bir sürümü ya da silme işaretini kalıcı siler (geri alınamaz). GOVERNANCE / COMPLIANCE saklamasında ya da legal hold'daki sürüm bitiş tarihiyle
         reddedilir. `confirm=true` gerekir.
       parameters:
-      - *id044
-      - *id045
+      - *id046
+      - *id047
       - name: key
         in: query
         required: true
@@ -16852,9 +17157,9 @@ paths:
         confirm: false
       description: Copies the version as the new current version (the old one stays). Max 5 GB; delete markers cannot be restored (use undelete).
       x-description-tr: Sürümü yeni güncel sürüm olarak kopyalar (eskisi durur). En çok 5 GB; silme işareti geri yüklenmez (undelete kullanın).
-      parameters: &id046
-      - *id044
-      - *id045
+      parameters: &id048
+      - *id046
+      - *id047
       responses:
         '202':
           description: OK
@@ -16893,7 +17198,7 @@ paths:
           application/json:
             schema:
               type: object
-              properties: &id047
+              properties: &id049
                 key:
                   type: string
                   description: Object key
@@ -16916,7 +17221,7 @@ paths:
         confirm: false
       description: Removes the latest delete marker of the key, so the previous version becomes current again. `version_id` must be that delete marker.
       x-description-tr: Anahtarın en güncel silme işaretini kaldırır; önceki sürüm yeniden güncel olur. `version_id` o silme işareti olmalıdır.
-      parameters: *id046
+      parameters: *id048
       responses:
         '202':
           description: OK
@@ -16952,7 +17257,7 @@ paths:
           application/json:
             schema:
               type: object
-              properties: *id047
+              properties: *id049
               required:
               - key
               - version_id
@@ -16969,7 +17274,7 @@ paths:
         confirm: false
       description: '`object_lock` (set at creation, cannot change) and `default_retention` (null = none): new objects get this retention automatically.'
       x-description-tr: '`object_lock` (açılışta seçilir, değişmez) ve `default_retention` (null = yok): yeni nesneler bu saklamayı kendiliğinden alır.'
-      parameters: *id046
+      parameters: *id048
       responses:
         '200':
           description: OK
@@ -17006,7 +17311,7 @@ paths:
       x-description-tr: 'Yalnız kilitli kovalar. `mode` GOVERNANCE ya da COMPLIANCE ve `days` 1-3650, ya da OFF (yeni nesnelere otomatik saklama yok; mevcut kilitler
         sürer). GOVERNANCE: yalnız Gyro personeli talep üzerine aşabilir. COMPLIANCE kilidi süresi dolana kadar kimse (Gyro dahil) kısaltamaz, GOVERNANCE''a çeviremez,
         kaldıramaz; veri saklanır ve iptalde bile süre sonuna kadar ücret sürer. `"confirm": true` ve `"acknowledge": "COMPLIANCE"` gönderin.'
-      parameters: *id046
+      parameters: *id048
       responses:
         '202':
           description: OK
@@ -17069,8 +17374,8 @@ paths:
       description: Lock mode, end date and legal hold of one version (`version_id` empty = current version).
       x-description-tr: Bir sürümün kilit kipi, bitiş tarihi ve legal hold durumu (`version_id` boş = güncel sürüm).
       parameters:
-      - *id044
-      - *id045
+      - *id046
+      - *id047
       - name: key
         in: query
         required: true
@@ -17119,7 +17424,7 @@ paths:
       x-description-tr: 'Bir sürümün saklamasını şimdiden itibaren `days` (1-3650) gün olarak koyar ya da uzatır (`version_id` boş = güncel). Saklama yalnız uzatılabilir;
         COMPLIANCE GOVERNANCE''a çevrilemez. COMPLIANCE kilidi süresi dolana kadar kimse (Gyro dahil) kısaltamaz, GOVERNANCE''a çeviremez, kaldıramaz; veri saklanır
         ve iptalde bile süre sonuna kadar ücret sürer. `"confirm": true` ve `"acknowledge": "COMPLIANCE"` gönderin.'
-      parameters: *id046
+      parameters: *id048
       responses:
         '202':
           description: OK
@@ -17187,8 +17492,8 @@ paths:
       description: '`legal_hold` true = the version cannot be deleted until the hold is removed (no end date).'
       x-description-tr: '`legal_hold` true = kaldırılana kadar sürüm silinemez (bitiş tarihi yok).'
       parameters:
-      - *id044
-      - *id045
+      - *id046
+      - *id047
       - name: key
         in: query
         required: true
@@ -17242,7 +17547,7 @@ paths:
         confirm: false
       description: '`status` on / off (locked buckets only). A legal hold blocks deletion with no end date, independent of retention; you can remove it yourself.'
       x-description-tr: '`status` on / off (yalnız kilitli kovalar). Legal hold, saklamadan bağımsız ve bitiş tarihsiz silmeyi engeller; kendiniz kaldırabilirsiniz.'
-      parameters: *id046
+      parameters: *id048
       responses:
         '202':
           description: OK
@@ -17305,7 +17610,7 @@ paths:
         confirm: false
       description: 'Days after which non-current versions are deleted (new buckets: 30). 0 / null = kept until you delete them (they count toward the quota).'
       x-description-tr: Eski (güncel olmayan) sürümlerin kaç gün sonra silineceği (yeni kovalarda 30). 0 / null = siz silene kadar durur (kotadan düşer).
-      parameters: *id046
+      parameters: *id048
       responses:
         '200':
           description: OK
@@ -17339,7 +17644,7 @@ paths:
       description: '`days` 1-3650, or 0 to keep old versions. Locked versions are deleted only after their retention ends. Other lifecycle rules of the bucket are
         kept.'
       x-description-tr: '`days` 1-3650 ya da 0 (eski sürümler durur). Kilitli sürümler saklaması bitince silinir. Kovanın diğer yaşam döngüsü kuralları korunur.'
-      parameters: *id046
+      parameters: *id048
       responses:
         '202':
           description: OK
@@ -17432,7 +17737,7 @@ paths:
       description: Another account's template answers 404.
       x-description-tr: Başka hesabın şablonu 404 döner.
       parameters:
-      - &id048
+      - &id050
         name: id
         in: path
         required: true
@@ -17471,7 +17776,7 @@ paths:
       description: Name 1-60 characters (letters, digits, space . _ -).
       x-description-tr: Ad 1-60 karakter (harf, rakam, boşluk . _ -).
       parameters:
-      - *id048
+      - *id050
       responses:
         '200':
           description: OK
@@ -17519,7 +17824,7 @@ paths:
       description: Permanent. Servers created from it are not affected; the charge stops from the next hour.
       x-description-tr: Kalıcıdır. Şablondan açılmış sunucular etkilenmez; ücret sonraki saatten durur.
       parameters:
-      - *id048
+      - *id050
       responses:
         '202':
           description: OK
@@ -17634,7 +17939,7 @@ paths:
       x-description-tr: 'Şablondan kurulan normal ön ödemeli tr-ist-1 siparişi (24 saat bakiye kuralı, hesap sınırları). `product_id` (ya da `plan`) GET /cloud/products?region=tr-ist-1''den;
         diski şablonun `min_disk_gb` değerinden küçük olamaz. `"confirm": true` ve `Idempotency-Key` başlığı gerekir (teklif için `dry_run`).'
       parameters:
-      - *id048
+      - *id050
       responses:
         '202':
           description: OK
@@ -17695,7 +18000,7 @@ paths:
       x-description-tr: 'tr-ist-1 sunucunuzun kök diskini şablonla değiştirir (disk en az `min_disk_gb` olmalı); sunucunun SSH anahtarları yeniden kurulur, yeni root
         parolası döner (Idempotency-Key gönderilirse dönmez). `"confirm": true` gerekir.'
       parameters:
-      - *id048
+      - *id050
       responses:
         '202':
           description: OK
@@ -17762,7 +18067,7 @@ paths:
         eklendiği saatten çıkarıldığı saate kadar. Sunucu başına en çok `max` (varsayılan 5). Adres sunucuya otomatik tanımlanır (birincil arayüze /32, yeniden başlatma
         ve yeniden kurulumda korunur); ters DNS: PUT /cloud/servers/{id}/rdns. '
       parameters:
-      - &id049
+      - &id051
         name: id
         in: path
         required: true
@@ -17813,7 +18118,7 @@ paths:
         eklendiği saatten çıkarıldığı saate kadar. Sunucu başına en çok `max` (varsayılan 5). Adres sunucuya otomatik tanımlanır (birincil arayüze /32, yeniden başlatma
         ve yeniden kurulumda korunur); ters DNS: PUT /cloud/servers/{id}/rdns. Yalnız ön ödemeli tr-ist-1 sunucuları; askıdayken eklenemez.'
       parameters:
-      - *id049
+      - *id051
       requestBody:
         required: false
         content:
@@ -17868,7 +18173,7 @@ paths:
       x-description-tr: Adres sunucudan kaldırılır ve havuza döner (aynı adresi geri alma garantisi yok); ücret içinde bulunulan saatten sonra durur. `confirm=true`
         gerekir.
       parameters:
-      - *id049
+      - *id051
       - name: ip
         in: path
         required: true

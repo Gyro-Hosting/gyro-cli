@@ -17,23 +17,25 @@ gyro container service update <ID> <NAME> [flags]
 ### Options
 
 ```
-      --args strings             İmajın komutuna argümanlar
-      --command strings          İmajın giriş komutunu değiştir
-      --cpu-m int                Örnek başına işlemci (milicore, 250 = 0,25 vCPU)
-      --data string              istek gövdesi JSON, @dosya ya da @- (stdin)
-      --dry-run                  hiçbir şeyi değiştirmeden teklifi / isteği göster
-      --env string               Ortam değişkenleri (güncellemede tamamı değişir) (JSON)
-      --health-path string       HTTP sağlık yolu (boş = TCP)
-  -h, --help                     help for update
-      --idempotency-key string   tekrar güvenliği anahtarı (para işlemlerinde otomatik)
-      --image string             İmaj, ör. ghcr.io/firma/web:1.4
-      --memory-mi int            Örnek başına bellek (MiB)
-      --port int                 Kapsayıcı portu (0 = port yok). Kök olmayan kullanıcı: 1024 üstü port
-      --public                   HTTPS adres <ad>-<kod>.gyroapp.net
-      --reason string            Free text shown in the revision history (e.g. a git sha)
-      --replicas int             Örnek sayısı (varsayılan 1)
-      --run-as-user int          Kapsayıcı içi kullanıcı kimliği (varsayılan 10001)
-      --set stringArray          ek gövde alanı anahtar=değer (tekrarlanabilir)
+      --alerts string               Uyarı eşiği: hazır kopya bu sayının altına düşerse bildirim (0 = kapalı). (JSON)
+      --args strings                İmajın komutuna argümanlar
+      --autoscaling enabled:false   Otomatik ölçekleme: kopya sayısı ayrılan boyutun ortalama CPU (isteğe bağlı bellek) kullanımına göre değişir. enabled:false = kapalı. (JSON)
+      --command strings             İmajın giriş komutunu değiştir
+      --cpu-m int                   Örnek başına işlemci (milicore, 250 = 0,25 vCPU)
+      --data string                 istek gövdesi JSON, @dosya ya da @- (stdin)
+      --dry-run                     hiçbir şeyi değiştirmeden teklifi / isteği göster
+      --env string                  Ortam değişkenleri (güncellemede tamamı değişir) (JSON)
+      --health-path string          HTTP sağlık yolu (boş = TCP)
+  -h, --help                        help for update
+      --idempotency-key string      tekrar güvenliği anahtarı (para işlemlerinde otomatik)
+      --image string                İmaj, ör. ghcr.io/firma/web:1.4
+      --memory-mi int               Örnek başına bellek (MiB)
+      --port int                    Kapsayıcı portu (0 = port yok). Kök olmayan kullanıcı: 1024 üstü port
+      --public                      HTTPS adres <ad>-<kod>.gyroapp.net
+      --reason string               Free text shown in the revision history (e.g. a git sha)
+      --replicas int                Örnek sayısı (varsayılan 1)
+      --run-as-user int             Kapsayıcı içi kullanıcı kimliği (varsayılan 10001)
+      --set stringArray             ek gövde alanı anahtar=değer (tekrarlanabilir)
 ```
 
 ### Options inherited from parent commands

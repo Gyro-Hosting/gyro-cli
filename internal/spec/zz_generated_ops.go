@@ -3,7 +3,7 @@
 package spec
 
 // APIVersion is info.version of the spec this table was generated from.
-const APIVersion = "2.16.1"
+const APIVersion = "2.17.0"
 
 // Ops lists every API operation.
 var Ops = []Op{
@@ -142,6 +142,59 @@ var Ops = []Op{
 			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Service id", DescTR: ""},
 		},
 	},
+	{ID: "typed_get_containers__id__notifications", Method: "GET", Path: "/cloud/containers/{id}/notifications", Tag: "Containers",
+		Summary: "Notification settings and current alerts", SummaryTR: "Bildirim ayarları ve süren uyarılar",
+		Desc: "`settings` (channels, events, cooldown; the webhook secret is never returned), `conditions` = what is wrong right now, `history` = last 30 alerts. Events: down (no ready replica for >3 min), crashloop (keeps restarting / image pull fails / out of memory), replicas_low (below alerts.min_ready), scale_max (autoscaling wants more than max), capacity (replicas wait for room in the node pool). An event is announced after ~2 minutes, at most once per cooldown per service + event (flapping included), with a 'resolved' message.", DescTR: "`settings` (kanallar, olaylar, tekrar aralığı; webhook anahtarı dönmez), `conditions` = şu an süren sorunlar, `history` = son 30 uyarı. Olaylar: down, crashloop, replicas_low, scale_max, capacity. Olay ~2 dakika sürünce bildirilir; aynı servis + olay tekrar aralığında bir kez (gidip gelenler dahil), düzelince 'düzeldi' mesajı.",
+		Scope: "services_read", Command: []string{"container", "notifications", "get"},
+		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Service id", DescTR: ""},
+		},
+	},
+	{ID: "typed_put_containers__id__notifications", Method: "PUT", Path: "/cloud/containers/{id}/notifications", Tag: "Containers",
+		Summary: "Set notification channels", SummaryTR: "Bildirim kanallarını ayarla",
+		Desc: "Send only the fields to change. A webhook secret is generated when a webhook URL is first set (POST .../notifications/webhook-secret returns it). No WhatsApp.", DescTR: "Yalnız değişecek alanları gönderin. Webhook adresi ilk kez girilince imza anahtarı üretilir (POST .../notifications/webhook-secret ile alınır).",
+		Scope: "services_write", Command: []string{"container", "notifications", "set"},
+		HasBody: true, BodyRequired: true, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Service id", DescTR: ""},
+		},
+		Body: []Field{
+			{Name: "email", Type: "boolean", Items: "", Enum: nil, Default: "", Required: false, Desc: "Account e-mail (default on)", DescTR: ""},
+			{Name: "sms", Type: "boolean", Items: "", Enum: nil, Default: "", Required: false, Desc: "Account phone", DescTR: ""},
+			{Name: "telegram", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "Telegram chat id (send /start to the platform bot, e.g. @gyrouptime_bot); empty = off", DescTR: ""},
+			{Name: "webhook_url", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "https URL of a public server; JSON POST signed with X-Gyro-Signature: sha256=HMAC(secret, X-Gyro-Timestamp + '.' + body)", DescTR: ""},
+			{Name: "events", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "Comma separated: down, crashloop, replicas_low, scale_max, capacity", DescTR: ""},
+			{Name: "cooldown", Type: "integer", Items: "", Enum: nil, Default: "", Required: false, Desc: "Minutes between two announcements of the same service + event (5-1440, default 30)", DescTR: ""},
+			{Name: "resolved", Type: "boolean", Items: "", Enum: nil, Default: "", Required: false, Desc: "Send a 'resolved' message (default on)", DescTR: ""},
+			{Name: "confirm", Type: "boolean", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
+		},
+	},
+	{ID: "typed_post_containers__id__notifications_test", Method: "POST", Path: "/cloud/containers/{id}/notifications/test", Tag: "Containers",
+		Summary: "Send a test notification", SummaryTR: "Test bildirimi gönder",
+		Desc: "Sends a test message to every enabled channel; `channels` = per channel result. At most 5 per 10 minutes.", DescTR: "Açık her kanala test mesajı; `channels` kanal başına sonuç. 10 dakikada en çok 5.",
+		Scope: "services_write", Command: []string{"container", "notifications", "test"},
+		HasBody: true, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Service id", DescTR: ""},
+		},
+		Body: []Field{
+			{Name: "confirm", Type: "boolean", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
+		},
+	},
+	{ID: "typed_post_containers__id__notifications_webhook_secret", Method: "POST", Path: "/cloud/containers/{id}/notifications/webhook-secret", Tag: "Containers",
+		Summary: "Webhook signing secret", SummaryTR: "Webhook imza anahtarı",
+		Desc: "Returns the signing secret (`rotate: true` makes a new one; not returned when the request carries an Idempotency-Key).", DescTR: "İmza anahtarını döndürür (`rotate: true` yenisini üretir).",
+		Scope: "services_write", Command: []string{"container", "notifications", "webhook-secret"},
+		HasBody: true, BodyRequired: true, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Service id", DescTR: ""},
+		},
+		Body: []Field{
+			{Name: "rotate", Type: "boolean", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
+			{Name: "confirm", Type: "boolean", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
+		},
+	},
 	{ID: "typed_get_containers__id__registry", Method: "GET", Path: "/cloud/containers/{id}/registry", Tag: "Containers",
 		Summary: "Gyro image registry of the environment", SummaryTR: "Ortamın Gyro imaj deposu",
 		Desc: "Host, image prefix `<host>/<code>/`, username, usage (`used_gb`, `free_gb` = 2, `billable_gb`, `cap_gb` = 50), `push_allowed` and the clean-up policy. Only this environment can push/pull its repositories. Above 2 GB: €0.05 per GB per month, charged hourly from the prepaid balance. The password is returned only by POST .../registry/credentials.", DescTR: "Depo adresi, imaj öneki `<host>/<kod>/`, kullanıcı adı, kullanım (2 GB ücretsiz, üst sınır 50 GB), gönderim izni ve temizlik ayarı. Yalnız bu ortam kendi depolarına erişir. 2 GB üstü GB başına aylık 0,05 € (saatlik bakiyeden). Parola yalnız POST .../registry/credentials ile döner.",
@@ -243,12 +296,14 @@ var Ops = []Op{
 			{Name: "command", Type: "array", Items: "string", Enum: nil, Default: "", Required: false, Desc: "Override the image entrypoint", DescTR: "İmajın giriş komutunu değiştir"},
 			{Name: "env", Type: "object", Items: "", Enum: nil, Default: "", Required: false, Desc: "Plain environment variables (replaces the whole set on update)", DescTR: "Ortam değişkenleri (güncellemede tamamı değişir)"},
 			{Name: "run_as_user", Type: "integer", Items: "", Enum: nil, Default: "", Required: false, Desc: "User id inside the container (default 10001)", DescTR: "Kapsayıcı içi kullanıcı kimliği (varsayılan 10001)"},
+			{Name: "autoscaling", Type: "object", Items: "", Enum: nil, Default: "", Required: false, Desc: "Autoscaling (horizontal): replicas follow the average CPU (and optionally memory) use of the reserved size. `enabled:false` = off (fixed replicas).", DescTR: "Otomatik ölçekleme: kopya sayısı ayrılan boyutun ortalama CPU (isteğe bağlı bellek) kullanımına göre değişir. `enabled:false` = kapalı."},
+			{Name: "alerts", Type: "object", Items: "", Enum: nil, Default: "", Required: false, Desc: "Alert threshold: notify when fewer replicas are ready (0 = off). Channels: PUT /cloud/containers/{id}/notifications.", DescTR: "Uyarı eşiği: hazır kopya bu sayının altına düşerse bildirim (0 = kapalı)."},
 			{Name: "confirm", Type: "boolean", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
 		},
 	},
 	{ID: "typed_get_containers__id__services__name", Method: "GET", Path: "/cloud/containers/{id}/services/{name}", Tag: "Containers",
 		Summary: "Get a container service", SummaryTR: "Kapsayıcı servisini getir",
-		Desc: "Spec, state, problem code (ImagePullBackOff, CrashLoopBackOff, OOMKilled, Unschedulable ...), instances, revision, domains and the names of secrets (values are never returned).", DescTR: "Tanım, durum, sorun kodu, örnekler, sürüm, alan adları ve gizli değer adları (değerler asla dönmez).",
+		Desc: "Spec, state, problem code (ImagePullBackOff, CrashLoopBackOff, OOMKilled, Unschedulable ...), instances, revision, domains and the names of secrets (values are never returned). `autoscaling` = settings + live status (current/desired replicas, current CPU/memory %, at_max), `capacity` = {blocked, fits}.", DescTR: "Tanım, durum, sorun kodu, örnekler, sürüm, alan adları ve gizli değer adları (değerler asla dönmez).",
 		Scope: "services_read", Command: []string{"container", "service", "get"},
 		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
 		Params: []Param{
@@ -258,7 +313,7 @@ var Ops = []Op{
 	},
 	{ID: "typed_patch_containers__id__services__name", Method: "PATCH", Path: "/cloud/containers/{id}/services/{name}", Tag: "Containers",
 		Summary: "Deploy a new version / change settings", SummaryTR: "Yeni sürüm dağıt / ayar değiştir",
-		Desc: "Send only the fields to change (e.g. `image`). Every change except `replicas` creates a new revision and rolls out instance by instance without downtime.", DescTR: "Yalnız değişecek alanları gönderin (ör. `image`). `replicas` dışındaki her değişiklik yeni sürüm oluşturur ve kesintisiz dağıtılır.",
+		Desc: "Send only the fields to change (e.g. `image`). Every change except `replicas` creates a new revision and rolls out instance by instance without downtime. With autoscaling on, `replicas` is ignored (the autoscaler owns it). `autoscaling` / `alerts` are settings, not revisions.", DescTR: "Yalnız değişecek alanları gönderin (ör. `image`). `replicas` dışındaki her değişiklik yeni sürüm oluşturur ve kesintisiz dağıtılır.",
 		Scope: "services_write", Command: []string{"container", "service", "update"},
 		HasBody: true, BodyRequired: true, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
 		Params: []Param{
@@ -278,6 +333,8 @@ var Ops = []Op{
 			{Name: "env", Type: "object", Items: "", Enum: nil, Default: "", Required: false, Desc: "Plain environment variables (replaces the whole set on update)", DescTR: "Ortam değişkenleri (güncellemede tamamı değişir)"},
 			{Name: "run_as_user", Type: "integer", Items: "", Enum: nil, Default: "", Required: false, Desc: "User id inside the container (default 10001)", DescTR: "Kapsayıcı içi kullanıcı kimliği (varsayılan 10001)"},
 			{Name: "reason", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "Free text shown in the revision history (e.g. a git sha)", DescTR: ""},
+			{Name: "autoscaling", Type: "object", Items: "", Enum: nil, Default: "", Required: false, Desc: "Autoscaling (horizontal): replicas follow the average CPU (and optionally memory) use of the reserved size. `enabled:false` = off (fixed replicas).", DescTR: "Otomatik ölçekleme: kopya sayısı ayrılan boyutun ortalama CPU (isteğe bağlı bellek) kullanımına göre değişir. `enabled:false` = kapalı."},
+			{Name: "alerts", Type: "object", Items: "", Enum: nil, Default: "", Required: false, Desc: "Alert threshold: notify when fewer replicas are ready (0 = off). Channels: PUT /cloud/containers/{id}/notifications.", DescTR: "Uyarı eşiği: hazır kopya bu sayının altına düşerse bildirim (0 = kapalı)."},
 			{Name: "confirm", Type: "boolean", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
 		},
 	},
@@ -291,6 +348,22 @@ var Ops = []Op{
 			{Name: "name", In: "path", Type: "string", Items: "", Enum: nil, Default: "", Required: true, Desc: "Service name", DescTR: ""},
 		},
 		Body: []Field{
+			{Name: "confirm", Type: "boolean", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
+		},
+	},
+	{ID: "typed_put_containers__id__services__name__autoscaling", Method: "PUT", Path: "/cloud/containers/{id}/services/{name}/autoscaling", Tag: "Containers",
+		Summary: "Autoscaling / alert threshold of a service", SummaryTR: "Servisin otomatik ölçekleme / uyarı eşiği",
+		Desc: "Body `{\"autoscaling\": {\"enabled\": true, \"min\": 1, \"max\": 5, \"cpu_percent\": 70, \"memory_percent\": 0}, \"alerts\": {\"min_ready\": 2}}`. Replicas are added when the average use exceeds the target (at most double per 30 s) and removed one per minute after 3 calm minutes. Max cannot exceed the plan replica limit; replicas that do not fit in the node pool wait (`warnings: max_exceeds_capacity`, alert `capacity`). Not a revision. Switching off keeps the current replica count (or `replicas`).", DescTR: "Gövde `{\"autoscaling\": {...}, \"alerts\": {\"min_ready\": 2}}`. Ortalama kullanım hedefi aşınca kopya eklenir (30 sn'de en çok iki katı), 3 dakika sakin kalınca dakikada bir azaltılır. En çok kopya paket sınırını aşamaz; havuza sığmayan kopyalar bekler. Sürüm oluşturmaz. Kapatınca mevcut kopya sayısı (ya da `replicas`) kalır.",
+		Scope: "services_write", Command: []string{"container", "service", "autoscale"},
+		HasBody: true, BodyRequired: true, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Service id", DescTR: ""},
+			{Name: "name", In: "path", Type: "string", Items: "", Enum: nil, Default: "", Required: true, Desc: "Service name", DescTR: ""},
+		},
+		Body: []Field{
+			{Name: "autoscaling", Type: "object", Items: "", Enum: nil, Default: "", Required: false, Desc: "Autoscaling (horizontal): replicas follow the average CPU (and optionally memory) use of the reserved size. `enabled:false` = off (fixed replicas).", DescTR: "Otomatik ölçekleme: kopya sayısı ayrılan boyutun ortalama CPU (isteğe bağlı bellek) kullanımına göre değişir. `enabled:false` = kapalı."},
+			{Name: "alerts", Type: "object", Items: "", Enum: nil, Default: "", Required: false, Desc: "Alert threshold: notify when fewer replicas are ready (0 = off). Channels: PUT /cloud/containers/{id}/notifications.", DescTR: "Uyarı eşiği: hazır kopya bu sayının altına düşerse bildirim (0 = kapalı)."},
+			{Name: "replicas", Type: "integer", Items: "", Enum: nil, Default: "", Required: false, Desc: "Fixed replicas when switching autoscaling off", DescTR: ""},
 			{Name: "confirm", Type: "boolean", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
 		},
 	},
@@ -425,7 +498,7 @@ var Ops = []Op{
 	},
 	{ID: "typed_post_containers__id__services__name__scale", Method: "POST", Path: "/cloud/containers/{id}/services/{name}/scale", Tag: "Containers",
 		Summary: "Scale a service", SummaryTR: "Servisi ölçekle",
-		Desc: "Sets the number of instances (0 = stop, settings kept). Does not create a revision.", DescTR: "Örnek sayısını ayarlar (0 = durdur). Sürüm oluşturmaz.",
+		Desc: "Sets the number of instances (0 = stop, settings kept). Does not create a revision. Refused with 409 `autoscaling_enabled` while autoscaling is on (change min/max instead).", DescTR: "Örnek sayısını ayarlar (0 = durdur). Sürüm oluşturmaz.",
 		Scope: "services_write", Command: []string{"container", "service", "scale"},
 		HasBody: true, BodyRequired: true, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
 		Params: []Param{

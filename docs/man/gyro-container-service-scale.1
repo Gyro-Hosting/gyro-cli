@@ -13,7 +13,7 @@ gyro-container-service-scale - Scale a service
 Scale a service
 
 .PP
-Sets the number of instances (0 = stop, settings kept). Does not create a revision.
+Sets the number of instances (0 = stop, settings kept). Does not create a revision. Refused with 409 \fBautoscaling_enabled\fR while autoscaling is on (change min/max instead).
 
 .PP
 API: POST /cloud/containers/{id}/services/{name}/scale (operationId typed_post_containers\fBid\fPservices\fBname\fPscale, scope services_write)
