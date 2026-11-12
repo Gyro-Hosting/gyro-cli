@@ -6,8 +6,6 @@ Bir adresin PTR kaydını ayarla (veya sıfırla)
 
 Bir adresin PTR kaydını ayarla (veya sıfırla)
 
-`dns_ptr` and `ptr` are accepted as aliases of `hostname`. tr-ist-1: a PTR on an address without a record is created (request; goes live after approval, `status: pending`); resetting an address without a record is a no-op.
-
 API: PUT /cloud/servers/{id}/rdns (operationId setRdns, scope cloud_write)
 
 ```

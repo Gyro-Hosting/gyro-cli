@@ -2,7 +2,7 @@
 .TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
 
 .SH NAME
-gyro-service-addon-list - Add-ons the service holds
+gyro-service-addon-list - List service addons (path: {id})
 
 
 .SH SYNOPSIS
@@ -10,13 +10,13 @@ gyro-service-addon-list - Add-ons the service holds
 
 
 .SH DESCRIPTION
-Add-ons the service holds
+List service addons (path: {id})
 
 .PP
-Prepaid add-ons (billing: prepaid) carry the hourly price and removable: true.
+List service addons (path: {id}). Service of the calling account (any product line). Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/sahip-olunan-hizmetler).
 
 .PP
-API: GET /cloud/services/{id}/addons (operationId listServiceAddons, scope services_read)
+API: GET /services/{id}/addons (operationId coreGetServiceAddons, scope Services/GetServiceAddons)
 
 
 .SH OPTIONS

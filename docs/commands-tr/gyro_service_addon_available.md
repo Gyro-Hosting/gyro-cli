@@ -31,6 +31,6 @@ gyro service addon available [flags]
 
 ### SEE ALSO
 
-* [gyro service addon](gyro_service_addon.md)	 - Hizmetin ek hizmetleri
+* [gyro service addon](gyro_service_addon.md)	 - Hizmet Eklentilerini Okuma
 * [gyro service addon available get](gyro_service_addon_available_get.md)	 - Bu hizmete alınabilecek ek hizmetler
 

@@ -6,7 +6,7 @@ Open a one-time VNC console ticket
 
 Open a one-time VNC console ticket
 
-Returns a websocket URL and password valid for about a minute. Never send an Idempotency-Key here (400). In tr-ist-1 the ticket is a WebMKS websocket (`protocol: webmks`, empty password: the URL is the one-time secret). tr-ist-1: the WebSocket URL is on konsol.gyrohosting.com (single-use ticket).
+Returns a websocket URL and password valid for about a minute. Never send an Idempotency-Key here (400). In tr-ist-1 the ticket is a WebMKS websocket (`protocol: webmks`, empty password: the URL is the one-time secret).
 
 API: POST /cloud/servers/{id}/console (operationId openConsole, scope cloud_write)
 

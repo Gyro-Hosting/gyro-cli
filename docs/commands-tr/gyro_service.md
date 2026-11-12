@@ -32,7 +32,8 @@ gyro service [flags]
 ### SEE ALSO
 
 * [gyro](gyro.md)	 - Gyro Hosting komut satırı aracı
-* [gyro service addon](gyro_service_addon.md)	 - Hizmetin ek hizmetleri
+* [gyro service addon](gyro_service_addon.md)	 - Hizmet Eklentilerini Okuma
+* [gyro service addons](gyro_service_addons.md)	 - Ek hizmet satın al (bakiyeden ödenir)
 * [gyro service cancellation](gyro_service_cancellation.md)	 - İptal Talebi Açma
 * [gyro service dashboard](gyro_service_dashboard.md)	 - Panel Özetini Okuma
 * [gyro service get](gyro_service_get.md)	 - Hizmeti getir (yenileme, iptal, erişim bilgileri)

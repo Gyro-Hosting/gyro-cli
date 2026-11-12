@@ -13,9 +13,6 @@ gyro-server-rdns-set - Set (or reset) the PTR record of one address
 Set (or reset) the PTR record of one address
 
 .PP
-\fBdns_ptr\fR and \fBptr\fR are accepted as aliases of \fBhostname\fR\&. tr-ist-1: a PTR on an address without a record is created (request; goes live after approval, \fBstatus: pending\fR); resetting an address without a record is a no-op.
-
-.PP
 API: PUT /cloud/servers/{id}/rdns (operationId setRdns, scope cloud_write)
 
 

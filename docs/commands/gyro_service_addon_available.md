@@ -31,6 +31,6 @@ gyro service addon available [flags]
 
 ### SEE ALSO
 
-* [gyro service addon](gyro_service_addon.md)	 - Add-ons the service holds
+* [gyro service addon](gyro_service_addon.md)	 - List service addons (path: {id})
 * [gyro service addon available get](gyro_service_addon_available_get.md)	 - Add-ons offered for this service (with options and prices)
 

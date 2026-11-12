@@ -6,8 +6,6 @@ Set (or reset) the PTR record of one address
 
 Set (or reset) the PTR record of one address
 
-`dns_ptr` and `ptr` are accepted as aliases of `hostname`. tr-ist-1: a PTR on an address without a record is created (request; goes live after approval, `status: pending`); resetting an address without a record is a no-op.
-
 API: PUT /cloud/servers/{id}/rdns (operationId setRdns, scope cloud_write)
 
 ```

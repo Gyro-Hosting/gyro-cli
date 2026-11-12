@@ -6,8 +6,6 @@ Bu hizmete alınabilecek ek hizmetler
 
 Bu hizmete alınabilecek ek hizmetler
 
-Prepaid add-on options show `cycle: hourly`, `billing: prepaid` and `price {amount (EUR/hour), monthly_cap}`.
-
 API: GET /cloud/services/{id}/addons/available (operationId listAvailableAddons, scope services_read)
 
 ```

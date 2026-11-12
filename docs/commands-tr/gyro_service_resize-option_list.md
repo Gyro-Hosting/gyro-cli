@@ -6,8 +6,6 @@ Hizmetin yükseltilebileceği ürünler ve fiyatları
 
 Hizmetin yükseltilebileceği ürünler ve fiyatları
 
-Prepaid services answer `billing: prepaid`; each option has `plan`, `current` and one `hourly` price with `monthly_cap`.
-
 API: GET /cloud/services/{id}/resize-options (operationId getResizeOptions, scope services_read)
 
 ```

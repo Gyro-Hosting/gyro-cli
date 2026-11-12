@@ -109,7 +109,6 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro container service update` | Deploy a new version / change settings | `PATCH /cloud/containers/{id}/services/{name}` |
 | `gyro core invoice pay` | Pay invoice (path: {id}) | `POST /invoices/{id}/pay` |
 | `gyro core product list` | List products | `GET /products` |
-| `gyro core service addon list` | List service addons (path: {id}) | `GET /services/{id}/addons` |
 | `gyro core service get` | Get service (path: {id}) | `GET /services/{id}` |
 | `gyro core service list` | List services | `GET /services` |
 | `gyro core service tool get` | Get service tool data (path: {id}, {tool}) | `GET /services/{id}/tools/{tool}` |
@@ -318,9 +317,8 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro server snapshot restore` | Restore a snapshot onto the server (overwrites the disk) | `POST /cloud/servers/{id}/snapshots/{sid}/restore` |
 | `gyro server update | rename` | Rename a server or switch auto-renew | `PATCH /cloud/servers/{id}` |
 | `gyro service addon available get` | Add-ons offered for this service (with options and prices) | `GET /cloud/services/{id}/addons/available` |
-| `gyro service addon create` | Buy an add-on (paid from balance) | `POST /cloud/services/{id}/addons` |
-| `gyro service addon delete` | Remove a prepaid add-on at once | `DELETE /cloud/services/{id}/addons/{aid}` |
-| `gyro service addon list` | Add-ons the service holds | `GET /cloud/services/{id}/addons` |
+| `gyro service addon list` | List service addons (path: {id}) | `GET /services/{id}/addons` |
+| `gyro service addons` | Buy an add-on (paid from balance) | `POST /cloud/services/{id}/addons` |
 | `gyro service cancellation create` | Create cancellation (path: {id}) | `POST /services/{id}/cancellation` |
 | `gyro service cancellation delete` | Revoke cancellation (path: {id}) | `DELETE /services/{id}/cancellation` |
 | `gyro service dashboard get` | Get service dashboard (path: {id}) | `GET /services/{id}/dashboard` |
