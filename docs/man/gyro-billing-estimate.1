@@ -2,7 +2,7 @@
 .TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
 
 .SH NAME
-gyro-billing-estimate - Hourly, daily and monthly (capped) cost of plans; how long your balance lasts
+gyro-billing-estimate - Hourly, daily and monthly cost of plans and serverless containers; how long your balance lasts
 
 
 .SH SYNOPSIS
@@ -10,7 +10,7 @@ gyro-billing-estimate - Hourly, daily and monthly (capped) cost of plans; how lo
 
 
 .SH DESCRIPTION
-Hourly, daily and monthly (capped) cost of plans; how long your balance lasts
+Plans (Istanbul servers, container plans) are capped at their monthly price. Serverless containers (--cpu-m/--memory-mi, or --item /:) are billed per running copy per hour without a cap; sizes: gyro container sizes.
 
 
 .SH OPTIONS
@@ -18,12 +18,24 @@ Hourly, daily and monthly (capped) cost of plans; how long your balance lasts
 	how many
 
 .PP
+\fB--cpu-m\fP=0
+	serverless container: CPU per copy in millicores (250, 500, 1000, 2000, 4000)
+
+.PP
 \fB-h\fP, \fB--help\fP[=false]
 	help for estimate
 
 .PP
+\fB--hours\fP=0
+	serverless container: running hours for the total (default 730)
+
+.PP
 \fB--item\fP=[]
-	plan:count, repeatable
+	plan:count or serverless /:count, repeatable
+
+.PP
+\fB--memory-mi\fP=0
+	serverless container: memory per copy in MiB (see gyro container sizes)
 
 .PP
 \fB--plan\fP=""
@@ -91,6 +103,8 @@ Hourly, daily and monthly (capped) cost of plans; how long your balance lasts
 .EX
   gyro billing estimate --plan standart-2-4 --region tr-ist-1 --count 3
   gyro billing estimate --item standart-2-4:2 --item standart-4-8:1
+  gyro billing estimate --cpu-m 500 --memory-mi 1024 --count 2 --hours 730
+  gyro billing estimate --item 250/512:3 --item standart-2-4:1
 .EE
 
 

@@ -33,7 +33,7 @@ gyro billing [flags]
 
 * [gyro](gyro.md)	 - Gyro Hosting command-line interface
 * [gyro billing balance](gyro_billing_balance.md)	 - Balance, hourly cost and estimated time left
-* [gyro billing estimate](gyro_billing_estimate.md)	 - Hourly, daily and monthly (capped) cost of plans; how long your balance lasts
+* [gyro billing estimate](gyro_billing_estimate.md)	 - Hourly, daily and monthly cost of plans and serverless containers; how long your balance lasts
 * [gyro billing statement](gyro_billing_statement.md)	 - Monthly usage statement (not an invoice); --pdf / --csv to download
 * [gyro billing topup-url](gyro_billing_topup-url.md)	 - Browser link of the balance top-up page (top-ups are invoiced with VAT; usage is not)
 * [gyro billing usage](gyro_billing_usage.md)	 - Hour-by-hour usage (or daily/monthly totals)

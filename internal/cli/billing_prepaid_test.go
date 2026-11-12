@@ -25,7 +25,9 @@ func TestPrepaidBilling(t *testing.T) {
 		j(w, 200, map[string]any{"data": map[string]any{"items": []any{map[string]any{"period": "2026-11-10", "hours": 24, "amount": map[string]any{"amount": 13.44, "currency": "TRY"}}},
 			"totals": []any{map[string]any{"amount": 13.44, "currency": "TRY"}}}, "meta": map[string]any{"total": 1, "page": 1, "limit": 100, "next_page": 0}})
 	}
+	var lastEst map[string]any
 	m.routes["POST /cloud/billing/estimate"] = func(w http.ResponseWriter, r *http.Request, b map[string]any) {
+		lastEst = b
 		items, _ := b["items"].([]any)
 		if len(items) != 2 {
 			j(w, 422, errBody("bad", "items"))
@@ -49,6 +51,17 @@ func TestPrepaidBilling(t *testing.T) {
 	r = run(t, srv, nil, "", false, "billing", "estimate", "--item", "standart-2-4:2", "--plan", "standart-4-8")
 	if r.code != 0 || !strings.Contains(r.out, "first 24 hours") {
 		t.Fatalf("estimate: %d %q %q", r.code, r.out, r.err)
+	}
+	r = run(t, srv, nil, "", false, "billing", "estimate", "--item", "250/512:3", "--cpu-m", "500", "--memory-mi", "1024", "--hours", "100")
+	if r.code != 0 {
+		t.Fatalf("estimate serverless: %d %q %q", r.code, r.out, r.err)
+	}
+	if it, _ := lastEst["items"].([]any); len(it) != 2 || it[0].(map[string]any)["type"] != "serverless" || it[0].(map[string]any)["cpu_m"].(float64) != 250 ||
+		it[0].(map[string]any)["count"].(float64) != 3 || it[1].(map[string]any)["memory_mi"].(float64) != 1024 || it[1].(map[string]any)["hours"].(float64) != 100 {
+		t.Fatalf("serverless body: %v", lastEst)
+	}
+	if r = run(t, srv, nil, "", false, "billing", "estimate", "--item", "x/512"); r.code == 0 {
+		t.Fatalf("bad serverless item accepted")
 	}
 	dst := filepath.Join(t.TempDir(), "s.pdf")
 	r = run(t, srv, nil, "", false, "billing", "statement", "2026-11", "--pdf", dst)

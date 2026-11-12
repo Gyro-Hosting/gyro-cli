@@ -33,7 +33,7 @@ gyro billing [flags]
 
 * [gyro](gyro.md)	 - Gyro Hosting komut satırı aracı
 * [gyro billing balance](gyro_billing_balance.md)	 - Bakiye, saatlik ücret ve tahmini kalan süre
-* [gyro billing estimate](gyro_billing_estimate.md)	 - Planların saatlik, günlük ve aylık (tavanlı) maliyeti; bakiyenizin ne kadar yeteceği
+* [gyro billing estimate](gyro_billing_estimate.md)	 - Planların ve sunucusuz kapsayıcıların saatlik, günlük ve aylık maliyeti; bakiyenizin ne kadar yeteceği
 * [gyro billing statement](gyro_billing_statement.md)	 - Aylık kullanım dökümü (fatura değildir); indirmek için --pdf / --csv
 * [gyro billing topup-url](gyro_billing_topup-url.md)	 - Browser link of the balance top-up page (top-ups are invoiced with VAT; usage is not)
 * [gyro billing usage](gyro_billing_usage.md)	 - Saat saat kullanım (ya da günlük/aylık toplam)

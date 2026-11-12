@@ -227,13 +227,19 @@ func addPrepaidBilling(a *App, root *cobra.Command) {
 
 	/* -------------------------------------------------------------- estimate */
 	var plan, region string
-	var count, productID int
+	var count, productID, cpuM, memMi, hours int
 	var items []string
 	est := &cobra.Command{
 		Use:   "estimate",
-		Short: i18n.S("Hourly, daily and monthly (capped) cost of plans; how long your balance lasts", "Planların saatlik, günlük ve aylık (tavanlı) maliyeti; bakiyenizin ne kadar yeteceği"),
+		Short: i18n.S("Hourly, daily and monthly cost of plans and serverless containers; how long your balance lasts", "Planların ve sunucusuz kapsayıcıların saatlik, günlük ve aylık maliyeti; bakiyenizin ne kadar yeteceği"),
+		Long: i18n.S("Plans (Istanbul servers, container plans) are capped at their monthly price. Serverless containers (--cpu-m/--memory-mi, or --item <cpu_m>/<memory_mi>:<count>) "+
+			"are billed per running copy per hour without a cap; sizes: gyro container sizes.",
+			"Planlar (İstanbul sunucuları, kapsayıcı planları) aylık fiyatla sınırlıdır. Sunucusuz kapsayıcılar (--cpu-m/--memory-mi ya da --item <cpu_m>/<memory_mi>:<adet>) "+
+				"çalışan kopya başına saatlik, tavansız ücretlenir; boyutlar: gyro container sizes."),
 		Example: "  gyro billing estimate --plan standart-2-4 --region tr-ist-1 --count 3\n" +
-			"  gyro billing estimate --item standart-2-4:2 --item standart-4-8:1",
+			"  gyro billing estimate --item standart-2-4:2 --item standart-4-8:1\n" +
+			"  gyro billing estimate --cpu-m 500 --memory-mi 1024 --count 2 --hours 730\n" +
+			"  gyro billing estimate --item 250/512:3 --item standart-2-4:1",
 		Args: cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var list []map[string]any
@@ -245,7 +251,27 @@ func addPrepaidBilling(a *App, root *cobra.Command) {
 						n = v
 					}
 				}
+				if c, m, ok := strings.Cut(p, "/"); ok {
+					cv, err1 := strconv.Atoi(c)
+					mv, err2 := strconv.Atoi(m)
+					if err1 != nil || err2 != nil {
+						return fmt.Errorf("%s: %q", i18n.S("serverless item must be <cpu_m>/<memory_mi>[:count]", "sunucusuz kalem <cpu_m>/<memory_mi>[:adet] olmalı"), it)
+					}
+					x := map[string]any{"type": "serverless", "cpu_m": cv, "memory_mi": mv, "count": n}
+					if hours > 0 {
+						x["hours"] = hours
+					}
+					list = append(list, x)
+					continue
+				}
 				list = append(list, map[string]any{"plan": p, "region": region, "count": n})
+			}
+			if cpuM > 0 || memMi > 0 {
+				x := map[string]any{"type": "serverless", "cpu_m": cpuM, "memory_mi": memMi, "count": count}
+				if hours > 0 {
+					x["hours"] = hours
+				}
+				list = append(list, x)
 			}
 			if plan != "" || productID > 0 {
 				m := map[string]any{"region": region, "count": count}
@@ -258,7 +284,7 @@ func addPrepaidBilling(a *App, root *cobra.Command) {
 				list = append(list, m)
 			}
 			if len(list) == 0 {
-				return fmt.Errorf("%s", i18n.S("give --plan or --item", "--plan ya da --item verin"))
+				return fmt.Errorf("%s", i18n.S("give --plan, --item or --cpu-m/--memory-mi", "--plan, --item ya da --cpu-m/--memory-mi verin"))
 			}
 			ctx, cancel := a.Ctx()
 			defer cancel()
@@ -276,7 +302,9 @@ func addPrepaidBilling(a *App, root *cobra.Command) {
 			var e map[string]any
 			_ = json.Unmarshal(resp.Data, &e)
 			rows, _ := e["items"].([]any)
-			cols := []output.Column{{Header: "plan", Path: "plan"}, {Header: "count", Path: "count"}, {Header: "hourly", Path: "hourly"}, {Header: "daily", Path: "daily"}, {Header: "monthly_cap", Path: "monthly_cap"}}
+			cols := []output.Column{{Header: "plan", Path: "plan"}, {Header: "type", Path: "type"}, {Header: "cpu_m", Path: "cpu_m"}, {Header: "memory_mi", Path: "memory_mi"},
+				{Header: "count", Path: "count"}, {Header: "hourly", Path: "hourly"}, {Header: "daily", Path: "daily"}, {Header: "monthly_cap", Path: "monthly_cap"},
+				{Header: "capped", Path: "capped"}, {Header: "total", Path: "total"}}
 			if err := a.Printer().Print(rows, cols, ""); err != nil {
 				return err
 			}
@@ -296,7 +324,10 @@ func addPrepaidBilling(a *App, root *cobra.Command) {
 	ef.IntVar(&productID, "product-id", 0, i18n.S("or the product id", "ya da ürün no"))
 	ef.StringVar(&region, "region", "tr-ist-1", i18n.S("region (prepaid: tr-ist-1)", "bölge (ön ödemeli: tr-ist-1)"))
 	ef.IntVar(&count, "count", 1, i18n.S("how many", "adet"))
-	ef.StringArrayVar(&items, "item", nil, i18n.S("plan:count, repeatable", "plan:adet, tekrarlanabilir"))
+	ef.StringArrayVar(&items, "item", nil, i18n.S("plan:count or serverless <cpu_m>/<memory_mi>:count, repeatable", "plan:adet ya da sunucusuz <cpu_m>/<memory_mi>:adet, tekrarlanabilir"))
+	ef.IntVar(&cpuM, "cpu-m", 0, i18n.S("serverless container: CPU per copy in millicores (250, 500, 1000, 2000, 4000)", "sunucusuz kapsayıcı: kopya başına işlemci, milicore (250, 500, 1000, 2000, 4000)"))
+	ef.IntVar(&memMi, "memory-mi", 0, i18n.S("serverless container: memory per copy in MiB (see gyro container sizes)", "sunucusuz kapsayıcı: kopya başına bellek, MiB (bkz. gyro container sizes)"))
+	ef.IntVar(&hours, "hours", 0, i18n.S("serverless container: running hours for the total (default 730)", "sunucusuz kapsayıcı: toplam için çalışma saati (varsayılan 730)"))
 	g.AddCommand(est)
 
 	/* -------------------------------------------------------------- statement */
