@@ -2,7 +2,7 @@
 openapi: 3.1.0
 info:
   title: Gyro Public API
-  version: 2.17.2
+  version: 2.17.3
   summary: Manage Gyro cloud servers, SSH keys and billing programmatically.
   x-summary-tr: Gyro bulut sunucularınızı, SSH anahtarlarınızı ve faturalarınızı programla yönetin.
   description: "The Gyro Public API lets you automate everything you do in the Gyro client area:\norder and manage cloud servers, keep SSH keys, read invoices and\
@@ -27,7 +27,8 @@ info:
     \ / `alerts` on create and update), notification channels (`GET/PUT /cloud/containers/{id}/notifications`, `.../notifications/test`, `.../notifications/webhook-secret`:\
     \ e-mail, SMS, Telegram, signed webhook). Additive.\n\n**2.17.1**: additional IPv4: each added address is billed at least 6 hours (`pricing.minimum_hours`), per-server\
     \ add limit per hour (`adds_per_hour`, `adds_left_this_hour`). Additive.\n\n**2.17.2**: tr-ist-1 reverse DNS is published automatically: default PTR `<a-b-c-d>.ip.gyrohosting.com`\
-    \ on every address, custom PTR live within seconds (`status: active`, new `default` flag), removed when the server/IP is released. Additive.\n"
+    \ on every address, custom PTR live within seconds (`status: active`, new `default` flag), removed when the server/IP is released. Additive.\n\n**2.17.3**: tr-ist-1\
+    \ snapshots: every additional snapshot is billed at least 1 hour (a snapshot created and deleted between two hourly counts is billed too). Text only.\n"
   x-description-tr: "Gyro Public API, müşteri panelinde yaptığınız her işi otomatikleştirmenizi sağlar:\nbulut sunucu siparişi ve yönetimi, SSH anahtarları, fatura\
     \ ve bakiye okuma.\nResmi Terraform sağlayıcısı (`gyro-hosting/gyro`) ve `gyroctl` bu API'yi kullanır.\n\n* **Taban adres** `https://www.gyrohosting.com/api/v1/client`\n\
     * **Kimlik** `Authorization: Bearer wck_...` (anahtarı *Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri* bölümünden oluşturun)\n* **Biçim** JSON\
@@ -51,7 +52,8 @@ info:
     \ `.../notifications/test`, `.../notifications/webhook-secret`: e-posta, SMS, Telegram, imzalı webhook). Geriye uyumlu.\n\n**2.17.1**: ek IPv4: her eklenen adres\
     \ en az 6 saat ücretlendirilir (`pricing.minimum_hours`), sunucu başına saatlik ekleme sınırı (`adds_per_hour`, `adds_left_this_hour`). Geriye uyumlu.\n\n**2.17.2**:\
     \ tr-ist-1 ters DNS otomatik yayında: her adreste varsayılan PTR `<a-b-c-d>.ip.gyrohosting.com`, özel PTR saniyeler içinde (`status: active`, yeni `default` alanı),\
-    \ sunucu/IP bırakılınca silinir. Geriye uyumlu.\n"
+    \ sunucu/IP bırakılınca silinir. Geriye uyumlu.\n\n**2.17.3**: tr-ist-1 snapshot: her ek snapshot en az 1 saat ücretlenir (iki saatlik sayım arasında oluşturulup\
+    \ silinen de). Yalnız metin.\n"
   contact:
     name: Gyro Hosting
     url: https://www.gyrohosting.com
@@ -866,10 +868,14 @@ paths:
                         description: Snapshot space bought as an add-on (0 = none)
         '404':
           $ref: '#/components/responses/NotFound'
-      description: 'tr-ist-1: `quota` = number of snapshots allowed on the plan (add-on), snapshot ids are stable numbers derived by the API.
+      description: '**Billing (tr-ist-1, prepaid):** the first snapshot is free; every additional snapshot is its own hourly item and is billed **at least 1 hour**,
+        even if it is deleted within minutes (the oldest snapshot counts as the free one). tr-ist-1: `quota` = number of snapshots allowed on the plan (add-on), snapshot
+        ids are stable numbers derived by the API.
 
         Prepaid tr-ist-1 servers also return `pricing` {billing, free, extra_monthly_eur, extra_hourly_eur, billable}: the first snapshot(s) are free, each extra
         snapshot is charged hourly from the balance while it exists. 2.14.0 (Gyro Compute): snapshot ids are the platform''s own ids; `name` is returned too.'
+      x-description-tr: '**Ücret (tr-ist-1, ön ödemeli):** ilk snapshot ücretsizdir; her ek snapshot ayrı saatlik kalemdir ve dakikalar içinde silinse de **en az
+        1 saat** ücretlenir (en eski snapshot ücretsiz sayılır). '
     post:
       tags:
       - Snapshots and backups
@@ -899,6 +905,10 @@ paths:
           $ref: '#/components/responses/Conflict'
         '422':
           $ref: '#/components/responses/Validation'
+      description: '**Billing (tr-ist-1, prepaid):** the first snapshot is free; every additional snapshot is its own hourly item and is billed **at least 1 hour**,
+        even if it is deleted within minutes (the oldest snapshot counts as the free one). '
+      x-description-tr: '**Ücret (tr-ist-1, ön ödemeli):** ilk snapshot ücretsizdir; her ek snapshot ayrı saatlik kalemdir ve dakikalar içinde silinse de **en az
+        1 saat** ücretlenir (en eski snapshot ücretsiz sayılır). '
   /cloud/servers/{id}/snapshots/{sid}/restore:
     parameters:
     - $ref: '#/components/parameters/ServerId'
@@ -953,6 +963,10 @@ paths:
           description: Accepted
         '404':
           $ref: '#/components/responses/NotFound'
+      description: '**Billing (tr-ist-1, prepaid):** the first snapshot is free; every additional snapshot is its own hourly item and is billed **at least 1 hour**,
+        even if it is deleted within minutes (the oldest snapshot counts as the free one). '
+      x-description-tr: '**Ücret (tr-ist-1, ön ödemeli):** ilk snapshot ücretsizdir; her ek snapshot ayrı saatlik kalemdir ve dakikalar içinde silinse de **en az
+        1 saat** ücretlenir (en eski snapshot ücretsiz sayılır). '
   /cloud/servers/{id}/backups:
     parameters:
     - $ref: '#/components/parameters/ServerId'

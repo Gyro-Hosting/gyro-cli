@@ -13,6 +13,9 @@ gyro-server-snapshot-create - Take a snapshot
 Take a snapshot
 
 .PP
+\fBBilling (tr-ist-1, prepaid):\fP the first snapshot is free; every additional snapshot is its own hourly item and is billed \fBat least 1 hour\fP, even if it is deleted within minutes (the oldest snapshot counts as the free one).
+
+.PP
 API: POST /cloud/servers/{id}/snapshots (operationId createSnapshot, scope cloud_write)
 
 

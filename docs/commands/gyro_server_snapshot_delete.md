@@ -6,6 +6,8 @@ Delete a snapshot
 
 Delete a snapshot
 
+**Billing (tr-ist-1, prepaid):** the first snapshot is free; every additional snapshot is its own hourly item and is billed **at least 1 hour**, even if it is deleted within minutes (the oldest snapshot counts as the free one).
+
 API: DELETE /cloud/servers/{id}/snapshots/{sid} (operationId deleteSnapshot, scope cloud_write)
 
 ```

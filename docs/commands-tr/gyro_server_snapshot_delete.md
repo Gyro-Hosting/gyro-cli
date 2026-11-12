@@ -6,6 +6,8 @@ Snapshot sil
 
 Snapshot sil
 
+**Ücret (tr-ist-1, ön ödemeli):** ilk snapshot ücretsizdir; her ek snapshot ayrı saatlik kalemdir ve dakikalar içinde silinse de **en az 1 saat** ücretlenir (en eski snapshot ücretsiz sayılır).
+
 API: DELETE /cloud/servers/{id}/snapshots/{sid} (operationId deleteSnapshot, scope cloud_write)
 
 ```

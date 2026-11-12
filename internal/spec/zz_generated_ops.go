@@ -3,7 +3,7 @@
 package spec
 
 // APIVersion is info.version of the spec this table was generated from.
-const APIVersion = "2.17.2"
+const APIVersion = "2.17.3"
 
 // Ops lists every API operation.
 var Ops = []Op{
@@ -2411,7 +2411,7 @@ var Ops = []Op{
 	},
 	{ID: "listSnapshots", Method: "GET", Path: "/cloud/servers/{id}/snapshots", Tag: "Snapshots and backups",
 		Summary: "List snapshots and the snapshot quota", SummaryTR: "Snapshot'ları ve kotayı listele",
-		Desc: "tr-ist-1: `quota` = number of snapshots allowed on the plan (add-on), snapshot ids are stable numbers derived by the API. Prepaid tr-ist-1 servers also return `pricing` {billing, free, extra_monthly_eur, extra_hourly_eur, billable}: the first snapshot(s) are free, each extra snapshot is charged hourly from the balance while it exists. 2.14.0 (Gyro Compute): snapshot ids are the platform's own ids; `name` is returned too.", DescTR: "",
+		Desc: "**Billing (tr-ist-1, prepaid):** the first snapshot is free; every additional snapshot is its own hourly item and is billed **at least 1 hour**, even if it is deleted within minutes (the oldest snapshot counts as the free one). tr-ist-1: `quota` = number of snapshots allowed on the plan (add-on), snapshot ids are stable numbers derived by the API. Prepaid tr-ist-1 servers also return `pricing` {billing, free, extra_monthly_eur, extra_hourly_eur, billable}: the first snapshot(s) are free, each extra snapshot is charged hourly from the balance while it exists. 2.14.0 (Gyro Compute): snapshot ids are the platform's own ids; `name` is returned too.", DescTR: "**Ücret (tr-ist-1, ön ödemeli):** ilk snapshot ücretsizdir; her ek snapshot ayrı saatlik kalemdir ve dakikalar içinde silinse de **en az 1 saat** ücretlenir (en eski snapshot ücretsiz sayılır).",
 		Scope: "cloud_read", Command: []string{"server", "snapshot", "list"},
 		HasBody: false, BodyRequired: false, ListResponse: true, Paginated: false, Confirm: false, Money: false, Hidden: false,
 		ItemsKey: "items",
@@ -2422,6 +2422,7 @@ var Ops = []Op{
 	},
 	{ID: "createSnapshot", Method: "POST", Path: "/cloud/servers/{id}/snapshots", Tag: "Snapshots and backups",
 		Summary: "Take a snapshot", SummaryTR: "Snapshot al",
+		Desc: "**Billing (tr-ist-1, prepaid):** the first snapshot is free; every additional snapshot is its own hourly item and is billed **at least 1 hour**, even if it is deleted within minutes (the oldest snapshot counts as the free one).", DescTR: "**Ücret (tr-ist-1, ön ödemeli):** ilk snapshot ücretsizdir; her ek snapshot ayrı saatlik kalemdir ve dakikalar içinde silinse de **en az 1 saat** ücretlenir (en eski snapshot ücretsiz sayılır).",
 		Scope: "cloud_write", Command: []string{"server", "snapshot", "create"},
 		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
 		Columns: []string{"status", "server_id"},
@@ -2431,6 +2432,7 @@ var Ops = []Op{
 	},
 	{ID: "deleteSnapshot", Method: "DELETE", Path: "/cloud/servers/{id}/snapshots/{sid}", Tag: "Snapshots and backups",
 		Summary: "Delete a snapshot", SummaryTR: "Snapshot sil",
+		Desc: "**Billing (tr-ist-1, prepaid):** the first snapshot is free; every additional snapshot is its own hourly item and is billed **at least 1 hour**, even if it is deleted within minutes (the oldest snapshot counts as the free one).", DescTR: "**Ücret (tr-ist-1, ön ödemeli):** ilk snapshot ücretsizdir; her ek snapshot ayrı saatlik kalemdir ve dakikalar içinde silinse de **en az 1 saat** ücretlenir (en eski snapshot ücretsiz sayılır).",
 		Scope: "cloud_write", Command: []string{"server", "snapshot", "delete"},
 		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: true, Money: false, Hidden: false,
 		Params: []Param{

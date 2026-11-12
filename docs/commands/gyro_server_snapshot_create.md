@@ -6,6 +6,8 @@ Take a snapshot
 
 Take a snapshot
 
+**Billing (tr-ist-1, prepaid):** the first snapshot is free; every additional snapshot is its own hourly item and is billed **at least 1 hour**, even if it is deleted within minutes (the oldest snapshot counts as the free one).
+
 API: POST /cloud/servers/{id}/snapshots (operationId createSnapshot, scope cloud_write)
 
 ```
