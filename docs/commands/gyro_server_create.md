@@ -10,7 +10,7 @@ automatically, so a retried command never orders twice.
 
 --plan accepts a plan name (standart-2-4, pro-2-8 ...) or a product id (see 'gyro plan list').
 --region (or --location) accepts a region (eu-de-1, tr-ist-1, see 'gyro location list') or a city (falkenstein, istanbul).
-In tr-ist-1 (Istanbul) up to 10 --ssh-key values are installed for root shortly after the server first boots.
+In tr-ist-1 (Istanbul) up to 10 --ssh-key values and --user-data go with cloud-init at creation (SSH in about 25 s).
 
 ```
 gyro server create [HOSTNAME] [flags]

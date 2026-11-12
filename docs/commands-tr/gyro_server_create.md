@@ -10,7 +10,7 @@ iki kez sipariş vermez.
 
 --plan: plan adı (standart-2-4, pro-2-8 ...) ya da ürün kimliği ('gyro plan list').
 --region (ya da --location): bölge (eu-de-1, tr-ist-1, 'gyro location list') ya da şehir (falkenstein, istanbul).
-tr-ist-1'de (İstanbul) en çok 10 --ssh-key, sunucu ilk açıldıktan kısa süre sonra root için yüklenir.
+tr-ist-1'de (İstanbul) en çok 10 --ssh-key ve --user-data oluşturmada cloud-init ile kurulur (SSH ~25 sn).
 
 ```
 gyro server create [HOSTNAME] [flags]

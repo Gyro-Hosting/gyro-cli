@@ -534,14 +534,14 @@ automatically, so a retried command never orders twice.
 
 --plan accepts a plan name (standart-2-4, pro-2-8 ...) or a product id (see 'gyro plan list').
 --region (or --location) accepts a region (eu-de-1, tr-ist-1, see 'gyro location list') or a city (falkenstein, istanbul).
-In tr-ist-1 (Istanbul) up to 10 --ssh-key values are installed for root shortly after the server first boots.`,
+In tr-ist-1 (Istanbul) up to 10 --ssh-key values and --user-data go with cloud-init at creation (SSH in about 25 s).`,
 			`Bulut sunucu siparişi verir. Önce API'den fiyat teklifi gösterilir ve onay istenir; ödeme kart değil
 hesap bakiyesinden yapılır. Komuta otomatik tekrar güvenliği anahtarı eklenir, tekrar denenen komut
 iki kez sipariş vermez.
 
 --plan: plan adı (standart-2-4, pro-2-8 ...) ya da ürün kimliği ('gyro plan list').
 --region (ya da --location): bölge (eu-de-1, tr-ist-1, 'gyro location list') ya da şehir (falkenstein, istanbul).
-tr-ist-1'de (İstanbul) en çok 10 --ssh-key, sunucu ilk açıldıktan kısa süre sonra root için yüklenir.`),
+tr-ist-1'de (İstanbul) en çok 10 --ssh-key ve --user-data oluşturmada cloud-init ile kurulur (SSH ~25 sn).`),
 		Example: `  gyro server create web-1 --plan pro-2-8 --location falkenstein --image ubuntu-24.04 --ssh-key mykey --wait
   gyro server create --plan standart-2-4 --location eu-de-1 --image debian-12 --ssh-key ~/.ssh/id_ed25519.pub --dry-run
   gyro server create db-1 --plan standart-2-4 --location eu-de-2 --image ubuntu-24.04 --user-data @cloud-init.yaml --yes -o json
