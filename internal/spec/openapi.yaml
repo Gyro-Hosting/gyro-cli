@@ -2,7 +2,7 @@
 openapi: 3.1.0
 info:
   title: Gyro Public API
-  version: 2.17.0
+  version: 2.17.1
   summary: Manage Gyro cloud servers, SSH keys and billing programmatically.
   x-summary-tr: Gyro bulut sunucularınızı, SSH anahtarlarınızı ve faturalarınızı programla yönetin.
   description: "The Gyro Public API lets you automate everything you do in the Gyro client area:\norder and manage cloud servers, keep SSH keys, read invoices and\
@@ -25,7 +25,8 @@ info:
     \n**2.16.1**: `GET /cloud/apps` returns `min_ram_gb` (fixed), `min_disk_gb`, `min_cpu`, `popular_tr`, `version`, `license` and `description` for each one-click\
     \ app. Additive change.\n\n**2.17.0**: Gyro Containers: per-service autoscaling (`PUT /cloud/containers/{id}/services/{name}/autoscaling`, also `autoscaling`\
     \ / `alerts` on create and update), notification channels (`GET/PUT /cloud/containers/{id}/notifications`, `.../notifications/test`, `.../notifications/webhook-secret`:\
-    \ e-mail, SMS, Telegram, signed webhook). Additive.\n"
+    \ e-mail, SMS, Telegram, signed webhook). Additive.\n\n**2.17.1**: additional IPv4: each added address is billed at least 6 hours (`pricing.minimum_hours`), per-server\
+    \ add limit per hour (`adds_per_hour`, `adds_left_this_hour`). Additive.\n"
   x-description-tr: "Gyro Public API, müşteri panelinde yaptığınız her işi otomatikleştirmenizi sağlar:\nbulut sunucu siparişi ve yönetimi, SSH anahtarları, fatura\
     \ ve bakiye okuma.\nResmi Terraform sağlayıcısı (`gyro-hosting/gyro`) ve `gyroctl` bu API'yi kullanır.\n\n* **Taban adres** `https://www.gyrohosting.com/api/v1/client`\n\
     * **Kimlik** `Authorization: Bearer wck_...` (anahtarı *Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri* bölümünden oluşturun)\n* **Biçim** JSON\
@@ -46,7 +47,8 @@ info:
     \ başına en çok 5; sunucuya otomatik tanımlanır).\n\n**2.16.1**: `GET /cloud/apps` her tek tık uygulama için `min_ram_gb` (düzeltildi), `min_disk_gb`, `min_cpu`,\
     \ `popular_tr` (Türkiye'de popüler), `version`, `license` ve `description` döndürür. Geriye uyumlu ekleme.\n\n**2.17.0**: Gyro Kapsayıcı: servis başına otomatik\
     \ ölçekleme (`PUT /cloud/containers/{id}/services/{name}/autoscaling`, oluştur/güncellemede `autoscaling` / `alerts`), bildirim kanalları (`GET/PUT /cloud/containers/{id}/notifications`,\
-    \ `.../notifications/test`, `.../notifications/webhook-secret`: e-posta, SMS, Telegram, imzalı webhook). Geriye uyumlu.\n"
+    \ `.../notifications/test`, `.../notifications/webhook-secret`: e-posta, SMS, Telegram, imzalı webhook). Geriye uyumlu.\n\n**2.17.1**: ek IPv4: her eklenen adres\
+    \ en az 6 saat ücretlendirilir (`pricing.minimum_hours`), sunucu başına saatlik ekleme sınırı (`adds_per_hour`, `adds_left_this_hour`). Geriye uyumlu.\n"
   contact:
     name: Gyro Hosting
     url: https://www.gyrohosting.com
@@ -18060,12 +18062,16 @@ paths:
       x-scope: cloud_read
       x-cli:
         command: server ip list
-      description: 'Additional IPv4 addresses are billed per address hourly from the prepaid balance (default 2 EUR per address-month, `pricing` shows the current
-        price), from the hour they are added until they are released. Up to `max` per server (default 5). Each address is configured on the server automatically (/32
-        on the primary interface, kept across reboots and reinstalls); reverse DNS: PUT /cloud/servers/{id}/rdns. '
-      x-description-tr: 'Ek IPv4 adresleri adres başına ön ödemeli bakiyeden saatlik ücretlendirilir (varsayılan adres başına aylık 2 €, güncel fiyat `pricing` alanında);
-        eklendiği saatten çıkarıldığı saate kadar. Sunucu başına en çok `max` (varsayılan 5). Adres sunucuya otomatik tanımlanır (birincil arayüze /32, yeniden başlatma
-        ve yeniden kurulumda korunur); ters DNS: PUT /cloud/servers/{id}/rdns. '
+      description: '**Minimum charge:** each added IP is billed for at least 6 hours (`pricing.minimum_hours`): releasing it earlier still bills the minimum (debited
+        at release), and taking the same address again starts a new minimum. At most `adds_per_hour` addresses (default 10) can be added to a server per 60 minutes.
+        Additional IPv4 addresses are billed per address hourly from the prepaid balance (default 2 EUR per address-month, `pricing` shows the current price), from
+        the hour they are added until they are released. Up to `max` per server (default 5). Each address is configured on the server automatically (/32 on the primary
+        interface, kept across reboots and reinstalls); reverse DNS: PUT /cloud/servers/{id}/rdns. '
+      x-description-tr: '**Asgari ücret:** her eklenen IP en az 6 saat ücretlendirilir (`pricing.minimum_hours`): daha erken bırakılsa da asgari süre (bırakırken)
+        düşülür; aynı adresi yeniden almak yeni bir asgari süre başlatır. Bir sunucuya 60 dakikada en çok `adds_per_hour` (varsayılan 10) adres eklenebilir. Ek IPv4
+        adresleri adres başına ön ödemeli bakiyeden saatlik ücretlendirilir (varsayılan adres başına aylık 2 €, güncel fiyat `pricing` alanında); eklendiği saatten
+        çıkarıldığı saate kadar. Sunucu başına en çok `max` (varsayılan 5). Adres sunucuya otomatik tanımlanır (birincil arayüze /32, yeniden başlatma ve yeniden
+        kurulumda korunur); ters DNS: PUT /cloud/servers/{id}/rdns. '
       parameters:
       - &id051
         name: id
@@ -18110,13 +18116,16 @@ paths:
       x-cli:
         command: server ip add
         money: true
-      description: 'Additional IPv4 addresses are billed per address hourly from the prepaid balance (default 2 EUR per address-month, `pricing` shows the current
-        price), from the hour they are added until they are released. Up to `max` per server (default 5). Each address is configured on the server automatically (/32
-        on the primary interface, kept across reboots and reinstalls); reverse DNS: PUT /cloud/servers/{id}/rdns. Prepaid tr-ist-1 servers only; not while the server
-        is suspended.'
-      x-description-tr: 'Ek IPv4 adresleri adres başına ön ödemeli bakiyeden saatlik ücretlendirilir (varsayılan adres başına aylık 2 €, güncel fiyat `pricing` alanında);
-        eklendiği saatten çıkarıldığı saate kadar. Sunucu başına en çok `max` (varsayılan 5). Adres sunucuya otomatik tanımlanır (birincil arayüze /32, yeniden başlatma
-        ve yeniden kurulumda korunur); ters DNS: PUT /cloud/servers/{id}/rdns. Yalnız ön ödemeli tr-ist-1 sunucuları; askıdayken eklenemez.'
+      description: '**Minimum charge:** each added IP is billed for at least 6 hours (`pricing.minimum_hours`): releasing it earlier still bills the minimum (debited
+        at release), and taking the same address again starts a new minimum. At most `adds_per_hour` addresses (default 10) can be added to a server per 60 minutes.
+        Additional IPv4 addresses are billed per address hourly from the prepaid balance (default 2 EUR per address-month, `pricing` shows the current price), from
+        the hour they are added until they are released. Up to `max` per server (default 5). Each address is configured on the server automatically (/32 on the primary
+        interface, kept across reboots and reinstalls); reverse DNS: PUT /cloud/servers/{id}/rdns. Prepaid tr-ist-1 servers only; not while the server is suspended.'
+      x-description-tr: '**Asgari ücret:** her eklenen IP en az 6 saat ücretlendirilir (`pricing.minimum_hours`): daha erken bırakılsa da asgari süre (bırakırken)
+        düşülür; aynı adresi yeniden almak yeni bir asgari süre başlatır. Bir sunucuya 60 dakikada en çok `adds_per_hour` (varsayılan 10) adres eklenebilir. Ek IPv4
+        adresleri adres başına ön ödemeli bakiyeden saatlik ücretlendirilir (varsayılan adres başına aylık 2 €, güncel fiyat `pricing` alanında); eklendiği saatten
+        çıkarıldığı saate kadar. Sunucu başına en çok `max` (varsayılan 5). Adres sunucuya otomatik tanımlanır (birincil arayüze /32, yeniden başlatma ve yeniden
+        kurulumda korunur); ters DNS: PUT /cloud/servers/{id}/rdns. Yalnız ön ödemeli tr-ist-1 sunucuları; askıdayken eklenemez.'
       parameters:
       - *id051
       requestBody:
@@ -18168,10 +18177,13 @@ paths:
       x-cli:
         command: server ip remove
         confirm: true
-      description: The address is removed from the server and returns to the pool (getting the same address back is not guaranteed); billing stops after the current
-        hour. Needs `confirm=true`.
-      x-description-tr: Adres sunucudan kaldırılır ve havuza döner (aynı adresi geri alma garantisi yok); ücret içinde bulunulan saatten sonra durur. `confirm=true`
-        gerekir.
+      description: '**Minimum charge:** each added IP is billed for at least 6 hours (`pricing.minimum_hours`): releasing it earlier still bills the minimum (debited
+        at release), and taking the same address again starts a new minimum. At most `adds_per_hour` addresses (default 10) can be added to a server per 60 minutes.
+        The address is removed from the server and returns to the pool (getting the same address back is not guaranteed); billing stops at release (the minimum still
+        applies). Needs `confirm=true`.'
+      x-description-tr: '**Asgari ücret:** her eklenen IP en az 6 saat ücretlendirilir (`pricing.minimum_hours`): daha erken bırakılsa da asgari süre (bırakırken)
+        düşülür; aynı adresi yeniden almak yeni bir asgari süre başlatır. Bir sunucuya 60 dakikada en çok `adds_per_hour` (varsayılan 10) adres eklenebilir. Adres
+        sunucudan kaldırılır ve havuza döner (aynı adresi geri alma garantisi yok); ücret bırakınca durur (asgari süre yine uygulanır). `confirm=true` gerekir.'
       parameters:
       - *id051
       - name: ip
@@ -20380,9 +20392,21 @@ components:
               - string
               - 'null'
               description: TL (EUR) at the panel rate
+            minimum_hours:
+              type: integer
+              description: every added address is billed at least this many hours (default 6), even if released earlier; taking an address again starts a new minimum
         added:
           type: array
           items:
             type: string
         released:
           type: string
+        adds_per_hour:
+          type:
+          - integer
+          - 'null'
+          description: addresses that can be added to this server per rolling 60 minutes (default 10)
+        adds_left_this_hour:
+          type:
+          - integer
+          - 'null'

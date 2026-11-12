@@ -3,7 +3,7 @@
 package spec
 
 // APIVersion is info.version of the spec this table was generated from.
-const APIVersion = "2.17.0"
+const APIVersion = "2.17.1"
 
 // Ops lists every API operation.
 var Ops = []Op{
@@ -2299,20 +2299,20 @@ var Ops = []Op{
 	},
 	{ID: "listServerIps", Method: "GET", Path: "/cloud/servers/{id}/ips", Tag: "Networking",
 		Summary: "List the server's IPv4 addresses", SummaryTR: "Sunucunun IPv4 adresleri",
-		Desc: "Additional IPv4 addresses are billed per address hourly from the prepaid balance (default 2 EUR per address-month, `pricing` shows the current price), from the hour they are added until they are released. Up to `max` per server (default 5). Each address is configured on the server automatically (/32 on the primary interface, kept across reboots and reinstalls); reverse DNS: PUT /cloud/servers/{id}/rdns.", DescTR: "Ek IPv4 adresleri adres başına ön ödemeli bakiyeden saatlik ücretlendirilir (varsayılan adres başına aylık 2 €, güncel fiyat `pricing` alanında); eklendiği saatten çıkarıldığı saate kadar. Sunucu başına en çok `max` (varsayılan 5). Adres sunucuya otomatik tanımlanır (birincil arayüze /32, yeniden başlatma ve yeniden kurulumda korunur); ters DNS: PUT /cloud/servers/{id}/rdns.",
+		Desc: "**Minimum charge:** each added IP is billed for at least 6 hours (`pricing.minimum_hours`): releasing it earlier still bills the minimum (debited at release), and taking the same address again starts a new minimum. At most `adds_per_hour` addresses (default 10) can be added to a server per 60 minutes. Additional IPv4 addresses are billed per address hourly from the prepaid balance (default 2 EUR per address-month, `pricing` shows the current price), from the hour they are added until they are released. Up to `max` per server (default 5). Each address is configured on the server automatically (/32 on the primary interface, kept across reboots and reinstalls); reverse DNS: PUT /cloud/servers/{id}/rdns.", DescTR: "**Asgari ücret:** her eklenen IP en az 6 saat ücretlendirilir (`pricing.minimum_hours`): daha erken bırakılsa da asgari süre (bırakırken) düşülür; aynı adresi yeniden almak yeni bir asgari süre başlatır. Bir sunucuya 60 dakikada en çok `adds_per_hour` (varsayılan 10) adres eklenebilir. Ek IPv4 adresleri adres başına ön ödemeli bakiyeden saatlik ücretlendirilir (varsayılan adres başına aylık 2 €, güncel fiyat `pricing` alanında); eklendiği saatten çıkarıldığı saate kadar. Sunucu başına en çok `max` (varsayılan 5). Adres sunucuya otomatik tanımlanır (birincil arayüze /32, yeniden başlatma ve yeniden kurulumda korunur); ters DNS: PUT /cloud/servers/{id}/rdns.",
 		Scope: "cloud_read", Command: []string{"server", "ip", "list"},
 		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
-		Columns: []string{"server_id", "primary_ip", "count", "max", "available", "applied_on_server", "pending", "released"},
+		Columns: []string{"server_id", "primary_ip", "count", "max", "available", "applied_on_server", "pending", "released", "adds_per_hour", "adds_left_this_hour"},
 		Params: []Param{
 			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Server id (tr-ist-1)", DescTR: ""},
 		},
 	},
 	{ID: "addServerIps", Method: "POST", Path: "/cloud/servers/{id}/ips", Tag: "Networking",
 		Summary: "Add additional IPv4 addresses", SummaryTR: "Ek IPv4 adresi ekle",
-		Desc: "Additional IPv4 addresses are billed per address hourly from the prepaid balance (default 2 EUR per address-month, `pricing` shows the current price), from the hour they are added until they are released. Up to `max` per server (default 5). Each address is configured on the server automatically (/32 on the primary interface, kept across reboots and reinstalls); reverse DNS: PUT /cloud/servers/{id}/rdns. Prepaid tr-ist-1 servers only; not while the server is suspended.", DescTR: "Ek IPv4 adresleri adres başına ön ödemeli bakiyeden saatlik ücretlendirilir (varsayılan adres başına aylık 2 €, güncel fiyat `pricing` alanında); eklendiği saatten çıkarıldığı saate kadar. Sunucu başına en çok `max` (varsayılan 5). Adres sunucuya otomatik tanımlanır (birincil arayüze /32, yeniden başlatma ve yeniden kurulumda korunur); ters DNS: PUT /cloud/servers/{id}/rdns. Yalnız ön ödemeli tr-ist-1 sunucuları; askıdayken eklenemez.",
+		Desc: "**Minimum charge:** each added IP is billed for at least 6 hours (`pricing.minimum_hours`): releasing it earlier still bills the minimum (debited at release), and taking the same address again starts a new minimum. At most `adds_per_hour` addresses (default 10) can be added to a server per 60 minutes. Additional IPv4 addresses are billed per address hourly from the prepaid balance (default 2 EUR per address-month, `pricing` shows the current price), from the hour they are added until they are released. Up to `max` per server (default 5). Each address is configured on the server automatically (/32 on the primary interface, kept across reboots and reinstalls); reverse DNS: PUT /cloud/servers/{id}/rdns. Prepaid tr-ist-1 servers only; not while the server is suspended.", DescTR: "**Asgari ücret:** her eklenen IP en az 6 saat ücretlendirilir (`pricing.minimum_hours`): daha erken bırakılsa da asgari süre (bırakırken) düşülür; aynı adresi yeniden almak yeni bir asgari süre başlatır. Bir sunucuya 60 dakikada en çok `adds_per_hour` (varsayılan 10) adres eklenebilir. Ek IPv4 adresleri adres başına ön ödemeli bakiyeden saatlik ücretlendirilir (varsayılan adres başına aylık 2 €, güncel fiyat `pricing` alanında); eklendiği saatten çıkarıldığı saate kadar. Sunucu başına en çok `max` (varsayılan 5). Adres sunucuya otomatik tanımlanır (birincil arayüze /32, yeniden başlatma ve yeniden kurulumda korunur); ters DNS: PUT /cloud/servers/{id}/rdns. Yalnız ön ödemeli tr-ist-1 sunucuları; askıdayken eklenemez.",
 		Scope: "cloud_write", Command: []string{"server", "ip", "add"},
 		HasBody: true, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: true, Hidden: false,
-		Columns: []string{"server_id", "primary_ip", "count", "max", "available", "applied_on_server", "pending", "released"},
+		Columns: []string{"server_id", "primary_ip", "count", "max", "available", "applied_on_server", "pending", "released", "adds_per_hour", "adds_left_this_hour"},
 		Params: []Param{
 			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Server id (tr-ist-1)", DescTR: ""},
 		},
@@ -2322,10 +2322,10 @@ var Ops = []Op{
 	},
 	{ID: "removeServerIp", Method: "DELETE", Path: "/cloud/servers/{id}/ips/{ip}", Tag: "Networking",
 		Summary: "Release an additional IPv4 address", SummaryTR: "Ek IPv4 adresini bırak",
-		Desc: "The address is removed from the server and returns to the pool (getting the same address back is not guaranteed); billing stops after the current hour. Needs `confirm=true`.", DescTR: "Adres sunucudan kaldırılır ve havuza döner (aynı adresi geri alma garantisi yok); ücret içinde bulunulan saatten sonra durur. `confirm=true` gerekir.",
+		Desc: "**Minimum charge:** each added IP is billed for at least 6 hours (`pricing.minimum_hours`): releasing it earlier still bills the minimum (debited at release), and taking the same address again starts a new minimum. At most `adds_per_hour` addresses (default 10) can be added to a server per 60 minutes. The address is removed from the server and returns to the pool (getting the same address back is not guaranteed); billing stops at release (the minimum still applies). Needs `confirm=true`.", DescTR: "**Asgari ücret:** her eklenen IP en az 6 saat ücretlendirilir (`pricing.minimum_hours`): daha erken bırakılsa da asgari süre (bırakırken) düşülür; aynı adresi yeniden almak yeni bir asgari süre başlatır. Bir sunucuya 60 dakikada en çok `adds_per_hour` (varsayılan 10) adres eklenebilir. Adres sunucudan kaldırılır ve havuza döner (aynı adresi geri alma garantisi yok); ücret bırakınca durur (asgari süre yine uygulanır). `confirm=true` gerekir.",
 		Scope: "cloud_write", Command: []string{"server", "ip", "remove"},
 		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: true, Money: false, Hidden: false,
-		Columns: []string{"server_id", "primary_ip", "count", "max", "available", "applied_on_server", "pending", "released"},
+		Columns: []string{"server_id", "primary_ip", "count", "max", "available", "applied_on_server", "pending", "released", "adds_per_hour", "adds_left_this_hour"},
 		Params: []Param{
 			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Server id (tr-ist-1)", DescTR: ""},
 			{Name: "ip", In: "path", Type: "string", Items: "", Enum: nil, Default: "", Required: true, Desc: "", DescTR: ""},

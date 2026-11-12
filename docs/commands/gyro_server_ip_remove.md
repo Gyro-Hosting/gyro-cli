@@ -6,7 +6,7 @@ Release an additional IPv4 address
 
 Release an additional IPv4 address
 
-The address is removed from the server and returns to the pool (getting the same address back is not guaranteed); billing stops after the current hour. Needs `confirm=true`.
+**Minimum charge:** each added IP is billed for at least 6 hours (`pricing.minimum_hours`): releasing it earlier still bills the minimum (debited at release), and taking the same address again starts a new minimum. At most `adds_per_hour` addresses (default 10) can be added to a server per 60 minutes. The address is removed from the server and returns to the pool (getting the same address back is not guaranteed); billing stops at release (the minimum still applies). Needs `confirm=true`.
 
 API: DELETE /cloud/servers/{id}/ips/{ip} (operationId removeServerIp, scope cloud_write)
 

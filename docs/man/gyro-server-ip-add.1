@@ -13,7 +13,7 @@ gyro-server-ip-add - Add additional IPv4 addresses
 Add additional IPv4 addresses
 
 .PP
-Additional IPv4 addresses are billed per address hourly from the prepaid balance (default 2 EUR per address-month, \fBpricing\fR shows the current price), from the hour they are added until they are released. Up to \fBmax\fR per server (default 5). Each address is configured on the server automatically (/32 on the primary interface, kept across reboots and reinstalls); reverse DNS: PUT /cloud/servers/{id}/rdns. Prepaid tr-ist-1 servers only; not while the server is suspended.
+\fBMinimum charge:\fP each added IP is billed for at least 6 hours (\fBpricing.minimum_hours\fR): releasing it earlier still bills the minimum (debited at release), and taking the same address again starts a new minimum. At most \fBadds_per_hour\fR addresses (default 10) can be added to a server per 60 minutes. Additional IPv4 addresses are billed per address hourly from the prepaid balance (default 2 EUR per address-month, \fBpricing\fR shows the current price), from the hour they are added until they are released. Up to \fBmax\fR per server (default 5). Each address is configured on the server automatically (/32 on the primary interface, kept across reboots and reinstalls); reverse DNS: PUT /cloud/servers/{id}/rdns. Prepaid tr-ist-1 servers only; not while the server is suspended.
 
 .PP
 API: POST /cloud/servers/{id}/ips (operationId addServerIps, scope cloud_write)

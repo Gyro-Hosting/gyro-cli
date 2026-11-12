@@ -6,7 +6,7 @@ Sunucunun IPv4 adresleri
 
 Sunucunun IPv4 adresleri
 
-Ek IPv4 adresleri adres başına ön ödemeli bakiyeden saatlik ücretlendirilir (varsayılan adres başına aylık 2 €, güncel fiyat `pricing` alanında); eklendiği saatten çıkarıldığı saate kadar. Sunucu başına en çok `max` (varsayılan 5). Adres sunucuya otomatik tanımlanır (birincil arayüze /32, yeniden başlatma ve yeniden kurulumda korunur); ters DNS: PUT /cloud/servers/{id}/rdns.
+**Asgari ücret:** her eklenen IP en az 6 saat ücretlendirilir (`pricing.minimum_hours`): daha erken bırakılsa da asgari süre (bırakırken) düşülür; aynı adresi yeniden almak yeni bir asgari süre başlatır. Bir sunucuya 60 dakikada en çok `adds_per_hour` (varsayılan 10) adres eklenebilir. Ek IPv4 adresleri adres başına ön ödemeli bakiyeden saatlik ücretlendirilir (varsayılan adres başına aylık 2 €, güncel fiyat `pricing` alanında); eklendiği saatten çıkarıldığı saate kadar. Sunucu başına en çok `max` (varsayılan 5). Adres sunucuya otomatik tanımlanır (birincil arayüze /32, yeniden başlatma ve yeniden kurulumda korunur); ters DNS: PUT /cloud/servers/{id}/rdns.
 
 API: GET /cloud/servers/{id}/ips (operationId listServerIps, scope cloud_read)
 

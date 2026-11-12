@@ -6,7 +6,7 @@ Ek IPv4 adresini bırak
 
 Ek IPv4 adresini bırak
 
-Adres sunucudan kaldırılır ve havuza döner (aynı adresi geri alma garantisi yok); ücret içinde bulunulan saatten sonra durur. `confirm=true` gerekir.
+**Asgari ücret:** her eklenen IP en az 6 saat ücretlendirilir (`pricing.minimum_hours`): daha erken bırakılsa da asgari süre (bırakırken) düşülür; aynı adresi yeniden almak yeni bir asgari süre başlatır. Bir sunucuya 60 dakikada en çok `adds_per_hour` (varsayılan 10) adres eklenebilir. Adres sunucudan kaldırılır ve havuza döner (aynı adresi geri alma garantisi yok); ücret bırakınca durur (asgari süre yine uygulanır). `confirm=true` gerekir.
 
 API: DELETE /cloud/servers/{id}/ips/{ip} (operationId removeServerIp, scope cloud_write)
 

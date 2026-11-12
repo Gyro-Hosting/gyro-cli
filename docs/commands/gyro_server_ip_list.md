@@ -6,7 +6,7 @@ List the server's IPv4 addresses
 
 List the server's IPv4 addresses
 
-Additional IPv4 addresses are billed per address hourly from the prepaid balance (default 2 EUR per address-month, `pricing` shows the current price), from the hour they are added until they are released. Up to `max` per server (default 5). Each address is configured on the server automatically (/32 on the primary interface, kept across reboots and reinstalls); reverse DNS: PUT /cloud/servers/{id}/rdns.
+**Minimum charge:** each added IP is billed for at least 6 hours (`pricing.minimum_hours`): releasing it earlier still bills the minimum (debited at release), and taking the same address again starts a new minimum. At most `adds_per_hour` addresses (default 10) can be added to a server per 60 minutes. Additional IPv4 addresses are billed per address hourly from the prepaid balance (default 2 EUR per address-month, `pricing` shows the current price), from the hour they are added until they are released. Up to `max` per server (default 5). Each address is configured on the server automatically (/32 on the primary interface, kept across reboots and reinstalls); reverse DNS: PUT /cloud/servers/{id}/rdns.
 
 API: GET /cloud/servers/{id}/ips (operationId listServerIps, scope cloud_read)
 
