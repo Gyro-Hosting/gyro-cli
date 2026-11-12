@@ -2204,7 +2204,7 @@ var Ops = []Op{
 			{Name: "direction", Type: "string", Items: "", Enum: []string{"in", "out"}, Default: "in", Required: false, Desc: "in = inbound to the server, out = new outbound connections (network firewall only)", DescTR: ""},
 			{Name: "action", Type: "string", Items: "", Enum: []string{"allow", "deny"}, Default: "allow", Required: false, Desc: "", DescTR: ""},
 			{Name: "protocol", Type: "string", Items: "", Enum: []string{"tcp", "udp", "tcp_udp", "icmp", "all"}, Default: "tcp", Required: false, Desc: "", DescTR: ""},
-			{Name: "source", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "any | IPv4/CIDR list (comma separated, max 10) | country:TR,DE | not-country:TR (country add-on; any ISO 3166-1 alpha-2 code with RIPE address space, max 10 per rule). For direction out: the remote address.", DescTR: ""},
+			{Name: "source", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "any | IPv4/CIDR list (comma separated, max 10). For direction out: the remote address. Country sources (country:XX / not-country:XX) are accepted only when capabilities.country_filter is true (currently not offered).", DescTR: ""},
 			{Name: "destination", Type: "string", Items: "", Enum: nil, Default: "any", Required: false, Desc: "any (all IPs of the server) or one IP address of the server", DescTR: ""},
 			{Name: "port", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "any | 22 | 80,443 | 1000-2000 (not for icmp/all)", DescTR: ""},
 			{Name: "description", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},

@@ -17539,8 +17539,8 @@ components:
           default: tcp
         source:
           type: string
-          description: 'any | IPv4/CIDR list (comma separated, max 10) | country:TR,DE | not-country:TR (country add-on; any ISO 3166-1 alpha-2 code with RIPE address
-            space, max 10 per rule). For direction out: the remote address.'
+          description: 'any | IPv4/CIDR list (comma separated, max 10). For direction out: the remote address. Country sources (country:XX / not-country:XX) are accepted
+            only when capabilities.country_filter is true (currently not offered).'
           example: 203.0.113.0/24
         destination:
           type: string
@@ -17577,8 +17577,8 @@ components:
           enum:
           - network
           - cloud
-          description: network = Istanbul core router (allow + deny, inbound + outbound); cloud = provider firewall (allow rules only, default deny, inbound only,
-            no country)
+          description: network = Istanbul core network (allow + deny, inbound + outbound, stateless - see capabilities); cloud = provider firewall (allow rules only,
+            default deny, inbound only)
         default_action:
           type: string
           enum:
@@ -17618,6 +17618,40 @@ components:
           items:
             type: string
           description: Network addresses corrected on save (e.g. 10.1.2.3/24 -> 10.1.2.0/24)
+        capabilities:
+          $ref: '#/components/schemas/FirewallCapabilities'
+    FirewallCapabilities:
+      type: object
+      description: Features of the firewall platform behind this server. A request that uses a feature marked false is rejected with 422 err_feature_off.
+      properties:
+        backend:
+          type: string
+          enum:
+          - stateful
+          - stateless
+          - cloud
+          description: 'stateless = hardware ACL at the network edge: with default_action deny, replies to connections the server opened are let through automatically
+            (TCP replies, UDP from port 53/123, UDP to udp_return_ports, ICMP replies).'
+        country_filter:
+          type: boolean
+        brute_force:
+          type: boolean
+        port_scan:
+          type: boolean
+        rate_limit:
+          type: boolean
+        outbound_rules:
+          type: boolean
+        security_groups:
+          type: boolean
+        trial:
+          type: boolean
+        counters:
+          type: boolean
+        udp_return_ports:
+          type: string
+          nullable: true
+          example: 32768-65535
     FirewallPolicyInput:
       type: object
       required:
