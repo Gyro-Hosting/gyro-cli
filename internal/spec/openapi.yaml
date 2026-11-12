@@ -2,7 +2,7 @@
 openapi: 3.1.0
 info:
   title: Gyro Public API
-  version: 2.14.0
+  version: 2.15.0
   summary: Manage Gyro cloud servers, SSH keys and billing programmatically.
   x-summary-tr: Gyro bulut sunucularınızı, SSH anahtarlarınızı ve faturalarınızı programla yönetin.
   description: "The Gyro Public API lets you automate everything you do in the Gyro client area:\norder and manage cloud servers, keep SSH keys, read invoices and\
@@ -18,7 +18,10 @@ info:
     \ Storage (versioning + object lock / WORM): `object_lock` on bucket create, versions list / restore / undelete / delete, bucket default retention, per-version\
     \ retention and legal hold, old version expiry, lock summary and scan. Standard Object Storage answers 409 `feature_not_available` on these.\n\n**2.14.0**: tr-ist-1\
     \ servers on Gyro Compute: SSH keys (up to 10) and `user_data` at creation through cloud-init (~25 s to SSH), `reset` action, rebuild with `user_data`, real snapshot\
-    \ ids, metrics (instant), browser console URL. Request / response shapes unchanged.\n"
+    \ ids, metrics (instant), browser console URL. Request / response shapes unchanged.\n\n**2.14.1**: `GET /cloud/apps` returns `min_ram_gb` (fixed), `min_disk_gb`,\
+    \ `min_cpu`, `popular_tr`, `version`, `license` and `description` for each one-click app. Additive change.\n\n**2.15.0**: custom templates for tr-ist-1 servers:\
+    \ capture a server (`POST /cloud/servers/{id}/templates`), list / rename / delete, new server (`POST /cloud/templates/{id}/servers`) or reinstall (`POST /cloud/templates/{id}/rebuild`)\
+    \ from it. 0.05 EUR per GB-month (prepaid, hourly). No image upload.\n"
   x-description-tr: "Gyro Public API, müşteri panelinde yaptığınız her işi otomatikleştirmenizi sağlar:\nbulut sunucu siparişi ve yönetimi, SSH anahtarları, fatura\
     \ ve bakiye okuma.\nResmi Terraform sağlayıcısı (`gyro-hosting/gyro`) ve `gyroctl` bu API'yi kullanır.\n\n* **Taban adres** `https://www.gyrohosting.com/api/v1/client`\n\
     * **Kimlik** `Authorization: Bearer wck_...` (anahtarı *Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri* bölümünden oluşturun)\n* **Biçim** JSON\
@@ -32,7 +35,11 @@ info:
     \ / WORM): kova açılışında `object_lock`, sürüm listele / geri yükle / silme işaretini kaldır / kalıcı sil, kova varsayılan saklaması, sürüm başına saklama ve\
     \ legal hold, eski sürüm silme süresi, kilit özeti ve tarama. Standart Nesne Depolama bu uçlarda 409 `feature_not_available` döner.\n\n**2.14.0**: tr-ist-1 sunucuları\
     \ Gyro Compute üzerinde: oluşturmada cloud-init ile SSH anahtarları (en çok 10) ve `user_data` (SSH'a ~25 sn), `reset` eylemi, `user_data` ile yeniden kurulum,\
-    \ gerçek snapshot numaraları, anlık metrikler, tarayıcı konsolu adresi. İstek / yanıt biçimleri değişmedi.\n"
+    \ gerçek snapshot numaraları, anlık metrikler, tarayıcı konsolu adresi. İstek / yanıt biçimleri değişmedi.\n\n**2.14.1**: `GET /cloud/apps` her tek tık uygulama\
+    \ için `min_ram_gb` (düzeltildi), `min_disk_gb`, `min_cpu`, `popular_tr` (Türkiye'de popüler), `version`, `license` ve `description` döndürür. Geriye uyumlu ekleme.\n\
+    \n**2.15.0**: tr-ist-1 sunucuları için özel şablonlar: sunucudan şablon (`POST /cloud/servers/{id}/templates`), listele / adlandır / sil, şablondan yeni sunucu\
+    \ (`POST /cloud/templates/{id}/servers`) ya da yeniden kurulum (`POST /cloud/templates/{id}/rebuild`). GB başına aylık 0,05 € (ön ödemeli, saatlik). Dışarıdan\
+    \ imaj yüklenmez.\n"
   contact:
     name: Gyro Hosting
     url: https://www.gyrohosting.com
@@ -171,6 +178,9 @@ tags:
 - name: Affiliate
   description: Affiliate programme.
   x-description-tr: Satış ortaklığı.
+- name: Templates
+  description: Custom templates from your own tr-ist-1 servers (no image upload)
+  x-description-tr: Kendi tr-ist-1 sunucularınızdan özel şablonlar (dışarıdan imaj yüklenmez)
 paths:
   /whoami:
     get:
@@ -2627,8 +2637,30 @@ paths:
                           type: array
                           items:
                             type: string
+                        min_ram_gb:
+                          type: number
+                          description: Minimum RAM (GB) the app needs; smaller plans should not be used
+                        min_disk_gb:
+                          type: integer
+                        min_cpu:
+                          type: integer
                         needs_domain:
                           type: boolean
+                        popular_tr:
+                          type: boolean
+                          description: Listed under "Popular in Türkiye" on the order screen
+                          x-description-tr: Sipariş ekranında "Türkiye'de popüler" listesinde
+                        version:
+                          type: string
+                        license:
+                          type: string
+                        description:
+                          type: object
+                          properties:
+                            tr:
+                              type: string
+                            en:
+                              type: string
         '401':
           $ref: '#/components/responses/Unauthorized'
   /cloud/servers/{id}/app:
@@ -17338,6 +17370,378 @@ paths:
                   maximum: 3650
               required:
               - days
+  /cloud/templates:
+    get:
+      tags:
+      - Templates
+      operationId: listTemplates
+      summary: List your templates
+      x-summary-tr: Şablonlarınızı listele
+      x-scope: cloud_read
+      x-cli:
+        command: template list
+      description: Billed 0.05 EUR per GB-month of the space the template really uses, hourly from the prepaid balance (through the account's template storage service,
+        opened with the first template). Deleting a template stops its charge. At most 10 templates; visible only in your account. `meta` carries count, max, total_gb
+        and pricing.
+      x-description-tr: 'Şablonun gerçekten kullandığı alan üzerinden GB başına aylık 0,05 € (ön ödemeli bakiyeden saatlik; ilk şablonla açılan şablon deposu hizmeti
+        üzerinden). Silince ücret durur. En çok 10 şablon; yalnız sizin hesabınızda görünür. `meta`: adet, sınır, toplam GB, fiyat.'
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Template'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: template_limit, template_not_ready, busy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          $ref: '#/components/responses/Validation'
+  /cloud/templates/{id}:
+    get:
+      tags:
+      - Templates
+      operationId: getTemplate
+      summary: Get a template
+      x-summary-tr: Şablonu getir
+      x-scope: cloud_read
+      x-cli:
+        command: template get
+      description: Another account's template answers 404.
+      x-description-tr: Başka hesabın şablonu 404 döner.
+      parameters:
+      - &id048
+        name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Template id
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Template'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: template_limit, template_not_ready, busy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          $ref: '#/components/responses/Validation'
+    patch:
+      tags:
+      - Templates
+      operationId: updateTemplate
+      summary: Rename a template
+      x-summary-tr: Şablonu yeniden adlandır
+      x-scope: cloud_write
+      x-cli:
+        command: template update
+      description: Name 1-60 characters (letters, digits, space . _ -).
+      x-description-tr: Ad 1-60 karakter (harf, rakam, boşluk . _ -).
+      parameters:
+      - *id048
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Template'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: template_limit, template_not_ready, busy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  maxLength: 60
+                description:
+                  type: string
+                  maxLength: 200
+              required: []
+    delete:
+      tags:
+      - Templates
+      operationId: deleteTemplate
+      summary: Delete a template
+      x-summary-tr: Şablonu sil
+      x-scope: cloud_write
+      x-cli:
+        command: template delete
+        confirm: true
+      description: Permanent. Servers created from it are not affected; the charge stops from the next hour.
+      x-description-tr: Kalıcıdır. Şablondan açılmış sunucular etkilenmez; ücret sonraki saatten durur.
+      parameters:
+      - *id048
+      responses:
+        '202':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                      template_id:
+                        type: integer
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: template_limit, template_not_ready, busy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          $ref: '#/components/responses/Validation'
+  /cloud/servers/{id}/templates:
+    post:
+      tags:
+      - Templates
+      operationId: createTemplate
+      summary: Capture a server as a template
+      x-summary-tr: Sunucudan şablon oluştur
+      x-scope: cloud_write
+      x-cli:
+        command: template create
+      description: 'Billed 0.05 EUR per GB-month of the space the template really uses, hourly from the prepaid balance (through the account''s template storage service,
+        opened with the first template). Deleting a template stops its charge. At most 10 templates; visible only in your account. Only the root disk is copied. `mode:
+        snapshot` (default) keeps the server running (file system frozen briefly via a temporary snapshot); `mode: shutdown` stops the server, copies it and starts
+        it again. Servers created from the template get a new host name, IP, root password, SSH host keys and machine id (cloud-init); your users, files and settings
+        stay. Linux servers only. Ready in about a minute (`status` creating -> ready).'
+      x-description-tr: 'Şablonun gerçekten kullandığı alan üzerinden GB başına aylık 0,05 € (ön ödemeli bakiyeden saatlik; ilk şablonla açılan şablon deposu hizmeti
+        üzerinden). Silince ücret durur. En çok 10 şablon; yalnız sizin hesabınızda görünür. Yalnız kök disk alınır. `mode: snapshot` (varsayılan) sunucu açık kalır
+        (geçici anlık görüntü, dosya sistemi kısa süre dondurulur); `mode: shutdown` sunucuyu kapatıp kopyalar ve yeniden açar. Şablondan açılan sunucularda sunucu
+        adı, IP, root parolası, SSH sunucu anahtarları ve makine kimliği yenilenir; kullanıcılarınız, dosyalarınız ve ayarlarınız kalır. Yalnız Linux. Yaklaşık bir
+        dakikada hazır.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Server id (tr-ist-1)
+      responses:
+        '202':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                      server_id:
+                        type: integer
+                      template:
+                        $ref: '#/components/schemas/Template'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: template_limit, template_not_ready, busy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  maxLength: 60
+                description:
+                  type: string
+                  maxLength: 200
+                mode:
+                  type: string
+                  enum:
+                  - snapshot
+                  - shutdown
+              required: []
+  /cloud/templates/{id}/servers:
+    post:
+      tags:
+      - Templates
+      operationId: createServerFromTemplate
+      summary: New server from a template
+      x-summary-tr: Şablondan yeni sunucu
+      x-scope: cloud_order
+      x-cli:
+        command: template deploy
+        money: true
+      description: 'A normal prepaid tr-ist-1 order (24-hour balance rule, account limits) installed from the template. `product_id` (or `plan`) from GET /cloud/products?region=tr-ist-1;
+        its disk must be at least the template `min_disk_gb`. Send `"confirm": true` and an `Idempotency-Key` header (`dry_run` for a quote).'
+      x-description-tr: 'Şablondan kurulan normal ön ödemeli tr-ist-1 siparişi (24 saat bakiye kuralı, hesap sınırları). `product_id` (ya da `plan`) GET /cloud/products?region=tr-ist-1''den;
+        diski şablonun `min_disk_gb` değerinden küçük olamaz. `"confirm": true` ve `Idempotency-Key` başlığı gerekir (teklif için `dry_run`).'
+      parameters:
+      - *id048
+      responses:
+        '202':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/CreateServerResult'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: template_limit, template_not_ready, busy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                product_id:
+                  type: integer
+                plan:
+                  type: string
+                hostname:
+                  type: string
+                ssh_keys:
+                  type: array
+                  items:
+                    type: integer
+                user_data:
+                  type: string
+                confirm:
+                  type: boolean
+                dry_run:
+                  type: boolean
+              required: []
+  /cloud/templates/{id}/rebuild:
+    post:
+      tags:
+      - Templates
+      operationId: rebuildFromTemplate
+      summary: Reinstall a server from a template
+      x-summary-tr: Sunucuyu şablonla yeniden kur
+      x-scope: cloud_write
+      x-cli:
+        command: template rebuild
+        confirm: true
+      description: 'Overwrites the root disk of one of your tr-ist-1 servers with the template (its disk must be at least `min_disk_gb`); the server''s SSH keys are
+        installed again and a new root password is returned (withheld when an Idempotency-Key is sent). Needs `"confirm": true`.'
+      x-description-tr: 'tr-ist-1 sunucunuzun kök diskini şablonla değiştirir (disk en az `min_disk_gb` olmalı); sunucunun SSH anahtarları yeniden kurulur, yeni root
+        parolası döner (Idempotency-Key gönderilirse dönmez). `"confirm": true` gerekir.'
+      parameters:
+      - *id048
+      responses:
+        '202':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      action:
+                        type: string
+                      status:
+                        type: string
+                      server_id:
+                        type: integer
+                      template_id:
+                        type: integer
+                      root_password:
+                        type: string
+                      root_password_withheld:
+                        type: boolean
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: template_limit, template_not_ready, busy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                server_id:
+                  type: integer
+                user_data:
+                  type: string
+                confirm:
+                  type: boolean
+              required:
+              - server_id
+              - confirm
 components:
   securitySchemes:
     bearerAuth:
@@ -19379,3 +19783,68 @@ components:
           type: boolean
         default_days:
           type: integer
+    Template:
+      type: object
+      properties:
+        id:
+          type: integer
+        image:
+          type: string
+          description: 'Image slug to use for installs: custom:<id>'
+        name:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+          enum:
+          - creating
+          - ready
+          - error
+          - deleting
+          - suspended
+          description: suspended = template storage suspended (balance)
+        size_gb:
+          type: number
+          description: Space the template really uses (GB, billed)
+        size_bytes:
+          type: integer
+        min_disk_gb:
+          type: integer
+          description: Smallest disk a server from this template can have
+        base_image:
+          type: string
+        base_image_name:
+          type: string
+        source_server_id:
+          type:
+          - integer
+          - 'null'
+        region:
+          type: string
+        warnings:
+          type: array
+          items:
+            type: string
+          description: crash_consistent | extra_disks_excluded
+        created_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        ready_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        pricing:
+          type: object
+          properties:
+            billing:
+              type: string
+            per_gb_monthly_eur:
+              type: number
+            monthly_eur:
+              type: number
+            hourly_eur:
+              type: number

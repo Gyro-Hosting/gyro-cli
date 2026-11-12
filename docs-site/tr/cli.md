@@ -383,6 +383,13 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro storage website disable` | Statik web sitesini kapat | `DELETE /cloud/storage/{id}/buckets/{bucket}/website` |
 | `gyro storage website get` | Kovanın statik web sitesi ayarları | `GET /cloud/storage/{id}/buckets/{bucket}/website` |
 | `gyro storage website set` | Statik web sitesini aç / güncelle | `PUT /cloud/storage/{id}/buckets/{bucket}/website` |
+| `gyro template create` | Sunucudan şablon oluştur | `POST /cloud/servers/{id}/templates` |
+| `gyro template delete` | Şablonu sil | `DELETE /cloud/templates/{id}` |
+| `gyro template deploy` | Şablondan yeni sunucu | `POST /cloud/templates/{id}/servers` |
+| `gyro template get` | Şablonu getir | `GET /cloud/templates/{id}` |
+| `gyro template list` | Şablonlarınızı listele | `GET /cloud/templates` |
+| `gyro template rebuild` | Sunucuyu şablonla yeniden kur | `POST /cloud/templates/{id}/rebuild` |
+| `gyro template update` | Şablonu yeniden adlandır | `PATCH /cloud/templates/{id}` |
 | `gyro ticket access-group list` | Erişim Gruplarını Listeleme | `GET /tickets/access-groups` |
 | `gyro ticket attachment get` | Eki İndirme | `GET /tickets/{id}/attachments/{aid}` |
 | `gyro ticket close` | Talebi Kapatma | `POST /tickets/{id}/close` |

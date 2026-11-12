@@ -1,0 +1,113 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-template-create - Capture a server as a template
+
+
+.SH SYNOPSIS
+\fBgyro template create  [flags]\fP
+
+
+.SH DESCRIPTION
+Capture a server as a template
+
+.PP
+Billed 0.05 EUR per GB-month of the space the template really uses, hourly from the prepaid balance (through the account's template storage service, opened with the first template). Deleting a template stops its charge. At most 10 templates; visible only in your account. Only the root disk is copied. \fBmode: snapshot\fR (default) keeps the server running (file system frozen briefly via a temporary snapshot); \fBmode: shutdown\fR stops the server, copies it and starts it again. Servers created from the template get a new host name, IP, root password, SSH host keys and machine id (cloud-init); your users, files and settings stay. Linux servers only. Ready in about a minute (\fBstatus\fR creating -> ready).
+
+.PP
+API: POST /cloud/servers/{id}/templates (operationId createTemplate, scope cloud_write)
+
+
+.SH OPTIONS
+\fB--data\fP=""
+	request body as JSON, @file or @- (stdin)
+
+.PP
+\fB--description\fP=""
+	description
+
+.PP
+\fB--dry-run\fP[=false]
+	show the price quote / request without changing anything
+
+.PP
+\fB-h\fP, \fB--help\fP[=false]
+	help for create
+
+.PP
+\fB--idempotency-key\fP=""
+	idempotency key (automatic for money operations)
+
+.PP
+\fB--mode\fP=""
+	mode (snapshot|shutdown)
+
+.PP
+\fB--name\fP=""
+	name
+
+.PP
+\fB--set\fP=[]
+	extra body field key=value (repeatable)
+
+.PP
+\fB--wait\fP[=false]
+	wait until the server is no longer busy
+
+.PP
+\fB--wait-timeout\fP=15m0s
+	maximum time for --wait
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH SEE ALSO
+\fBgyro-template(1)\fP

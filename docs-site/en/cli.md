@@ -383,6 +383,13 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro storage website disable` | Disable the static website | `DELETE /cloud/storage/{id}/buckets/{bucket}/website` |
 | `gyro storage website get` | Static website settings of a bucket | `GET /cloud/storage/{id}/buckets/{bucket}/website` |
 | `gyro storage website set` | Enable / update the static website | `PUT /cloud/storage/{id}/buckets/{bucket}/website` |
+| `gyro template create` | Capture a server as a template | `POST /cloud/servers/{id}/templates` |
+| `gyro template delete` | Delete a template | `DELETE /cloud/templates/{id}` |
+| `gyro template deploy` | New server from a template | `POST /cloud/templates/{id}/servers` |
+| `gyro template get` | Get a template | `GET /cloud/templates/{id}` |
+| `gyro template list` | List your templates | `GET /cloud/templates` |
+| `gyro template rebuild` | Reinstall a server from a template | `POST /cloud/templates/{id}/rebuild` |
+| `gyro template update` | Rename a template | `PATCH /cloud/templates/{id}` |
 | `gyro ticket access-group list` | List ticket access groups | `GET /tickets/access-groups` |
 | `gyro ticket attachment get` | Get ticket attachment (path: {id}, {aid}) | `GET /tickets/{id}/attachments/{aid}` |
 | `gyro ticket close` | Close ticket (path: {id}) | `POST /tickets/{id}/close` |
