@@ -20053,6 +20053,9 @@ components:
         applied_on_server:
           type: boolean
           description: false = the server's guest agent did not confirm yet (see manual_commands)
+        pending:
+          type: boolean
+          description: true while the address list is being applied on the server (a few seconds)
         manual_commands:
           type: array
           items:

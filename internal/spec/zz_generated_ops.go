@@ -2229,7 +2229,7 @@ var Ops = []Op{
 		Desc: "Additional IPv4 addresses are billed per address hourly from the prepaid balance (default 2 EUR per address-month, `pricing` shows the current price), from the hour they are added until they are released. Up to `max` per server (default 5). Each address is configured on the server automatically (/32 on the primary interface, kept across reboots and reinstalls); reverse DNS: PUT /cloud/servers/{id}/rdns.", DescTR: "Ek IPv4 adresleri adres başına ön ödemeli bakiyeden saatlik ücretlendirilir (varsayılan adres başına aylık 2 €, güncel fiyat `pricing` alanında); eklendiği saatten çıkarıldığı saate kadar. Sunucu başına en çok `max` (varsayılan 5). Adres sunucuya otomatik tanımlanır (birincil arayüze /32, yeniden başlatma ve yeniden kurulumda korunur); ters DNS: PUT /cloud/servers/{id}/rdns.",
 		Scope: "cloud_read", Command: []string{"server", "ip", "list"},
 		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
-		Columns: []string{"server_id", "primary_ip", "count", "max", "available", "applied_on_server", "released"},
+		Columns: []string{"server_id", "primary_ip", "count", "max", "available", "applied_on_server", "pending", "released"},
 		Params: []Param{
 			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Server id (tr-ist-1)", DescTR: ""},
 		},
@@ -2239,7 +2239,7 @@ var Ops = []Op{
 		Desc: "Additional IPv4 addresses are billed per address hourly from the prepaid balance (default 2 EUR per address-month, `pricing` shows the current price), from the hour they are added until they are released. Up to `max` per server (default 5). Each address is configured on the server automatically (/32 on the primary interface, kept across reboots and reinstalls); reverse DNS: PUT /cloud/servers/{id}/rdns. Prepaid tr-ist-1 servers only; not while the server is suspended.", DescTR: "Ek IPv4 adresleri adres başına ön ödemeli bakiyeden saatlik ücretlendirilir (varsayılan adres başına aylık 2 €, güncel fiyat `pricing` alanında); eklendiği saatten çıkarıldığı saate kadar. Sunucu başına en çok `max` (varsayılan 5). Adres sunucuya otomatik tanımlanır (birincil arayüze /32, yeniden başlatma ve yeniden kurulumda korunur); ters DNS: PUT /cloud/servers/{id}/rdns. Yalnız ön ödemeli tr-ist-1 sunucuları; askıdayken eklenemez.",
 		Scope: "cloud_write", Command: []string{"server", "ip", "add"},
 		HasBody: true, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: true, Hidden: false,
-		Columns: []string{"server_id", "primary_ip", "count", "max", "available", "applied_on_server", "released"},
+		Columns: []string{"server_id", "primary_ip", "count", "max", "available", "applied_on_server", "pending", "released"},
 		Params: []Param{
 			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Server id (tr-ist-1)", DescTR: ""},
 		},
@@ -2252,7 +2252,7 @@ var Ops = []Op{
 		Desc: "The address is removed from the server and returns to the pool (getting the same address back is not guaranteed); billing stops after the current hour. Needs `confirm=true`.", DescTR: "Adres sunucudan kaldırılır ve havuza döner (aynı adresi geri alma garantisi yok); ücret içinde bulunulan saatten sonra durur. `confirm=true` gerekir.",
 		Scope: "cloud_write", Command: []string{"server", "ip", "remove"},
 		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: true, Money: false, Hidden: false,
-		Columns: []string{"server_id", "primary_ip", "count", "max", "available", "applied_on_server", "released"},
+		Columns: []string{"server_id", "primary_ip", "count", "max", "available", "applied_on_server", "pending", "released"},
 		Params: []Param{
 			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Server id (tr-ist-1)", DescTR: ""},
 			{Name: "ip", In: "path", Type: "string", Items: "", Enum: nil, Default: "", Required: true, Desc: "", DescTR: ""},
