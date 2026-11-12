@@ -2,7 +2,7 @@
 openapi: 3.1.0
 info:
   title: Gyro Public API
-  version: 2.16.0
+  version: 2.16.1
   summary: Manage Gyro cloud servers, SSH keys and billing programmatically.
   x-summary-tr: Gyro bulut sunucularınızı, SSH anahtarlarınızı ve faturalarınızı programla yönetin.
   description: "The Gyro Public API lets you automate everything you do in the Gyro client area:\norder and manage cloud servers, keep SSH keys, read invoices and\
@@ -18,11 +18,12 @@ info:
     \ Storage (versioning + object lock / WORM): `object_lock` on bucket create, versions list / restore / undelete / delete, bucket default retention, per-version\
     \ retention and legal hold, old version expiry, lock summary and scan. Standard Object Storage answers 409 `feature_not_available` on these.\n\n**2.14.0**: tr-ist-1\
     \ servers on Gyro Compute: SSH keys (up to 10) and `user_data` at creation through cloud-init (~25 s to SSH), `reset` action, rebuild with `user_data`, real snapshot\
-    \ ids, metrics (instant), browser console URL. Request / response shapes unchanged.\n\n**2.14.1**: `GET /cloud/apps` returns `min_ram_gb` (fixed), `min_disk_gb`,\
-    \ `min_cpu`, `popular_tr`, `version`, `license` and `description` for each one-click app. Additive change.\n\n**2.15.0**: custom templates for tr-ist-1 servers:\
-    \ capture a server (`POST /cloud/servers/{id}/templates`), list / rename / delete, new server (`POST /cloud/templates/{id}/servers`) or reinstall (`POST /cloud/templates/{id}/rebuild`)\
+    \ ids, metrics (instant), browser console URL. Request / response shapes unchanged.\n\n**2.15.0**: custom templates for tr-ist-1 servers: capture a server (`POST\
+    \ /cloud/servers/{id}/templates`), list / rename / delete, new server (`POST /cloud/templates/{id}/servers`) or reinstall (`POST /cloud/templates/{id}/rebuild`)\
     \ from it. 0.05 EUR per GB-month (prepaid, hourly). No image upload.\n\n**2.16.0**: additional IPv4 addresses for tr-ist-1 servers: `GET/POST /cloud/servers/{id}/ips`,\
-    \ `DELETE /cloud/servers/{id}/ips/{ip}` (hourly from the prepaid balance, default 2 EUR per address-month, up to 5 per server; configured on the server automatically).\n"
+    \ `DELETE /cloud/servers/{id}/ips/{ip}` (hourly from the prepaid balance, default 2 EUR per address-month, up to 5 per server; configured on the server automatically).\n\
+    \n**2.16.1**: `GET /cloud/apps` returns `min_ram_gb` (fixed), `min_disk_gb`, `min_cpu`, `popular_tr`, `version`, `license` and `description` for each one-click\
+    \ app. Additive change.\n"
   x-description-tr: "Gyro Public API, müşteri panelinde yaptığınız her işi otomatikleştirmenizi sağlar:\nbulut sunucu siparişi ve yönetimi, SSH anahtarları, fatura\
     \ ve bakiye okuma.\nResmi Terraform sağlayıcısı (`gyro-hosting/gyro`) ve `gyroctl` bu API'yi kullanır.\n\n* **Taban adres** `https://www.gyrohosting.com/api/v1/client`\n\
     * **Kimlik** `Authorization: Bearer wck_...` (anahtarı *Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri* bölümünden oluşturun)\n* **Biçim** JSON\
@@ -36,12 +37,12 @@ info:
     \ / WORM): kova açılışında `object_lock`, sürüm listele / geri yükle / silme işaretini kaldır / kalıcı sil, kova varsayılan saklaması, sürüm başına saklama ve\
     \ legal hold, eski sürüm silme süresi, kilit özeti ve tarama. Standart Nesne Depolama bu uçlarda 409 `feature_not_available` döner.\n\n**2.14.0**: tr-ist-1 sunucuları\
     \ Gyro Compute üzerinde: oluşturmada cloud-init ile SSH anahtarları (en çok 10) ve `user_data` (SSH'a ~25 sn), `reset` eylemi, `user_data` ile yeniden kurulum,\
-    \ gerçek snapshot numaraları, anlık metrikler, tarayıcı konsolu adresi. İstek / yanıt biçimleri değişmedi.\n\n**2.14.1**: `GET /cloud/apps` her tek tık uygulama\
-    \ için `min_ram_gb` (düzeltildi), `min_disk_gb`, `min_cpu`, `popular_tr` (Türkiye'de popüler), `version`, `license` ve `description` döndürür. Geriye uyumlu ekleme.\n\
-    \n**2.15.0**: tr-ist-1 sunucuları için özel şablonlar: sunucudan şablon (`POST /cloud/servers/{id}/templates`), listele / adlandır / sil, şablondan yeni sunucu\
-    \ (`POST /cloud/templates/{id}/servers`) ya da yeniden kurulum (`POST /cloud/templates/{id}/rebuild`). GB başına aylık 0,05 € (ön ödemeli, saatlik). Dışarıdan\
-    \ imaj yüklenmez.\n\n**2.16.0**: tr-ist-1 sunucularına ek IPv4: `GET/POST /cloud/servers/{id}/ips`, `DELETE /cloud/servers/{id}/ips/{ip}` (ön ödemeli bakiyeden\
-    \ saatlik, varsayılan adres başına aylık 2 €, sunucu başına en çok 5; sunucuya otomatik tanımlanır).\n"
+    \ gerçek snapshot numaraları, anlık metrikler, tarayıcı konsolu adresi. İstek / yanıt biçimleri değişmedi.\n\n**2.15.0**: tr-ist-1 sunucuları için özel şablonlar:\
+    \ sunucudan şablon (`POST /cloud/servers/{id}/templates`), listele / adlandır / sil, şablondan yeni sunucu (`POST /cloud/templates/{id}/servers`) ya da yeniden\
+    \ kurulum (`POST /cloud/templates/{id}/rebuild`). GB başına aylık 0,05 € (ön ödemeli, saatlik). Dışarıdan imaj yüklenmez.\n\n**2.16.0**: tr-ist-1 sunucularına\
+    \ ek IPv4: `GET/POST /cloud/servers/{id}/ips`, `DELETE /cloud/servers/{id}/ips/{ip}` (ön ödemeli bakiyeden saatlik, varsayılan adres başına aylık 2 €, sunucu\
+    \ başına en çok 5; sunucuya otomatik tanımlanır).\n\n**2.16.1**: `GET /cloud/apps` her tek tık uygulama için `min_ram_gb` (düzeltildi), `min_disk_gb`, `min_cpu`,\
+    \ `popular_tr` (Türkiye'de popüler), `version`, `license` ve `description` döndürür. Geriye uyumlu ekleme.\n"
   contact:
     name: Gyro Hosting
     url: https://www.gyrohosting.com
