@@ -6,7 +6,7 @@ List reverse DNS entries
 
 List reverse DNS entries
 
-**tr-ist-1 (Gyro Bulut İstanbul):** every address (primary and additional IPv4) gets an automatic PTR `<a-b-c-d>.ip.gyrohosting.com` with a matching A record. Set `hostname` to your own FQDN to replace it (published within seconds); an empty value restores the default. Names under Gyro domains and protected brand names are refused (`hostname_reserved`, `hostname_blocked`); at most 30 changes per server per hour (`rate_limited`). The A record of your name should point to the address (forward-confirmed reverse DNS) for e-mail delivery; it is not enforced. When the server is deleted or an additional IP is released, its PTR is removed.
+**tr-ist-1 (Gyro Bulut İstanbul):** every address (primary and additional IPv4) gets an automatic PTR `<a-b-c-d>.ip.gyrohosting.com` with a matching A record. Set `hostname` to your own FQDN to replace it (published within seconds); an empty value restores the default. Names under Gyro domains and protected brand names are refused (HTTP 422 with an explanatory message); at most 30 changes per server per hour. The A record of your name should point to the address (forward-confirmed reverse DNS) for e-mail delivery; it is not enforced. When the server is deleted or an additional IP is released, its PTR is removed.
 
 API: GET /cloud/servers/{id}/rdns (operationId listRdns, scope cloud_read)
 
