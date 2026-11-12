@@ -1,0 +1,113 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-s3-object-retention-set - Lock an object version
+
+
+.SH SYNOPSIS
+\fBgyro s3 object retention set   [flags]\fP
+
+
+.SH DESCRIPTION
+Lock an object version
+
+.PP
+Sets or extends the retention of one version (\fBversion_id\fR empty = current) for \fBdays\fR 1-3650 from now. Retention can only be extended; COMPLIANCE cannot be switched to GOVERNANCE. COMPLIANCE cannot be shortened, switched to GOVERNANCE or removed by anyone (Gyro included) until it expires; the data is kept and the service keeps being billed until then, even after cancellation. Send \fB"confirm": true\fR and \fB"acknowledge": "COMPLIANCE"\fR\&.
+
+.PP
+API: PUT /cloud/storage/{id}/buckets/{bucket}/objects/retention (operationId setStorageObjectRetention, scope services_write)
+
+
+.SH OPTIONS
+\fB--acknowledge\fP=""
+	COMPLIANCE only: type COMPLIANCE
+
+.PP
+\fB--data\fP=""
+	request body as JSON, @file or @- (stdin)
+
+.PP
+\fB--days\fP=0
+	days
+
+.PP
+\fB--dry-run\fP[=false]
+	show the price quote / request without changing anything
+
+.PP
+\fB-h\fP, \fB--help\fP[=false]
+	help for set
+
+.PP
+\fB--idempotency-key\fP=""
+	idempotency key (automatic for money operations)
+
+.PP
+\fB--key\fP=""
+	key
+
+.PP
+\fB--mode\fP=""
+	mode (GOVERNANCE|COMPLIANCE)
+
+.PP
+\fB--set\fP=[]
+	extra body field key=value (repeatable)
+
+.PP
+\fB--version-id\fP=""
+	Empty = current version
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH SEE ALSO
+\fBgyro-s3-object-retention(1)\fP

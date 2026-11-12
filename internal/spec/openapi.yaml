@@ -2,7 +2,7 @@
 openapi: 3.1.0
 info:
   title: Gyro Public API
-  version: 2.13.0
+  version: 2.14.0
   summary: Manage Gyro cloud servers, SSH keys and billing programmatically.
   x-summary-tr: Gyro bulut sunucularınızı, SSH anahtarlarınızı ve faturalarınızı programla yönetin.
   description: "The Gyro Public API lets you automate everything you do in the Gyro client area:\norder and manage cloud servers, keep SSH keys, read invoices and\
@@ -14,7 +14,11 @@ info:
     \ Terraform resources; `GET /cloud/images?region=`; SSH keys installed after first boot in tr-ist-1 (`ssh_keys` on the server).\n\n**2.11.0**: prepaid hourly\
     \ billing from the account balance for Gyro Containers (ECS) and Gyro Cloud Istanbul (`billing: prepaid` on products and servers; `/cloud/billing/balance|usage|statement/{month}|estimate|topup-url`);\
     \ `/cloud/containers` (Gyro Containers).\n\n**2.13.0 (pre-sale)**: plan change for prepaid services through `/cloud/services/{id}/resize` (no invoice, `plan`\
-    \ name accepted); tr-ist-1 reverse DNS create on new addresses + `status`; prepaid snapshot pricing on `/cloud/servers/{id}/snapshots`.\n"
+    \ name accepted); tr-ist-1 reverse DNS create on new addresses + `status`; prepaid snapshot pricing on `/cloud/servers/{id}/snapshots`.\n\n**2.13.1**: Protected\
+    \ Storage (versioning + object lock / WORM): `object_lock` on bucket create, versions list / restore / undelete / delete, bucket default retention, per-version\
+    \ retention and legal hold, old version expiry, lock summary and scan. Standard Object Storage answers 409 `feature_not_available` on these.\n\n**2.14.0**: tr-ist-1\
+    \ servers on Gyro Compute: SSH keys (up to 10) and `user_data` at creation through cloud-init (~25 s to SSH), `reset` action, rebuild with `user_data`, real snapshot\
+    \ ids, metrics (instant), browser console URL. Request / response shapes unchanged.\n"
   x-description-tr: "Gyro Public API, müşteri panelinde yaptığınız her işi otomatikleştirmenizi sağlar:\nbulut sunucu siparişi ve yönetimi, SSH anahtarları, fatura\
     \ ve bakiye okuma.\nResmi Terraform sağlayıcısı (`gyro-hosting/gyro`) ve `gyroctl` bu API'yi kullanır.\n\n* **Taban adres** `https://www.gyrohosting.com/api/v1/client`\n\
     * **Kimlik** `Authorization: Bearer wck_...` (anahtarı *Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri* bölümünden oluşturun)\n* **Biçim** JSON\
@@ -24,7 +28,11 @@ info:
     \ (Gyro Bulut İstanbul); `GET /cloud/images?region=`; tr-ist-1'de SSH anahtarları ilk açılıştan sonra yüklenir (sunucuda `ssh_keys`).\n\n**2.11.0**: Gyro Kapsayıcı\
     \ (ECS) ve Gyro Bulut İstanbul için bakiyeden saatlik ön ödemeli faturalama (ürün ve sunucularda `billing: prepaid`; `/cloud/billing/balance|usage|statement/{month}|estimate|topup-url`);\
     \ `/cloud/containers` (Gyro Kapsayıcı).\n\n**2.13.0 (satış öncesi)**: ön ödemeli hizmetlerde `/cloud/services/{id}/resize` ile plan değişikliği (fatura yok, `plan`\
-    \ adı kabul edilir); tr-ist-1'de yeni IP'de ters DNS oluşturma + `status`; ön ödemeli snapshot fiyatı.\n"
+    \ adı kabul edilir); tr-ist-1'de yeni IP'de ters DNS oluşturma + `status`; ön ödemeli snapshot fiyatı.\n\n**2.13.1**: Korumalı Depolama (sürümleme + nesne kilidi\
+    \ / WORM): kova açılışında `object_lock`, sürüm listele / geri yükle / silme işaretini kaldır / kalıcı sil, kova varsayılan saklaması, sürüm başına saklama ve\
+    \ legal hold, eski sürüm silme süresi, kilit özeti ve tarama. Standart Nesne Depolama bu uçlarda 409 `feature_not_available` döner.\n\n**2.14.0**: tr-ist-1 sunucuları\
+    \ Gyro Compute üzerinde: oluşturmada cloud-init ile SSH anahtarları (en çok 10) ve `user_data` (SSH'a ~25 sn), `reset` eylemi, `user_data` ile yeniden kurulum,\
+    \ gerçek snapshot numaraları, anlık metrikler, tarayıcı konsolu adresi. İstek / yanıt biçimleri değişmedi.\n"
   contact:
     name: Gyro Hosting
     url: https://www.gyrohosting.com
@@ -760,7 +768,9 @@ paths:
         answer 422 `action_not_supported`. rebuild accepts the images of the server''s own product (GET /cloud/images?region=tr-ist-1); the SSH keys given at creation
         are installed again once the rebuilt server is ready (follow `ssh_keys.state`). Prepaid servers: DELETE always cancels at once (no cancellation request).
 
-        '
+
+        **2.14.0 (Gyro Compute, tr-ist-1)**: `reset` (hard reset) is available too; `rebuild` accepts `user_data` and installs the server''s SSH keys again; `poweroff`
+        is a hard power off (shutdown = graceful). rescue actions answer 422 `action_not_supported`.'
       x-description-tr: 'Ağır işlemler (yeniden kurulum, reset, kurtarma, snapshot''tan dönüş, parola sıfırlama) sunucu başına günlük sınırlıdır.
 
         Tek seferlik `root_password` yalnız istekte `Idempotency-Key` **yoksa** döner (tekrar için saklanan yanıtlara sır yazılmaz;
@@ -771,7 +781,9 @@ paths:
         **tr-ist-1 bölgesi**: poweron, shutdown, reboot, poweroff (shutdown ile aynı), rebuild ve reset_password var; reset, enable_rescue ve disable_rescue 422 `action_not_supported`
         döner. rebuild sunucunun kendi ürününün imajlarını kabul eder.
 
-        '
+
+        **2.14.0 (Gyro Compute, tr-ist-1)**: `reset` (sert yeniden başlatma) da var; `rebuild` `user_data` kabul eder ve sunucunun SSH anahtarlarını yeniden kurar;
+        `poweroff` sert kapatmadır (shutdown = düzgün kapatma).'
       x-scope: cloud_write
       requestBody:
         content:
@@ -835,7 +847,7 @@ paths:
       description: 'tr-ist-1: `quota` = number of snapshots allowed on the plan (add-on), snapshot ids are stable numbers derived by the API.
 
         Prepaid tr-ist-1 servers also return `pricing` {billing, free, extra_monthly_eur, extra_hourly_eur, billable}: the first snapshot(s) are free, each extra
-        snapshot is charged hourly from the balance while it exists.'
+        snapshot is charged hourly from the balance while it exists. 2.14.0 (Gyro Compute): snapshot ids are the platform''s own ids; `name` is returned too.'
     post:
       tags:
       - Snapshots and backups
@@ -996,6 +1008,7 @@ paths:
                     $ref: '#/components/schemas/Metrics'
         '404':
           $ref: '#/components/responses/NotFound'
+      description: 'tr-ist-1 (Gyro Compute): instant values (one point per series: cpu %, memory active/total MB, uptime s) and `instant: true`.'
   /cloud/servers/{id}/activity:
     parameters:
     - $ref: '#/components/parameters/ServerId'
@@ -1795,9 +1808,11 @@ paths:
       description: 'Returns a websocket URL and password valid for about a minute. Never send an Idempotency-Key here (400). In tr-ist-1 the ticket is a WebMKS websocket
         (`protocol: webmks`, empty password: the URL is the one-time secret).
 
-        tr-ist-1: the WebSocket URL is on konsol.gyrohosting.com (single-use ticket).'
+        tr-ist-1: the WebSocket URL is on konsol.gyrohosting.com (single-use ticket). 2.14.0 (Gyro Compute): `protocol: web`, `url` is a one-time browser page (90
+        s) with keyboard + screen; `wss_url` carries the same URL for older clients.'
       x-description-tr: 'Yaklaşık bir dakika geçerli websocket adresi ve parola döner. Idempotency-Key göndermeyin (400). tr-ist-1''de bilet WebMKS websocket''idir
-        (`protocol: webmks`, parola boş: adresin kendisi tek seferlik sırdır).'
+        (`protocol: webmks`, parola boş: adresin kendisi tek seferlik sırdır). 2.14.0 (Gyro Compute): `protocol: web`, `url` tarayıcıda açılan tek kullanımlık konsol
+        sayfasıdır (90 sn); eski istemciler için `wss_url` aynı adresi taşır.'
       x-scope: cloud_write
       responses:
         '201':
@@ -1820,6 +1835,9 @@ paths:
                         type: string
                       expires_in:
                         type: integer
+                      url:
+                        type: string
+                        description: '2.14.0, tr-ist-1 Gyro Compute: one-time console page to open in a browser'
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
@@ -4892,11 +4910,16 @@ paths:
       tags:
       - Object storage
       operationId: typed_post_storage__id__buckets
-      summary: POST buckets:create (GyroDepolama)
-      x-summary-tr: buckets:create (GyroDepolama)
+      summary: Create a bucket
+      x-summary-tr: Kova oluştur
       x-scope: services_write
-      description: 'Typed shortcut of the generic bridge: tool `buckets`, action `create`. Body fields are the tool''s own fields.'
-      x-description-tr: 'Genel köprünün kısayolu: araç `buckets`, eylem `create`. Gövde alanları aracın kendi alanlarıdır.'
+      description: 'Creates a bucket. Object Storage: the name is private to the service. Protected Storage: every bucket is versioned and the name gets the service
+        code suffix (`<name>-<code>`); `object_lock: true` creates a WORM bucket (needs a free locked-bucket right: Object Lock add-on, see `GET /cloud/storage/{id}/object-lock`).
+        Object lock can only be chosen at creation and never turned off. `object_lock: true` on a standard Object Storage service answers 409 `feature_not_available`.
+        Needs `"confirm": true`.'
+      x-description-tr: 'Kova oluşturur. Nesne Depolama: ad hizmete özeldir. Korumalı Depolama: her kova sürümlüdür ve ada hizmet kodu eklenir (`<ad>-<kod>`); `object_lock:
+        true` WORM kovası açar (boş kilitli kova hakkı gerekir: Nesne Kilidi ek hizmeti, bkz. `GET /cloud/storage/{id}/object-lock`). Nesne kilidi yalnız açılışta
+        seçilir, sonradan kapatılamaz. Standart Nesne Depolama''da `object_lock: true` 409 `feature_not_available` döner. `"confirm": true` gerekir.'
       parameters:
       - name: id
         in: path
@@ -4922,14 +4945,27 @@ paths:
         '422':
           $ref: '#/components/responses/Validation'
       requestBody:
+        required: true
         content:
           application/json:
             schema:
               type: object
-              additionalProperties: true
               properties:
+                bucket:
+                  type: string
+                  description: Bucket name (3-58, lowercase letters, digits, -)
+                  x-description-tr: Kova adı (3-58, küçük harf, rakam, -)
+                object_lock:
+                  type: boolean
+                  description: 'Protected Storage only: create with object lock (WORM). Cannot be changed later'
+                  x-description-tr: 'Yalnız Korumalı Depolama: nesne kilitli (WORM) aç. Sonradan değiştirilemez'
                 confirm:
                   type: boolean
+              required:
+              - bucket
+      x-cli:
+        command: storage bucket create
+        confirm: true
   /cloud/storage/{id}/buckets/{bucket}:
     delete:
       tags:
@@ -16559,6 +16595,749 @@ paths:
           $ref: '#/components/responses/Conflict'
         '422':
           $ref: '#/components/responses/Validation'
+  /cloud/storage/{id}/object-lock:
+    get:
+      tags:
+      - Object storage
+      operationId: getStorageObjectLock
+      summary: 'Protected Storage: object lock summary'
+      x-summary-tr: 'Korumalı Depolama: nesne kilidi özeti'
+      x-scope: services_read
+      x-cli:
+        command: storage object-lock status
+        confirm: false
+      description: 'Locked-bucket rights (Object Lock add-on) and use, the default retention of every bucket, and the last lock scan (number of COMPLIANCE / GOVERNANCE
+        / legal hold versions and the latest end date). Protected Storage only: a standard Object Storage service answers 409 `feature_not_available`.'
+      x-description-tr: 'Kilitli kova hakkı (Nesne Kilidi ek hizmeti) ve kullanımı, kovaların varsayılan saklaması ve son kilit taraması (COMPLIANCE / GOVERNANCE
+        / legal hold sürüm sayısı, en geç bitiş). Yalnız Korumalı Depolama: standart Nesne Depolama hizmeti 409 `feature_not_available` döner.'
+      parameters: &id043
+      - &id044
+        name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id (Protected Storage)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/StorageObjectLockSummary'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: feature_not_available (standard Object Storage service) or not_actionable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          $ref: '#/components/responses/Validation'
+  /cloud/storage/{id}/object-lock/scan:
+    post:
+      tags:
+      - Object storage
+      operationId: scanStorageObjectLock
+      summary: Scan locked versions now
+      x-summary-tr: Kilitli sürümleri şimdi tara
+      x-scope: services_write
+      x-cli:
+        command: storage object-lock scan
+        confirm: false
+      description: 'Counts locked versions in every locked bucket (up to 25 s / 5000 versions; `complete: false` when cut short).'
+      x-description-tr: 'Kilitli kovalardaki kilitli sürümleri sayar (en çok 25 sn / 5000 sürüm; yarım kalırsa `complete: false`).'
+      parameters: *id043
+      responses:
+        '202':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      service_id:
+                        type: integer
+                      scan:
+                        $ref: '#/components/schemas/StorageLockScan'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: feature_not_available (standard Object Storage service) or not_actionable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          $ref: '#/components/responses/Validation'
+  /cloud/storage/{id}/buckets/{bucket}/versions:
+    get:
+      tags:
+      - Object storage
+      operationId: listStorageVersions
+      summary: List object versions
+      x-summary-tr: Nesne sürümlerini listele
+      x-scope: services_read
+      x-cli:
+        command: storage versions list
+        confirm: false
+      description: Versions and delete markers of one folder (50 per page, `/` delimiter; sub-folders in `folders`). Continue with `key_marker` + `version_id_marker`
+        from the previous page while `truncated` is true. In locked buckets each version carries `lock_mode`, `retain_until` and `legal_hold`.
+      x-description-tr: Bir klasördeki sürümler ve silme işaretleri (sayfa 50, ayraç `/`; alt klasörler `folders`). `truncated` true iken önceki sayfanın `key_marker`
+        + `version_id_marker` değerleriyle devam edin. Kilitli kovalarda her sürümde `lock_mode`, `retain_until`, `legal_hold` bulunur.
+      parameters:
+      - *id044
+      - &id045
+        name: bucket
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Bucket name (full name, with the -code suffix)
+      - name: prefix
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Folder or key prefix (empty = root)
+      - name: key_marker
+        in: query
+        required: false
+        schema:
+          type: string
+        description: 'Continuation: next_key_marker of the previous page'
+      - name: version_id_marker
+        in: query
+        required: false
+        schema:
+          type: string
+        description: 'Continuation: next_version_id_marker of the previous page'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/StorageVersionList'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: feature_not_available (standard Object Storage service) or not_actionable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          $ref: '#/components/responses/Validation'
+    delete:
+      tags:
+      - Object storage
+      operationId: deleteStorageVersion
+      summary: Permanently delete a version
+      x-summary-tr: Sürümü kalıcı sil
+      x-scope: services_write
+      x-cli:
+        command: storage versions delete
+        confirm: true
+      description: Permanently deletes one version or delete marker (cannot be undone). Versions under GOVERNANCE / COMPLIANCE retention or legal hold are refused
+        with the end date. Needs `confirm=true`.
+      x-description-tr: Bir sürümü ya da silme işaretini kalıcı siler (geri alınamaz). GOVERNANCE / COMPLIANCE saklamasında ya da legal hold'daki sürüm bitiş tarihiyle
+        reddedilir. `confirm=true` gerekir.
+      parameters:
+      - *id044
+      - *id045
+      - name: key
+        in: query
+        required: true
+        schema:
+          type: string
+        description: Object key
+      - name: version_id
+        in: query
+        required: true
+        schema:
+          type: string
+        description: Version id
+      - name: confirm
+        in: query
+        required: true
+        schema:
+          type: boolean
+      responses:
+        '202':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      bucket:
+                        type: string
+                      key:
+                        type: string
+                      version_id:
+                        type: string
+                      deleted:
+                        type: boolean
+                      message:
+                        type: string
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: feature_not_available (standard Object Storage service) or not_actionable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          $ref: '#/components/responses/Validation'
+  /cloud/storage/{id}/buckets/{bucket}/versions/restore:
+    post:
+      tags:
+      - Object storage
+      operationId: restoreStorageVersion
+      summary: Restore an older version
+      x-summary-tr: Eski sürümü geri yükle
+      x-scope: services_write
+      x-cli:
+        command: storage versions restore
+        confirm: false
+      description: Copies the version as the new current version (the old one stays). Max 5 GB; delete markers cannot be restored (use undelete).
+      x-description-tr: Sürümü yeni güncel sürüm olarak kopyalar (eskisi durur). En çok 5 GB; silme işareti geri yüklenmez (undelete kullanın).
+      parameters: &id046
+      - *id044
+      - *id045
+      responses:
+        '202':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      bucket:
+                        type: string
+                      key:
+                        type: string
+                      restored_from:
+                        type: string
+                      version_id:
+                        type: string
+                        description: New current version
+                      message:
+                        type: string
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: feature_not_available (standard Object Storage service) or not_actionable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: &id047
+                key:
+                  type: string
+                  description: Object key
+                version_id:
+                  type: string
+                  description: Version id (from versions list)
+              required:
+              - key
+              - version_id
+  /cloud/storage/{id}/buckets/{bucket}/versions/undelete:
+    post:
+      tags:
+      - Object storage
+      operationId: undeleteStorageObject
+      summary: Remove a delete marker
+      x-summary-tr: Silme işaretini kaldır
+      x-scope: services_write
+      x-cli:
+        command: storage versions undelete
+        confirm: false
+      description: Removes the latest delete marker of the key, so the previous version becomes current again. `version_id` must be that delete marker.
+      x-description-tr: Anahtarın en güncel silme işaretini kaldırır; önceki sürüm yeniden güncel olur. `version_id` o silme işareti olmalıdır.
+      parameters: *id046
+      responses:
+        '202':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      bucket:
+                        type: string
+                      key:
+                        type: string
+                      removed_delete_marker:
+                        type: string
+                      message:
+                        type: string
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: feature_not_available (standard Object Storage service) or not_actionable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: *id047
+              required:
+              - key
+              - version_id
+  /cloud/storage/{id}/buckets/{bucket}/object-lock:
+    get:
+      tags:
+      - Object storage
+      operationId: getStorageBucketObjectLock
+      summary: Default retention of a bucket
+      x-summary-tr: Kovanın varsayılan saklaması
+      x-scope: services_read
+      x-cli:
+        command: storage object-lock get
+        confirm: false
+      description: '`object_lock` (set at creation, cannot change) and `default_retention` (null = none): new objects get this retention automatically.'
+      x-description-tr: '`object_lock` (açılışta seçilir, değişmez) ve `default_retention` (null = yok): yeni nesneler bu saklamayı kendiliğinden alır.'
+      parameters: *id046
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/StorageBucketObjectLock'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: feature_not_available (standard Object Storage service) or not_actionable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          $ref: '#/components/responses/Validation'
+    put:
+      tags:
+      - Object storage
+      operationId: setStorageBucketObjectLock
+      summary: Set the default retention of a bucket
+      x-summary-tr: Kovanın varsayılan saklamasını ayarla
+      x-scope: services_write
+      x-cli:
+        command: storage object-lock set
+        confirm: true
+      description: 'Locked buckets only. `mode` GOVERNANCE or COMPLIANCE with `days` 1-3650, or OFF (new objects get no automatic retention; existing locks stay).
+        GOVERNANCE: only Gyro staff can bypass it on request. COMPLIANCE cannot be shortened, switched to GOVERNANCE or removed by anyone (Gyro included) until it
+        expires; the data is kept and the service keeps being billed until then, even after cancellation. Send `"confirm": true` and `"acknowledge": "COMPLIANCE"`.'
+      x-description-tr: 'Yalnız kilitli kovalar. `mode` GOVERNANCE ya da COMPLIANCE ve `days` 1-3650, ya da OFF (yeni nesnelere otomatik saklama yok; mevcut kilitler
+        sürer). GOVERNANCE: yalnız Gyro personeli talep üzerine aşabilir. COMPLIANCE kilidi süresi dolana kadar kimse (Gyro dahil) kısaltamaz, GOVERNANCE''a çeviremez,
+        kaldıramaz; veri saklanır ve iptalde bile süre sonuna kadar ücret sürer. `"confirm": true` ve `"acknowledge": "COMPLIANCE"` gönderin.'
+      parameters: *id046
+      responses:
+        '202':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/StorageBucketObjectLock'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: feature_not_available (standard Object Storage service) or not_actionable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                mode:
+                  type: string
+                  enum:
+                  - GOVERNANCE
+                  - COMPLIANCE
+                  - 'OFF'
+                days:
+                  type: integer
+                  minimum: 1
+                  maximum: 3650
+                  description: Retention days (not with OFF)
+                acknowledge:
+                  type: string
+                  enum:
+                  - COMPLIANCE
+                  description: 'COMPLIANCE only: type COMPLIANCE to accept that it cannot be removed'
+                  x-description-tr: 'Yalnız COMPLIANCE: kaldırılamayacağını kabul için COMPLIANCE yazın'
+                confirm:
+                  type: boolean
+              required:
+              - mode
+  /cloud/storage/{id}/buckets/{bucket}/objects/retention:
+    get:
+      tags:
+      - Object storage
+      operationId: getStorageObjectRetention
+      summary: Retention of an object version
+      x-summary-tr: Nesne sürümünün saklaması
+      x-scope: services_read
+      x-cli:
+        command: storage object retention get
+        confirm: false
+      description: Lock mode, end date and legal hold of one version (`version_id` empty = current version).
+      x-description-tr: Bir sürümün kilit kipi, bitiş tarihi ve legal hold durumu (`version_id` boş = güncel sürüm).
+      parameters:
+      - *id044
+      - *id045
+      - name: key
+        in: query
+        required: true
+        schema:
+          type: string
+        description: Object key
+      - name: version_id
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Version id (empty = current)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/StorageObjectRetention'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: feature_not_available (standard Object Storage service) or not_actionable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          $ref: '#/components/responses/Validation'
+    put:
+      tags:
+      - Object storage
+      operationId: setStorageObjectRetention
+      summary: Lock an object version
+      x-summary-tr: Nesne sürümünü kilitle
+      x-scope: services_write
+      x-cli:
+        command: storage object retention set
+        confirm: true
+      description: 'Sets or extends the retention of one version (`version_id` empty = current) for `days` 1-3650 from now. Retention can only be extended; COMPLIANCE
+        cannot be switched to GOVERNANCE. COMPLIANCE cannot be shortened, switched to GOVERNANCE or removed by anyone (Gyro included) until it expires; the data is
+        kept and the service keeps being billed until then, even after cancellation. Send `"confirm": true` and `"acknowledge": "COMPLIANCE"`.'
+      x-description-tr: 'Bir sürümün saklamasını şimdiden itibaren `days` (1-3650) gün olarak koyar ya da uzatır (`version_id` boş = güncel). Saklama yalnız uzatılabilir;
+        COMPLIANCE GOVERNANCE''a çevrilemez. COMPLIANCE kilidi süresi dolana kadar kimse (Gyro dahil) kısaltamaz, GOVERNANCE''a çeviremez, kaldıramaz; veri saklanır
+        ve iptalde bile süre sonuna kadar ücret sürer. `"confirm": true` ve `"acknowledge": "COMPLIANCE"` gönderin.'
+      parameters: *id046
+      responses:
+        '202':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/StorageObjectRetention'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: feature_not_available (standard Object Storage service) or not_actionable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                key:
+                  type: string
+                version_id:
+                  type: string
+                  description: Empty = current version
+                mode:
+                  type: string
+                  enum:
+                  - GOVERNANCE
+                  - COMPLIANCE
+                days:
+                  type: integer
+                  minimum: 1
+                  maximum: 3650
+                acknowledge:
+                  type: string
+                  enum:
+                  - COMPLIANCE
+                  description: 'COMPLIANCE only: type COMPLIANCE'
+                  x-description-tr: 'Yalnız COMPLIANCE: COMPLIANCE yazın'
+                confirm:
+                  type: boolean
+              required:
+              - key
+              - mode
+              - days
+  /cloud/storage/{id}/buckets/{bucket}/objects/legal-hold:
+    get:
+      tags:
+      - Object storage
+      operationId: getStorageObjectLegalHold
+      summary: Legal hold of an object version
+      x-summary-tr: Nesne sürümünün legal hold durumu
+      x-scope: services_read
+      x-cli:
+        command: storage object legal-hold get
+        confirm: false
+      description: '`legal_hold` true = the version cannot be deleted until the hold is removed (no end date).'
+      x-description-tr: '`legal_hold` true = kaldırılana kadar sürüm silinemez (bitiş tarihi yok).'
+      parameters:
+      - *id044
+      - *id045
+      - name: key
+        in: query
+        required: true
+        schema:
+          type: string
+        description: Object key
+      - name: version_id
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Version id (empty = current)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      bucket:
+                        type: string
+                      key:
+                        type: string
+                      version_id:
+                        type: string
+                      legal_hold:
+                        type: boolean
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: feature_not_available (standard Object Storage service) or not_actionable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          $ref: '#/components/responses/Validation'
+    put:
+      tags:
+      - Object storage
+      operationId: setStorageObjectLegalHold
+      summary: Place or remove a legal hold
+      x-summary-tr: Legal hold koy / kaldır
+      x-scope: services_write
+      x-cli:
+        command: storage object legal-hold set
+        confirm: false
+      description: '`status` on / off (locked buckets only). A legal hold blocks deletion with no end date, independent of retention; you can remove it yourself.'
+      x-description-tr: '`status` on / off (yalnız kilitli kovalar). Legal hold, saklamadan bağımsız ve bitiş tarihsiz silmeyi engeller; kendiniz kaldırabilirsiniz.'
+      parameters: *id046
+      responses:
+        '202':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      bucket:
+                        type: string
+                      key:
+                        type: string
+                      version_id:
+                        type: string
+                      legal_hold:
+                        type: boolean
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: feature_not_available (standard Object Storage service) or not_actionable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                key:
+                  type: string
+                version_id:
+                  type: string
+                  description: Empty = current version
+                status:
+                  type: string
+                  enum:
+                  - 'on'
+                  - 'off'
+              required:
+              - key
+              - status
+  /cloud/storage/{id}/buckets/{bucket}/lifecycle/noncurrent:
+    get:
+      tags:
+      - Object storage
+      operationId: getStorageNoncurrentExpiration
+      summary: Old version expiry of a bucket
+      x-summary-tr: Kovanın eski sürüm silme kuralı
+      x-scope: services_read
+      x-cli:
+        command: storage lifecycle noncurrent get
+        confirm: false
+      description: 'Days after which non-current versions are deleted (new buckets: 30). 0 / null = kept until you delete them (they count toward the quota).'
+      x-description-tr: Eski (güncel olmayan) sürümlerin kaç gün sonra silineceği (yeni kovalarda 30). 0 / null = siz silene kadar durur (kotadan düşer).
+      parameters: *id046
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/StorageNoncurrentExpiration'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: feature_not_available (standard Object Storage service) or not_actionable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          $ref: '#/components/responses/Validation'
+    put:
+      tags:
+      - Object storage
+      operationId: setStorageNoncurrentExpiration
+      summary: Set old version expiry
+      x-summary-tr: Eski sürüm silme süresini ayarla
+      x-scope: services_write
+      x-cli:
+        command: storage lifecycle noncurrent set
+        confirm: false
+      description: '`days` 1-3650, or 0 to keep old versions. Locked versions are deleted only after their retention ends. Other lifecycle rules of the bucket are
+        kept.'
+      x-description-tr: '`days` 1-3650 ya da 0 (eski sürümler durur). Kilitli sürümler saklaması bitince silinir. Kovanın diğer yaşam döngüsü kuralları korunur.'
+      parameters: *id046
+      responses:
+        '202':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/StorageNoncurrentExpiration'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: feature_not_available (standard Object Storage service) or not_actionable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                days:
+                  type: integer
+                  minimum: 0
+                  maximum: 3650
+              required:
+              - days
 components:
   securitySchemes:
     bearerAuth:
@@ -17055,15 +17834,18 @@ components:
           items:
             type: integer
           maxItems: 10
-          description: 'Ids from /cloud/ssh-keys. Global regions: one key, installed at creation. tr-ist-1: up to 10 keys, installed for root once the server is ready
-            (usually a few minutes after it is running); follow `ssh_keys.state` on GET /cloud/servers/{id}.'
+          description: 'Ids from /cloud/ssh-keys. Global regions: one key, installed at creation. tr-ist-1: up to 10 keys, installed for root at creation through
+            cloud-init (2.14.0; `ssh_keys` on GET /cloud/servers/{id} stays null for these servers).'
         hostname:
           type: string
           example: web-1.example.com
         user_data:
           type: string
           maxLength: 32768
-          description: 'cloud-init user data (global regions; not accepted in tr-ist-1: 422)'
+          description: 'cloud-init user data: `#cloud-config` or a `#!` script, max 32 KiB. Accepted in every region (tr-ist-1 since 2.14.0). Ignored when a one-click
+            application is chosen on the product.'
+          x-description-tr: 'cloud-init kullanıcı verisi: `#cloud-config` ya da `#!` betiği, en çok 32 KiB. Tüm bölgelerde (tr-ist-1''de 2.14.0''dan beri) kabul edilir.
+            Üründe tek tıkla uygulama seçilirse kullanılmaz.'
         dry_run:
           type: boolean
           default: false
@@ -18420,3 +19202,180 @@ components:
           type: integer
         amount:
           $ref: '#/components/schemas/Money'
+    StorageVersion:
+      type: object
+      properties:
+        key:
+          type: string
+        version_id:
+          type: string
+        is_latest:
+          type: boolean
+        delete_marker:
+          type: boolean
+        size:
+          type: integer
+        modified:
+          type: string
+          format: date-time
+        lock_mode:
+          type:
+          - string
+          - 'null'
+          enum:
+          - GOVERNANCE
+          - COMPLIANCE
+          - null
+        retain_until:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        legal_hold:
+          type: boolean
+    StorageVersionList:
+      type: object
+      properties:
+        bucket:
+          type: string
+        prefix:
+          type: string
+        object_lock:
+          type: boolean
+        folders:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/StorageVersion'
+          description: Versions and delete markers
+        next_key_marker:
+          type:
+          - string
+          - 'null'
+        next_version_id_marker:
+          type:
+          - string
+          - 'null'
+        truncated:
+          type: boolean
+    StorageDefaultRetention:
+      type:
+      - object
+      - 'null'
+      properties:
+        mode:
+          type: string
+          enum:
+          - GOVERNANCE
+          - COMPLIANCE
+        days:
+          type:
+          - integer
+          - 'null'
+        years:
+          type:
+          - integer
+          - 'null'
+    StorageBucketObjectLock:
+      type: object
+      properties:
+        bucket:
+          type: string
+        object_lock:
+          type: boolean
+        default_retention:
+          $ref: '#/components/schemas/StorageDefaultRetention'
+    StorageLockScan:
+      type: object
+      properties:
+        complete:
+          type: boolean
+        versions:
+          type: integer
+        compliance:
+          type: integer
+        governance:
+          type: integer
+        legal_hold:
+          type: integer
+        latest_until:
+          type:
+          - string
+          - 'null'
+        latest_compliance_until:
+          type:
+          - string
+          - 'null'
+        scanned_at:
+          type:
+          - string
+          - 'null'
+    StorageObjectLockSummary:
+      type: object
+      properties:
+        service_id:
+          type: integer
+        product:
+          type: string
+          enum:
+          - protected_storage
+        versioning:
+          type: boolean
+        locked_bucket_rights:
+          type: integer
+        locked_buckets_used:
+          type: integer
+        max_retention_days:
+          type: integer
+        buckets:
+          type: array
+          items:
+            $ref: '#/components/schemas/StorageBucketObjectLock'
+        scan:
+          oneOf:
+          - $ref: '#/components/schemas/StorageLockScan'
+          - type: 'null'
+    StorageObjectRetention:
+      type: object
+      properties:
+        bucket:
+          type: string
+        key:
+          type: string
+        version_id:
+          type: string
+        size:
+          type: integer
+        mode:
+          type:
+          - string
+          - 'null'
+          enum:
+          - GOVERNANCE
+          - COMPLIANCE
+          - null
+        retain_until:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        retention_active:
+          type: boolean
+        legal_hold:
+          type: boolean
+    StorageNoncurrentExpiration:
+      type: object
+      properties:
+        bucket:
+          type: string
+        noncurrent_days:
+          type:
+          - integer
+          - 'null'
+        enabled:
+          type: boolean
+        default_days:
+          type: integer

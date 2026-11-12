@@ -14,12 +14,20 @@ create (fields with --set key=value)
 
 
 .SH OPTIONS
+\fB--bucket\fP=""
+	bucket name (same as --set bucket=NAME)
+
+.PP
 \fB--data\fP=""
 	JSON body, @file or @-
 
 .PP
 \fB-h\fP, \fB--help\fP[=false]
 	help for create
+
+.PP
+\fB--object-lock\fP[=false]
+	Protected Storage: create the bucket with object lock (WORM); cannot be turned off later
 
 .PP
 \fB--set\fP=[]

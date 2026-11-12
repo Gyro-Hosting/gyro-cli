@@ -34,6 +34,8 @@ gyro s3 object [flags]
 * [gyro s3](gyro_s3.md)	 - S3 nesne depolama: kovalar ve erişim anahtarları
 * [gyro s3 object delete](gyro_s3_object_delete.md)	 - Nesneleri sil
 * [gyro s3 object download-url](gyro_s3_object_download-url.md)	 - İmzalı indirme adresi
+* [gyro s3 object legal-hold](gyro_s3_object_legal-hold.md)	 - Nesne sürümünün legal hold durumu
 * [gyro s3 object list](gyro_s3_object_list.md)	 - Kova klasöründeki nesneleri listele
+* [gyro s3 object retention](gyro_s3_object_retention.md)	 - Nesne sürümünün saklaması
 * [gyro s3 object upload-url](gyro_s3_object_upload-url.md)	 - İmzalı yükleme adresleri
 

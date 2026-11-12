@@ -71,7 +71,7 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro api request POST /cloud/mail/{id}/aliases` | POST aliases:create (GyroMail) | `POST /cloud/mail/{id}/aliases` |
 | `gyro api request POST /cloud/mail/{id}/mailboxes` | POST mailboxes:create (GyroMail) | `POST /cloud/mail/{id}/mailboxes` |
 | `gyro api request POST /cloud/mail/{id}/migrations` | POST sync-jobs:create (GyroMail) | `POST /cloud/mail/{id}/migrations` |
-| `gyro api request POST /cloud/storage/{id}/buckets` | POST buckets:create (GyroDepolama) | `POST /cloud/storage/{id}/buckets` |
+| `gyro api request POST /cloud/storage/{id}/buckets` | Create a bucket | `POST /cloud/storage/{id}/buckets` |
 | `gyro api request POST /cloud/storage/{id}/keys` | POST access-keys:create (GyroDepolama) | `POST /cloud/storage/{id}/keys` |
 | `gyro balance` | Account balance | `GET /balance` |
 | `gyro balance setting update` | Update balance settings | `PATCH /balance/settings` |
@@ -361,11 +361,25 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro storage folder create` | Create a folder | `POST /cloud/storage/{id}/buckets/{bucket}/folders` |
 | `gyro storage folder delete` | Delete a folder with its contents | `DELETE /cloud/storage/{id}/buckets/{bucket}/folders` |
 | `gyro storage key rotate` | POST access-keys:rotate (GyroDepolama) | `POST /cloud/storage/{id}/keys/{key}/rotate` |
+| `gyro storage lifecycle noncurrent get` | Old version expiry of a bucket | `GET /cloud/storage/{id}/buckets/{bucket}/lifecycle/noncurrent` |
+| `gyro storage lifecycle noncurrent set` | Set old version expiry | `PUT /cloud/storage/{id}/buckets/{bucket}/lifecycle/noncurrent` |
 | `gyro storage object delete` | Delete objects | `POST /cloud/storage/{id}/buckets/{bucket}/objects/delete` |
 | `gyro storage object download-url` | Presigned download URL | `POST /cloud/storage/{id}/buckets/{bucket}/objects/download-url` |
+| `gyro storage object legal-hold get` | Legal hold of an object version | `GET /cloud/storage/{id}/buckets/{bucket}/objects/legal-hold` |
+| `gyro storage object legal-hold set` | Place or remove a legal hold | `PUT /cloud/storage/{id}/buckets/{bucket}/objects/legal-hold` |
 | `gyro storage object list` | List objects in a bucket folder | `GET /cloud/storage/{id}/buckets/{bucket}/objects` |
+| `gyro storage object retention get` | Retention of an object version | `GET /cloud/storage/{id}/buckets/{bucket}/objects/retention` |
+| `gyro storage object retention set` | Lock an object version | `PUT /cloud/storage/{id}/buckets/{bucket}/objects/retention` |
 | `gyro storage object upload-url` | Presigned upload URLs | `POST /cloud/storage/{id}/buckets/{bucket}/objects/upload-url` |
+| `gyro storage object-lock get` | Default retention of a bucket | `GET /cloud/storage/{id}/buckets/{bucket}/object-lock` |
+| `gyro storage object-lock scan` | Scan locked versions now | `POST /cloud/storage/{id}/object-lock/scan` |
+| `gyro storage object-lock set` | Set the default retention of a bucket | `PUT /cloud/storage/{id}/buckets/{bucket}/object-lock` |
+| `gyro storage object-lock status` | Protected Storage: object lock summary | `GET /cloud/storage/{id}/object-lock` |
 | `gyro storage usage get` | GET usage (GyroDepolama) | `GET /cloud/storage/{id}/usage` |
+| `gyro storage versions delete` | Permanently delete a version | `DELETE /cloud/storage/{id}/buckets/{bucket}/versions` |
+| `gyro storage versions list` | List object versions | `GET /cloud/storage/{id}/buckets/{bucket}/versions` |
+| `gyro storage versions restore` | Restore an older version | `POST /cloud/storage/{id}/buckets/{bucket}/versions/restore` |
+| `gyro storage versions undelete` | Remove a delete marker | `POST /cloud/storage/{id}/buckets/{bucket}/versions/undelete` |
 | `gyro storage website disable` | Disable the static website | `DELETE /cloud/storage/{id}/buckets/{bucket}/website` |
 | `gyro storage website get` | Static website settings of a bucket | `GET /cloud/storage/{id}/buckets/{bucket}/website` |
 | `gyro storage website set` | Enable / update the static website | `PUT /cloud/storage/{id}/buckets/{bucket}/website` |

@@ -71,7 +71,7 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro api request POST /cloud/mail/{id}/aliases` | aliases:create (GyroMail) | `POST /cloud/mail/{id}/aliases` |
 | `gyro api request POST /cloud/mail/{id}/mailboxes` | mailboxes:create (GyroMail) | `POST /cloud/mail/{id}/mailboxes` |
 | `gyro api request POST /cloud/mail/{id}/migrations` | sync-jobs:create (GyroMail) | `POST /cloud/mail/{id}/migrations` |
-| `gyro api request POST /cloud/storage/{id}/buckets` | buckets:create (GyroDepolama) | `POST /cloud/storage/{id}/buckets` |
+| `gyro api request POST /cloud/storage/{id}/buckets` | Kova oluştur | `POST /cloud/storage/{id}/buckets` |
 | `gyro api request POST /cloud/storage/{id}/keys` | access-keys:create (GyroDepolama) | `POST /cloud/storage/{id}/keys` |
 | `gyro balance` | Hesap bakiyesi | `GET /balance` |
 | `gyro balance setting update` | Cüzdan Ayarlarını Değiştirme | `PATCH /balance/settings` |
@@ -361,11 +361,25 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro storage folder create` | Klasör oluştur | `POST /cloud/storage/{id}/buckets/{bucket}/folders` |
 | `gyro storage folder delete` | Klasörü içindekilerle sil | `DELETE /cloud/storage/{id}/buckets/{bucket}/folders` |
 | `gyro storage key rotate` | access-keys:rotate (GyroDepolama) | `POST /cloud/storage/{id}/keys/{key}/rotate` |
+| `gyro storage lifecycle noncurrent get` | Kovanın eski sürüm silme kuralı | `GET /cloud/storage/{id}/buckets/{bucket}/lifecycle/noncurrent` |
+| `gyro storage lifecycle noncurrent set` | Eski sürüm silme süresini ayarla | `PUT /cloud/storage/{id}/buckets/{bucket}/lifecycle/noncurrent` |
 | `gyro storage object delete` | Nesneleri sil | `POST /cloud/storage/{id}/buckets/{bucket}/objects/delete` |
 | `gyro storage object download-url` | İmzalı indirme adresi | `POST /cloud/storage/{id}/buckets/{bucket}/objects/download-url` |
+| `gyro storage object legal-hold get` | Nesne sürümünün legal hold durumu | `GET /cloud/storage/{id}/buckets/{bucket}/objects/legal-hold` |
+| `gyro storage object legal-hold set` | Legal hold koy / kaldır | `PUT /cloud/storage/{id}/buckets/{bucket}/objects/legal-hold` |
 | `gyro storage object list` | Kova klasöründeki nesneleri listele | `GET /cloud/storage/{id}/buckets/{bucket}/objects` |
+| `gyro storage object retention get` | Nesne sürümünün saklaması | `GET /cloud/storage/{id}/buckets/{bucket}/objects/retention` |
+| `gyro storage object retention set` | Nesne sürümünü kilitle | `PUT /cloud/storage/{id}/buckets/{bucket}/objects/retention` |
 | `gyro storage object upload-url` | İmzalı yükleme adresleri | `POST /cloud/storage/{id}/buckets/{bucket}/objects/upload-url` |
+| `gyro storage object-lock get` | Kovanın varsayılan saklaması | `GET /cloud/storage/{id}/buckets/{bucket}/object-lock` |
+| `gyro storage object-lock scan` | Kilitli sürümleri şimdi tara | `POST /cloud/storage/{id}/object-lock/scan` |
+| `gyro storage object-lock set` | Kovanın varsayılan saklamasını ayarla | `PUT /cloud/storage/{id}/buckets/{bucket}/object-lock` |
+| `gyro storage object-lock status` | Korumalı Depolama: nesne kilidi özeti | `GET /cloud/storage/{id}/object-lock` |
 | `gyro storage usage get` | usage (GyroDepolama) | `GET /cloud/storage/{id}/usage` |
+| `gyro storage versions delete` | Sürümü kalıcı sil | `DELETE /cloud/storage/{id}/buckets/{bucket}/versions` |
+| `gyro storage versions list` | Nesne sürümlerini listele | `GET /cloud/storage/{id}/buckets/{bucket}/versions` |
+| `gyro storage versions restore` | Eski sürümü geri yükle | `POST /cloud/storage/{id}/buckets/{bucket}/versions/restore` |
+| `gyro storage versions undelete` | Silme işaretini kaldır | `POST /cloud/storage/{id}/buckets/{bucket}/versions/undelete` |
 | `gyro storage website disable` | Statik web sitesini kapat | `DELETE /cloud/storage/{id}/buckets/{bucket}/website` |
 | `gyro storage website get` | Kovanın statik web sitesi ayarları | `GET /cloud/storage/{id}/buckets/{bucket}/website` |
 | `gyro storage website set` | Statik web sitesini aç / güncelle | `PUT /cloud/storage/{id}/buckets/{bucket}/website` |

@@ -34,6 +34,8 @@ gyro s3 object [flags]
 * [gyro s3](gyro_s3.md)	 - S3 object storage: buckets and access keys
 * [gyro s3 object delete](gyro_s3_object_delete.md)	 - Delete objects
 * [gyro s3 object download-url](gyro_s3_object_download-url.md)	 - Presigned download URL
+* [gyro s3 object legal-hold](gyro_s3_object_legal-hold.md)	 - Legal hold of an object version
 * [gyro s3 object list](gyro_s3_object_list.md)	 - List objects in a bucket folder
+* [gyro s3 object retention](gyro_s3_object_retention.md)	 - Retention of an object version
 * [gyro s3 object upload-url](gyro_s3_object_upload-url.md)	 - Presigned upload URLs
 

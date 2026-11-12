@@ -9,8 +9,10 @@ gyro s3 bucket create <SERVICE> [flags]
 ### Options
 
 ```
+      --bucket string     kova adı (--set bucket=AD ile aynı)
       --data string       JSON gövde, @dosya ya da @-
   -h, --help              help for create
+      --object-lock       Korumalı Depolama: kovayı nesne kilidi (WORM) ile aç; sonradan kapatılamaz
       --set stringArray   alan anahtar=değer (tekrarlanabilir)
 ```
 

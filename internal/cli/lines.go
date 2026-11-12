@@ -409,6 +409,8 @@ func lineNounCmd(a *App, n lineNoun) *cobra.Command {
 		verb := verb
 		var set []string
 		var data string
+		var bucketName *string
+		var objectLock *bool
 		c := &cobra.Command{Use: verb + " <SERVICE>", Short: i18n.F("%s (fields with --set key=value)", "%s (alanlar --set anahtar=değer)", verb), Args: cobra.ExactArgs(1),
 			RunE: func(cmd *cobra.Command, args []string) error {
 				ctx, cancel := a.Ctx()
@@ -438,10 +440,22 @@ func lineNounCmd(a *App, n lineNoun) *cobra.Command {
 				if action == "" {
 					return &ExitErr{ExitUsage, fmt.Errorf("%s %q: %s (gyro ... tool %s %s <ACTION>)", i18n.S("no matching action for", "eşleşen eylem yok:"), verb, strings.Join(acts, ", "), args[0], tool)}
 				}
+				if bucketName != nil && *bucketName != "" {
+					set = append(set, "bucket="+*bucketName)
+				}
+				if objectLock != nil && *objectLock {
+					set = append(set, "object_lock=true")
+				}
 				return runTool(a, sid, tool, action, set, data)
 			}}
 		c.Flags().StringArrayVar(&set, "set", nil, i18n.S("field key=value (repeatable)", "alan anahtar=değer (tekrarlanabilir)"))
 		c.Flags().StringVar(&data, "data", "", i18n.S("JSON body, @file or @-", "JSON gövde, @dosya ya da @-"))
+		if n.name == "bucket" && verb == "create" {
+			// Protected Storage (API 2.13.1): WORM bucket at creation; standard Object Storage answers 409 feature_not_available
+			bucketName = c.Flags().String("bucket", "", i18n.S("bucket name (same as --set bucket=NAME)", "kova adı (--set bucket=AD ile aynı)"))
+			objectLock = c.Flags().Bool("object-lock", false, i18n.S("Protected Storage: create the bucket with object lock (WORM); cannot be turned off later",
+				"Korumalı Depolama: kovayı nesne kilidi (WORM) ile aç; sonradan kapatılamaz"))
+		}
 		g.AddCommand(c)
 	}
 	return g

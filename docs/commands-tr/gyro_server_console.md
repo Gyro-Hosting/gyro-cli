@@ -6,7 +6,7 @@ Tek seferlik VNC konsol bileti al
 
 Tek seferlik VNC konsol bileti al
 
-Yaklaşık bir dakika geçerli websocket adresi ve parola döner. Idempotency-Key göndermeyin (400). tr-ist-1'de bilet WebMKS websocket'idir (`protocol: webmks`, parola boş: adresin kendisi tek seferlik sırdır).
+Yaklaşık bir dakika geçerli websocket adresi ve parola döner. Idempotency-Key göndermeyin (400). tr-ist-1'de bilet WebMKS websocket'idir (`protocol: webmks`, parola boş: adresin kendisi tek seferlik sırdır). 2.14.0 (Gyro Compute): `protocol: web`, `url` tarayıcıda açılan tek kullanımlık konsol sayfasıdır (90 sn); eski istemciler için `wss_url` aynı adresi taşır.
 
 API: POST /cloud/servers/{id}/console (operationId openConsole, scope cloud_write)
 

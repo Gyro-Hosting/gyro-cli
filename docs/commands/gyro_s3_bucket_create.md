@@ -9,8 +9,10 @@ gyro s3 bucket create <SERVICE> [flags]
 ### Options
 
 ```
+      --bucket string     bucket name (same as --set bucket=NAME)
       --data string       JSON body, @file or @-
   -h, --help              help for create
+      --object-lock       Protected Storage: create the bucket with object lock (WORM); cannot be turned off later
       --set stringArray   field key=value (repeatable)
 ```
 

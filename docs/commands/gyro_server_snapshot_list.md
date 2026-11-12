@@ -6,7 +6,7 @@ List snapshots and the snapshot quota
 
 List snapshots and the snapshot quota
 
-tr-ist-1: `quota` = number of snapshots allowed on the plan (add-on), snapshot ids are stable numbers derived by the API. Prepaid tr-ist-1 servers also return `pricing` {billing, free, extra_monthly_eur, extra_hourly_eur, billable}: the first snapshot(s) are free, each extra snapshot is charged hourly from the balance while it exists.
+tr-ist-1: `quota` = number of snapshots allowed on the plan (add-on), snapshot ids are stable numbers derived by the API. Prepaid tr-ist-1 servers also return `pricing` {billing, free, extra_monthly_eur, extra_hourly_eur, billable}: the first snapshot(s) are free, each extra snapshot is charged hourly from the balance while it exists. 2.14.0 (Gyro Compute): snapshot ids are the platform's own ids; `name` is returned too.
 
 API: GET /cloud/servers/{id}/snapshots (operationId listSnapshots, scope cloud_read)
 
