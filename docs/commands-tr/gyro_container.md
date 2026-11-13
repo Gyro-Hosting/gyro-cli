@@ -41,6 +41,7 @@ gyro container [flags]
 * [gyro container metrics](gyro_container_metrics.md)	 - Servis işlemci / bellek
 * [gyro container nodes](gyro_container_nodes.md)	 - Düğüm havuzu
 * [gyro container notifications](gyro_container_notifications.md)	 - Bildirim ayarları ve süren uyarılar
+* [gyro container pipeline](gyro_container_pipeline.md)	 - Pipeline'ları listele
 * [gyro container plans](gyro_container_plans.md)	 - Kapsayıcı ortam paketlerini listele
 * [gyro container registry](gyro_container_registry.md)	 - Ortamın Gyro imaj deposu
 * [gyro container secret](gyro_container_secret.md)	 - Gizli değer sil

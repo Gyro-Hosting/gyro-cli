@@ -95,6 +95,24 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro container notifications set` | Bildirim kanallarını ayarla | `PUT /cloud/containers/{id}/notifications` |
 | `gyro container notifications test` | Test bildirimi gönder | `POST /cloud/containers/{id}/notifications/test` |
 | `gyro container notifications webhook-secret` | Webhook imza anahtarı | `POST /cloud/containers/{id}/notifications/webhook-secret` |
+| `gyro container pipeline approve` | Dağıtımı onayla | `POST /cloud/containers/{id}/pipeline-runs/{run}/approve` |
+| `gyro container pipeline cancel` | Çalıştırmayı durdur | `POST /cloud/containers/{id}/pipeline-runs/{run}/cancel` |
+| `gyro container pipeline create` | Pipeline oluştur | `POST /cloud/containers/{id}/pipelines` |
+| `gyro container pipeline delete` | Pipeline'ı sil | `DELETE /cloud/containers/{id}/pipelines/{pipeline}` |
+| `gyro container pipeline get` | Pipeline'ı getir | `GET /cloud/containers/{id}/pipelines/{pipeline}` |
+| `gyro container pipeline list` | Pipeline'ları listele | `GET /cloud/containers/{id}/pipelines` |
+| `gyro container pipeline logs` | Çalıştırma logu | `GET /cloud/containers/{id}/pipeline-runs/{run}/logs` |
+| `gyro container pipeline redeploy` | Bu çalıştırmanın imajını yeniden dağıt (geri dönüş) | `POST /cloud/containers/{id}/pipeline-runs/{run}/redeploy` |
+| `gyro container pipeline reject` | Dağıtımı reddet | `POST /cloud/containers/{id}/pipeline-runs/{run}/reject` |
+| `gyro container pipeline rotate-secret` | Webhook gizli anahtarını yenile | `POST /cloud/containers/{id}/pipelines/{pipeline}/webhook/rotate` |
+| `gyro container pipeline run` | Çalıştırma başlat | `POST /cloud/containers/{id}/pipelines/{pipeline}/runs` |
+| `gyro container pipeline run-get` | Çalıştırmayı getir | `GET /cloud/containers/{id}/pipeline-runs/{run}` |
+| `gyro container pipeline runs` | Pipeline çalıştırmaları | `GET /cloud/containers/{id}/pipelines/{pipeline}/runs` |
+| `gyro container pipeline secret delete` | Derleme gizli değerini sil | `DELETE /cloud/containers/{id}/pipelines/{pipeline}/secrets/{secret}` |
+| `gyro container pipeline secret set` | Derleme gizli değeri ayarla | `PUT /cloud/containers/{id}/pipelines/{pipeline}/secrets` |
+| `gyro container pipeline test` | Depo erişimini test et | `POST /cloud/containers/{id}/pipelines/{pipeline}/test` |
+| `gyro container pipeline update` | Pipeline'ı değiştir | `PATCH /cloud/containers/{id}/pipelines/{pipeline}` |
+| `gyro container pipeline webhook` | Webhook adresi ve gizli anahtar | `GET /cloud/containers/{id}/pipelines/{pipeline}/webhook` |
 | `gyro container plans` | Kapsayıcı ortam paketlerini listele | `GET /cloud/containers/plans` |
 | `gyro container registry credentials` | Depo parolası | `POST /cloud/containers/{id}/registry/credentials` |
 | `gyro container registry get` | Ortamın Gyro imaj deposu | `GET /cloud/containers/{id}/registry` |

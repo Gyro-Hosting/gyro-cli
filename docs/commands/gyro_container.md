@@ -41,6 +41,7 @@ gyro container [flags]
 * [gyro container metrics](gyro_container_metrics.md)	 - Service CPU / memory
 * [gyro container nodes](gyro_container_nodes.md)	 - Node pool
 * [gyro container notifications](gyro_container_notifications.md)	 - Notification settings and current alerts
+* [gyro container pipeline](gyro_container_pipeline.md)	 - List pipelines
 * [gyro container plans](gyro_container_plans.md)	 - List container environment plans
 * [gyro container registry](gyro_container_registry.md)	 - Gyro image registry of the environment
 * [gyro container secret](gyro_container_secret.md)	 - Delete secret values

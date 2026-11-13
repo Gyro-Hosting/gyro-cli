@@ -95,6 +95,24 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro container notifications set` | Set notification channels | `PUT /cloud/containers/{id}/notifications` |
 | `gyro container notifications test` | Send a test notification | `POST /cloud/containers/{id}/notifications/test` |
 | `gyro container notifications webhook-secret` | Webhook signing secret | `POST /cloud/containers/{id}/notifications/webhook-secret` |
+| `gyro container pipeline approve` | Approve the deployment | `POST /cloud/containers/{id}/pipeline-runs/{run}/approve` |
+| `gyro container pipeline cancel` | Stop a run | `POST /cloud/containers/{id}/pipeline-runs/{run}/cancel` |
+| `gyro container pipeline create` | Create a pipeline | `POST /cloud/containers/{id}/pipelines` |
+| `gyro container pipeline delete` | Delete a pipeline | `DELETE /cloud/containers/{id}/pipelines/{pipeline}` |
+| `gyro container pipeline get` | Get a pipeline | `GET /cloud/containers/{id}/pipelines/{pipeline}` |
+| `gyro container pipeline list` | List pipelines | `GET /cloud/containers/{id}/pipelines` |
+| `gyro container pipeline logs` | Run log | `GET /cloud/containers/{id}/pipeline-runs/{run}/logs` |
+| `gyro container pipeline redeploy` | Deploy this run's image again (rollback) | `POST /cloud/containers/{id}/pipeline-runs/{run}/redeploy` |
+| `gyro container pipeline reject` | Reject the deployment | `POST /cloud/containers/{id}/pipeline-runs/{run}/reject` |
+| `gyro container pipeline rotate-secret` | Rotate the webhook secret | `POST /cloud/containers/{id}/pipelines/{pipeline}/webhook/rotate` |
+| `gyro container pipeline run` | Start a run | `POST /cloud/containers/{id}/pipelines/{pipeline}/runs` |
+| `gyro container pipeline run-get` | Get a run | `GET /cloud/containers/{id}/pipeline-runs/{run}` |
+| `gyro container pipeline runs` | Runs of a pipeline | `GET /cloud/containers/{id}/pipelines/{pipeline}/runs` |
+| `gyro container pipeline secret delete` | Delete a build secret | `DELETE /cloud/containers/{id}/pipelines/{pipeline}/secrets/{secret}` |
+| `gyro container pipeline secret set` | Set build secrets | `PUT /cloud/containers/{id}/pipelines/{pipeline}/secrets` |
+| `gyro container pipeline test` | Test repository access | `POST /cloud/containers/{id}/pipelines/{pipeline}/test` |
+| `gyro container pipeline update` | Change a pipeline | `PATCH /cloud/containers/{id}/pipelines/{pipeline}` |
+| `gyro container pipeline webhook` | Webhook address and secret | `GET /cloud/containers/{id}/pipelines/{pipeline}/webhook` |
 | `gyro container plans` | List container environment plans | `GET /cloud/containers/plans` |
 | `gyro container registry credentials` | Registry password | `POST /cloud/containers/{id}/registry/credentials` |
 | `gyro container registry get` | Gyro image registry of the environment | `GET /cloud/containers/{id}/registry` |
