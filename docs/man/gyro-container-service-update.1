@@ -25,7 +25,7 @@ API: PATCH /cloud/containers/{id}/services/{name} (operationId typed_patch_conta
 
 .PP
 \fB--args\fP=[]
-	Arguments for the image's default command
+	Arguments for the image's default command. A JSON array of strings, e.g. ["sh","-c","echo a && npm start"]. A plain string is accepted too and split like a shell: whitespace separates, quotes keep text together ("..." with \\" escapes, '...' literal): \fBsh -c "echo a && npm start"\fR -> ["sh","-c","echo a && npm start"]. A string starting with [ must be a valid JSON array; an unclosed quote is an error.
 
 .PP
 \fB--autoscaling\fP=""
@@ -33,7 +33,7 @@ API: PATCH /cloud/containers/{id}/services/{name} (operationId typed_patch_conta
 
 .PP
 \fB--command\fP=[]
-	Override the image entrypoint
+	Override the image entrypoint. A JSON array of strings, e.g. ["sh","-c","echo a && npm start"]. A plain string is accepted too and split like a shell: whitespace separates, quotes keep text together ("..." with \\" escapes, '...' literal): \fBsh -c "echo a && npm start"\fR -> ["sh","-c","echo a && npm start"]. A string starting with [ must be a valid JSON array; an unclosed quote is an error.
 
 .PP
 \fB--cpu-m\fP=0

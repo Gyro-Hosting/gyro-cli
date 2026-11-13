@@ -17,25 +17,25 @@ gyro container service create <ID> [flags]
 ### Options
 
 ```
-      --alerts string               Alert threshold: notify when fewer replicas are ready (0 = off). Channels: PUT /cloud/containers/{id}/notifications. (JSON)
-      --args strings                Arguments for the image's default command
-      --autoscaling enabled:false   Autoscaling (horizontal): replicas follow the average CPU (and optionally memory) use of the reserved size. enabled:false = off (fixed replicas). (JSON)
-      --command strings             Override the image entrypoint
-      --cpu-m int                   CPU per instance in millicores (250 = 0.25 vCPU)
-      --data string                 request body as JSON, @file or @- (stdin)
-      --dry-run                     show the price quote / request without changing anything
-      --env string                  Plain environment variables (replaces the whole set on update) (JSON)
-      --health-path string          HTTP health check path (empty = TCP check)
-  -h, --help                        help for create
-      --idempotency-key string      idempotency key (automatic for money operations)
-      --image string                Image reference, e.g. ghcr.io/acme/web:1.4 (public registries or your private registry)
-      --memory-mi int               Memory per instance in MiB
-      --name string                 Service name
-      --port int                    Container port (0 = no network port). Containers run as a non-root user: use a port >= 1024
-      --public                      HTTPS address <name>-<code>.gyroapp.net (and your domains)
-      --replicas int                Number of instances (default 1)
-      --run-as-user int             User id inside the container (default 10001)
-      --set stringArray             extra body field key=value (repeatable)
+      --alerts string                         Alert threshold: notify when fewer replicas are ready (0 = off). Channels: PUT /cloud/containers/{id}/notifications. (JSON)
+      --args sh -c "echo a && npm start"      Arguments for the image's default command. A JSON array of strings, e.g. ["sh","-c","echo a && npm start"]. A plain string is accepted too and split like a shell: whitespace separates, quotes keep text together ("..." with \" escapes, '...' literal): sh -c "echo a && npm start" -> ["sh","-c","echo a && npm start"]. A string starting with [ must be a valid JSON array; an unclosed quote is an error.
+      --autoscaling enabled:false             Autoscaling (horizontal): replicas follow the average CPU (and optionally memory) use of the reserved size. enabled:false = off (fixed replicas). (JSON)
+      --command sh -c "echo a && npm start"   Override the image entrypoint. A JSON array of strings, e.g. ["sh","-c","echo a && npm start"]. A plain string is accepted too and split like a shell: whitespace separates, quotes keep text together ("..." with \" escapes, '...' literal): sh -c "echo a && npm start" -> ["sh","-c","echo a && npm start"]. A string starting with [ must be a valid JSON array; an unclosed quote is an error.
+      --cpu-m int                             CPU per instance in millicores (250 = 0.25 vCPU)
+      --data string                           request body as JSON, @file or @- (stdin)
+      --dry-run                               show the price quote / request without changing anything
+      --env string                            Plain environment variables (replaces the whole set on update) (JSON)
+      --health-path string                    HTTP health check path (empty = TCP check)
+  -h, --help                                  help for create
+      --idempotency-key string                idempotency key (automatic for money operations)
+      --image string                          Image reference, e.g. ghcr.io/acme/web:1.4 (public registries or your private registry)
+      --memory-mi int                         Memory per instance in MiB
+      --name string                           Service name
+      --port int                              Container port (0 = no network port). Containers run as a non-root user: use a port >= 1024
+      --public                                HTTPS address <name>-<code>.gyroapp.net (and your domains)
+      --replicas int                          Number of instances (default 1)
+      --run-as-user int                       User id inside the container (default 10001)
+      --set stringArray                       extra body field key=value (repeatable)
 ```
 
 ### Options inherited from parent commands
