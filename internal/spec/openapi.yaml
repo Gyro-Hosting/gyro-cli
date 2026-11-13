@@ -2,7 +2,7 @@
 openapi: 3.1.0
 info:
   title: Gyro Public API
-  version: 2.17.4
+  version: 2.17.5
   summary: Manage Gyro cloud servers, SSH keys and billing programmatically.
   x-summary-tr: Gyro bulut sunucularınızı, SSH anahtarlarınızı ve faturalarınızı programla yönetin.
   description: "The Gyro Public API lets you automate everything you do in the Gyro client area:\norder and manage cloud servers, keep SSH keys, read invoices and\
@@ -30,7 +30,9 @@ info:
     \ on every address, custom PTR live within seconds (`status: active`, new `default` flag), removed when the server/IP is released. Additive.\n\n**2.17.3**: tr-ist-1\
     \ snapshots: every additional snapshot is billed at least 1 hour (a snapshot created and deleted between two hourly counts is billed too). Text only.\n\n**2.17.4**:\
     \ Gyro Containers Serverless: `GET /cloud/billing/container-sizes` (vCPU / memory pairs and prices), `POST /cloud/billing/estimate` accepts `{\"type\": \"serverless\"\
-    , \"cpu_m\", \"memory_mi\", \"count\", \"hours\"}` (no monthly cap, `capped` flag on every item). Additive.\n"
+    , \"cpu_m\", \"memory_mi\", \"count\", \"hours\"}` (no monthly cap, `capped` flag on every item). Additive.\n\n**2.17.5**: mount a Gyro Object Storage bucket\
+    \ on a server: `GET/POST /cloud/servers/{id}/storage-mounts`, `GET/DELETE /cloud/servers/{id}/storage-mounts/{mid}`, `POST .../{mid}/command` (one-line installer,\
+    \ automatic on tr-ist-1; one narrow key per mount; free). Additive.\n"
   x-description-tr: "Gyro Public API, müşteri panelinde yaptığınız her işi otomatikleştirmenizi sağlar:\nbulut sunucu siparişi ve yönetimi, SSH anahtarları, fatura\
     \ ve bakiye okuma.\nResmi Terraform sağlayıcısı (`gyro-hosting/gyro`) ve `gyroctl` bu API'yi kullanır.\n\n* **Taban adres** `https://www.gyrohosting.com/api/v1/client`\n\
     * **Kimlik** `Authorization: Bearer wck_...` (anahtarı *Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri* bölümünden oluşturun)\n* **Biçim** JSON\
@@ -56,7 +58,9 @@ info:
     \ tr-ist-1 ters DNS otomatik yayında: her adreste varsayılan PTR `<a-b-c-d>.ip.gyrohosting.com`, özel PTR saniyeler içinde (`status: active`, yeni `default` alanı),\
     \ sunucu/IP bırakılınca silinir. Geriye uyumlu.\n\n**2.17.3**: tr-ist-1 snapshot: her ek snapshot en az 1 saat ücretlenir (iki saatlik sayım arasında oluşturulup\
     \ silinen de). Yalnız metin.\n\n**2.17.4**: Gyro Kapsayıcı Sunucusuz: `GET /cloud/billing/container-sizes` (vCPU / bellek çiftleri ve fiyatlar), `POST /cloud/billing/estimate`\
-    \ `{\"type\": \"serverless\", \"cpu_m\", \"memory_mi\", \"count\", \"hours\"}` kabul eder (aylık tavan yok, her kalemde `capped`). Geriye uyumlu.\n"
+    \ `{\"type\": \"serverless\", \"cpu_m\", \"memory_mi\", \"count\", \"hours\"}` kabul eder (aylık tavan yok, her kalemde `capped`). Geriye uyumlu.\n\n**2.17.5**:\
+    \ Nesne Depolama kovasını sunucuya bağlama: `GET/POST /cloud/servers/{id}/storage-mounts`, `GET/DELETE /cloud/servers/{id}/storage-mounts/{mid}`, `POST .../{mid}/command`\
+    \ (tek satır kurulum, tr-ist-1'de otomatik; bağlantı başına dar anahtar; ücretsiz). Geriye uyumlu.\n"
   contact:
     name: Gyro Hosting
     url: https://www.gyrohosting.com
@@ -18335,6 +18339,268 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
+  /cloud/servers/{id}/storage-mounts:
+    get:
+      tags:
+      - Object storage
+      operationId: listStorageMounts
+      summary: List object storage mounts of a server
+      x-summary-tr: Sunucuya bağlı kovalar
+      x-scope: cloud_read
+      x-cli:
+        command: server storage-mount list
+      description: 'Mount a bucket of your Gyro Object Storage service on a Linux server (systemd) as a folder (rclone FUSE mount with a local write cache, starts
+        on boot, reconnects). Each mount gets its own access key limited to that one bucket (read-only or read/write); it does not use your key limit and is deleted
+        with the mount. Gyro Cloud Istanbul (tr-ist-1) servers apply it automatically (`automatic: true`); other servers run `install_command` once. Free; S3 traffic
+        counts towards the storage service. Not available for Protected Storage (object lock) buckets. Supported servers: Gyro Cloud (Istanbul and EU), Turkey VDS,
+        dedicated servers.'
+      x-description-tr: 'Nesne Depolama hizmetinizdeki bir kovayı Linux sunucunuza (systemd) klasör olarak bağlar (rclone FUSE, yerel yazma önbelleği, açılışta başlar,
+        kopunca yeniden bağlanır). Her bağlantının yalnız o kovaya yetkili (salt okuma ya da okuma/yazma) ayrı bir erişim anahtarı vardır; anahtar sınırınızdan düşmez,
+        bağlantıyla birlikte silinir. Gyro Bulut İstanbul (tr-ist-1) sunucularında otomatik uygulanır (`automatic: true`); diğer sunucularda `install_command` bir
+        kez çalıştırılır. Ücretsizdir; S3 trafiği depolama hizmetinden sayılır. Korumalı Depolama (nesne kilidi) kovaları bağlanamaz.'
+      parameters:
+      - &id052
+        name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Server service id
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      storage_mounts:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/StorageMount'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: server_not_active | storage_not_active | limit | mount_point_in_use | mount_point_nested | not_live
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          $ref: '#/components/responses/Validation'
+        '429':
+          description: rate_limited
+        '503':
+          description: storage_mount_unavailable
+    post:
+      tags:
+      - Object storage
+      operationId: createStorageMount
+      summary: Mount a bucket on the server
+      x-summary-tr: Kovayı sunucuya bağla
+      x-scope: cloud_write
+      x-cli:
+        command: server storage-mount create
+      description: 'Mount a bucket of your Gyro Object Storage service on a Linux server (systemd) as a folder (rclone FUSE mount with a local write cache, starts
+        on boot, reconnects). Each mount gets its own access key limited to that one bucket (read-only or read/write); it does not use your key limit and is deleted
+        with the mount. Gyro Cloud Istanbul (tr-ist-1) servers apply it automatically (`automatic: true`); other servers run `install_command` once. Free; S3 traffic
+        counts towards the storage service. Not available for Protected Storage (object lock) buckets. Supported servers: Gyro Cloud (Istanbul and EU), Turkey VDS,
+        dedicated servers. The answer carries `install_command` (single use, 60 minutes).'
+      x-description-tr: 'Nesne Depolama hizmetinizdeki bir kovayı Linux sunucunuza (systemd) klasör olarak bağlar (rclone FUSE, yerel yazma önbelleği, açılışta başlar,
+        kopunca yeniden bağlanır). Her bağlantının yalnız o kovaya yetkili (salt okuma ya da okuma/yazma) ayrı bir erişim anahtarı vardır; anahtar sınırınızdan düşmez,
+        bağlantıyla birlikte silinir. Gyro Bulut İstanbul (tr-ist-1) sunucularında otomatik uygulanır (`automatic: true`); diğer sunucularda `install_command` bir
+        kez çalıştırılır. Ücretsizdir; S3 trafiği depolama hizmetinden sayılır. Korumalı Depolama (nesne kilidi) kovaları bağlanamaz. Yanıtta `install_command` döner
+        (tek kullanımlık, 60 dakika).'
+      parameters:
+      - *id052
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - storage_service_id
+              - bucket
+              properties:
+                storage_service_id:
+                  type: integer
+                  description: your active Object Storage service
+                bucket:
+                  type: string
+                  description: bucket name in that service
+                  example: backups
+                mount_point:
+                  type: string
+                  description: absolute path under /mnt, /srv, /data, /media, /opt, /home or /var/www; default /mnt/<bucket>. Must be empty or missing on the server.
+                  example: /mnt/backups
+                read_only:
+                  type: boolean
+                  default: false
+      responses:
+        '202':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      storage_mount:
+                        $ref: '#/components/schemas/StorageMount'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: server_not_active | storage_not_active | limit | mount_point_in_use | mount_point_nested | not_live
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          $ref: '#/components/responses/Validation'
+        '429':
+          description: rate_limited
+        '503':
+          description: storage_mount_unavailable
+  /cloud/servers/{id}/storage-mounts/{mid}:
+    get:
+      tags:
+      - Object storage
+      operationId: getStorageMount
+      summary: Get one storage mount
+      x-summary-tr: Bağlantı ayrıntısı
+      x-scope: cloud_read
+      x-cli:
+        command: server storage-mount get
+      parameters:
+      - *id052
+      - &id053
+        name: mid
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Storage mount id
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      storage_mount:
+                        $ref: '#/components/schemas/StorageMount'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: server_not_active | storage_not_active | limit | mount_point_in_use | mount_point_nested | not_live
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          $ref: '#/components/responses/Validation'
+        '429':
+          description: rate_limited
+        '503':
+          description: storage_mount_unavailable
+    delete:
+      tags:
+      - Object storage
+      operationId: deleteStorageMount
+      summary: Remove a storage mount
+      x-summary-tr: Bağlantıyı kaldır
+      x-scope: cloud_write
+      x-cli:
+        command: server storage-mount remove
+        confirm: true
+      description: The mount key is deleted at once (the server can no longer reach the bucket; files in the bucket are kept). tr-ist-1 servers remove the unit automatically;
+        on others run `remove_command`.
+      x-description-tr: Bağlantı anahtarı hemen silinir (sunucu kovaya erişemez; kovadaki dosyalar silinmez). tr-ist-1 sunucularında birim otomatik kaldırılır; diğerlerinde
+        `remove_command` çalıştırın.
+      parameters:
+      - *id052
+      - *id053
+      responses:
+        '202':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      storage_mount:
+                        $ref: '#/components/schemas/StorageMount'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: server_not_active | storage_not_active | limit | mount_point_in_use | mount_point_nested | not_live
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          $ref: '#/components/responses/Validation'
+        '429':
+          description: rate_limited
+        '503':
+          description: storage_mount_unavailable
+  /cloud/servers/{id}/storage-mounts/{mid}/command:
+    post:
+      tags:
+      - Object storage
+      operationId: renewStorageMountCommand
+      summary: New install command (rotates the mount key)
+      x-summary-tr: Yeni kurulum komutu (bağlantı anahtarı yenilenir)
+      x-scope: cloud_write
+      x-cli:
+        command: server storage-mount command
+      description: Creates a new access key for the mount and a new single-use install command (the old key stops at once). Use after reinstalling the server or when
+        the command expired.
+      x-description-tr: Bağlantı için yeni erişim anahtarı ve yeni tek kullanımlık komut üretir (eski anahtar hemen durur). Sunucu yeniden kurulduğunda ya da komutun
+        süresi dolduğunda kullanın.
+      parameters:
+      - *id052
+      - *id053
+      responses:
+        '202':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      storage_mount:
+                        $ref: '#/components/schemas/StorageMount'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: server_not_active | storage_not_active | limit | mount_point_in_use | mount_point_nested | not_live
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          $ref: '#/components/responses/Validation'
+        '429':
+          description: rate_limited
+        '503':
+          description: storage_mount_unavailable
 components:
   securitySchemes:
     bearerAuth:
@@ -20597,3 +20863,57 @@ components:
                     type: string
         note:
           type: string
+    StorageMount:
+      type: object
+      properties:
+        id:
+          type: integer
+        server_id:
+          type: integer
+        storage_service_id:
+          type: integer
+        bucket:
+          type: string
+          description: bucket name at the time of mounting (renaming the bucket later does not break the mount)
+        mount_point:
+          type: string
+          example: /mnt/backups
+        read_only:
+          type: boolean
+        name:
+          type: string
+          description: 'systemd unit instance: gyro-s3mount@<name>'
+        state:
+          type: string
+          enum:
+          - pending
+          - installing
+          - active
+          - error
+          - expired
+          - removed
+          - ended
+          description: pending = waiting for the install command; installing = command/agent running; active = mounted (reported by the server); expired = command
+            not used within 60 minutes (key removed, request a new command)
+        automatic:
+          type: boolean
+          description: true = applied by the Gyro Compute guest agent (tr-ist-1); otherwise run install_command on the server
+        message:
+          type: string
+        last_report_at:
+          type:
+          - string
+          - 'null'
+        created_at:
+          type: string
+        token_expires_at:
+          type:
+          - string
+          - 'null'
+        install_command:
+          type: string
+          description: 'only in create / command answers: one-line command (valid 60 minutes, single use; the script checksum is verified before it runs). Treat as
+            a secret.'
+        remove_command:
+          type: string
+          example: sudo gyro-s3mount remove backups

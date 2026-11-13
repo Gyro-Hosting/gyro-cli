@@ -325,6 +325,11 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro server snapshot delete` | Delete a snapshot | `DELETE /cloud/servers/{id}/snapshots/{sid}` |
 | `gyro server snapshot list` | List snapshots and the snapshot quota | `GET /cloud/servers/{id}/snapshots` |
 | `gyro server snapshot restore` | Restore a snapshot onto the server (overwrites the disk) | `POST /cloud/servers/{id}/snapshots/{sid}/restore` |
+| `gyro server storage-mount command` | New install command (rotates the mount key) | `POST /cloud/servers/{id}/storage-mounts/{mid}/command` |
+| `gyro server storage-mount create` | Mount a bucket on the server | `POST /cloud/servers/{id}/storage-mounts` |
+| `gyro server storage-mount get` | Get one storage mount | `GET /cloud/servers/{id}/storage-mounts/{mid}` |
+| `gyro server storage-mount list` | List object storage mounts of a server | `GET /cloud/servers/{id}/storage-mounts` |
+| `gyro server storage-mount remove` | Remove a storage mount | `DELETE /cloud/servers/{id}/storage-mounts/{mid}` |
 | `gyro server update | rename` | Rename a server or switch auto-renew | `PATCH /cloud/servers/{id}` |
 | `gyro service addon available get` | Add-ons offered for this service (with options and prices) | `GET /cloud/services/{id}/addons/available` |
 | `gyro service addon create` | Buy an add-on (paid from balance) | `POST /cloud/services/{id}/addons` |

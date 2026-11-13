@@ -51,6 +51,7 @@ gyro server [flags]
 * [gyro server reset-password](gyro_server_reset-password.md)	 - Set a new random root password (shown once)
 * [gyro server snapshot](gyro_server_snapshot.md)	 - List snapshots and the snapshot quota
 * [gyro server ssh](gyro_server_ssh.md)	 - Open an SSH session to a server
+* [gyro server storage-mount](gyro_server_storage-mount.md)	 - List object storage mounts of a server
 * [gyro server update](gyro_server_update.md)	 - Change host name or auto-renew
 * [gyro server wait](gyro_server_wait.md)	 - Wait until a server is provisioned and idle
 

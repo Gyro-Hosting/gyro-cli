@@ -51,6 +51,7 @@ gyro server [flags]
 * [gyro server reset-password](gyro_server_reset-password.md)	 - Yeni rastgele root parolası (bir kez gösterilir)
 * [gyro server snapshot](gyro_server_snapshot.md)	 - Snapshot'ları ve kotayı listele
 * [gyro server ssh](gyro_server_ssh.md)	 - Sunucuya SSH bağlantısı aç
+* [gyro server storage-mount](gyro_server_storage-mount.md)	 - Sunucuya bağlı kovalar
 * [gyro server update](gyro_server_update.md)	 - Ad ya da otomatik yenilemeyi değiştir
 * [gyro server wait](gyro_server_wait.md)	 - Sunucu kurulup boşa çıkana kadar bekle
 

@@ -3,7 +3,7 @@
 package spec
 
 // APIVersion is info.version of the spec this table was generated from.
-const APIVersion = "2.17.4"
+const APIVersion = "2.17.5"
 
 // Ops lists every API operation.
 var Ops = []Op{
@@ -2461,6 +2461,59 @@ var Ops = []Op{
 		},
 		Body: []Field{
 			{Name: "confirm", Type: "boolean", Items: "", Enum: []string{"true"}, Default: "", Required: true, Desc: "", DescTR: ""},
+		},
+	},
+	{ID: "listStorageMounts", Method: "GET", Path: "/cloud/servers/{id}/storage-mounts", Tag: "Object storage",
+		Summary: "List object storage mounts of a server", SummaryTR: "Sunucuya bağlı kovalar",
+		Desc: "Mount a bucket of your Gyro Object Storage service on a Linux server (systemd) as a folder (rclone FUSE mount with a local write cache, starts on boot, reconnects). Each mount gets its own access key limited to that one bucket (read-only or read/write); it does not use your key limit and is deleted with the mount. Gyro Cloud Istanbul (tr-ist-1) servers apply it automatically (`automatic: true`); other servers run `install_command` once. Free; S3 traffic counts towards the storage service. Not available for Protected Storage (object lock) buckets. Supported servers: Gyro Cloud (Istanbul and EU), Turkey VDS, dedicated servers.", DescTR: "Nesne Depolama hizmetinizdeki bir kovayı Linux sunucunuza (systemd) klasör olarak bağlar (rclone FUSE, yerel yazma önbelleği, açılışta başlar, kopunca yeniden bağlanır). Her bağlantının yalnız o kovaya yetkili (salt okuma ya da okuma/yazma) ayrı bir erişim anahtarı vardır; anahtar sınırınızdan düşmez, bağlantıyla birlikte silinir. Gyro Bulut İstanbul (tr-ist-1) sunucularında otomatik uygulanır (`automatic: true`); diğer sunucularda `install_command` bir kez çalıştırılır. Ücretsizdir; S3 trafiği depolama hizmetinden sayılır. Korumalı Depolama (nesne kilidi) kovaları bağlanamaz.",
+		Scope: "cloud_read", Command: []string{"server", "storage-mount", "list"},
+		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Server service id", DescTR: ""},
+		},
+	},
+	{ID: "createStorageMount", Method: "POST", Path: "/cloud/servers/{id}/storage-mounts", Tag: "Object storage",
+		Summary: "Mount a bucket on the server", SummaryTR: "Kovayı sunucuya bağla",
+		Desc: "Mount a bucket of your Gyro Object Storage service on a Linux server (systemd) as a folder (rclone FUSE mount with a local write cache, starts on boot, reconnects). Each mount gets its own access key limited to that one bucket (read-only or read/write); it does not use your key limit and is deleted with the mount. Gyro Cloud Istanbul (tr-ist-1) servers apply it automatically (`automatic: true`); other servers run `install_command` once. Free; S3 traffic counts towards the storage service. Not available for Protected Storage (object lock) buckets. Supported servers: Gyro Cloud (Istanbul and EU), Turkey VDS, dedicated servers. The answer carries `install_command` (single use, 60 minutes).", DescTR: "Nesne Depolama hizmetinizdeki bir kovayı Linux sunucunuza (systemd) klasör olarak bağlar (rclone FUSE, yerel yazma önbelleği, açılışta başlar, kopunca yeniden bağlanır). Her bağlantının yalnız o kovaya yetkili (salt okuma ya da okuma/yazma) ayrı bir erişim anahtarı vardır; anahtar sınırınızdan düşmez, bağlantıyla birlikte silinir. Gyro Bulut İstanbul (tr-ist-1) sunucularında otomatik uygulanır (`automatic: true`); diğer sunucularda `install_command` bir kez çalıştırılır. Ücretsizdir; S3 trafiği depolama hizmetinden sayılır. Korumalı Depolama (nesne kilidi) kovaları bağlanamaz. Yanıtta `install_command` döner (tek kullanımlık, 60 dakika).",
+		Scope: "cloud_write", Command: []string{"server", "storage-mount", "create"},
+		HasBody: true, BodyRequired: true, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Server service id", DescTR: ""},
+		},
+		Body: []Field{
+			{Name: "storage_service_id", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "your active Object Storage service", DescTR: ""},
+			{Name: "bucket", Type: "string", Items: "", Enum: nil, Default: "", Required: true, Desc: "bucket name in that service", DescTR: ""},
+			{Name: "mount_point", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "absolute path under /mnt, /srv, /data, /media, /opt, /home or /var/www; default /mnt/<bucket>. Must be empty or missing on the server.", DescTR: ""},
+			{Name: "read_only", Type: "boolean", Items: "", Enum: nil, Default: "false", Required: false, Desc: "", DescTR: ""},
+		},
+	},
+	{ID: "getStorageMount", Method: "GET", Path: "/cloud/servers/{id}/storage-mounts/{mid}", Tag: "Object storage",
+		Summary: "Get one storage mount", SummaryTR: "Bağlantı ayrıntısı",
+		Scope: "cloud_read", Command: []string{"server", "storage-mount", "get"},
+		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Server service id", DescTR: ""},
+			{Name: "mid", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Storage mount id", DescTR: ""},
+		},
+	},
+	{ID: "deleteStorageMount", Method: "DELETE", Path: "/cloud/servers/{id}/storage-mounts/{mid}", Tag: "Object storage",
+		Summary: "Remove a storage mount", SummaryTR: "Bağlantıyı kaldır",
+		Desc: "The mount key is deleted at once (the server can no longer reach the bucket; files in the bucket are kept). tr-ist-1 servers remove the unit automatically; on others run `remove_command`.", DescTR: "Bağlantı anahtarı hemen silinir (sunucu kovaya erişemez; kovadaki dosyalar silinmez). tr-ist-1 sunucularında birim otomatik kaldırılır; diğerlerinde `remove_command` çalıştırın.",
+		Scope: "cloud_write", Command: []string{"server", "storage-mount", "remove"},
+		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: true, Money: false, Hidden: false,
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Server service id", DescTR: ""},
+			{Name: "mid", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Storage mount id", DescTR: ""},
+		},
+	},
+	{ID: "renewStorageMountCommand", Method: "POST", Path: "/cloud/servers/{id}/storage-mounts/{mid}/command", Tag: "Object storage",
+		Summary: "New install command (rotates the mount key)", SummaryTR: "Yeni kurulum komutu (bağlantı anahtarı yenilenir)",
+		Desc: "Creates a new access key for the mount and a new single-use install command (the old key stops at once). Use after reinstalling the server or when the command expired.", DescTR: "Bağlantı için yeni erişim anahtarı ve yeni tek kullanımlık komut üretir (eski anahtar hemen durur). Sunucu yeniden kurulduğunda ya da komutun süresi dolduğunda kullanın.",
+		Scope: "cloud_write", Command: []string{"server", "storage-mount", "command"},
+		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: true, Money: false, Hidden: false,
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Server service id", DescTR: ""},
+			{Name: "mid", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Storage mount id", DescTR: ""},
 		},
 	},
 	{ID: "createTemplate", Method: "POST", Path: "/cloud/servers/{id}/templates", Tag: "Templates",

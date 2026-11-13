@@ -325,6 +325,11 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro server snapshot delete` | Snapshot sil | `DELETE /cloud/servers/{id}/snapshots/{sid}` |
 | `gyro server snapshot list` | Snapshot'ları ve kotayı listele | `GET /cloud/servers/{id}/snapshots` |
 | `gyro server snapshot restore` | Snapshot'ı sunucuya geri yükle (diski ezer) | `POST /cloud/servers/{id}/snapshots/{sid}/restore` |
+| `gyro server storage-mount command` | Yeni kurulum komutu (bağlantı anahtarı yenilenir) | `POST /cloud/servers/{id}/storage-mounts/{mid}/command` |
+| `gyro server storage-mount create` | Kovayı sunucuya bağla | `POST /cloud/servers/{id}/storage-mounts` |
+| `gyro server storage-mount get` | Bağlantı ayrıntısı | `GET /cloud/servers/{id}/storage-mounts/{mid}` |
+| `gyro server storage-mount list` | Sunucuya bağlı kovalar | `GET /cloud/servers/{id}/storage-mounts` |
+| `gyro server storage-mount remove` | Bağlantıyı kaldır | `DELETE /cloud/servers/{id}/storage-mounts/{mid}` |
 | `gyro server update | rename` | Sunucu adını değiştir veya otomatik yenilemeyi aç/kapat | `PATCH /cloud/servers/{id}` |
 | `gyro service addon available get` | Bu hizmete alınabilecek ek hizmetler | `GET /cloud/services/{id}/addons/available` |
 | `gyro service addon create` | Ek hizmet satın al (bakiyeden ödenir) | `POST /cloud/services/{id}/addons` |
