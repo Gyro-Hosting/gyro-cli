@@ -1034,7 +1034,7 @@ func addServerPower(a *App, srv *cobra.Command) {
 
 func addServerMaintenance(a *App, srv *cobra.Command) {
 	// rebuild
-	var image string
+	var image, rbApp, rbAppDomain, rbUserData string
 	var wait bool
 	var waitFor time.Duration
 	rebuild := &cobra.Command{
@@ -1052,13 +1052,44 @@ func addServerMaintenance(a *App, srv *cobra.Command) {
 			if err != nil {
 				return err
 			}
-			return a.runAction(cmd, args[0], "rebuild", map[string]any{"image": img},
-				i18n.F("Reinstall server %%s with %s? ALL DATA ON THE DISK IS LOST.", "Sunucu %%s %s ile yeniden kurulsun mu? DİSKTEKİ TÜM VERİ SİLİNİR.", img), wait, "running", waitFor)
+			body := map[string]any{"image": img}
+			what := img
+			if rbApp != "" {
+				if rbUserData != "" {
+					return fmt.Errorf("%s", i18n.S("--app and --user-data cannot be combined", "--app ve --user-data birlikte kullanılamaz"))
+				}
+				body["app"] = rbApp
+				if rbAppDomain != "" {
+					body["app_domain"] = rbAppDomain
+				}
+				what = img + " + " + rbApp
+			} else if rbAppDomain != "" {
+				return fmt.Errorf("%s", i18n.S("--app-domain needs --app", "--app-domain için --app gerekir"))
+			}
+			if rbUserData != "" {
+				ud, err := a.ReadValue(rbUserData)
+				if err != nil {
+					return err
+				}
+				body["user_data"] = ud
+			}
+			if err := a.runAction(cmd, args[0], "rebuild", body,
+				i18n.F("Reinstall server %%s with %s? ALL DATA ON THE DISK IS LOST.", "Sunucu %%s %s ile yeniden kurulsun mu? DİSKTEKİ TÜM VERİ SİLİNİR.", what), wait, "running", waitFor); err != nil {
+				return err
+			}
+			if rbApp != "" && !a.Machine() {
+				a.Info("%s", i18n.F("App install started. Follow it with: gyro server app log get %s", "Uygulama kurulumu başladı. İzlemek için: gyro server app log get %s", args[0]))
+			}
+			return nil
 		},
 	}
 	rebuild.Flags().StringVar(&image, "image", "", i18n.S("OS image slug (required)", "imaj (zorunlu)"))
 	_ = rebuild.MarkFlagRequired("image")
 	_ = rebuild.RegisterFlagCompletionFunc("image", completeField(a, "/cloud/images", "slug"))
+	rebuild.Flags().StringVar(&rbApp, "app", "", i18n.S("one-click app to install on the new system (id from 'gyro app list'; API 2.19.1)", "yeni sisteme kurulacak tek tıkla uygulama ('gyro app list' kimliği; API 2.19.1)"))
+	rebuild.Flags().StringVar(&rbAppDomain, "app-domain", "", i18n.S("domain for the app (A record must point to the server)", "uygulama alan adı (A kaydı sunucuyu göstermeli)"))
+	rebuild.Flags().StringVar(&rbUserData, "user-data", "", i18n.S("cloud-init for the new system: text, @file or @- (tr-ist-1)", "yeni sistem için cloud-init: metin, @dosya ya da @- (tr-ist-1)"))
+	_ = rebuild.RegisterFlagCompletionFunc("app", completeField(a, "/cloud/apps", "id"))
 	rebuild.Flags().BoolVar(&wait, "wait", false, i18n.S("wait until the server runs again", "sunucu tekrar çalışana kadar bekle"))
 	rebuild.Flags().DurationVar(&waitFor, "wait-timeout", 20*time.Minute, i18n.S("maximum time for --wait", "--wait için en uzun süre"))
 	srv.AddCommand(rebuild)
