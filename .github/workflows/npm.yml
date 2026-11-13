@@ -1,0 +1,80 @@
+# Publishes the gyro binaries to npm as @gyro-hosting/cli (+ one @gyro-hosting/cli-<os>-<arch> package per platform).
+# The packages are built from the PUBLISHED GitHub release assets: npm/build.mjs checks the GPG signature of
+# gyro_<v>_SHA256SUMS and the checksum of every archive before anything is published. No install scripts.
+#
+# Triggers:
+#   release published            - releases published by a person or a PAT (tag push -> draft -> publish)
+#   workflow_run spec-sync       - automatic spec-sync releases (published with GITHUB_TOKEN, which emits no release event)
+#   workflow_dispatch tag=vX.Y.Z - manual (re)publish; already published versions are skipped
+# Enabled only when the repository variable NPM_PUBLISH is "true".
+# Auth: npm trusted publishing (OIDC, no secret) once configured on npmjs.com for this workflow file;
+#       until then the NPM_TOKEN repository secret (granular token, publish rights on @gyro-hosting only).
+name: npm
+on:
+  release:
+    types: [published]
+  workflow_run:
+    workflows: [spec-sync]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      tag: {description: 'Release tag, e.g. v1.26.0 (empty = latest release)', type: string, required: false}
+permissions:
+  contents: read
+  id-token: write
+concurrency:
+  group: npm-publish
+  cancel-in-progress: false
+jobs:
+  publish:
+    if: ${{ vars.NPM_PUBLISH == 'true' && (github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Resolve release tag
+        id: tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          IN_TAG: ${{ inputs.tag || github.event.release.tag_name }}
+        run: |
+          tag="$IN_TAG"
+          if [ -z "$tag" ]; then tag=$(gh release view --json tagName -q .tagName); fi
+          case "$tag" in v[0-9]*) ;; *) echo "bad tag '$tag'"; exit 1;; esac
+          draft=$(gh release view "$tag" --json isDraft -q .isDraft)
+          [ "$draft" = "false" ] || { echo "$tag is still a draft"; exit 1; }
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          # the launcher package is published last, so if it exists every platform package exists too
+          if npm view "@gyro-hosting/cli@${tag#v}" version >/dev/null 2>&1; then
+            echo "@gyro-hosting/cli@${tag#v} already on npm, nothing to do"; echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/checkout@v4
+        if: steps.tag.outputs.skip != 'true'
+        with:
+          ref: ${{ steps.tag.outputs.tag }}
+      - name: Use the npm/ tooling from main when the release predates it
+        if: steps.tag.outputs.skip != 'true'
+        run: |
+          if [ ! -f npm/build.mjs ]; then git fetch --depth=1 origin main && git checkout FETCH_HEAD -- npm; fi
+      - uses: actions/setup-node@v4
+        if: steps.tag.outputs.skip != 'true'
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+      - name: Upgrade npm (trusted publishing needs >= 11.5.1)
+        if: steps.tag.outputs.skip != 'true'
+        run: npm install -g npm@^11.5.1
+      - name: Build packages from the signed release
+        if: steps.tag.outputs.skip != 'true'
+        run: node npm/build.mjs --version "${{ steps.tag.outputs.tag }}" --require-signature
+      - name: Publish
+        if: steps.tag.outputs.skip != 'true'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_PUBLISH_FLAGS: --provenance
+        run: npm/publish.sh npm/dist
+      - name: Summary
+        if: steps.tag.outputs.skip != 'true'
+        run: |
+          v="${{ steps.tag.outputs.tag }}"
+          echo "### npm: @gyro-hosting/cli@${v#v}" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"; cat npm/dist/BINARIES.sha256 >> "$GITHUB_STEP_SUMMARY"; echo '```' >> "$GITHUB_STEP_SUMMARY"

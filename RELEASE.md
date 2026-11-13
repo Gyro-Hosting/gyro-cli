@@ -16,3 +16,14 @@ spec change). It downloads the published OpenAPI document from `SPEC_URL` (repos
 differs from `internal/spec/openapi.yaml` it regenerates commands and docs, runs the tests, commits, tags
 (new/removed operations → minor, description-only → patch) and calls `release.yml`, which publishes the release (not draft).
 If tests or the release fail, an issue labelled `spec-sync` is opened instead.
+
+## npm (`@gyro-hosting/cli`)
+`.github/workflows/npm.yml` republishes every published release to npm: one package per platform
+(`@gyro-hosting/cli-{linux,darwin,win32}-{x64,arm64}`, `os`/`cpu` set, binary copied unchanged from the release archive)
+and the launcher `@gyro-hosting/cli` (`bin/gyro.js`, `optionalDependencies` on the platform packages, no install scripts).
+`npm/build.mjs` downloads the release assets, verifies the GPG signature of `gyro_<v>_SHA256SUMS` and the checksum of every
+archive, then builds `npm/dist/`; `npm/publish.sh` publishes platform packages first and skips versions already on npm.
+It runs on `release: published`, after a successful `spec-sync` run and on demand (*Actions → npm → Run workflow*, tag).
+Enabled by the repository variable `NPM_PUBLISH=true`. Auth: npm trusted publishing (OIDC, workflow `npm.yml`) for each of
+the 7 packages, or the `NPM_TOKEN` secret until that is configured. Packages carry npm provenance.
+Local check: `node npm/build.mjs --version X.Y.Z && (cd npm/dist/cli && npm pack --dry-run)`.
