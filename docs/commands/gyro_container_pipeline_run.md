@@ -6,7 +6,7 @@ Start a run
 
 Start a run
 
-`ref`: branch (`main`), tag (`tag:v1.2.0`) or full ref; `sha`: optional 40 character commit. Without both the first branch of the rule builds. Queued runs start when the environment's parallel build limit allows.
+`ref`: branch (`main`), tag (`tag:v1.2.0`) or full ref; `sha`: optional 40 character commit. Without both the first branch of the rule builds. Queued runs start when the environment's parallel build limit allows. With `upload_id` the uploaded archive is built (gyro-pipeline.yml is not read for archives).
 
 API: POST /cloud/containers/{id}/pipelines/{pipeline}/runs (operationId pipeline_run, scope services_write)
 
@@ -17,6 +17,7 @@ gyro container pipeline run <ID> <PIPELINE> [flags]
 ### Options
 
 ```
+      --archive-name string      Shown in the run list
       --data string              request body as JSON, @file or @- (stdin)
       --dry-run                  show the price quote / request without changing anything
   -h, --help                     help for run
@@ -24,6 +25,7 @@ gyro container pipeline run <ID> <PIPELINE> [flags]
       --ref string               ref
       --set stringArray          extra body field key=value (repeatable)
       --sha string               sha
+      --upload-id string         Build an uploaded archive (from POST .../uploads) instead of a git ref
 ```
 
 ### Options inherited from parent commands

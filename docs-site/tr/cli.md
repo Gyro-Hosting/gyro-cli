@@ -99,7 +99,11 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro container pipeline cancel` | Çalıştırmayı durdur | `POST /cloud/containers/{id}/pipeline-runs/{run}/cancel` |
 | `gyro container pipeline create` | Pipeline oluştur | `POST /cloud/containers/{id}/pipelines` |
 | `gyro container pipeline delete` | Pipeline'ı sil | `DELETE /cloud/containers/{id}/pipelines/{pipeline}` |
+| `gyro container pipeline deploy-key create` | SSH deploy key oluştur | `PUT /cloud/containers/{id}/pipelines/{pipeline}/deploy-key` |
+| `gyro container pipeline deploy-key delete` | SSH deploy key'i sil | `DELETE /cloud/containers/{id}/pipelines/{pipeline}/deploy-key` |
 | `gyro container pipeline get` | Pipeline'ı getir | `GET /cloud/containers/{id}/pipelines/{pipeline}` |
+| `gyro container pipeline host-key scan` | SSH sunucu anahtarı | `GET /cloud/containers/{id}/pipelines/{pipeline}/host-key` |
+| `gyro container pipeline host-key trust` | SSH sunucu anahtarını onayla (ya da kaldır) | `PUT /cloud/containers/{id}/pipelines/{pipeline}/host-key` |
 | `gyro container pipeline list` | Pipeline'ları listele | `GET /cloud/containers/{id}/pipelines` |
 | `gyro container pipeline logs` | Çalıştırma logu | `GET /cloud/containers/{id}/pipeline-runs/{run}/logs` |
 | `gyro container pipeline redeploy` | Bu çalıştırmanın imajını yeniden dağıt (geri dönüş) | `POST /cloud/containers/{id}/pipeline-runs/{run}/redeploy` |
@@ -112,6 +116,7 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro container pipeline secret set` | Derleme gizli değeri ayarla | `PUT /cloud/containers/{id}/pipelines/{pipeline}/secrets` |
 | `gyro container pipeline test` | Depo erişimini test et | `POST /cloud/containers/{id}/pipelines/{pipeline}/test` |
 | `gyro container pipeline update` | Pipeline'ı değiştir | `PATCH /cloud/containers/{id}/pipelines/{pipeline}` |
+| `gyro container pipeline upload` | Arşiv derlemesi için yükleme adresi | `POST /cloud/containers/{id}/pipelines/{pipeline}/uploads` |
 | `gyro container pipeline webhook` | Webhook adresi ve gizli anahtar | `GET /cloud/containers/{id}/pipelines/{pipeline}/webhook` |
 | `gyro container plans` | Kapsayıcı ortam paketlerini listele | `GET /cloud/containers/plans` |
 | `gyro container registry credentials` | Depo parolası | `POST /cloud/containers/{id}/registry/credentials` |

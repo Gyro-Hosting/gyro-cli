@@ -13,13 +13,17 @@ gyro-container-pipeline-run - Start a run
 Start a run
 
 .PP
-\fBref\fR: branch (\fBmain\fR), tag (\fBtag:v1.2.0\fR) or full ref; \fBsha\fR: optional 40 character commit. Without both the first branch of the rule builds. Queued runs start when the environment's parallel build limit allows.
+\fBref\fR: branch (\fBmain\fR), tag (\fBtag:v1.2.0\fR) or full ref; \fBsha\fR: optional 40 character commit. Without both the first branch of the rule builds. Queued runs start when the environment's parallel build limit allows. With \fBupload_id\fR the uploaded archive is built (gyro-pipeline.yml is not read for archives).
 
 .PP
 API: POST /cloud/containers/{id}/pipelines/{pipeline}/runs (operationId pipeline_run, scope services_write)
 
 
 .SH OPTIONS
+\fB--archive-name\fP=""
+	Shown in the run list
+
+.PP
 \fB--data\fP=""
 	request body as JSON, @file or @- (stdin)
 
@@ -46,6 +50,10 @@ API: POST /cloud/containers/{id}/pipelines/{pipeline}/runs (operationId pipeline
 .PP
 \fB--sha\fP=""
 	sha
+
+.PP
+\fB--upload-id\fP=""
+	Build an uploaded archive (from POST .../uploads) instead of a git ref
 
 
 .SH OPTIONS INHERITED FROM PARENT COMMANDS

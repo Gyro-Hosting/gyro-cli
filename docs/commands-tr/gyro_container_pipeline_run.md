@@ -6,7 +6,7 @@
 
 Çalıştırma başlat
 
-`ref`: dal (`main`), etiket (`tag:v1.2.0`) ya da tam ref; `sha`: isteğe bağlı 40 karakter commit. İkisi yoksa kuraldaki ilk dal derlenir.
+`ref`: dal (`main`), etiket (`tag:v1.2.0`) ya da tam ref; `sha`: isteğe bağlı 40 karakter commit. İkisi yoksa kuraldaki ilk dal derlenir. `upload_id` verilirse yüklenen arşiv derlenir (arşivlerde gyro-pipeline.yml okunmaz).
 
 API: POST /cloud/containers/{id}/pipelines/{pipeline}/runs (operationId pipeline_run, scope services_write)
 
@@ -17,6 +17,7 @@ gyro container pipeline run <ID> <PIPELINE> [flags]
 ### Options
 
 ```
+      --archive-name string      Shown in the run list
       --data string              istek gövdesi JSON, @dosya ya da @- (stdin)
       --dry-run                  hiçbir şeyi değiştirmeden teklifi / isteği göster
   -h, --help                     help for run
@@ -24,6 +25,7 @@ gyro container pipeline run <ID> <PIPELINE> [flags]
       --ref string               ref
       --set stringArray          ek gövde alanı anahtar=değer (tekrarlanabilir)
       --sha string               sha
+      --upload-id string         Git ref yerine yüklenen arşivi derle (POST .../uploads yanıtındaki kimlik)
 ```
 
 ### Options inherited from parent commands

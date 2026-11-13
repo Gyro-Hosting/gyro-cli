@@ -101,11 +101,11 @@ API: POST /cloud/containers/{id}/pipelines (operationId pipeline_create, scope s
 
 .PP
 \fB--provider\fP=""
-	provider (github|gitlab|gitea|git)
+	provider (github|gitlab|gitea|git|archive)
 
 .PP
 \fB--repo\fP=""
-	https clone URL, no credentials
+	https clone URL (no credentials) or SSH address git@host:org/repo.git / ssh://user@host[:port]/path (needs a deploy key); empty for provider archive
 
 .PP
 \fB--repo-file\fP[=false]

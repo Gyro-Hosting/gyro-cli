@@ -3,7 +3,7 @@
 package spec
 
 // APIVersion is info.version of the spec this table was generated from.
-const APIVersion = "2.23.0"
+const APIVersion = "2.24.0"
 
 // Ops lists every API operation.
 var Ops = []Op{
@@ -237,7 +237,7 @@ var Ops = []Op{
 		Summary: "Get a run", SummaryTR: "Çalıştırmayı getir",
 		Scope: "services_read", Command: []string{"container", "pipeline", "run-get"},
 		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
-		Columns: []string{"id", "pipeline", "n", "trigger", "ref", "sha", "short_sha", "message", "author", "state", "step", "error", "image", "digest", "build_seconds", "billed_minutes", "duration_seconds", "created", "started", "finished", "deadline", "from_run"},
+		Columns: []string{"id", "pipeline", "n", "trigger", "ref", "sha", "short_sha", "message", "author", "state", "step", "error", "image", "digest", "build_seconds", "billed_minutes", "duration_seconds", "created", "started", "finished", "deadline", "from_run", "archive", "archive_name", "archive_size", "archive_format", "image_tag"},
 		Params: []Param{
 			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Service id", DescTR: ""},
 			{Name: "run", In: "path", Type: "string", Items: "", Enum: nil, Default: "", Required: true, Desc: "Run id", DescTR: ""},
@@ -326,8 +326,8 @@ var Ops = []Op{
 		},
 		Body: []Field{
 			{Name: "name", Type: "string", Items: "", Enum: nil, Default: "", Required: true, Desc: "Display name (1-48)", DescTR: "Görünen ad (1-48)"},
-			{Name: "provider", Type: "string", Items: "", Enum: []string{"github", "gitlab", "gitea", "git"}, Default: "github", Required: false, Desc: "", DescTR: ""},
-			{Name: "repo", Type: "string", Items: "", Enum: nil, Default: "", Required: true, Desc: "https clone URL, no credentials", DescTR: "https klon adresi, kimlik bilgisi yok"},
+			{Name: "provider", Type: "string", Items: "", Enum: []string{"github", "gitlab", "gitea", "git", "archive"}, Default: "github", Required: false, Desc: "", DescTR: ""},
+			{Name: "repo", Type: "string", Items: "", Enum: nil, Default: "", Required: true, Desc: "https clone URL (no credentials) or SSH address git@host:org/repo.git / ssh://user@host[:port]/path (needs a deploy key); empty for provider archive", DescTR: "https klon adresi (kimlik bilgisi yok) ya da SSH adresi git@sunucu:kurum/depo.git / ssh://kullanici@sunucu[:port]/yol (deploy key gerekir); provider archive için boş"},
 			{Name: "token", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "Read-only access token for a private repository (stored encrypted, never returned; \"-\" on update removes it)", DescTR: "Özel depo için yalnız okuma erişim belirteci (şifreli saklanır, geri dönmez; güncellemede \"-\" siler)"},
 			{Name: "git_user", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "User name for the token (default: x-access-token / oauth2 / git)", DescTR: ""},
 			{Name: "branch", Type: "string", Items: "", Enum: nil, Default: "main", Required: false, Desc: "Branches whose pushes build (comma separated globs, empty = none)", DescTR: "Push'u derlenen dallar (virgüllü glob, boş = yok)"},
@@ -357,7 +357,7 @@ var Ops = []Op{
 		Desc: "Settings, webhook address, build secret names (values never returned).", DescTR: "Ayarlar, webhook adresi, gizli değer adları (değerler dönmez).",
 		Scope: "services_read", Command: []string{"container", "pipeline", "get"},
 		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
-		Columns: []string{"id", "name", "provider", "repo", "git_user", "branch", "tags", "auto", "repo_file", "dockerfile", "context", "image", "approval", "auto_rollback", "build_image", "cpu_m", "memory_mi", "timeout_min", "verify_min", "webhook_url", "has_token", "registry_image", "created", "updated"},
+		Columns: []string{"id", "name", "provider", "repo", "git_user", "branch", "tags", "auto", "repo_file", "dockerfile", "context", "image", "approval", "auto_rollback", "build_image", "cpu_m", "memory_mi", "timeout_min", "verify_min", "webhook_url", "has_token", "registry_image", "created", "updated", "auth"},
 		Params: []Param{
 			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Service id", DescTR: ""},
 			{Name: "pipeline", In: "path", Type: "string", Items: "", Enum: nil, Default: "", Required: true, Desc: "Pipeline id (p + 8)", DescTR: ""},
@@ -374,8 +374,8 @@ var Ops = []Op{
 		},
 		Body: []Field{
 			{Name: "name", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "Display name (1-48)", DescTR: "Görünen ad (1-48)"},
-			{Name: "provider", Type: "string", Items: "", Enum: []string{"github", "gitlab", "gitea", "git"}, Default: "github", Required: false, Desc: "", DescTR: ""},
-			{Name: "repo", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "https clone URL, no credentials", DescTR: "https klon adresi, kimlik bilgisi yok"},
+			{Name: "provider", Type: "string", Items: "", Enum: []string{"github", "gitlab", "gitea", "git", "archive"}, Default: "github", Required: false, Desc: "", DescTR: ""},
+			{Name: "repo", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "https clone URL (no credentials) or SSH address git@host:org/repo.git / ssh://user@host[:port]/path (needs a deploy key); empty for provider archive", DescTR: "https klon adresi (kimlik bilgisi yok) ya da SSH adresi git@sunucu:kurum/depo.git / ssh://kullanici@sunucu[:port]/yol (deploy key gerekir); provider archive için boş"},
 			{Name: "token", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "Read-only access token for a private repository (stored encrypted, never returned; \"-\" on update removes it)", DescTR: "Özel depo için yalnız okuma erişim belirteci (şifreli saklanır, geri dönmez; güncellemede \"-\" siler)"},
 			{Name: "git_user", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "User name for the token (default: x-access-token / oauth2 / git)", DescTR: ""},
 			{Name: "branch", Type: "string", Items: "", Enum: nil, Default: "main", Required: false, Desc: "Branches whose pushes build (comma separated globs, empty = none)", DescTR: "Push'u derlenen dallar (virgüllü glob, boş = yok)"},
@@ -413,6 +413,60 @@ var Ops = []Op{
 			{Name: "confirm", Type: "boolean", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
 		},
 	},
+	{ID: "pipeline_deploy_key_create", Method: "PUT", Path: "/cloud/containers/{id}/pipelines/{pipeline}/deploy-key", Tag: "Containers",
+		Summary: "Create the SSH deploy key", SummaryTR: "SSH deploy key oluştur",
+		Desc: "Creates an ed25519 key pair for an SSH repository and returns only the public key (add it to the repository as a read-only deploy key). The private key is stored encrypted and never returned. A pipeline has one key; `\"rotate\": true` replaces it (the old key stops working).", DescTR: "SSH deposu için ed25519 anahtar çifti üretir, yalnız açık anahtarı döner (depoya salt okuma deploy key olarak ekleyin). Özel anahtar şifreli saklanır, hiç dönmez. `\"rotate\": true` yeniler.",
+		Scope: "services_write", Command: []string{"container", "pipeline", "deploy-key", "create"},
+		HasBody: true, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Service id", DescTR: ""},
+			{Name: "pipeline", In: "path", Type: "string", Items: "", Enum: nil, Default: "", Required: true, Desc: "Pipeline id (p + 8)", DescTR: ""},
+		},
+		Body: []Field{
+			{Name: "rotate", Type: "boolean", Items: "", Enum: nil, Default: "false", Required: false, Desc: "", DescTR: ""},
+			{Name: "confirm", Type: "boolean", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
+		},
+	},
+	{ID: "pipeline_deploy_key_delete", Method: "DELETE", Path: "/cloud/containers/{id}/pipelines/{pipeline}/deploy-key", Tag: "Containers",
+		Summary: "Delete the SSH deploy key", SummaryTR: "SSH deploy key'i sil",
+		Desc: "The pipeline can no longer reach its SSH repository. Needs `\"confirm\": true`.", DescTR: "Pipeline SSH deposuna artık erişemez. `\"confirm\": true` gerekir.",
+		Scope: "services_write", Command: []string{"container", "pipeline", "deploy-key", "delete"},
+		HasBody: true, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: true, Money: false, Hidden: false,
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Service id", DescTR: ""},
+			{Name: "pipeline", In: "path", Type: "string", Items: "", Enum: nil, Default: "", Required: true, Desc: "Pipeline id (p + 8)", DescTR: ""},
+		},
+		Body: []Field{
+			{Name: "confirm", Type: "boolean", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
+		},
+	},
+	{ID: "pipeline_host_key_scan", Method: "GET", Path: "/cloud/containers/{id}/pipelines/{pipeline}/host-key", Tag: "Containers",
+		Summary: "SSH server host key", SummaryTR: "SSH sunucu anahtarı",
+		Desc: "Connects to the repository's SSH server (public addresses only) and returns the host key fingerprint. GitHub / GitLab / Bitbucket keys are pinned (`pinned: true`). Other servers: compare the fingerprint with your own record, then confirm it with PUT.", DescTR: "Deponun SSH sunucusuna bağlanıp anahtar parmak izini döner. GitHub / GitLab / Bitbucket anahtarları sabittir. Diğer sunucularda parmak izini kendi kaydınızla karşılaştırıp PUT ile onaylayın.",
+		Scope: "services_read", Command: []string{"container", "pipeline", "host-key", "scan"},
+		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
+		Columns: []string{"host", "port", "pinned", "trusted"},
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Service id", DescTR: ""},
+			{Name: "pipeline", In: "path", Type: "string", Items: "", Enum: nil, Default: "", Required: true, Desc: "Pipeline id (p + 8)", DescTR: ""},
+		},
+	},
+	{ID: "pipeline_host_key_trust", Method: "PUT", Path: "/cloud/containers/{id}/pipelines/{pipeline}/host-key", Tag: "Containers",
+		Summary: "Confirm (or forget) the SSH host key", SummaryTR: "SSH sunucu anahtarını onayla (ya da kaldır)",
+		Desc: "`fingerprint`: the SHA256 fingerprint you verified (the server is scanned again and must present it); `forget: true` removes the confirmation. Builds stop if the server key changes later.", DescTR: "`fingerprint`: doğruladığınız SHA256 parmak izi (sunucu yeniden taranır, aynısını göstermelidir); `forget: true` onayı kaldırır. Anahtar sonradan değişirse derleme durur.",
+		Scope: "services_write", Command: []string{"container", "pipeline", "host-key", "trust"},
+		HasBody: true, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
+		Columns: []string{"trusted", "fingerprint"},
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Service id", DescTR: ""},
+			{Name: "pipeline", In: "path", Type: "string", Items: "", Enum: nil, Default: "", Required: true, Desc: "Pipeline id (p + 8)", DescTR: ""},
+		},
+		Body: []Field{
+			{Name: "fingerprint", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
+			{Name: "forget", Type: "boolean", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
+			{Name: "confirm", Type: "boolean", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
+		},
+	},
 	{ID: "pipeline_runs", Method: "GET", Path: "/cloud/containers/{id}/pipelines/{pipeline}/runs", Tag: "Containers",
 		Summary: "Runs of a pipeline", SummaryTR: "Pipeline çalıştırmaları",
 		Desc: "Last 50 runs, newest first.", DescTR: "Son 50 çalıştırma, yeniden eskiye.",
@@ -425,7 +479,7 @@ var Ops = []Op{
 	},
 	{ID: "pipeline_run", Method: "POST", Path: "/cloud/containers/{id}/pipelines/{pipeline}/runs", Tag: "Containers",
 		Summary: "Start a run", SummaryTR: "Çalıştırma başlat",
-		Desc: "`ref`: branch (`main`), tag (`tag:v1.2.0`) or full ref; `sha`: optional 40 character commit. Without both the first branch of the rule builds. Queued runs start when the environment's parallel build limit allows.", DescTR: "`ref`: dal (`main`), etiket (`tag:v1.2.0`) ya da tam ref; `sha`: isteğe bağlı 40 karakter commit. İkisi yoksa kuraldaki ilk dal derlenir.",
+		Desc: "`ref`: branch (`main`), tag (`tag:v1.2.0`) or full ref; `sha`: optional 40 character commit. Without both the first branch of the rule builds. Queued runs start when the environment's parallel build limit allows. With `upload_id` the uploaded archive is built (gyro-pipeline.yml is not read for archives).", DescTR: "`ref`: dal (`main`), etiket (`tag:v1.2.0`) ya da tam ref; `sha`: isteğe bağlı 40 karakter commit. İkisi yoksa kuraldaki ilk dal derlenir. `upload_id` verilirse yüklenen arşiv derlenir (arşivlerde gyro-pipeline.yml okunmaz).",
 		Scope: "services_write", Command: []string{"container", "pipeline", "run"},
 		HasBody: true, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
 		Params: []Param{
@@ -436,6 +490,8 @@ var Ops = []Op{
 			{Name: "ref", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
 			{Name: "sha", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
 			{Name: "confirm", Type: "boolean", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
+			{Name: "upload_id", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "Build an uploaded archive (from POST .../uploads) instead of a git ref", DescTR: "Git ref yerine yüklenen arşivi derle (POST .../uploads yanıtındaki kimlik)"},
+			{Name: "archive_name", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "Shown in the run list", DescTR: ""},
 		},
 	},
 	{ID: "pipeline_secret_set", Method: "PUT", Path: "/cloud/containers/{id}/pipelines/{pipeline}/secrets", Tag: "Containers",
@@ -476,6 +532,21 @@ var Ops = []Op{
 			{Name: "pipeline", In: "path", Type: "string", Items: "", Enum: nil, Default: "", Required: true, Desc: "Pipeline id (p + 8)", DescTR: ""},
 		},
 		Body: []Field{
+			{Name: "confirm", Type: "boolean", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
+		},
+	},
+	{ID: "pipeline_upload", Method: "POST", Path: "/cloud/containers/{id}/pipelines/{pipeline}/uploads", Tag: "Containers",
+		Summary: "Upload URL for an archive build", SummaryTR: "Arşiv derlemesi için yükleme adresi",
+		Desc: "Returns a presigned `url` (valid 15 minutes) for one `PUT` of exactly `size` bytes (tar.gz / tgz / zip, max 200 MB; send `Content-Length: size`, e.g. `curl -T site.tar.gz \"<url>\"`). Then start the build with `POST .../runs {\"upload_id\": ...}`. Archives are deleted after 24 hours. Do not send an Idempotency-Key here (the URL would be withheld from the replayed answer).", DescTR: "15 dakika geçerli, tam `size` bayt için tek `PUT` adresi (`url`) döner (tar.gz / tgz / zip, en çok 200 MB; ör. `curl -T site.tar.gz \"<url>\"`). Sonra `POST .../runs {\"upload_id\": ...}` ile derleyin. Arşivler 24 saatte silinir.",
+		Scope: "services_write", Command: []string{"container", "pipeline", "upload"},
+		HasBody: true, BodyRequired: true, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
+		Columns: []string{"upload_id", "url", "method", "expires_in", "max_bytes", "retention_hours"},
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Service id", DescTR: ""},
+			{Name: "pipeline", In: "path", Type: "string", Items: "", Enum: nil, Default: "", Required: true, Desc: "Pipeline id (p + 8)", DescTR: ""},
+		},
+		Body: []Field{
+			{Name: "size", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "archive size in bytes (1 - 209715200)", DescTR: ""},
 			{Name: "confirm", Type: "boolean", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
 		},
 	},

@@ -37,8 +37,8 @@ gyro container pipeline update <ID> <PIPELINE> [flags]
       --memory-mi int            Build memory (MiB, plan limit)
       --name string              Görünen ad (1-48)
       --notify strings           Notifications (channels: the environment's alert settings)
-      --provider string          provider (github|gitlab|gitea|git)
-      --repo string              https klon adresi, kimlik bilgisi yok
+      --provider string          provider (github|gitlab|gitea|git|archive)
+      --repo string              https klon adresi (kimlik bilgisi yok) ya da SSH adresi git@sunucu:kurum/depo.git / ssh://kullanici@sunucu[:port]/yol (deploy key gerekir); provider archive için boş
       --repo-file                Read gyro-pipeline.yml from the repository (GitHub, GitLab, Gitea)
       --set stringArray          ek gövde alanı anahtar=değer (tekrarlanabilir)
       --tags string              Derlenen etiketler (glob, ör. v*)

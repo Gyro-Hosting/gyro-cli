@@ -1,0 +1,97 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-container-pipeline-upload - Upload URL for an archive build
+
+
+.SH SYNOPSIS
+\fBgyro container pipeline upload   [flags]\fP
+
+
+.SH DESCRIPTION
+Upload URL for an archive build
+
+.PP
+Returns a presigned \fBurl\fR (valid 15 minutes) for one \fBPUT\fR of exactly \fBsize\fR bytes (tar.gz / tgz / zip, max 200 MB; send \fBContent-Length: size\fR, e.g. \fBcurl -T site.tar.gz "<url>"\fR). Then start the build with \fBPOST .../runs {"upload_id": ...}\fR\&. Archives are deleted after 24 hours. Do not send an Idempotency-Key here (the URL would be withheld from the replayed answer).
+
+.PP
+API: POST /cloud/containers/{id}/pipelines/{pipeline}/uploads (operationId pipeline_upload, scope services_write)
+
+
+.SH OPTIONS
+\fB--data\fP=""
+	request body as JSON, @file or @- (stdin)
+
+.PP
+\fB--dry-run\fP[=false]
+	show the price quote / request without changing anything
+
+.PP
+\fB-h\fP, \fB--help\fP[=false]
+	help for upload
+
+.PP
+\fB--idempotency-key\fP=""
+	idempotency key (automatic for money operations)
+
+.PP
+\fB--set\fP=[]
+	extra body field key=value (repeatable)
+
+.PP
+\fB--size\fP=0
+	archive size in bytes (1 - 209715200)
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH SEE ALSO
+\fBgyro-container-pipeline(1)\fP

@@ -2,7 +2,7 @@
 openapi: 3.1.0
 info:
   title: Gyro Public API
-  version: 2.23.0
+  version: 2.24.0
   summary: Manage Gyro cloud servers, SSH keys and billing programmatically.
   x-summary-tr: Gyro bulut sunucularınızı, SSH anahtarlarınızı ve faturalarınızı programla yönetin.
   description: "The Gyro Public API lets you automate everything you do in the Gyro client area:\norder and manage cloud servers, keep SSH keys, read invoices and\
@@ -46,6 +46,9 @@ info:
     \ `GET .../registry/imports` shows progress. Additive.\n\n**2.23.0**: Gyro Pipeline for containers: `/cloud/containers/{id}/pipelines` connects a GitHub / GitLab\
     \ / Gitea / https git repository; a push or tag (webhook) or `POST .../runs` builds the Dockerfile in an isolated build environment, pushes `<registry>/<code>/<image>:<sha7>`\
     \ and rolls the target services out with health watch and automatic rollback. Runs, live logs, approval and redeploy under `/cloud/containers/{id}/pipeline-runs/{run}`.\
+    \ Additive.\n\n**2.24.0**: Gyro Pipeline: archive builds (`POST .../pipelines/{pipeline}/uploads` gives a presigned upload URL, tar.gz / zip up to 200 MB, kept\
+    \ 24 h; then `POST .../runs {\"upload_id\"}`; provider `archive` = pipelines without a repository) and private repositories over SSH (`PUT .../deploy-key` creates\
+    \ an ed25519 deploy key, only the public key is returned; `GET/PUT .../host-key` shows and confirms the server key; GitHub / GitLab / Bitbucket keys are pinned).\
     \ Additive.\n"
   x-description-tr: "Gyro Public API, müşteri panelinde yaptığınız her işi otomatikleştirmenizi sağlar:\nbulut sunucu siparişi ve yönetimi, SSH anahtarları, fatura\
     \ ve bakiye okuma.\nResmi Terraform sağlayıcısı (`gyro-hosting/gyro`) ve `gyroctl` bu API'yi kullanır.\n\n* **Taban adres** `https://www.gyrohosting.com/api/v1/client`\n\
@@ -87,7 +90,10 @@ info:
     \ bir https depodaki imajı ortamın Gyro deposuna kopyalar (`docker push` yok; isteğe bağlı token saklanmaz), `GET .../registry/imports` ilerlemeyi gösterir. Geriye\
     \ uyumlu.\n\n**2.23.0**: Kapsayıcılar için Gyro Pipeline: `/cloud/containers/{id}/pipelines` GitHub / GitLab / Gitea / https git deposu bağlar; push ya da etiket\
     \ (webhook) veya `POST .../runs` Dockerfile'ı yalıtılmış ortamda derler, `<depo>/<kod>/<imaj>:<sha7>` olarak yükler ve hedef servisleri sağlık kontrolü + otomatik\
-    \ geri dönüşle yeni sürüme geçirir. Çalıştırmalar, canlı log, onay ve yeniden dağıtım `/cloud/containers/{id}/pipeline-runs/{run}` altında. Geriye uyumlu.\n"
+    \ geri dönüşle yeni sürüme geçirir. Çalıştırmalar, canlı log, onay ve yeniden dağıtım `/cloud/containers/{id}/pipeline-runs/{run}` altında. Geriye uyumlu.\n\n\
+    **2.24.0**: Gyro Pipeline: arşivden derleme (`POST .../pipelines/{pipeline}/uploads` ön imzalı yükleme adresi verir, tar.gz / zip en çok 200 MB, 24 saat saklanır;\
+    \ sonra `POST .../runs {\"upload_id\"}`; provider `archive` = depo olmadan) ve SSH ile özel depolar (`PUT .../deploy-key` ed25519 deploy key üretir, yalnız açık\
+    \ anahtar döner; `GET/PUT .../host-key` sunucu anahtarını gösterir ve onaylar; GitHub / GitLab / Bitbucket anahtarları sabit). Geriye uyumlu.\n"
   contact:
     name: Gyro Hosting
     url: https://www.gyrohosting.com
@@ -10644,11 +10650,14 @@ paths:
                   - gitlab
                   - gitea
                   - git
+                  - archive
                   default: github
                 repo: &id045
                   type: string
-                  description: https clone URL, no credentials
-                  x-description-tr: https klon adresi, kimlik bilgisi yok
+                  description: https clone URL (no credentials) or SSH address git@host:org/repo.git / ssh://user@host[:port]/path (needs a deploy key); empty for
+                    provider archive
+                  x-description-tr: https klon adresi (kimlik bilgisi yok) ya da SSH adresi git@sunucu:kurum/depo.git / ssh://kullanici@sunucu[:port]/yol (deploy
+                    key gerekir); provider archive için boş
                   example: https://github.com/gyro-ornek/uygulama
                 token: &id046
                   type: string
@@ -11250,8 +11259,10 @@ paths:
       x-summary-tr: Çalıştırma başlat
       x-scope: services_write
       description: '`ref`: branch (`main`), tag (`tag:v1.2.0`) or full ref; `sha`: optional 40 character commit. Without both the first branch of the rule builds.
-        Queued runs start when the environment''s parallel build limit allows. '
-      x-description-tr: '`ref`: dal (`main`), etiket (`tag:v1.2.0`) ya da tam ref; `sha`: isteğe bağlı 40 karakter commit. İkisi yoksa kuraldaki ilk dal derlenir. '
+        Queued runs start when the environment''s parallel build limit allows.  With `upload_id` the uploaded archive is built (gyro-pipeline.yml is not read for
+        archives).'
+      x-description-tr: '`ref`: dal (`main`), etiket (`tag:v1.2.0`) ya da tam ref; `sha`: isteğe bağlı 40 karakter commit. İkisi yoksa kuraldaki ilk dal derlenir.  `upload_id`
+        verilirse yüklenen arşiv derlenir (arşivlerde gyro-pipeline.yml okunmaz).'
       parameters:
       - name: id
         in: path
@@ -11298,6 +11309,15 @@ paths:
                   type: string
                 confirm:
                   type: boolean
+                upload_id:
+                  type: string
+                  example: u3k9x0abc12de
+                  description: Build an uploaded archive (from POST .../uploads) instead of a git ref
+                  x-description-tr: Git ref yerine yüklenen arşivi derle (POST .../uploads yanıtındaki kimlik)
+                archive_name:
+                  type: string
+                  example: site.tar.gz
+                  description: Shown in the run list
       x-cli:
         command: container pipeline run
         confirm: false
@@ -11617,6 +11637,326 @@ paths:
       x-cli:
         command: container pipeline redeploy
         confirm: true
+  /cloud/containers/{id}/pipelines/{pipeline}/uploads:
+    post:
+      tags:
+      - Containers
+      operationId: pipeline_upload
+      summary: Upload URL for an archive build
+      x-summary-tr: Arşiv derlemesi için yükleme adresi
+      x-scope: services_write
+      description: 'Returns a presigned `url` (valid 15 minutes) for one `PUT` of exactly `size` bytes (tar.gz / tgz / zip, max 200 MB; send `Content-Length: size`,
+        e.g. `curl -T site.tar.gz "<url>"`). Then start the build with `POST .../runs {"upload_id": ...}`. Archives are deleted after 24 hours. Do not send an Idempotency-Key
+        here (the URL would be withheld from the replayed answer). '
+      x-description-tr: '15 dakika geçerli, tam `size` bayt için tek `PUT` adresi (`url`) döner (tar.gz / tgz / zip, en çok 200 MB; ör. `curl -T site.tar.gz "<url>"`).
+        Sonra `POST .../runs {"upload_id": ...}` ile derleyin. Arşivler 24 saatte silinir. '
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: pipeline
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Pipeline id (p + 8)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      upload_id:
+                        type: string
+                      url:
+                        type: string
+                      method:
+                        type: string
+                        example: PUT
+                      headers:
+                        type: object
+                      expires_in:
+                        type: integer
+                        example: 900
+                      max_bytes:
+                        type: integer
+                      retention_hours:
+                        type: integer
+                        example: 24
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                size:
+                  type: integer
+                  description: archive size in bytes (1 - 209715200)
+                confirm:
+                  type: boolean
+              required:
+              - size
+      x-cli:
+        command: container pipeline upload
+        confirm: false
+  /cloud/containers/{id}/pipelines/{pipeline}/deploy-key:
+    put:
+      tags:
+      - Containers
+      operationId: pipeline_deploy_key_create
+      summary: Create the SSH deploy key
+      x-summary-tr: SSH deploy key oluştur
+      x-scope: services_write
+      description: 'Creates an ed25519 key pair for an SSH repository and returns only the public key (add it to the repository as a read-only deploy key). The private
+        key is stored encrypted and never returned. A pipeline has one key; `"rotate": true` replaces it (the old key stops working). '
+      x-description-tr: 'SSH deposu için ed25519 anahtar çifti üretir, yalnız açık anahtarı döner (depoya salt okuma deploy key olarak ekleyin). Özel anahtar şifreli
+        saklanır, hiç dönmez. `"rotate": true` yeniler. '
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: pipeline
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Pipeline id (p + 8)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      deploy_key: &id091
+                        type: object
+                        nullable: true
+                        properties:
+                          public_key:
+                            type: string
+                            example: ssh-ed25519 AAAAC3Nza... gyro-pipeline
+                          fingerprint:
+                            type: string
+                          type:
+                            type: string
+                            example: ed25519
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                rotate:
+                  type: boolean
+                  default: false
+                confirm:
+                  type: boolean
+      x-cli:
+        command: container pipeline deploy-key create
+        confirm: false
+    delete:
+      tags:
+      - Containers
+      operationId: pipeline_deploy_key_delete
+      summary: Delete the SSH deploy key
+      x-summary-tr: SSH deploy key'i sil
+      x-scope: services_write
+      description: 'The pipeline can no longer reach its SSH repository. Needs `"confirm": true`.'
+      x-description-tr: 'Pipeline SSH deposuna artık erişemez. `"confirm": true` gerekir.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: pipeline
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Pipeline id (p + 8)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                confirm:
+                  type: boolean
+      x-cli:
+        command: container pipeline deploy-key delete
+        confirm: true
+  /cloud/containers/{id}/pipelines/{pipeline}/host-key:
+    get:
+      tags:
+      - Containers
+      operationId: pipeline_host_key_scan
+      summary: SSH server host key
+      x-summary-tr: SSH sunucu anahtarı
+      x-scope: services_read
+      description: 'Connects to the repository''s SSH server (public addresses only) and returns the host key fingerprint. GitHub / GitLab / Bitbucket keys are pinned
+        (`pinned: true`). Other servers: compare the fingerprint with your own record, then confirm it with PUT. '
+      x-description-tr: 'Deponun SSH sunucusuna bağlanıp anahtar parmak izini döner. GitHub / GitLab / Bitbucket anahtarları sabittir. Diğer sunucularda parmak izini
+        kendi kaydınızla karşılaştırıp PUT ile onaylayın. '
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: pipeline
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Pipeline id (p + 8)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      host:
+                        type: string
+                      port:
+                        type: integer
+                      pinned:
+                        type: boolean
+                      trusted:
+                        type: boolean
+                      keys:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              type: string
+                            fingerprint:
+                              type: string
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      x-cli:
+        command: container pipeline host-key scan
+        confirm: false
+    put:
+      tags:
+      - Containers
+      operationId: pipeline_host_key_trust
+      summary: Confirm (or forget) the SSH host key
+      x-summary-tr: SSH sunucu anahtarını onayla (ya da kaldır)
+      x-scope: services_write
+      description: '`fingerprint`: the SHA256 fingerprint you verified (the server is scanned again and must present it); `forget: true` removes the confirmation.
+        Builds stop if the server key changes later. '
+      x-description-tr: '`fingerprint`: doğruladığınız SHA256 parmak izi (sunucu yeniden taranır, aynısını göstermelidir); `forget: true` onayı kaldırır. Anahtar
+        sonradan değişirse derleme durur. '
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: pipeline
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Pipeline id (p + 8)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      trusted:
+                        type: boolean
+                      fingerprint:
+                        type: string
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fingerprint:
+                  type: string
+                  example: SHA256:abc...
+                forget:
+                  type: boolean
+                confirm:
+                  type: boolean
+      x-cli:
+        command: container pipeline host-key trust
+        confirm: false
   /cloud/licenses/{id}:
     get:
       tags:
@@ -23276,9 +23616,12 @@ components:
           - gitlab
           - gitea
           - git
+          - archive
+          description: '`archive`: no repository, builds only from uploaded archives'
         repo:
           type: string
           example: https://github.com/gyro-ornek/uygulama
+          description: https clone URL (no credentials) or SSH address (git@host:org/repo.git, ssh://user@host[:port]/path)
         git_user:
           type: string
         branch:
@@ -23352,6 +23695,51 @@ components:
         updated:
           type: string
           format: date-time
+        auth:
+          type: string
+          enum:
+          - none
+          - token
+          - ssh
+          - archive
+          description: How the source is reached
+        ssh:
+          type: object
+          description: SSH repositories only
+          properties:
+            host:
+              type: string
+            port:
+              type: integer
+            user:
+              type: string
+            pinned:
+              type: boolean
+              description: 'GitHub / GitLab / Bitbucket: published host keys are pinned'
+            host_key_trusted:
+              type: boolean
+            host_keys:
+              type: array
+              items:
+                type: object
+                properties:
+                  type:
+                    type: string
+                  fingerprint:
+                    type: string
+                    example: SHA256:+DiY3wvvV6TuJJhbpZisF/zLDA0zPMSvHdkr4UvCOqU
+            deploy_key: *id091
+        archive:
+          type: object
+          properties:
+            enabled:
+              type: boolean
+            max_bytes:
+              type: integer
+              example: 209715200
+            retention_hours:
+              type: integer
+              example: 24
     ContainerPipelineRun:
       type: object
       properties:
@@ -23371,6 +23759,7 @@ components:
           - manual
           - api
           - redeploy
+          - archive
         ref:
           type: string
           example: refs/heads/main
@@ -23411,9 +23800,10 @@ components:
           - verify
         error:
           type: string
-          description: repo_auth, repo_not_found, repo_unreachable, repo_blocked, ref_not_found, target_missing, clone_failed, commands_failed, build_failed, push_failed,
+          description: 'repo_auth, repo_not_found, repo_unreachable, repo_blocked, ref_not_found, target_missing, clone_failed, commands_failed, build_failed, push_failed,
             timeout, out_of_memory, no_capacity, build_image_pull, deploy_unhealthy, deploy_timeout, deploy_failed, minutes_exhausted, pipeline_file_invalid, cancelled,
-            rejected, approval_expired, internal
+            rejected, approval_expired, internal, archive_invalid (detail says why: links, ../ paths, device files, > 20 000 files, > 2 GB unpacked, damaged), archive_download,
+            upload_not_found, archive_format, archive_too_large, host_key_unconfirmed, host_key_mismatch, deploy_key_missing'
         image:
           type: string
           example: registry.ist.gyrohosting.com/ab12cd/web:1a2b3c4
@@ -23462,3 +23852,18 @@ components:
         from_run:
           type: string
           description: 'redeploy: source run'
+        archive:
+          type: string
+          description: upload id (archive runs)
+        archive_name:
+          type: string
+        archive_size:
+          type: integer
+        archive_format:
+          type: string
+          enum:
+          - tar.gz
+          - zip
+        image_tag:
+          type: string
+          description: <sha7> for commits, arc-<upload> for archives

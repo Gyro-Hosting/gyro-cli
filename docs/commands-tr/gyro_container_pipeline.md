@@ -36,7 +36,9 @@ gyro container pipeline [flags]
 * [gyro container pipeline cancel](gyro_container_pipeline_cancel.md)	 - Çalıştırmayı durdur
 * [gyro container pipeline create](gyro_container_pipeline_create.md)	 - Pipeline oluştur
 * [gyro container pipeline delete](gyro_container_pipeline_delete.md)	 - Pipeline'ı sil
+* [gyro container pipeline deploy-key](gyro_container_pipeline_deploy-key.md)	 - SSH deploy key oluştur
 * [gyro container pipeline get](gyro_container_pipeline_get.md)	 - Pipeline'ı getir
+* [gyro container pipeline host-key](gyro_container_pipeline_host-key.md)	 - SSH sunucu anahtarı
 * [gyro container pipeline list](gyro_container_pipeline_list.md)	 - Pipeline'ları listele
 * [gyro container pipeline logs](gyro_container_pipeline_logs.md)	 - Çalıştırma logu
 * [gyro container pipeline redeploy](gyro_container_pipeline_redeploy.md)	 - Bu çalıştırmanın imajını yeniden dağıt (geri dönüş)
@@ -48,5 +50,6 @@ gyro container pipeline [flags]
 * [gyro container pipeline secret](gyro_container_pipeline_secret.md)	 - Derleme gizli değerini sil
 * [gyro container pipeline test](gyro_container_pipeline_test.md)	 - Depo erişimini test et
 * [gyro container pipeline update](gyro_container_pipeline_update.md)	 - Pipeline'ı değiştir
+* [gyro container pipeline upload](gyro_container_pipeline_upload.md)	 - Arşiv derlemesi için yükleme adresi
 * [gyro container pipeline webhook](gyro_container_pipeline_webhook.md)	 - Webhook adresi ve gizli anahtar
 

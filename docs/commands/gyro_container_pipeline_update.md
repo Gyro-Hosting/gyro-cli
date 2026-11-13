@@ -37,8 +37,8 @@ gyro container pipeline update <ID> <PIPELINE> [flags]
       --memory-mi int            Build memory (MiB, plan limit)
       --name string              Display name (1-48)
       --notify strings           Notifications (channels: the environment's alert settings)
-      --provider string          provider (github|gitlab|gitea|git)
-      --repo string              https clone URL, no credentials
+      --provider string          provider (github|gitlab|gitea|git|archive)
+      --repo string              https clone URL (no credentials) or SSH address git@host:org/repo.git / ssh://user@host[:port]/path (needs a deploy key); empty for provider archive
       --repo-file                Read gyro-pipeline.yml from the repository (GitHub, GitLab, Gitea)
       --set stringArray          extra body field key=value (repeatable)
       --tags string              Tags that build (globs, e.g. v*)

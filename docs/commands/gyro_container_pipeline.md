@@ -36,7 +36,9 @@ gyro container pipeline [flags]
 * [gyro container pipeline cancel](gyro_container_pipeline_cancel.md)	 - Stop a run
 * [gyro container pipeline create](gyro_container_pipeline_create.md)	 - Create a pipeline
 * [gyro container pipeline delete](gyro_container_pipeline_delete.md)	 - Delete a pipeline
+* [gyro container pipeline deploy-key](gyro_container_pipeline_deploy-key.md)	 - Create the SSH deploy key
 * [gyro container pipeline get](gyro_container_pipeline_get.md)	 - Get a pipeline
+* [gyro container pipeline host-key](gyro_container_pipeline_host-key.md)	 - SSH server host key
 * [gyro container pipeline list](gyro_container_pipeline_list.md)	 - List pipelines
 * [gyro container pipeline logs](gyro_container_pipeline_logs.md)	 - Run log
 * [gyro container pipeline redeploy](gyro_container_pipeline_redeploy.md)	 - Deploy this run's image again (rollback)
@@ -48,5 +50,6 @@ gyro container pipeline [flags]
 * [gyro container pipeline secret](gyro_container_pipeline_secret.md)	 - Delete a build secret
 * [gyro container pipeline test](gyro_container_pipeline_test.md)	 - Test repository access
 * [gyro container pipeline update](gyro_container_pipeline_update.md)	 - Change a pipeline
+* [gyro container pipeline upload](gyro_container_pipeline_upload.md)	 - Upload URL for an archive build
 * [gyro container pipeline webhook](gyro_container_pipeline_webhook.md)	 - Webhook address and secret
 
