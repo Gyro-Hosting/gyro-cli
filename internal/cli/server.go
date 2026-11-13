@@ -521,9 +521,10 @@ func appField(op *spec.Op) string {
 }
 
 func addServerCreate(a *App, srv *cobra.Command) {
-	var plan, loc, region, image, hostname, cycle, userData, app, data, idem string
-	var keys, set []string
+	var plan, loc, region, image, hostname, cycle, userData, app, data, idem, nick string
+	var keys, set, tags []string
 	var wait, dry bool
+	var count int
 	var waitFor time.Duration
 	cmd := &cobra.Command{
 		Use:   "create [HOSTNAME]",
@@ -534,18 +535,23 @@ automatically, so a retried command never orders twice.
 
 --plan accepts a plan name (standart-2-4, pro-2-8 ...) or a product id (see 'gyro plan list').
 --region (or --location) accepts a region (eu-de-1, tr-ist-1, see 'gyro location list') or a city (falkenstein, istanbul).
-In tr-ist-1 (Istanbul) up to 10 --ssh-key values and --user-data go with cloud-init at creation (SSH in about 25 s).`,
+In tr-ist-1 (Istanbul) up to 10 --ssh-key values and --user-data go with cloud-init at creation (SSH in about 25 s).
+--count N creates N identical servers in one order (API 2.21.0+); "{n}" in the host name / --name becomes 1..N
+(without "{n}" -1, -2 ... is appended). --name and --tag label the servers (panel, console, 'gyro service label').`,
 			`Bulut sunucu siparişi verir. Önce API'den fiyat teklifi gösterilir ve onay istenir; ödeme kart değil
 hesap bakiyesinden yapılır. Komuta otomatik tekrar güvenliği anahtarı eklenir, tekrar denenen komut
 iki kez sipariş vermez.
 
 --plan: plan adı (standart-2-4, pro-2-8 ...) ya da ürün kimliği ('gyro plan list').
 --region (ya da --location): bölge (eu-de-1, tr-ist-1, 'gyro location list') ya da şehir (falkenstein, istanbul).
-tr-ist-1'de (İstanbul) en çok 10 --ssh-key ve --user-data oluşturmada cloud-init ile kurulur (SSH ~25 sn).`),
+tr-ist-1'de (İstanbul) en çok 10 --ssh-key ve --user-data oluşturmada cloud-init ile kurulur (SSH ~25 sn).
+--count N tek siparişte N aynı sunucu açar (API 2.21.0+); sunucu adında / --name içinde "{n}" 1..N olur
+("{n}" yoksa sona -1, -2 ... eklenir). --name ve --tag sunucuları adlandırır (panel, konsol, 'gyro service label').`),
 		Example: `  gyro server create web-1 --plan pro-2-8 --location falkenstein --image ubuntu-24.04 --ssh-key mykey --wait
   gyro server create --plan standart-2-4 --location eu-de-1 --image debian-12 --ssh-key ~/.ssh/id_ed25519.pub --dry-run
   gyro server create db-1 --plan standart-2-4 --location eu-de-2 --image ubuntu-24.04 --user-data @cloud-init.yaml --yes -o json
-  gyro server create ist-1 --plan standart-2-4 --region tr-ist-1 --image ubuntu-24.04 --ssh-key mykey --wait`,
+  gyro server create ist-1 --plan standart-2-4 --region tr-ist-1 --image ubuntu-24.04 --ssh-key mykey --wait
+  gyro server create gyro-web-{n} --count 3 --plan standart-1-2 --region tr-ist-1 --image ubuntu-24.04 --tag gyro-test --yes`,
 		Args: cobra.MaximumNArgs(1),
 	}
 	f := cmd.Flags()
@@ -558,6 +564,9 @@ tr-ist-1'de (İstanbul) en çok 10 --ssh-key ve --user-data oluşturmada cloud-i
 	f.StringVar(&cycle, "cycle", "monthly", "monthly|quarterly|semiannually|annually")
 	f.StringVar(&userData, "user-data", "", i18n.S("cloud-init user data, inline or @file", "cloud-init verisi, metin ya da @dosya"))
 	f.StringVar(&app, "app", "", i18n.S("one-click app to install (needs API v2)", "kurulacak tek tık uygulama (API v2 gerekir)"))
+	f.IntVar(&count, "count", 1, i18n.S("number of servers to create in one order (API 2.21.0+, default max 25)", "tek siparişte açılacak sunucu sayısı (API 2.21.0+, varsayılan en çok 25)"))
+	f.StringVar(&nick, "name", "", i18n.S("service name (nickname); {n} = number in a batch", "hizmet adı (takma ad); toplu oluşturmada {n} = sıra no"))
+	f.StringSliceVar(&tags, "tag", nil, i18n.S("tag for the new servers (repeatable, max 10)", "yeni sunuculara etiket (tekrarlanabilir, en çok 10)"))
 	f.BoolVar(&dry, "dry-run", false, i18n.S("only show the price quote", "yalnız fiyat teklifini göster"))
 	f.BoolVar(&wait, "wait", false, i18n.S("wait until the server is running", "sunucu çalışana kadar bekle"))
 	f.DurationVar(&waitFor, "wait-timeout", 15*time.Minute, i18n.S("maximum time for --wait", "--wait için en uzun süre"))
@@ -618,6 +627,23 @@ tr-ist-1'de (İstanbul) en çok 10 --ssh-key ve --user-data oluşturmada cloud-i
 		body["cycle"] = cycle
 		if hostname != "" {
 			body["hostname"] = hostname
+		}
+		if count < 1 {
+			return &ExitErr{ExitUsage, fmt.Errorf("%s", i18n.S("--count must be at least 1", "--count en az 1 olmalı"))}
+		}
+		if count > 1 {
+			if op != nil {
+				if _, ok := op.Field("quantity"); !ok {
+					return &ExitErr{ExitUsage, fmt.Errorf("%s", i18n.S("--count needs API 2.21.0 or later", "--count için API 2.21.0 ya da üstü gerekir"))}
+				}
+			}
+			body["quantity"] = count
+		}
+		if nick != "" {
+			body["name"] = nick
+		}
+		if len(tags) > 0 {
+			body["tags"] = tags
 		}
 		if userData != "" {
 			ud, err := a.ReadValue(userData)
@@ -708,7 +734,15 @@ tr-ist-1'de (İstanbul) en çok 10 --ssh-key ve --user-data oluşturmada cloud-i
 			if !a.Machine() {
 				fmt.Fprintf(a.Err, "  %-12s %.4f EUR / %s (%s %.2f EUR)\n", i18n.S("Prepaid", "Ön ödemeli")+":", quote.Prepaid.Hourly, i18n.S("hour", "saat"), i18n.S("monthly at most", "aylık en çok"), quote.Prepaid.Cap)
 			}
-			if err := a.Confirm(i18n.F("Order this server? It is charged hourly from your balance (%.4f EUR/hour, at most %.2f EUR a month).", "Bu sunucu sipariş edilsin mi? Bakiyenizden saatlik düşülür (%.4f EUR/saat, ayda en çok %.2f EUR).", quote.Prepaid.Hourly, quote.Prepaid.Cap)); err != nil {
+			if count > 1 {
+				if err := a.Confirm(i18n.F("Order %d servers? They are charged hourly from your balance (%.4f EUR/hour in total, at most %.2f EUR a month).", "%d sunucu sipariş edilsin mi? Bakiyenizden saatlik düşülür (toplam %.4f EUR/saat, ayda en çok %.2f EUR).", count, quote.Prepaid.Hourly, quote.Prepaid.Cap)); err != nil {
+					return err
+				}
+			} else if err := a.Confirm(i18n.F("Order this server? It is charged hourly from your balance (%.4f EUR/hour, at most %.2f EUR a month).", "Bu sunucu sipariş edilsin mi? Bakiyenizden saatlik düşülür (%.4f EUR/saat, ayda en çok %.2f EUR).", quote.Prepaid.Hourly, quote.Prepaid.Cap)); err != nil {
+				return err
+			}
+		} else if count > 1 {
+			if err := a.Confirm(i18n.F("Order %d servers and pay %s from your balance?", "%d sunucu sipariş edilip bakiyenizden %s ödensin mi?", count, output.Scalar(quote.Total))); err != nil {
 				return err
 			}
 		} else if err := a.Confirm(i18n.F("Order this server and pay %s from your balance?", "Bu sunucu sipariş edilip bakiyenizden %s ödensin mi?", output.Scalar(quote.Total))); err != nil {
@@ -724,6 +758,7 @@ tr-ist-1'de (İstanbul) en çok 10 --ssh-key ve --user-data oluşturmada cloud-i
 		}
 		var res struct {
 			Server  struct{ ID int64 } `json:"server"`
+			Servers []struct{ ID int64 } `json:"servers"`
 			Payment struct {
 				Status string `json:"status"`
 				Error  string `json:"error"`
@@ -742,6 +777,30 @@ tr-ist-1'de (İstanbul) en çok 10 --ssh-key ve --user-data oluşturmada cloud-i
 			return &ExitErr{ExitPayment, fmt.Errorf("%s: %s %s", i18n.S("payment not completed", "ödeme tamamlanmadı"), res.Payment.Status, res.Payment.Error)}
 		}
 		id := fmt.Sprint(res.Server.ID)
+		if len(res.Servers) > 1 {
+			ids := make([]string, 0, len(res.Servers))
+			for _, s := range res.Servers {
+				ids = append(ids, fmt.Sprint(s.ID))
+			}
+			a.Info("%s", i18n.F("Order %s placed, %d servers: %s (idempotency key %s).", "Sipariş %s verildi, %d sunucu: %s (tekrar anahtarı %s).", res.Order.Number, len(ids), strings.Join(ids, ", "), idem))
+			if wait {
+				for _, sid := range ids {
+					if err := a.waitServer(ctx, sid, "running", waitFor); err != nil {
+						return err
+					}
+				}
+			}
+			if a.Machine() || a.Opt.Query != "" {
+				return a.PrintRaw(resp.Data, nil, "servers")
+			}
+			v, _ := output.Decode(resp.Data)
+			if m, ok := v.(map[string]any); ok {
+				if l, ok := m["servers"].([]any); ok {
+					return a.Printer().Print(l, nil, "id")
+				}
+			}
+			return a.PrintRaw(resp.Data, nil, "servers")
+		}
 		a.Info("%s", i18n.F("Order %s placed, server id %s (idempotency key %s).", "Sipariş %s verildi, sunucu kimliği %s (tekrar anahtarı %s).", res.Order.Number, id, idem))
 		if wait && res.Server.ID > 0 {
 			if err := a.waitServer(ctx, id, "running", waitFor); err != nil {

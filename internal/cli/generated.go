@@ -345,6 +345,15 @@ func genCommand(a *App, op *spec.Op) *cobra.Command {
 			_ = cmd.RegisterFlagCompletionFunc(fn, fixedCompletion(f.Enum...))
 		}
 	}
+	if _, ok := o.flagName["b:quantity"]; ok {   // 2.21.0: --count is the friendlier name of the batch size
+		qn := o.flagName["b:quantity"]
+		fs.SetNormalizeFunc(func(_ *pflag.FlagSet, name string) pflag.NormalizedName {
+			if name == "count" {
+				return pflag.NormalizedName(qn)
+			}
+			return pflag.NormalizedName(name)
+		})
+	}
 	if op.HasBody {
 		fs.StringVar(&o.data, "data", "", i18n.S("request body as JSON, @file or @- (stdin)", "istek gövdesi JSON, @dosya ya da @- (stdin)"))
 		fs.StringArrayVar(&o.set, "set", nil, i18n.S("extra body field key=value (repeatable)", "ek gövde alanı anahtar=değer (tekrarlanabilir)"))
