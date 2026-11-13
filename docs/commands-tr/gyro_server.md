@@ -38,6 +38,7 @@ gyro server [flags]
 * [gyro server console](gyro_server_console.md)	 - Tek seferlik VNC konsol bileti al
 * [gyro server create](gyro_server_create.md)	 - Yeni bulut sunucu siparişi (bakiyeden ödenir)
 * [gyro server delete](gyro_server_delete.md)	 - Sunucuyu sil (iptal) - veri bekleme süresi sonunda silinir
+* [gyro server disk](gyro_server_disk.md)	 - Sunucunun ek diskleri
 * [gyro server firewall](gyro_server_firewall.md)	 - Gelen trafik güvenlik duvarı kuralları
 * [gyro server get](gyro_server_get.md)	 - Sunucuyu canlı durumuyla göster
 * [gyro server ip](gyro_server_ip.md)	 - Sunucunun genel IPv4 adresini (ya da --ipv6) yaz

@@ -3,7 +3,7 @@
 package spec
 
 // APIVersion is info.version of the spec this table was generated from.
-const APIVersion = "2.18.0"
+const APIVersion = "2.19.0"
 
 // Ops lists every API operation.
 var Ops = []Op{
@@ -2289,6 +2289,56 @@ var Ops = []Op{
 		Columns: []string{"server_id", "wss_url", "password", "protocol", "expires_in", "url"},
 		Params: []Param{
 			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Server id (= service id in the client area)", DescTR: ""},
+		},
+	},
+	{ID: "listServerDisks", Method: "GET", Path: "/cloud/servers/{id}/disks", Tag: "Servers",
+		Summary: "List the server's additional disks", SummaryTR: "Sunucunun ek diskleri",
+		Desc: "Two classes: `ssd` (fast) and `hdd` (large storage for backups, archives and media; do not run databases on it). Additional disks are billed per GB hourly from the prepaid balance (`classes.<class>.per_gb_monthly_eur`, monthly / 672), from the hour they are added until they are removed; each disk at least `pricing.minimum_hours`. Up to 4 disks per server and `classes.<class>.max_gb` GB per class; sizes are multiples of `step_gb`. A new disk is empty (partition, format and mount it inside the server). Reinstalling the server removes the additional disks.", DescTR: "İki sınıf: `ssd` (hızlı) ve `hdd` (yedek, arşiv, medya için büyük depolama; veritabanı için kullanmayın). Ek diskler GB başına ön ödemeli bakiyeden saatlik ücretlendirilir (`classes.<sınıf>.per_gb_monthly_eur`, aylık / 672); eklendiği saatten silindiği saate kadar, her disk en az `pricing.minimum_hours` saat. Sunucu başına en çok 4 disk ve sınıf başına `classes.<sınıf>.max_gb` GB; boyutlar `step_gb` katları. Yeni disk boştur (sunucu içinde bölümlendirip biçimlendirin ve bağlayın). Yeniden kurulum ek diskleri siler.",
+		Scope: "cloud_read", Command: []string{"server", "disk", "list"},
+		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
+		Columns: []string{"server_id", "count", "max_disks", "used_gb", "max_gb", "available_gb", "step_gb", "on_sale", "removed"},
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Server id (tr-ist-1)", DescTR: ""},
+		},
+	},
+	{ID: "addServerDisk", Method: "POST", Path: "/cloud/servers/{id}/disks", Tag: "Servers",
+		Summary: "Add an additional disk", SummaryTR: "Ek disk ekle",
+		Desc: "Two classes: `ssd` (fast) and `hdd` (large storage for backups, archives and media; do not run databases on it). Additional disks are billed per GB hourly from the prepaid balance (`classes.<class>.per_gb_monthly_eur`, monthly / 672), from the hour they are added until they are removed; each disk at least `pricing.minimum_hours`. Up to 4 disks per server and `classes.<class>.max_gb` GB per class; sizes are multiples of `step_gb`. A new disk is empty (partition, format and mount it inside the server). Reinstalling the server removes the additional disks. Prepaid tr-ist-1 servers only; not while the server is suspended.", DescTR: "İki sınıf: `ssd` (hızlı) ve `hdd` (yedek, arşiv, medya için büyük depolama; veritabanı için kullanmayın). Ek diskler GB başına ön ödemeli bakiyeden saatlik ücretlendirilir (`classes.<sınıf>.per_gb_monthly_eur`, aylık / 672); eklendiği saatten silindiği saate kadar, her disk en az `pricing.minimum_hours` saat. Sunucu başına en çok 4 disk ve sınıf başına `classes.<sınıf>.max_gb` GB; boyutlar `step_gb` katları. Yeni disk boştur (sunucu içinde bölümlendirip biçimlendirin ve bağlayın). Yeniden kurulum ek diskleri siler. Yalnız ön ödemeli tr-ist-1 sunucuları; askıdayken eklenemez.",
+		Scope: "cloud_write", Command: []string{"server", "disk", "add"},
+		HasBody: true, BodyRequired: true, ListResponse: false, Paginated: false, Confirm: false, Money: true, Hidden: false,
+		Columns: []string{"server_id", "count", "max_disks", "used_gb", "max_gb", "available_gb", "step_gb", "on_sale", "removed"},
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Server id (tr-ist-1)", DescTR: ""},
+		},
+		Body: []Field{
+			{Name: "size_gb", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "", DescTR: ""},
+			{Name: "class", Type: "string", Items: "", Enum: []string{"ssd", "hdd"}, Default: "ssd", Required: false, Desc: "ssd (fast) or hdd (large storage; see classes.hdd.on_sale)", DescTR: ""},
+		},
+	},
+	{ID: "resizeServerDisk", Method: "PUT", Path: "/cloud/servers/{id}/disks/{disk}", Tag: "Servers",
+		Summary: "Grow an additional disk", SummaryTR: "Ek diski büyüt",
+		Desc: "Grows the disk to `size_gb` (never shrinks; not while snapshots exist). Extend the partition / file system inside the server afterwards.", DescTR: "Diski `size_gb` boyutuna büyütür (küçültmez; snapshot varken olmaz). Sonra sunucu içinde bölümü / dosya sistemini genişletin.",
+		Scope: "cloud_write", Command: []string{"server", "disk", "resize"},
+		HasBody: true, BodyRequired: true, ListResponse: false, Paginated: false, Confirm: true, Money: true, Hidden: false,
+		Columns: []string{"server_id", "count", "max_disks", "used_gb", "max_gb", "available_gb", "step_gb", "on_sale", "removed"},
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Server id (tr-ist-1)", DescTR: ""},
+			{Name: "disk", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Disk id (from GET /cloud/servers/{id}/disks)", DescTR: ""},
+		},
+		Body: []Field{
+			{Name: "size_gb", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "", DescTR: ""},
+		},
+	},
+	{ID: "removeServerDisk", Method: "DELETE", Path: "/cloud/servers/{id}/disks/{disk}", Tag: "Servers",
+		Summary: "Remove an additional disk (with its data)", SummaryTR: "Ek diski sil (verisiyle)",
+		Desc: "Detaches and deletes the disk with all its data (cannot be undone); billing stops after the current hour (minimum hours apply). Needs `confirm=true`.", DescTR: "Diski tüm verisiyle siler (geri alınamaz); ücret içinde bulunulan saatten sonra durur (asgari süre geçerli). `confirm=true` gerekir.",
+		Scope: "cloud_write", Command: []string{"server", "disk", "remove"},
+		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: true, Money: false, Hidden: false,
+		Columns: []string{"server_id", "count", "max_disks", "used_gb", "max_gb", "available_gb", "step_gb", "on_sale", "removed"},
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Server id (tr-ist-1)", DescTR: ""},
+			{Name: "disk", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Disk id (from GET /cloud/servers/{id}/disks)", DescTR: ""},
+			{Name: "confirm", In: "query", Type: "boolean", Items: "", Enum: nil, Default: "", Required: true, Desc: "", DescTR: ""},
 		},
 	},
 	{ID: "getFirewall", Method: "GET", Path: "/cloud/servers/{id}/firewall", Tag: "Networking",

@@ -2,7 +2,7 @@
 openapi: 3.1.0
 info:
   title: Gyro Public API
-  version: 2.18.0
+  version: 2.19.0
   summary: Manage Gyro cloud servers, SSH keys and billing programmatically.
   x-summary-tr: Gyro bulut sunucularınızı, SSH anahtarlarınızı ve faturalarınızı programla yönetin.
   description: "The Gyro Public API lets you automate everything you do in the Gyro client area:\norder and manage cloud servers, keep SSH keys, read invoices and\
@@ -33,7 +33,9 @@ info:
     , \"cpu_m\", \"memory_mi\", \"count\", \"hours\"}` (no monthly cap, `capped` flag on every item). Additive.\n\n**2.17.5**: mount a Gyro Object Storage bucket\
     \ on a server: `GET/POST /cloud/servers/{id}/storage-mounts`, `GET/DELETE /cloud/servers/{id}/storage-mounts/{mid}`, `POST .../{mid}/command` (one-line installer,\
     \ automatic on tr-ist-1; one narrow key per mount; free). Additive.\n\n**2.18.0**: projects: `/cloud/projects` (list/create/get/update/delete, move services),\
-    \ `PUT /cloud/services/{id}/project`, `project` on every service, `?project=` filter, optional `project_id` on order endpoints. Additive.\n"
+    \ `PUT /cloud/services/{id}/project`, `project` on every service, `?project=` filter, optional `project_id` on order endpoints. Additive.\n\n**2.19.0**: additional\
+    \ disks for tr-ist-1 servers: `GET/POST /cloud/servers/{id}/disks`, `PUT/DELETE /cloud/servers/{id}/disks/{disk}` (ssd or hdd class, per GB, hourly from the prepaid\
+    \ balance; up to 4 disks per server, grow only).\n"
   x-description-tr: "Gyro Public API, müşteri panelinde yaptığınız her işi otomatikleştirmenizi sağlar:\nbulut sunucu siparişi ve yönetimi, SSH anahtarları, fatura\
     \ ve bakiye okuma.\nResmi Terraform sağlayıcısı (`gyro-hosting/gyro`) ve `gyroctl` bu API'yi kullanır.\n\n* **Taban adres** `https://www.gyrohosting.com/api/v1/client`\n\
     * **Kimlik** `Authorization: Bearer wck_...` (anahtarı *Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri* bölümünden oluşturun)\n* **Biçim** JSON\
@@ -62,7 +64,9 @@ info:
     \ `{\"type\": \"serverless\", \"cpu_m\", \"memory_mi\", \"count\", \"hours\"}` kabul eder (aylık tavan yok, her kalemde `capped`). Geriye uyumlu.\n\n**2.17.5**:\
     \ Nesne Depolama kovasını sunucuya bağlama: `GET/POST /cloud/servers/{id}/storage-mounts`, `GET/DELETE /cloud/servers/{id}/storage-mounts/{mid}`, `POST .../{mid}/command`\
     \ (tek satır kurulum, tr-ist-1'de otomatik; bağlantı başına dar anahtar; ücretsiz). Geriye uyumlu.\n\n**2.18.0**: projeler: `/cloud/projects` (listele/oluştur/getir/güncelle/sil,\
-    \ hizmet taşı), `PUT /cloud/services/{id}/project`, her hizmette `project`, `?project=` süzgeci, sipariş uçlarında isteğe bağlı `project_id`. Geriye uyumlu.\n"
+    \ hizmet taşı), `PUT /cloud/services/{id}/project`, her hizmette `project`, `?project=` süzgeci, sipariş uçlarında isteğe bağlı `project_id`. Geriye uyumlu.\n\
+    \n**2.19.0**: tr-ist-1 sunucularına ek disk: `GET/POST /cloud/servers/{id}/disks`, `PUT/DELETE /cloud/servers/{id}/disks/{disk}` (ssd ya da hdd sınıfı, GB başına,\
+    \ ön ödemeli bakiyeden saatlik; sunucu başına en çok 4 disk, yalnız büyür).\n"
   contact:
     name: Gyro Hosting
     url: https://www.gyrohosting.com
@@ -18904,6 +18908,227 @@ paths:
         '429': *id058
       x-cli:
         command: service project set
+  /cloud/servers/{id}/disks:
+    get:
+      tags:
+      - Servers
+      operationId: listServerDisks
+      summary: List the server's additional disks
+      x-summary-tr: Sunucunun ek diskleri
+      x-scope: cloud_read
+      x-cli:
+        command: server disk list
+      description: 'Two classes: `ssd` (fast) and `hdd` (large storage for backups, archives and media; do not run databases on it). Additional disks are billed per
+        GB hourly from the prepaid balance (`classes.<class>.per_gb_monthly_eur`, monthly / 672), from the hour they are added until they are removed; each disk at
+        least `pricing.minimum_hours`. Up to 4 disks per server and `classes.<class>.max_gb` GB per class; sizes are multiples of `step_gb`. A new disk is empty (partition,
+        format and mount it inside the server). Reinstalling the server removes the additional disks. '
+      x-description-tr: 'İki sınıf: `ssd` (hızlı) ve `hdd` (yedek, arşiv, medya için büyük depolama; veritabanı için kullanmayın). Ek diskler GB başına ön ödemeli
+        bakiyeden saatlik ücretlendirilir (`classes.<sınıf>.per_gb_monthly_eur`, aylık / 672); eklendiği saatten silindiği saate kadar, her disk en az `pricing.minimum_hours`
+        saat. Sunucu başına en çok 4 disk ve sınıf başına `classes.<sınıf>.max_gb` GB; boyutlar `step_gb` katları. Yeni disk boştur (sunucu içinde bölümlendirip biçimlendirin
+        ve bağlayın). Yeniden kurulum ek diskleri siler. '
+      parameters:
+      - *id052
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ServerDisks'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: not_actionable (suspended / busy / snapshots exist)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          $ref: '#/components/responses/Validation'
+        '501':
+          description: not_supported (not a tr-ist-1 Gyro Compute server)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags:
+      - Servers
+      operationId: addServerDisk
+      summary: Add an additional disk
+      x-summary-tr: Ek disk ekle
+      x-scope: cloud_write
+      x-cli:
+        command: server disk add
+        money: true
+      description: 'Two classes: `ssd` (fast) and `hdd` (large storage for backups, archives and media; do not run databases on it). Additional disks are billed per
+        GB hourly from the prepaid balance (`classes.<class>.per_gb_monthly_eur`, monthly / 672), from the hour they are added until they are removed; each disk at
+        least `pricing.minimum_hours`. Up to 4 disks per server and `classes.<class>.max_gb` GB per class; sizes are multiples of `step_gb`. A new disk is empty (partition,
+        format and mount it inside the server). Reinstalling the server removes the additional disks. Prepaid tr-ist-1 servers only; not while the server is suspended.'
+      x-description-tr: 'İki sınıf: `ssd` (hızlı) ve `hdd` (yedek, arşiv, medya için büyük depolama; veritabanı için kullanmayın). Ek diskler GB başına ön ödemeli
+        bakiyeden saatlik ücretlendirilir (`classes.<sınıf>.per_gb_monthly_eur`, aylık / 672); eklendiği saatten silindiği saate kadar, her disk en az `pricing.minimum_hours`
+        saat. Sunucu başına en çok 4 disk ve sınıf başına `classes.<sınıf>.max_gb` GB; boyutlar `step_gb` katları. Yeni disk boştur (sunucu içinde bölümlendirip biçimlendirin
+        ve bağlayın). Yeniden kurulum ek diskleri siler. Yalnız ön ödemeli tr-ist-1 sunucuları; askıdayken eklenemez.'
+      parameters:
+      - *id052
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - size_gb
+              properties:
+                size_gb:
+                  type: integer
+                  minimum: 10
+                  maximum: 4000
+                  multipleOf: 10
+                class:
+                  type: string
+                  enum:
+                  - ssd
+                  - hdd
+                  default: ssd
+                  description: ssd (fast) or hdd (large storage; see classes.hdd.on_sale)
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ServerDisks'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: not_actionable (suspended / busy / snapshots exist)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          $ref: '#/components/responses/Validation'
+        '501':
+          description: not_supported (not a tr-ist-1 Gyro Compute server)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /cloud/servers/{id}/disks/{disk}:
+    put:
+      tags:
+      - Servers
+      operationId: resizeServerDisk
+      summary: Grow an additional disk
+      x-summary-tr: Ek diski büyüt
+      x-scope: cloud_write
+      x-cli:
+        command: server disk resize
+        money: true
+      description: Grows the disk to `size_gb` (never shrinks; not while snapshots exist). Extend the partition / file system inside the server afterwards.
+      x-description-tr: Diski `size_gb` boyutuna büyütür (küçültmez; snapshot varken olmaz). Sonra sunucu içinde bölümü / dosya sistemini genişletin.
+      parameters:
+      - *id052
+      - &id060
+        name: disk
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Disk id (from GET /cloud/servers/{id}/disks)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - size_gb
+              properties:
+                size_gb:
+                  type: integer
+                  minimum: 10
+                  maximum: 4000
+                  multipleOf: 10
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ServerDisks'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: not_actionable (suspended / busy / snapshots exist)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          $ref: '#/components/responses/Validation'
+        '501':
+          description: not_supported (not a tr-ist-1 Gyro Compute server)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+      - Servers
+      operationId: removeServerDisk
+      summary: Remove an additional disk (with its data)
+      x-summary-tr: Ek diski sil (verisiyle)
+      x-scope: cloud_write
+      x-cli:
+        command: server disk remove
+        confirm: true
+      description: Detaches and deletes the disk with all its data (cannot be undone); billing stops after the current hour (minimum hours apply). Needs `confirm=true`.
+      x-description-tr: Diski tüm verisiyle siler (geri alınamaz); ücret içinde bulunulan saatten sonra durur (asgari süre geçerli). `confirm=true` gerekir.
+      parameters:
+      - *id052
+      - *id060
+      - name: confirm
+        in: query
+        required: true
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ServerDisks'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: not_actionable (suspended / busy / snapshots exist)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          $ref: '#/components/responses/Validation'
+        '501':
+          description: not_supported (not a tr-ist-1 Gyro Compute server)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 components:
   securitySchemes:
     bearerAuth:
@@ -21239,7 +21464,7 @@ components:
           maxLength: 255
         color:
           type: string
-          enum: &id060
+          enum: &id061
           - gray
           - blue
           - green
@@ -21292,22 +21517,22 @@ components:
       required:
       - name
       properties:
-        name: &id061
+        name: &id062
           type: string
           minLength: 1
           maxLength: 40
           description: 'Letter or digit first; then letters, digits, space and . _ - / + # & ( ). Unique per account (case-insensitive). Reserved: Genel, General,
             Default.'
-        description: &id062
+        description: &id063
           type:
           - string
           - 'null'
           maxLength: 255
-        color: &id063
+        color: &id064
           type: string
-          enum: *id060
+          enum: *id061
           default: blue
-        icon: &id064
+        icon: &id065
           type: string
           enum:
           - folder
@@ -21342,10 +21567,10 @@ components:
     ProjectUpdate:
       type: object
       properties:
-        name: *id061
-        description: *id062
-        color: *id063
-        icon: *id064
+        name: *id062
+        description: *id063
+        color: *id064
+        icon: *id065
     ProjectRef:
       type:
       - object
@@ -21356,3 +21581,79 @@ components:
         name:
           type: string
       description: Project of the service (id 0 = default project); null when projects are not available
+    ServerDisks:
+      type: object
+      properties:
+        server_id:
+          type: integer
+        disks:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                description: disk id (stable while the disk exists)
+              name:
+                type: string
+              class:
+                type: string
+                enum:
+                - ssd
+                - hdd
+                description: ssd = fast SSD, hdd = large storage (backups, archives, media)
+              size_gb:
+                type: integer
+              monthly_eur:
+                type: number
+        count:
+          type: integer
+        max_disks:
+          type: integer
+          description: at most 4 additional disks per server
+        used_gb:
+          type: integer
+        max_gb:
+          type: integer
+          description: per-server allowance (GB)
+        available_gb:
+          type: integer
+        step_gb:
+          type: integer
+          description: sizes are multiples of this (default 10)
+        on_sale:
+          type: boolean
+          description: SSD class on sale
+        classes:
+          type: object
+          description: per class allowance and price
+          additionalProperties:
+            type: object
+            properties:
+              used_gb:
+                type: integer
+              max_gb:
+                type: integer
+              available_gb:
+                type: integer
+              on_sale:
+                type: boolean
+              per_gb_monthly_eur:
+                type: number
+              per_gb_hourly_eur:
+                type: number
+        pricing:
+          type: object
+          properties:
+            billing:
+              type: string
+            per_gb_monthly_eur:
+              type: number
+            per_gb_hourly_eur:
+              type: number
+            hdd_per_gb_monthly_eur:
+              type: number
+            minimum_hours:
+              type: integer
+        removed:
+          type: integer

@@ -1,0 +1,77 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-server-disk-list - List the server's additional disks
+
+
+.SH SYNOPSIS
+\fBgyro server disk list  [flags]\fP
+
+
+.SH DESCRIPTION
+List the server's additional disks
+
+.PP
+Two classes: \fBssd\fR (fast) and \fBhdd\fR (large storage for backups, archives and media; do not run databases on it). Additional disks are billed per GB hourly from the prepaid balance (\fBclasses.<class>.per_gb_monthly_eur\fR, monthly / 672), from the hour they are added until they are removed; each disk at least \fBpricing.minimum_hours\fR\&. Up to 4 disks per server and \fBclasses.<class>.max_gb\fR GB per class; sizes are multiples of \fBstep_gb\fR\&. A new disk is empty (partition, format and mount it inside the server). Reinstalling the server removes the additional disks.
+
+.PP
+API: GET /cloud/servers/{id}/disks (operationId listServerDisks, scope cloud_read)
+
+
+.SH OPTIONS
+\fB-h\fP, \fB--help\fP[=false]
+	help for list
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH SEE ALSO
+\fBgyro-server-disk(1)\fP

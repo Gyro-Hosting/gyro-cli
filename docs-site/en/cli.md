@@ -307,6 +307,10 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro server console` | Open a one-time VNC console ticket | `POST /cloud/servers/{id}/console` |
 | `gyro server create` | Create (order) a cloud server | `POST /cloud/servers` |
 | `gyro server delete` | Delete (cancel) a server | `DELETE /cloud/servers/{id}` |
+| `gyro server disk add` | Add an additional disk | `POST /cloud/servers/{id}/disks` |
+| `gyro server disk list` | List the server's additional disks | `GET /cloud/servers/{id}/disks` |
+| `gyro server disk remove` | Remove an additional disk (with its data) | `DELETE /cloud/servers/{id}/disks/{disk}` |
+| `gyro server disk resize` | Grow an additional disk | `PUT /cloud/servers/{id}/disks/{disk}` |
 | `gyro server firewall list` | Inbound firewall rules | `GET /cloud/servers/{id}/firewall` |
 | `gyro server firewall rule add` | Add a firewall rule | `POST /cloud/servers/{id}/firewall/rules` |
 | `gyro server firewall rule delete` | Remove a firewall rule (the last one needs confirm) | `DELETE /cloud/servers/{id}/firewall/rules/{n}` |

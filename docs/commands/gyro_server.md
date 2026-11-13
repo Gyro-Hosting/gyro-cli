@@ -38,6 +38,7 @@ gyro server [flags]
 * [gyro server console](gyro_server_console.md)	 - Open a one-time VNC console ticket
 * [gyro server create](gyro_server_create.md)	 - Order a new cloud server (paid from your balance)
 * [gyro server delete](gyro_server_delete.md)	 - Delete (cancel) a server - its data is destroyed after the grace period
+* [gyro server disk](gyro_server_disk.md)	 - List the server's additional disks
 * [gyro server firewall](gyro_server_firewall.md)	 - Inbound firewall rules
 * [gyro server get](gyro_server_get.md)	 - Show a server with its live state
 * [gyro server ip](gyro_server_ip.md)	 - Print the public IPv4 (or --ipv6) of a server

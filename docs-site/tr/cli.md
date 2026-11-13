@@ -307,6 +307,10 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro server console` | Tek seferlik VNC konsol bileti al | `POST /cloud/servers/{id}/console` |
 | `gyro server create` | Bulut sunucu oluştur (sipariş) | `POST /cloud/servers` |
 | `gyro server delete` | Sunucuyu sil (iptal) | `DELETE /cloud/servers/{id}` |
+| `gyro server disk add` | Ek disk ekle | `POST /cloud/servers/{id}/disks` |
+| `gyro server disk list` | Sunucunun ek diskleri | `GET /cloud/servers/{id}/disks` |
+| `gyro server disk remove` | Ek diski sil (verisiyle) | `DELETE /cloud/servers/{id}/disks/{disk}` |
+| `gyro server disk resize` | Ek diski büyüt | `PUT /cloud/servers/{id}/disks/{disk}` |
 | `gyro server firewall list` | Gelen trafik güvenlik duvarı kuralları | `GET /cloud/servers/{id}/firewall` |
 | `gyro server firewall rule add` | Gelen trafik kuralı ekle | `POST /cloud/servers/{id}/firewall/rules` |
 | `gyro server firewall rule delete` | Güvenlik duvarı kuralı sil (son kural confirm ister) | `DELETE /cloud/servers/{id}/firewall/rules/{n}` |
