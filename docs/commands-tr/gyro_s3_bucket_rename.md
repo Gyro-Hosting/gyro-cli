@@ -6,7 +6,7 @@ Kova adını değiştir
 
 Kova adını değiştir
 
-Kova adları hizmete özeldir (aynı adı başka müşteriler de kullanabilir). Veri taşınmaz. Eski adla S3 erişimi hemen durur; web sitesi `<yeni>-<hizmet kodu>.web.gyro-s3.com` olur, eski web adresi 40 gün 301 ile yönlendirilir; paylaşım bağlantıları çalışır. Kova başına günde en çok 5; eski ad 40 gün bu hizmette yeniden kullanılamaz. `"confirm": true` gerekir.
+Kova adları hizmete özeldir (aynı adı başka müşteriler de kullanabilir). Veri taşınmaz. Eski adla S3 erişimi hemen durur; web sitesi `<yeni>-<hizmet kodu>.web.gyro-s3.com` olur, eski web adresi 40 gün 301 ile yönlendirilir; paylaşım bağlantıları çalışır. Kova başına günde en çok 5; eski ad 40 gün bu hizmette yeniden kullanılamaz. `"confirm": true` gerekir. **Korumalı Depolama (2.20.0):** ad değiştirme desteklenir: kovanın görünen adı ve web adresi (`<yeni ad>-<hizmet kodu>.kweb.gyro-s3.com`, eski adres 40 gün 301) değişir; **S3 adı aynı kalır** (sürüm ve kilitler taşınmaz), S3 araçları onu kullanmaya devam eder.
 
 API: POST /cloud/storage/{id}/buckets/{bucket}/rename (operationId typed_post_storage__id__buckets__bucket__rename, scope services_write)
 

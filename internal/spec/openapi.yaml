@@ -2,7 +2,7 @@
 openapi: 3.1.0
 info:
   title: Gyro Public API
-  version: 2.19.1
+  version: 2.20.0
   summary: Manage Gyro cloud servers, SSH keys and billing programmatically.
   x-summary-tr: Gyro bulut sunucularınızı, SSH anahtarlarınızı ve faturalarınızı programla yönetin.
   description: "The Gyro Public API lets you automate everything you do in the Gyro client area:\norder and manage cloud servers, keep SSH keys, read invoices and\
@@ -36,7 +36,10 @@ info:
     \ `PUT /cloud/services/{id}/project`, `project` on every service, `?project=` filter, optional `project_id` on order endpoints. Additive.\n\n**2.19.0**: additional\
     \ disks for tr-ist-1 servers: `GET/POST /cloud/servers/{id}/disks`, `PUT/DELETE /cloud/servers/{id}/disks/{disk}` (ssd or hdd class, per GB, hourly from the prepaid\
     \ balance; up to 4 disks per server, grow only).\n\n**2.19.1**: `POST /cloud/servers/{id}/actions/rebuild` accepts `app` and `app_domain` (one-click app on top\
-    \ of the reinstall; response `app_install_id`); `POST /cloud/servers/{id}/app` also on tr-ist-1. Install status `kaldirildi` = removed by a later reinstall. Additive.\n"
+    \ of the reinstall; response `app_install_id`); `POST /cloud/servers/{id}/app` also on tr-ist-1. Install status `kaldirildi` = removed by a later reinstall. Additive.\n\
+    \n**2.20.0**: Protected Storage buckets can be mounted on servers (`/cloud/servers/{id}/storage-mounts`, read-only by default, read/write needs `accept_versioning:\
+    \ true`, field `protected`) and renamed (`POST /cloud/storage/{id}/buckets/{bucket}/rename`: display name + website address change, S3 name stays, `s3_name` in\
+    \ bucket lists). Additive.\n"
   x-description-tr: "Gyro Public API, müşteri panelinde yaptığınız her işi otomatikleştirmenizi sağlar:\nbulut sunucu siparişi ve yönetimi, SSH anahtarları, fatura\
     \ ve bakiye okuma.\nResmi Terraform sağlayıcısı (`gyro-hosting/gyro`) ve `gyroctl` bu API'yi kullanır.\n\n* **Taban adres** `https://www.gyrohosting.com/api/v1/client`\n\
     * **Kimlik** `Authorization: Bearer wck_...` (anahtarı *Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri* bölümünden oluşturun)\n* **Biçim** JSON\
@@ -69,7 +72,8 @@ info:
     \n**2.19.0**: tr-ist-1 sunucularına ek disk: `GET/POST /cloud/servers/{id}/disks`, `PUT/DELETE /cloud/servers/{id}/disks/{disk}` (ssd ya da hdd sınıfı, GB başına,\
     \ ön ödemeli bakiyeden saatlik; sunucu başına en çok 4 disk, yalnız büyür).\n\n**2.19.1**: `POST /cloud/servers/{id}/actions/rebuild` `app` ve `app_domain` alır\
     \ (yeniden kurulum + tek tıkla uygulama; yanıtta `app_install_id`); `POST /cloud/servers/{id}/app` tr-ist-1'de de çalışır. Kurulum durumu `kaldirildi` = sonraki\
-    \ yeniden kurulumla kaldırıldı. Geriye uyumlu.\n"
+    \ yeniden kurulumla kaldırıldı. Geriye uyumlu.\n\n**2.20.0**: Korumalı Depolama kovaları sunucuya bağlanabilir (varsayılan salt okuma, okuma-yazma `accept_versioning:\
+    \ true` ister, `protected` alanı) ve adı değiştirilebilir (görünen ad + web adresi değişir, S3 adı sabit, kova listelerinde `s3_name`). Geriye uyumlu.\n"
   contact:
     name: Gyro Hosting
     url: https://www.gyrohosting.com
@@ -5022,7 +5026,8 @@ paths:
       summary: GET buckets (GyroDepolama)
       x-summary-tr: buckets (GyroDepolama)
       x-scope: services_read
-      description: 'Typed shortcut of the generic bridge: tool `buckets`. Body fields are the tool''s own fields.'
+      description: 'Typed shortcut of the generic bridge: tool `buckets`. Body fields are the tool''s own fields. Each item has `s3_name` (2.20.0): the name to use
+        in S3 clients. Equal to `name` on Object Storage; on Protected Storage it stays the original name after a rename.'
       x-description-tr: 'Genel köprünün kısayolu: araç `buckets`. Gövde alanları aracın kendi alanlarıdır.'
       parameters:
       - name: id
@@ -5375,10 +5380,14 @@ paths:
       x-scope: services_write
       description: 'Bucket names are private to the service (other customers may use the same name). Data is not moved. S3 access by the old name stops at once; the
         website moves to `<new>-<service code>.web.gyro-s3.com` and the old website address redirects (301) for 40 days; share links keep working. Max 5 renames per
-        bucket per day; the old name cannot be reused inside the service for 40 days. Needs `"confirm": true`.'
+        bucket per day; the old name cannot be reused inside the service for 40 days. Needs `"confirm": true`. **Protected Storage (2.20.0):** renaming is supported:
+        the bucket''s display name and website address (`<new name>-<service code>.kweb.gyro-s3.com`, old address 301 for 40 days) change; the **S3 name stays the
+        same** (versions and locks are never moved), so S3 tools keep using it. The answer carries `s3_name`; `GET /cloud/storage/{id}/buckets` lists `s3_name` for
+        every bucket.'
       x-description-tr: 'Kova adları hizmete özeldir (aynı adı başka müşteriler de kullanabilir). Veri taşınmaz. Eski adla S3 erişimi hemen durur; web sitesi `<yeni>-<hizmet
         kodu>.web.gyro-s3.com` olur, eski web adresi 40 gün 301 ile yönlendirilir; paylaşım bağlantıları çalışır. Kova başına günde en çok 5; eski ad 40 gün bu hizmette
-        yeniden kullanılamaz. `"confirm": true` gerekir.'
+        yeniden kullanılamaz. `"confirm": true` gerekir. **Korumalı Depolama (2.20.0):** ad değiştirme desteklenir: kovanın görünen adı ve web adresi (`<yeni ad>-<hizmet
+        kodu>.kweb.gyro-s3.com`, eski adres 40 gün 301) değişir; **S3 adı aynı kalır** (sürüm ve kilitler taşınmaz), S3 araçları onu kullanmaya devam eder.'
       parameters:
       - name: id
         in: path
@@ -18416,12 +18425,12 @@ paths:
       description: 'Mount a bucket of your Gyro Object Storage service on a Linux server (systemd) as a folder (rclone FUSE mount with a local write cache, starts
         on boot, reconnects). Each mount gets its own access key limited to that one bucket (read-only or read/write); it does not use your key limit and is deleted
         with the mount. Gyro Cloud Istanbul (tr-ist-1) servers apply it automatically (`automatic: true`); other servers run `install_command` once. Free; S3 traffic
-        counts towards the storage service. Not available for Protected Storage (object lock) buckets. Supported servers: Gyro Cloud (Istanbul and EU), Turkey VDS,
+        counts towards the storage service. Protected Storage buckets: read-only by default (2.20.0). Supported servers: Gyro Cloud (Istanbul and EU), Turkey VDS,
         dedicated servers.'
       x-description-tr: 'Nesne Depolama hizmetinizdeki bir kovayı Linux sunucunuza (systemd) klasör olarak bağlar (rclone FUSE, yerel yazma önbelleği, açılışta başlar,
         kopunca yeniden bağlanır). Her bağlantının yalnız o kovaya yetkili (salt okuma ya da okuma/yazma) ayrı bir erişim anahtarı vardır; anahtar sınırınızdan düşmez,
         bağlantıyla birlikte silinir. Gyro Bulut İstanbul (tr-ist-1) sunucularında otomatik uygulanır (`automatic: true`); diğer sunucularda `install_command` bir
-        kez çalıştırılır. Ücretsizdir; S3 trafiği depolama hizmetinden sayılır. Korumalı Depolama (nesne kilidi) kovaları bağlanamaz.'
+        kez çalıştırılır. Ücretsizdir; S3 trafiği depolama hizmetinden sayılır. Korumalı Depolama kovaları: varsayılan salt okuma (2.20.0).'
       parameters:
       - &id053
         name: id
@@ -18471,13 +18480,13 @@ paths:
       description: 'Mount a bucket of your Gyro Object Storage service on a Linux server (systemd) as a folder (rclone FUSE mount with a local write cache, starts
         on boot, reconnects). Each mount gets its own access key limited to that one bucket (read-only or read/write); it does not use your key limit and is deleted
         with the mount. Gyro Cloud Istanbul (tr-ist-1) servers apply it automatically (`automatic: true`); other servers run `install_command` once. Free; S3 traffic
-        counts towards the storage service. Not available for Protected Storage (object lock) buckets. Supported servers: Gyro Cloud (Istanbul and EU), Turkey VDS,
-        dedicated servers. The answer carries `install_command` (single use, 60 minutes).'
+        counts towards the storage service. Supported servers: Gyro Cloud (Istanbul and EU), Turkey VDS, dedicated servers. The answer carries `install_command` (single
+        use, 60 minutes). **Protected Storage (2.20.0):** supported; read-only unless `read_only: false` together with `accept_versioning: true`.'
       x-description-tr: 'Nesne Depolama hizmetinizdeki bir kovayı Linux sunucunuza (systemd) klasör olarak bağlar (rclone FUSE, yerel yazma önbelleği, açılışta başlar,
         kopunca yeniden bağlanır). Her bağlantının yalnız o kovaya yetkili (salt okuma ya da okuma/yazma) ayrı bir erişim anahtarı vardır; anahtar sınırınızdan düşmez,
         bağlantıyla birlikte silinir. Gyro Bulut İstanbul (tr-ist-1) sunucularında otomatik uygulanır (`automatic: true`); diğer sunucularda `install_command` bir
-        kez çalıştırılır. Ücretsizdir; S3 trafiği depolama hizmetinden sayılır. Korumalı Depolama (nesne kilidi) kovaları bağlanamaz. Yanıtta `install_command` döner
-        (tek kullanımlık, 60 dakika).'
+        kez çalıştırılır. Ücretsizdir; S3 trafiği depolama hizmetinden sayılır.  Yanıtta `install_command` döner (tek kullanımlık, 60 dakika). **Korumalı Depolama
+        (2.20.0):** desteklenir; `read_only: false` ve `accept_versioning: true` verilmedikçe salt okuma bağlanır.'
       parameters:
       - *id053
       requestBody:
@@ -18503,7 +18512,12 @@ paths:
                   example: /mnt/backups
                 read_only:
                   type: boolean
+                  description: 'Default: false on Object Storage, **true on Protected Storage**.'
+                accept_versioning:
+                  type: boolean
                   default: false
+                  description: 'Protected Storage read/write only: confirms that every write/overwrite creates a new version, deletes only add a delete marker, locked
+                    files cannot be deleted and used space/cost grow. Without it: 422 versioning_ack_required.'
       responses:
         '202':
           description: OK
@@ -18526,7 +18540,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         '422':
-          $ref: '#/components/responses/Validation'
+          description: invalid_bucket | invalid_mount_point | versioning_ack_required (Protected Storage read/write without accept_versioning) | storage_error
         '429':
           description: rate_limited
         '503':
@@ -21491,6 +21505,10 @@ components:
         remove_command:
           type: string
           example: sudo gyro-s3mount remove backups
+        protected:
+          type: boolean
+          description: 'true = Protected Storage (versioned / lockable) bucket: every write on a read/write mount becomes a new version, deletes only add a delete
+            marker'
     Project:
       type: object
       properties:

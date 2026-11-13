@@ -6,7 +6,7 @@ Sunucuya bağlı kovalar
 
 Sunucuya bağlı kovalar
 
-Nesne Depolama hizmetinizdeki bir kovayı Linux sunucunuza (systemd) klasör olarak bağlar (rclone FUSE, yerel yazma önbelleği, açılışta başlar, kopunca yeniden bağlanır). Her bağlantının yalnız o kovaya yetkili (salt okuma ya da okuma/yazma) ayrı bir erişim anahtarı vardır; anahtar sınırınızdan düşmez, bağlantıyla birlikte silinir. Gyro Bulut İstanbul (tr-ist-1) sunucularında otomatik uygulanır (`automatic: true`); diğer sunucularda `install_command` bir kez çalıştırılır. Ücretsizdir; S3 trafiği depolama hizmetinden sayılır. Korumalı Depolama (nesne kilidi) kovaları bağlanamaz.
+Nesne Depolama hizmetinizdeki bir kovayı Linux sunucunuza (systemd) klasör olarak bağlar (rclone FUSE, yerel yazma önbelleği, açılışta başlar, kopunca yeniden bağlanır). Her bağlantının yalnız o kovaya yetkili (salt okuma ya da okuma/yazma) ayrı bir erişim anahtarı vardır; anahtar sınırınızdan düşmez, bağlantıyla birlikte silinir. Gyro Bulut İstanbul (tr-ist-1) sunucularında otomatik uygulanır (`automatic: true`); diğer sunucularda `install_command` bir kez çalıştırılır. Ücretsizdir; S3 trafiği depolama hizmetinden sayılır. Korumalı Depolama kovaları: varsayılan salt okuma (2.20.0).
 
 API: GET /cloud/servers/{id}/storage-mounts (operationId listStorageMounts, scope cloud_read)
 

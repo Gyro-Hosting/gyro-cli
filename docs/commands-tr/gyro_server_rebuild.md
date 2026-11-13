@@ -9,7 +9,7 @@ gyro server rebuild <SERVER> [flags]
 ### Options
 
 ```
-      --app string              yeni sisteme kurulacak tek tıkla uygulama ('gyro app list' kimliği; API 2.19.1)
+      --app string              yeni sisteme kurulacak tek tıkla uygulama (GET /cloud/apps kimliği, ör. wordpress, docker, uptime-kuma; API 2.19.1)
       --app-domain string       uygulama alan adı (A kaydı sunucuyu göstermeli)
   -h, --help                    help for rebuild
       --image string            imaj (zorunlu)

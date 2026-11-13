@@ -6,7 +6,7 @@ Kovayı sunucuya bağla
 
 Kovayı sunucuya bağla
 
-Nesne Depolama hizmetinizdeki bir kovayı Linux sunucunuza (systemd) klasör olarak bağlar (rclone FUSE, yerel yazma önbelleği, açılışta başlar, kopunca yeniden bağlanır). Her bağlantının yalnız o kovaya yetkili (salt okuma ya da okuma/yazma) ayrı bir erişim anahtarı vardır; anahtar sınırınızdan düşmez, bağlantıyla birlikte silinir. Gyro Bulut İstanbul (tr-ist-1) sunucularında otomatik uygulanır (`automatic: true`); diğer sunucularda `install_command` bir kez çalıştırılır. Ücretsizdir; S3 trafiği depolama hizmetinden sayılır. Korumalı Depolama (nesne kilidi) kovaları bağlanamaz. Yanıtta `install_command` döner (tek kullanımlık, 60 dakika).
+Nesne Depolama hizmetinizdeki bir kovayı Linux sunucunuza (systemd) klasör olarak bağlar (rclone FUSE, yerel yazma önbelleği, açılışta başlar, kopunca yeniden bağlanır). Her bağlantının yalnız o kovaya yetkili (salt okuma ya da okuma/yazma) ayrı bir erişim anahtarı vardır; anahtar sınırınızdan düşmez, bağlantıyla birlikte silinir. Gyro Bulut İstanbul (tr-ist-1) sunucularında otomatik uygulanır (`automatic: true`); diğer sunucularda `install_command` bir kez çalıştırılır. Ücretsizdir; S3 trafiği depolama hizmetinden sayılır. Yanıtta `install_command` döner (tek kullanımlık, 60 dakika). **Korumalı Depolama (2.20.0):** desteklenir; `read_only: false` ve `accept_versioning: true` verilmedikçe salt okuma bağlanır.
 
 API: POST /cloud/servers/{id}/storage-mounts (operationId createStorageMount, scope cloud_write)
 
@@ -17,13 +17,14 @@ gyro server storage-mount create <ID> [flags]
 ### Options
 
 ```
+      --accept-versioning        Protected Storage read/write only: confirms that every write/overwrite creates a new version, deletes only add a delete marker, locked files cannot be deleted and used space/cost grow. Without it: 422 versioning_ack_required.
       --bucket string            bucket name in that service
       --data string              istek gövdesi JSON, @dosya ya da @- (stdin)
       --dry-run                  hiçbir şeyi değiştirmeden teklifi / isteği göster
   -h, --help                     help for create
       --idempotency-key string   tekrar güvenliği anahtarı (para işlemlerinde otomatik)
       --mount-point string       absolute path under /mnt, /srv, /data, /media, /opt, /home or /var/www; default /mnt/<bucket>. Must be empty or missing on the server.
-      --read-only                read_only
+      --read-only                Default: false on Object Storage, **true on Protected Storage**.
       --set stringArray          ek gövde alanı anahtar=değer (tekrarlanabilir)
       --storage-service-id int   your active Object Storage service
       --wait                     sunucu meşgul olmayana kadar bekle

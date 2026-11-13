@@ -6,7 +6,7 @@ List object storage mounts of a server
 
 List object storage mounts of a server
 
-Mount a bucket of your Gyro Object Storage service on a Linux server (systemd) as a folder (rclone FUSE mount with a local write cache, starts on boot, reconnects). Each mount gets its own access key limited to that one bucket (read-only or read/write); it does not use your key limit and is deleted with the mount. Gyro Cloud Istanbul (tr-ist-1) servers apply it automatically (`automatic: true`); other servers run `install_command` once. Free; S3 traffic counts towards the storage service. Not available for Protected Storage (object lock) buckets. Supported servers: Gyro Cloud (Istanbul and EU), Turkey VDS, dedicated servers.
+Mount a bucket of your Gyro Object Storage service on a Linux server (systemd) as a folder (rclone FUSE mount with a local write cache, starts on boot, reconnects). Each mount gets its own access key limited to that one bucket (read-only or read/write); it does not use your key limit and is deleted with the mount. Gyro Cloud Istanbul (tr-ist-1) servers apply it automatically (`automatic: true`); other servers run `install_command` once. Free; S3 traffic counts towards the storage service. Protected Storage buckets: read-only by default (2.20.0). Supported servers: Gyro Cloud (Istanbul and EU), Turkey VDS, dedicated servers.
 
 API: GET /cloud/servers/{id}/storage-mounts (operationId listStorageMounts, scope cloud_read)
 

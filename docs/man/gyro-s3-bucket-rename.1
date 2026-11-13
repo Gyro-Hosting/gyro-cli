@@ -13,7 +13,7 @@ gyro-s3-bucket-rename - Rename a bucket
 Rename a bucket
 
 .PP
-Bucket names are private to the service (other customers may use the same name). Data is not moved. S3 access by the old name stops at once; the website moves to \fB<new>-<service code>.web.gyro-s3.com\fR and the old website address redirects (301) for 40 days; share links keep working. Max 5 renames per bucket per day; the old name cannot be reused inside the service for 40 days. Needs \fB"confirm": true\fR\&.
+Bucket names are private to the service (other customers may use the same name). Data is not moved. S3 access by the old name stops at once; the website moves to \fB<new>-<service code>.web.gyro-s3.com\fR and the old website address redirects (301) for 40 days; share links keep working. Max 5 renames per bucket per day; the old name cannot be reused inside the service for 40 days. Needs \fB"confirm": true\fR\&. \fBProtected Storage (2.20.0):\fP renaming is supported: the bucket's display name and website address (\fB<new name>-<service code>.kweb.gyro-s3.com\fR, old address 301 for 40 days) change; the \fBS3 name stays the same\fP (versions and locks are never moved), so S3 tools keep using it. The answer carries \fBs3_name\fR; \fBGET /cloud/storage/{id}/buckets\fR lists \fBs3_name\fR for every bucket.
 
 .PP
 API: POST /cloud/storage/{id}/buckets/{bucket}/rename (operationId typed_post_storage\fBid\fPbuckets\fBbucket\fPrename, scope services_write)

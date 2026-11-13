@@ -6,7 +6,7 @@ Rename a bucket
 
 Rename a bucket
 
-Bucket names are private to the service (other customers may use the same name). Data is not moved. S3 access by the old name stops at once; the website moves to `<new>-<service code>.web.gyro-s3.com` and the old website address redirects (301) for 40 days; share links keep working. Max 5 renames per bucket per day; the old name cannot be reused inside the service for 40 days. Needs `"confirm": true`.
+Bucket names are private to the service (other customers may use the same name). Data is not moved. S3 access by the old name stops at once; the website moves to `<new>-<service code>.web.gyro-s3.com` and the old website address redirects (301) for 40 days; share links keep working. Max 5 renames per bucket per day; the old name cannot be reused inside the service for 40 days. Needs `"confirm": true`. **Protected Storage (2.20.0):** renaming is supported: the bucket's display name and website address (`<new name>-<service code>.kweb.gyro-s3.com`, old address 301 for 40 days) change; the **S3 name stays the same** (versions and locks are never moved), so S3 tools keep using it. The answer carries `s3_name`; `GET /cloud/storage/{id}/buckets` lists `s3_name` for every bucket.
 
 API: POST /cloud/storage/{id}/buckets/{bucket}/rename (operationId typed_post_storage__id__buckets__bucket__rename, scope services_write)
 
