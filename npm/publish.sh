@@ -16,3 +16,20 @@ while read -r d; do
   (cd "$dist/$d" && npm publish --access public ${NPM_PUBLISH_FLAGS:-})
   echo "published $name@$ver"
 done < "$dist/PUBLISH_ORDER"
+
+# Verify: every package version must be visible on the public registry, otherwise fail the job
+# (a new version can take a few minutes to appear; wait up to NPM_VERIFY_TIMEOUT seconds, default 900).
+deadline=$(( $(date +%s) + ${NPM_VERIFY_TIMEOUT:-900} ))
+while read -r d; do
+  [ -n "$d" ] || continue
+  name=$(node -p "require('$dist/$d/package.json').name")
+  ver=$(node -p "require('$dist/$d/package.json').version")
+  until [ "$(npm view "$name@$ver" version --registry=https://registry.npmjs.org/ 2>/dev/null)" = "$ver" ]; do
+    if [ "$(date +%s)" -ge "$deadline" ]; then
+      echo "::error::$name@$ver is not visible on registry.npmjs.org (publish did not take effect)"
+      exit 1
+    fi
+    sleep 20
+  done
+  echo "verified $name@$ver on registry.npmjs.org"
+done < "$dist/PUBLISH_ORDER"
