@@ -79,6 +79,7 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro balance transaction list` | Bakiye hareketleri | `GET /balance/transactions` |
 | `gyro billing topup-url get` | Browser link of the balance top-up page (top-ups are invoiced with VAT; usage is not) | `GET /cloud/billing/topup-url` |
 | `gyro bulk` | Bir eylemi 50 sunucuya kadar toplu çalıştır | `POST /cloud/bulk` |
+| `gyro container create` | Kapsayıcı ortamı oluştur (toplu) | `POST /cloud/containers` |
 | `gyro container domain add` | Alan adı bağla | `POST /cloud/containers/{id}/services/{name}/domains` |
 | `gyro container domain list` | Servisin alan adları | `GET /cloud/containers/{id}/services/{name}/domains` |
 | `gyro container domain remove` | Alan adını kaldır | `DELETE /cloud/containers/{id}/services/{name}/domains/{domain}` |
@@ -94,6 +95,7 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro container notifications set` | Bildirim kanallarını ayarla | `PUT /cloud/containers/{id}/notifications` |
 | `gyro container notifications test` | Test bildirimi gönder | `POST /cloud/containers/{id}/notifications/test` |
 | `gyro container notifications webhook-secret` | Webhook imza anahtarı | `POST /cloud/containers/{id}/notifications/webhook-secret` |
+| `gyro container plans` | Kapsayıcı ortam paketlerini listele | `GET /cloud/containers/plans` |
 | `gyro container registry credentials` | Depo parolası | `POST /cloud/containers/{id}/registry/credentials` |
 | `gyro container registry get` | Ortamın Gyro imaj deposu | `GET /cloud/containers/{id}/registry` |
 | `gyro container registry image-delete` | İmaj etiketini sil | `DELETE /cloud/containers/{id}/registry/images` |

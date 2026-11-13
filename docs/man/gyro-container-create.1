@@ -1,0 +1,117 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-container-create - Create container environments (batch)
+
+
+.SH SYNOPSIS
+\fBgyro container create [flags]\fP
+
+
+.SH DESCRIPTION
+Create container environments (batch)
+
+.PP
+Orders 1..N environments of a plan in ONE order (\fBquantity\fR, default 1, max 25 per request). Prepaid: the order is 0 and usage is charged hourly from the balance; the balance must cover the first 24 hours of every environment and new accounts are limited in their first days. \fBname\fR (with \fB{n}\fR) and \fBtags\fR label every environment; \fBproject_id\fR puts them in a project. Send \fB"dry_run": true\fR for a quote; a real order needs \fB"confirm": true\fR and an \fBIdempotency-Key\fR header.
+
+.PP
+API: POST /cloud/containers (operationId createContainerEnvironments, scope cloud_order)
+
+
+.SH OPTIONS
+\fB--data\fP=""
+	request body as JSON, @file or @- (stdin)
+
+.PP
+\fB--dry-run\fP[=false]
+	show the price quote / request without changing anything
+
+.PP
+\fB-h\fP, \fB--help\fP[=false]
+	help for create
+
+.PP
+\fB--idempotency-key\fP=""
+	idempotency key (automatic for money operations)
+
+.PP
+\fB--name\fP=""
+	name (nickname); {n} = number in a batch
+
+.PP
+\fB--plan\fP=""
+	plan from GET /cloud/containers/plans (mini-1-1, small-1-2, starter, standart, pro, serverless)
+
+.PP
+\fB--product-id\fP=0
+	product id instead of plan
+
+.PP
+\fB--project-id\fP=0
+	project (0 = default project)
+
+.PP
+\fB--quantity\fP=0
+	environments to create in one order (--count), default 1, max 25
+
+.PP
+\fB--set\fP=[]
+	extra body field key=value (repeatable)
+
+.PP
+\fB--tags\fP=[]
+	tags (max 10)
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH SEE ALSO
+\fBgyro-container(1)\fP

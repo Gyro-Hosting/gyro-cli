@@ -2,7 +2,7 @@
 openapi: 3.1.0
 info:
   title: Gyro Public API
-  version: 2.20.1
+  version: 2.21.0
   summary: Manage Gyro cloud servers, SSH keys and billing programmatically.
   x-summary-tr: Gyro bulut sunucularınızı, SSH anahtarlarınızı ve faturalarınızı programla yönetin.
   description: "The Gyro Public API lets you automate everything you do in the Gyro client area:\norder and manage cloud servers, keep SSH keys, read invoices and\
@@ -39,7 +39,9 @@ info:
     \ of the reinstall; response `app_install_id`); `POST /cloud/servers/{id}/app` also on tr-ist-1. Install status `kaldirildi` = removed by a later reinstall. Additive.\n\
     \n**2.20.0**: Protected Storage buckets can be mounted on servers (`/cloud/servers/{id}/storage-mounts`, read-only by default, read/write needs `accept_versioning:\
     \ true`, field `protected`) and renamed (`POST /cloud/storage/{id}/buckets/{bucket}/rename`: display name + website address change, S3 name stays, `s3_name` in\
-    \ bucket lists). Additive.\n\n**2.20.1**: documentation only (example values). No functional change.\n"
+    \ bucket lists). Additive.\n\n**2.20.1**: documentation only (example values). No functional change.\n\n**2.21.0**: batch create: `POST /cloud/servers` takes\
+    \ `quantity` (N servers in one order), `name` (`{n}` template) / `tags` and `app`; container environments can be ordered through the API: `GET /cloud/containers/plans`,\
+    \ `POST /cloud/containers` (`quantity`, `name`, `tags`, `project_id`). Additive.\n"
   x-description-tr: "Gyro Public API, müşteri panelinde yaptığınız her işi otomatikleştirmenizi sağlar:\nbulut sunucu siparişi ve yönetimi, SSH anahtarları, fatura\
     \ ve bakiye okuma.\nResmi Terraform sağlayıcısı (`gyro-hosting/gyro`) ve `gyroctl` bu API'yi kullanır.\n\n* **Taban adres** `https://www.gyrohosting.com/api/v1/client`\n\
     * **Kimlik** `Authorization: Bearer wck_...` (anahtarı *Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri* bölümünden oluşturun)\n* **Biçim** JSON\
@@ -74,7 +76,9 @@ info:
     \ (yeniden kurulum + tek tıkla uygulama; yanıtta `app_install_id`); `POST /cloud/servers/{id}/app` tr-ist-1'de de çalışır. Kurulum durumu `kaldirildi` = sonraki\
     \ yeniden kurulumla kaldırıldı. Geriye uyumlu.\n\n**2.20.0**: Korumalı Depolama kovaları sunucuya bağlanabilir (varsayılan salt okuma, okuma-yazma `accept_versioning:\
     \ true` ister, `protected` alanı) ve adı değiştirilebilir (görünen ad + web adresi değişir, S3 adı sabit, kova listelerinde `s3_name`). Geriye uyumlu.\n\n**2.20.1**:\
-    \ yalnız belge (örnek değerler). İşlev değişikliği yok.\n"
+    \ yalnız belge (örnek değerler). İşlev değişikliği yok.\n\n**2.21.0**: toplu oluşturma: `POST /cloud/servers` `quantity` (tek siparişte N sunucu), `name` (`{n}`\
+    \ şablonu) / `tags` ve `app` alır; kapsayıcı ortamları API ile açılabilir: `GET /cloud/containers/plans`, `POST /cloud/containers` (`quantity`, `name`, `tags`,\
+    \ `project_id`). Geriye uyumlu.\n"
   contact:
     name: Gyro Hosting
     url: https://www.gyrohosting.com
@@ -600,11 +604,14 @@ paths:
         Provisioning is asynchronous (typically under a minute): poll `GET /cloud/servers/{id}` until\n`status` is `active` and `live.power_state` is `running`.\n\
         \n**Prepaid products** (`billing: prepaid`, e.g. tr-ist-1): `cycle` is ignored; the order total is 0 and usage is charged hourly from the balance (at most\
         \ the monthly price per month). The balance must cover the first 24 hours, otherwise 422 with the amount to top up (GET /cloud/billing/topup-url). During\
-        \ the first 7 days a new account may run at most 2 prepaid servers and 1 container environment."
+        \ the first 7 days a new account may run at most 2 prepaid servers and 1 container environment.\n\n**Batch (2.21.0):** `quantity` creates N servers in one\
+        \ order (one invoice), each a separate service; `name` (with `{n}`) and `tags` label them. `app` installs a one-click app on each."
       x-description-tr: "Sipariş oluşturur ve **hesap bakiyenizden** öder (kayıtlı karttan asla çekmez).\nGüvenlik kuralları:\n* önce `\"dry_run\": true` ile fiyat\
         \ teklifi alın; hiçbir şey oluşturulmaz;\n* gerçek sipariş için `\"confirm\": true` **ve** `Idempotency-Key` başlığı zorunludur — aynı anahtar ve\n  gövdeyle\
         \ tekrar denemek ikinci sipariş yerine ilk yanıtı döndürür (`Idempotency-Replayed: true`);\n* yönetici hesap başına sunucu sınırı koyabilir (`409 server_limit`).\n\
-        Kurulum eşzamansızdır (genellikle bir dakikadan kısa): `status` `active` ve `live.power_state`\n`running` olana kadar `GET /cloud/servers/{id}` ile sorgulayın.\n"
+        Kurulum eşzamansızdır (genellikle bir dakikadan kısa): `status` `active` ve `live.power_state`\n`running` olana kadar `GET /cloud/servers/{id}` ile sorgulayın.\n\
+        \n\n**Toplu (2.21.0):** `quantity` tek siparişte (tek fatura) N sunucu oluşturur, her biri ayrı hizmettir; `name` (`{n}` ile) ve `tags` adlandırır. `app`\
+        \ her birine tek tık uygulama kurar."
       x-scope: cloud_order
       parameters:
       - $ref: '#/components/parameters/IdempotencyKey'
@@ -659,6 +666,7 @@ paths:
           $ref: '#/components/responses/Conflict'
         '422':
           $ref: '#/components/responses/Validation'
+      x-cli: {}
   /cloud/servers/{id}:
     parameters:
     - $ref: '#/components/parameters/ServerId'
@@ -19184,6 +19192,140 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /cloud/containers/plans:
+    get:
+      tags:
+      - Containers
+      operationId: listContainerPlans
+      summary: List container environment plans
+      x-summary-tr: Kapsayıcı ortam paketlerini listele
+      x-scope: cloud_read
+      x-cli:
+        command: container plans
+      description: Orderable Gyro Container (ECS) environment plans with prepaid prices. A plan is ONE environment (a dedicated node pool); `max_services` is the
+        most apps you can define, `max_replicas` the most replicas per service; all of them share the pool.
+      x-description-tr: Sipariş edilebilir Gyro Kapsayıcı (ECS) ortam paketleri ve ön ödemeli fiyatlar. Paket = 1 ortam (size ayrılmış düğüm havuzu); `max_services`
+        tanımlanabilecek en fazla uygulama, `max_replicas` servis başına en fazla kopya; hepsi havuzu paylaşır.
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ContainerPlan'
+  /cloud/containers:
+    post:
+      tags:
+      - Containers
+      operationId: createContainerEnvironments
+      summary: Create container environments (batch)
+      x-summary-tr: Kapsayıcı ortamı oluştur (toplu)
+      x-scope: cloud_order
+      x-cli:
+        command: container create
+        money: true
+      description: 'Orders 1..N environments of a plan in ONE order (`quantity`, default 1, max 25 per request). Prepaid: the order is 0 and usage is charged hourly
+        from the balance; the balance must cover the first 24 hours of every environment and new accounts are limited in their first days. `name` (with `{n}`) and
+        `tags` label every environment; `project_id` puts them in a project. Send `"dry_run": true` for a quote; a real order needs `"confirm": true` and an `Idempotency-Key`
+        header.'
+      x-description-tr: 'Bir paketten 1..N ortamı TEK siparişte açar (`quantity`, varsayılan 1, istek başına en çok 25). Ön ödemeli: sipariş 0''dır, kullanım saatlik
+        bakiyeden düşer; bakiye her ortamın ilk 24 saatini karşılamalıdır, yeni hesaplar ilk günlerde sınırlıdır. `name` (`{n}` ile) ve `tags` her ortamı adlandırır;
+        `project_id` projeye koyar. Teklif için `"dry_run": true`; gerçek sipariş `"confirm": true` ve `Idempotency-Key` başlığı ister.'
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                plan:
+                  type: string
+                  example: mini-1-1
+                  description: plan from GET /cloud/containers/plans (mini-1-1, small-1-2, starter, standart, pro, serverless)
+                  x-description-tr: GET /cloud/containers/plans paketi
+                product_id:
+                  type: integer
+                  description: product id instead of plan
+                  x-description-tr: plan yerine ürün kimliği
+                quantity:
+                  type: integer
+                  minimum: 1
+                  default: 1
+                  description: environments to create in one order (--count), default 1, max 25
+                  x-description-tr: tek siparişte açılacak ortam (--count), varsayılan 1, en çok 25
+                name:
+                  type: string
+                  maxLength: 60
+                  example: gyro-ecs-{n}
+                  description: name (nickname); {n} = number in a batch
+                  x-description-tr: ad (takma ad); toplu oluşturmada {n} = sıra no
+                tags:
+                  type: array
+                  items:
+                    type: string
+                  maxItems: 10
+                  description: tags (max 10)
+                  x-description-tr: etiketler (en çok 10)
+                project_id:
+                  type:
+                  - integer
+                  - 'null'
+                  description: project (0 = default project)
+                  x-description-tr: proje (0 = Genel)
+                confirm:
+                  type: boolean
+                dry_run:
+                  type: boolean
+            example:
+              plan: mini-1-1
+              quantity: 3
+              name: gyro-ecs-{n}
+              tags:
+              - gyro-test
+              confirm: true
+      responses:
+        '200':
+          description: Dry-run quote
+        '202':
+          description: Ordered; environments are being set up
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      environments:
+                        type: array
+                        items:
+                          type: object
+                      quantity:
+                        type: integer
+                      plan:
+                        type: string
+                      order:
+                        type: object
+                      payment:
+                        type:
+                        - object
+                        - 'null'
+                      invoice:
+                        type:
+                        - object
+                        - 'null'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/Validation'
 components:
   securitySchemes:
     bearerAuth:
@@ -19685,6 +19827,7 @@ components:
         hostname:
           type: string
           example: web-1.example.com
+          description: ' In a batch `{n}` is replaced with 1..N (e.g. `web-{n}.example.com`); without `{n}` `-1`, `-2`... is appended.'
         user_data:
           type: string
           maxLength: 32768
@@ -19702,6 +19845,38 @@ components:
           type: integer
           description: 'Reseller main key: assign the new server to this end-customer'
         project_id: *id045
+        quantity:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 1
+          description: 'Create N identical servers in ONE order (default 1). Upper limit per request: 25 by default (operator setting / per-account override; 422
+            invalid_quantity above it). The server cap and the prepaid 24-hour balance rule count all N.'
+        name:
+          type: string
+          maxLength: 60
+          example: gyro-web-{n}
+          description: Service name (nickname, shown in the panel, console and API as `nickname`). `{n}` is replaced with 1..N in a batch; without `{n}` a batch appends
+            `-1`, `-2`...
+        tags:
+          type: array
+          maxItems: 10
+          items:
+            oneOf:
+            - type: string
+            - type: object
+              properties:
+                name:
+                  type: string
+                color:
+                  type: string
+          description: Labels for every new server (max 10, 24 characters each).
+        app:
+          type: string
+          description: One-click app id from GET /cloud/apps, installed when the server is up (products that offer apps). Not with `user_data`.
+        app_domain:
+          type: string
+          description: Domain of the app (its A record must point to the new server); quantity 1 only.
     Quote:
       type: object
       properties:
@@ -19751,6 +19926,13 @@ components:
           type:
           - integer
           - 'null'
+        servers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Server'
+          description: All servers of the order (2.21.0); `server` = the first one.
+        quantity:
+          type: integer
     ActionResult:
       type: object
       properties:
@@ -21719,3 +21901,73 @@ components:
               type: integer
         removed:
           type: integer
+    ContainerPlan:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: product id
+        plan:
+          type: string
+          example: mini-1-1
+          description: plan name for POST /cloud/containers (serverless = per-container usage)
+        name:
+          type: string
+        serverless:
+          type: boolean
+        region:
+          type: string
+          example: tr-ist-1
+        nodes:
+          type:
+          - integer
+          - 'null'
+          description: nodes in the environment's dedicated pool
+        node_cores:
+          type:
+          - integer
+          - 'null'
+        node_memory_gb:
+          type:
+          - number
+          - 'null'
+        node_disk_gb:
+          type:
+          - integer
+          - 'null'
+        max_services:
+          type:
+          - integer
+          - 'null'
+          description: most services (apps) you can define; all services and replicas share the pool
+        max_replicas:
+          type:
+          - integer
+          - 'null'
+          description: most replicas per service (autoscaling)
+        max_domains:
+          type:
+          - integer
+          - 'null'
+        billing:
+          type: string
+          const: prepaid
+        currency:
+          type: string
+        monthly_cap_eur:
+          type:
+          - number
+          - 'null'
+        hourly_eur:
+          type:
+          - number
+          - 'null'
+        usage:
+          type:
+          - object
+          - 'null'
+          properties:
+            vcpu_hour_eur:
+              type: number
+            gb_hour_eur:
+              type: number

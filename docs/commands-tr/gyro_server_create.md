@@ -11,6 +11,8 @@ iki kez sipariş vermez.
 --plan: plan adı (standart-2-4, pro-2-8 ...) ya da ürün kimliği ('gyro plan list').
 --region (ya da --location): bölge (eu-de-1, tr-ist-1, 'gyro location list') ya da şehir (falkenstein, istanbul).
 tr-ist-1'de (İstanbul) en çok 10 --ssh-key ve --user-data oluşturmada cloud-init ile kurulur (SSH ~25 sn).
+--count N tek siparişte N aynı sunucu açar (API 2.21.0+); sunucu adında / --name içinde "{n}" 1..N olur
+("{n}" yoksa sona -1, -2 ... eklenir). --name ve --tag sunucuları adlandırır (panel, konsol, 'gyro service label').
 
 ```
 gyro server create [HOSTNAME] [flags]
@@ -23,12 +25,14 @@ gyro server create [HOSTNAME] [flags]
   gyro server create --plan standart-2-4 --location eu-de-1 --image debian-12 --ssh-key ~/.ssh/id_ed25519.pub --dry-run
   gyro server create db-1 --plan standart-2-4 --location eu-de-2 --image ubuntu-24.04 --user-data @cloud-init.yaml --yes -o json
   gyro server create ist-1 --plan standart-2-4 --region tr-ist-1 --image ubuntu-24.04 --ssh-key mykey --wait
+  gyro server create gyro-web-{n} --count 3 --plan standart-1-2 --region tr-ist-1 --image ubuntu-24.04 --tag gyro-test --yes
 ```
 
 ### Options
 
 ```
       --app string               kurulacak tek tık uygulama (API v2 gerekir)
+      --count int                tek siparişte açılacak sunucu sayısı (API 2.21.0+, varsayılan en çok 25) (default 1)
       --cycle string             monthly|quarterly|semiannually|annually (default "monthly")
       --data string              ek istek gövdesi JSON / @dosya
       --dry-run                  yalnız fiyat teklifini göster
@@ -37,10 +41,12 @@ gyro server create [HOSTNAME] [flags]
       --idempotency-key string   tekrar güvenliği anahtarı (varsayılan: rastgele)
       --image string             işletim sistemi imajı, ör. ubuntu-24.04 (zorunlu)
       --location string          bölge (eu-de-1) ya da şehir
+      --name string              hizmet adı (takma ad); toplu oluşturmada {n} = sıra no
       --plan string              plan adı ya da ürün kimliği (zorunlu)
       --region string            bölge (eu-de-1, tr-ist-1); --location ile aynı
       --set stringArray          ek gövde alanı anahtar=değer (tekrarlanabilir)
       --ssh-key strings          SSH anahtarı kimliği, adı ya da .pub dosyası (yeniyse yüklenir)
+      --tag strings              yeni sunuculara etiket (tekrarlanabilir, en çok 10)
       --user-data string         cloud-init verisi, metin ya da @dosya
       --wait                     sunucu çalışana kadar bekle
       --wait-timeout duration    --wait için en uzun süre (default 15m0s)

@@ -3,7 +3,7 @@
 package spec
 
 // APIVersion is info.version of the spec this table was generated from.
-const APIVersion = "2.20.1"
+const APIVersion = "2.21.0"
 
 // Ops lists every API operation.
 var Ops = []Op{
@@ -107,6 +107,33 @@ var Ops = []Op{
 			{Name: "image", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
 			{Name: "confirm", Type: "boolean", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
 		},
+	},
+	{ID: "createContainerEnvironments", Method: "POST", Path: "/cloud/containers", Tag: "Containers",
+		Summary: "Create container environments (batch)", SummaryTR: "Kapsayıcı ortamı oluştur (toplu)",
+		Desc: "Orders 1..N environments of a plan in ONE order (`quantity`, default 1, max 25 per request). Prepaid: the order is 0 and usage is charged hourly from the balance; the balance must cover the first 24 hours of every environment and new accounts are limited in their first days. `name` (with `{n}`) and `tags` label every environment; `project_id` puts them in a project. Send `\"dry_run\": true` for a quote; a real order needs `\"confirm\": true` and an `Idempotency-Key` header.", DescTR: "Bir paketten 1..N ortamı TEK siparişte açar (`quantity`, varsayılan 1, istek başına en çok 25). Ön ödemeli: sipariş 0'dır, kullanım saatlik bakiyeden düşer; bakiye her ortamın ilk 24 saatini karşılamalıdır, yeni hesaplar ilk günlerde sınırlıdır. `name` (`{n}` ile) ve `tags` her ortamı adlandırır; `project_id` projeye koyar. Teklif için `\"dry_run\": true`; gerçek sipariş `\"confirm\": true` ve `Idempotency-Key` başlığı ister.",
+		Scope: "cloud_order", Command: []string{"container", "create"},
+		HasBody: true, BodyRequired: true, ListResponse: false, Paginated: false, Confirm: true, Money: true, Hidden: false,
+		Columns: []string{"quantity", "plan"},
+		Params: []Param{
+			{Name: "Idempotency-Key", In: "header", Type: "string", Items: "", Enum: nil, Default: "", Required: true, Desc: "Unique per logical request (e.g. a UUID). Replays within 24 hours return the stored answer.", DescTR: ""},
+		},
+		Body: []Field{
+			{Name: "plan", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "plan from GET /cloud/containers/plans (mini-1-1, small-1-2, starter, standart, pro, serverless)", DescTR: "GET /cloud/containers/plans paketi"},
+			{Name: "product_id", Type: "integer", Items: "", Enum: nil, Default: "", Required: false, Desc: "product id instead of plan", DescTR: "plan yerine ürün kimliği"},
+			{Name: "quantity", Type: "integer", Items: "", Enum: nil, Default: "1", Required: false, Desc: "environments to create in one order (--count), default 1, max 25", DescTR: "tek siparişte açılacak ortam (--count), varsayılan 1, en çok 25"},
+			{Name: "name", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "name (nickname); {n} = number in a batch", DescTR: "ad (takma ad); toplu oluşturmada {n} = sıra no"},
+			{Name: "tags", Type: "array", Items: "string", Enum: nil, Default: "", Required: false, Desc: "tags (max 10)", DescTR: "etiketler (en çok 10)"},
+			{Name: "project_id", Type: "integer", Items: "", Enum: nil, Default: "", Required: false, Desc: "project (0 = default project)", DescTR: "proje (0 = Genel)"},
+			{Name: "confirm", Type: "boolean", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
+			{Name: "dry_run", Type: "boolean", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
+		},
+	},
+	{ID: "listContainerPlans", Method: "GET", Path: "/cloud/containers/plans", Tag: "Containers",
+		Summary: "List container environment plans", SummaryTR: "Kapsayıcı ortam paketlerini listele",
+		Desc: "Orderable Gyro Container (ECS) environment plans with prepaid prices. A plan is ONE environment (a dedicated node pool); `max_services` is the most apps you can define, `max_replicas` the most replicas per service; all of them share the pool.", DescTR: "Sipariş edilebilir Gyro Kapsayıcı (ECS) ortam paketleri ve ön ödemeli fiyatlar. Paket = 1 ortam (size ayrılmış düğüm havuzu); `max_services` tanımlanabilecek en fazla uygulama, `max_replicas` servis başına en fazla kopya; hepsi havuzu paylaşır.",
+		Scope: "cloud_read", Command: []string{"container", "plans"},
+		HasBody: false, BodyRequired: false, ListResponse: true, Paginated: false, Confirm: false, Money: false, Hidden: false,
+		Columns: []string{"id", "plan", "name", "serverless", "region", "nodes", "node_cores", "node_memory_gb", "node_disk_gb", "max_services", "max_replicas", "max_domains", "billing", "currency", "monthly_cap_eur", "hourly_eur"},
 	},
 	{ID: "typed_get_containers__id__events", Method: "GET", Path: "/cloud/containers/{id}/events", Tag: "Containers",
 		Summary: "Recent warnings", SummaryTR: "Son uyarılar",
@@ -2010,7 +2037,7 @@ var Ops = []Op{
 	},
 	{ID: "createServer", Method: "POST", Path: "/cloud/servers", Tag: "Servers",
 		Summary: "Create (order) a cloud server", SummaryTR: "Bulut sunucu oluştur (sipariş)",
-		Desc: "Places an order and pays it **from your account balance** (never from a stored card). Safety rules: * send `\"dry_run\": true` first to get a price quote; nothing is created; * a real order needs `\"confirm\": true` **and** an `Idempotency-Key` header — retrying with the same key and body returns the first answer (`Idempotency-Replayed: true`) instead of a second order; * the operator may cap the number of servers per account (`409 server_limit`). Provisioning is asynchronous (typically under a minute): poll `GET /cloud/servers/{id}` until `status` is `active` and `live.power_state` is `running`. **Prepaid products** (`billing: prepaid`, e.g. tr-ist-1): `cycle` is ignored; the order total is 0 and usage is charged hourly from the balance (at most the monthly price per month). The balance must cover the first 24 hours, otherwise 422 with the amount to top up (GET /cloud/billing/topup-url). During the first 7 days a new account may run at most 2 prepaid servers and 1 container environment.", DescTR: "Sipariş oluşturur ve **hesap bakiyenizden** öder (kayıtlı karttan asla çekmez). Güvenlik kuralları: * önce `\"dry_run\": true` ile fiyat teklifi alın; hiçbir şey oluşturulmaz; * gerçek sipariş için `\"confirm\": true` **ve** `Idempotency-Key` başlığı zorunludur — aynı anahtar ve gövdeyle tekrar denemek ikinci sipariş yerine ilk yanıtı döndürür (`Idempotency-Replayed: true`); * yönetici hesap başına sunucu sınırı koyabilir (`409 server_limit`). Kurulum eşzamansızdır (genellikle bir dakikadan kısa): `status` `active` ve `live.power_state` `running` olana kadar `GET /cloud/servers/{id}` ile sorgulayın.",
+		Desc: "Places an order and pays it **from your account balance** (never from a stored card). Safety rules: * send `\"dry_run\": true` first to get a price quote; nothing is created; * a real order needs `\"confirm\": true` **and** an `Idempotency-Key` header — retrying with the same key and body returns the first answer (`Idempotency-Replayed: true`) instead of a second order; * the operator may cap the number of servers per account (`409 server_limit`). Provisioning is asynchronous (typically under a minute): poll `GET /cloud/servers/{id}` until `status` is `active` and `live.power_state` is `running`. **Prepaid products** (`billing: prepaid`, e.g. tr-ist-1): `cycle` is ignored; the order total is 0 and usage is charged hourly from the balance (at most the monthly price per month). The balance must cover the first 24 hours, otherwise 422 with the amount to top up (GET /cloud/billing/topup-url). During the first 7 days a new account may run at most 2 prepaid servers and 1 container environment. **Batch (2.21.0):** `quantity` creates N servers in one order (one invoice), each a separate service; `name` (with `{n}`) and `tags` label them. `app` installs a one-click app on each.", DescTR: "Sipariş oluşturur ve **hesap bakiyenizden** öder (kayıtlı karttan asla çekmez). Güvenlik kuralları: * önce `\"dry_run\": true` ile fiyat teklifi alın; hiçbir şey oluşturulmaz; * gerçek sipariş için `\"confirm\": true` **ve** `Idempotency-Key` başlığı zorunludur — aynı anahtar ve gövdeyle tekrar denemek ikinci sipariş yerine ilk yanıtı döndürür (`Idempotency-Replayed: true`); * yönetici hesap başına sunucu sınırı koyabilir (`409 server_limit`). Kurulum eşzamansızdır (genellikle bir dakikadan kısa): `status` `active` ve `live.power_state` `running` olana kadar `GET /cloud/servers/{id}` ile sorgulayın. **Toplu (2.21.0):** `quantity` tek siparişte (tek fatura) N sunucu oluşturur, her biri ayrı hizmettir; `name` (`{n}` ile) ve `tags` adlandırır. `app` her birine tek tık uygulama kurar.",
 		Scope: "cloud_order", Command: []string{"server", "create"},
 		HasBody: true, BodyRequired: true, ListResponse: false, Paginated: false, Confirm: true, Money: true, Hidden: false,
 		Columns: []string{"dry_run"},
@@ -2026,12 +2053,17 @@ var Ops = []Op{
 			{Name: "cycle", Type: "string", Items: "", Enum: []string{"monthly", "quarterly", "semiannually", "annually"}, Default: "monthly", Required: false, Desc: "", DescTR: ""},
 			{Name: "image", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
 			{Name: "ssh_keys", Type: "array", Items: "integer", Enum: nil, Default: "", Required: false, Desc: "Ids from /cloud/ssh-keys. Global regions: one key, installed at creation. tr-ist-1: up to 10 keys, installed for root at creation through cloud-init (2.14.0; `ssh_keys` on GET /cloud/servers/{id} stays null for these servers).", DescTR: ""},
-			{Name: "hostname", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
+			{Name: "hostname", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "In a batch `{n}` is replaced with 1..N (e.g. `web-{n}.example.com`); without `{n}` `-1`, `-2`... is appended.", DescTR: ""},
 			{Name: "user_data", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "cloud-init user data: `#cloud-config` or a `#!` script, max 32 KiB. Accepted in every region (tr-ist-1 since 2.14.0). Ignored when a one-click application is chosen on the product.", DescTR: "cloud-init kullanıcı verisi: `#cloud-config` ya da `#!` betiği, en çok 32 KiB. Tüm bölgelerde (tr-ist-1'de 2.14.0'dan beri) kabul edilir. Üründe tek tıkla uygulama seçilirse kullanılmaz."},
 			{Name: "dry_run", Type: "boolean", Items: "", Enum: nil, Default: "false", Required: false, Desc: "", DescTR: ""},
 			{Name: "confirm", Type: "boolean", Items: "", Enum: nil, Default: "", Required: false, Desc: "Must be true to place a paid order", DescTR: ""},
 			{Name: "end_customer_id", Type: "integer", Items: "", Enum: nil, Default: "", Required: false, Desc: "Reseller main key: assign the new server to this end-customer", DescTR: ""},
 			{Name: "project_id", Type: "integer", Items: "", Enum: nil, Default: "", Required: false, Desc: "Optional project for the new service(s) (0 = default project). Checked before the order: unknown id = 404 `project_not_found` (GyroAPI order endpoints) or 422 `checkout_blocked` with `[project_not_found]` (POST /orders).", DescTR: ""},
+			{Name: "quantity", Type: "integer", Items: "", Enum: nil, Default: "1", Required: false, Desc: "Create N identical servers in ONE order (default 1). Upper limit per request: 25 by default (operator setting / per-account override; 422 invalid_quantity above it). The server cap and the prepaid 24-hour balance rule count all N.", DescTR: ""},
+			{Name: "name", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "Service name (nickname, shown in the panel, console and API as `nickname`). `{n}` is replaced with 1..N in a batch; without `{n}` a batch appends `-1`, `-2`...", DescTR: ""},
+			{Name: "tags", Type: "array", Items: "string", Enum: nil, Default: "", Required: false, Desc: "Labels for every new server (max 10, 24 characters each).", DescTR: ""},
+			{Name: "app", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "One-click app id from GET /cloud/apps, installed when the server is up (products that offer apps). Not with `user_data`.", DescTR: ""},
+			{Name: "app_domain", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "Domain of the app (its A record must point to the new server); quantity 1 only.", DescTR: ""},
 		},
 	},
 	{ID: "getServer", Method: "GET", Path: "/cloud/servers/{id}", Tag: "Servers",
@@ -3442,7 +3474,7 @@ var Ops = []Op{
 		Desc: "A normal prepaid tr-ist-1 order (24-hour balance rule, account limits) installed from the template. `product_id` (or `plan`) from GET /cloud/products?region=tr-ist-1; its disk must be at least the template `min_disk_gb`. Send `\"confirm\": true` and an `Idempotency-Key` header (`dry_run` for a quote).", DescTR: "Şablondan kurulan normal ön ödemeli tr-ist-1 siparişi (24 saat bakiye kuralı, hesap sınırları). `product_id` (ya da `plan`) GET /cloud/products?region=tr-ist-1'den; diski şablonun `min_disk_gb` değerinden küçük olamaz. `\"confirm\": true` ve `Idempotency-Key` başlığı gerekir (teklif için `dry_run`).",
 		Scope: "cloud_order", Command: []string{"template", "deploy"},
 		HasBody: true, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: true, Money: true, Hidden: false,
-		Columns: []string{"end_customer_id"},
+		Columns: []string{"end_customer_id", "quantity"},
 		Params: []Param{
 			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Template id", DescTR: ""},
 		},

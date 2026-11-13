@@ -32,6 +32,7 @@ gyro container [flags]
 ### SEE ALSO
 
 * [gyro](gyro.md)	 - Gyro Hosting command-line interface
+* [gyro container create](gyro_container_create.md)	 - Create container environments (batch)
 * [gyro container domain](gyro_container_domain.md)	 - Domains of a service
 * [gyro container env](gyro_container_env.md)	 - Set environment variables
 * [gyro container events](gyro_container_events.md)	 - Recent warnings
@@ -40,6 +41,7 @@ gyro container [flags]
 * [gyro container metrics](gyro_container_metrics.md)	 - Service CPU / memory
 * [gyro container nodes](gyro_container_nodes.md)	 - Node pool
 * [gyro container notifications](gyro_container_notifications.md)	 - Notification settings and current alerts
+* [gyro container plans](gyro_container_plans.md)	 - List container environment plans
 * [gyro container registry](gyro_container_registry.md)	 - Gyro image registry of the environment
 * [gyro container secret](gyro_container_secret.md)	 - Delete secret values
 * [gyro container service](gyro_container_service.md)	 - List container services

@@ -32,6 +32,7 @@ gyro container [flags]
 ### SEE ALSO
 
 * [gyro](gyro.md)	 - Gyro Hosting komut satırı aracı
+* [gyro container create](gyro_container_create.md)	 - Kapsayıcı ortamı oluştur (toplu)
 * [gyro container domain](gyro_container_domain.md)	 - Servisin alan adları
 * [gyro container env](gyro_container_env.md)	 - Ortam değişkenlerini ayarla
 * [gyro container events](gyro_container_events.md)	 - Son uyarılar
@@ -40,6 +41,7 @@ gyro container [flags]
 * [gyro container metrics](gyro_container_metrics.md)	 - Servis işlemci / bellek
 * [gyro container nodes](gyro_container_nodes.md)	 - Düğüm havuzu
 * [gyro container notifications](gyro_container_notifications.md)	 - Bildirim ayarları ve süren uyarılar
+* [gyro container plans](gyro_container_plans.md)	 - Kapsayıcı ortam paketlerini listele
 * [gyro container registry](gyro_container_registry.md)	 - Ortamın Gyro imaj deposu
 * [gyro container secret](gyro_container_secret.md)	 - Gizli değer sil
 * [gyro container service](gyro_container_service.md)	 - Kapsayıcı servislerini listele
