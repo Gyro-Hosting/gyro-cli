@@ -36,6 +36,8 @@ gyro container registry [flags]
 * [gyro container registry get](gyro_container_registry_get.md)	 - Ortamın Gyro imaj deposu
 * [gyro container registry image-delete](gyro_container_registry_image-delete.md)	 - İmaj etiketini sil
 * [gyro container registry images](gyro_container_registry_images.md)	 - Depodaki imajlar
+* [gyro container registry import](gyro_container_registry_import.md)	 - Başka bir depodan imaj içe aktar
+* [gyro container registry imports](gyro_container_registry_imports.md)	 - İmaj içe aktarmaları (ilerleme ve geçmiş)
 * [gyro container registry policy](gyro_container_registry_policy.md)	 - İmaj temizlik ayarı
 * [gyro container registry rotate](gyro_container_registry_rotate.md)	 - Depo parolasını yenile
 

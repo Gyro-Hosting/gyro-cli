@@ -100,6 +100,8 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro container registry get` | Gyro image registry of the environment | `GET /cloud/containers/{id}/registry` |
 | `gyro container registry image-delete` | Delete an image tag | `DELETE /cloud/containers/{id}/registry/images` |
 | `gyro container registry images` | Images in the registry | `GET /cloud/containers/{id}/registry/images` |
+| `gyro container registry import` | Import an image from another registry | `POST /cloud/containers/{id}/registry/imports` |
+| `gyro container registry imports` | Image imports (progress and history) | `GET /cloud/containers/{id}/registry/imports` |
 | `gyro container registry policy` | Image clean-up policy | `PUT /cloud/containers/{id}/registry/policy` |
 | `gyro container registry rotate` | Rotate the registry password | `POST /cloud/containers/{id}/registry/rotate` |
 | `gyro container secret delete` | Delete secret values | `DELETE /cloud/containers/{id}/services/{name}/secrets` |

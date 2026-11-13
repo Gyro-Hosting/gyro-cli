@@ -100,6 +100,8 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro container registry get` | Ortamın Gyro imaj deposu | `GET /cloud/containers/{id}/registry` |
 | `gyro container registry image-delete` | İmaj etiketini sil | `DELETE /cloud/containers/{id}/registry/images` |
 | `gyro container registry images` | Depodaki imajlar | `GET /cloud/containers/{id}/registry/images` |
+| `gyro container registry import` | Başka bir depodan imaj içe aktar | `POST /cloud/containers/{id}/registry/imports` |
+| `gyro container registry imports` | İmaj içe aktarmaları (ilerleme ve geçmiş) | `GET /cloud/containers/{id}/registry/imports` |
 | `gyro container registry policy` | İmaj temizlik ayarı | `PUT /cloud/containers/{id}/registry/policy` |
 | `gyro container registry rotate` | Depo parolasını yenile | `POST /cloud/containers/{id}/registry/rotate` |
 | `gyro container secret delete` | Gizli değer sil | `DELETE /cloud/containers/{id}/services/{name}/secrets` |

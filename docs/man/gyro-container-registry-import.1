@@ -1,0 +1,117 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-container-registry-import - Import an image from another registry
+
+
+.SH SYNOPSIS
+\fBgyro container registry import  [flags]\fP
+
+
+.SH DESCRIPTION
+Import an image from another registry
+
+.PP
+Copies an image (e.g. \fBnginx:1.27\fR, \fBdocker.io/library/redis:7\fR, \fBghcr.io/gyro-ornek/uygulama:1.0\fR) into the environment's Gyro registry without \fBdocker push\fR\&. HTTPS registries only; only the linux/amd64 variant of multi-platform images is copied. \fBrepo\fR (default: last part of the source name) and \fBtag\fR (default: source tag) name the copy under \fB<host>/<code>/\fR; an existing name:tag needs \fBoverwrite: true\fR\&. Private images: \fBusername\fR + \fBpassword\fR (token) are used only for this copy, never stored or returned, and redacted in the API log. Runs in the background: poll GET .../registry/imports. Limits: 1 running import per environment (409 \fBimport_running\fR), 10 per hour (429 \fBimport_rate_limited\fR), 15 minutes, 128 layers, size within the free registry space (50 GB cap, 2 GB free, then the usual €0.05/GB-month). Sources that resolve to private, internal or Gyro infrastructure addresses are refused (\fBsource_blocked\fR).
+
+.PP
+API: POST /cloud/containers/{id}/registry/imports (operationId importContainerImage, scope services_write)
+
+
+.SH OPTIONS
+\fB--data\fP=""
+	request body as JSON, @file or @- (stdin)
+
+.PP
+\fB--dry-run\fP[=false]
+	show the price quote / request without changing anything
+
+.PP
+\fB-h\fP, \fB--help\fP[=false]
+	help for import
+
+.PP
+\fB--idempotency-key\fP=""
+	idempotency key (automatic for money operations)
+
+.PP
+\fB--overwrite\fP[=false]
+	replace an existing name:tag
+
+.PP
+\fB--password\fP=""
+	private source: token / password (not stored, redacted in logs)
+
+.PP
+\fB--repo\fP=""
+	target name under your prefix (lowercase, max 3 levels)
+
+.PP
+\fB--set\fP=[]
+	extra body field key=value (repeatable)
+
+.PP
+\fB--source\fP=""
+	source image (host/repo:tag or @sha256:...); docker.io when no host
+
+.PP
+\fB--tag\fP=""
+	target tag (default: source tag, \fBlatest\fR for a digest)
+
+.PP
+\fB--username\fP=""
+	private source: username (not stored)
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH SEE ALSO
+\fBgyro-container-registry(1)\fP

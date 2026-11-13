@@ -36,6 +36,8 @@ gyro container registry [flags]
 * [gyro container registry get](gyro_container_registry_get.md)	 - Gyro image registry of the environment
 * [gyro container registry image-delete](gyro_container_registry_image-delete.md)	 - Delete an image tag
 * [gyro container registry images](gyro_container_registry_images.md)	 - Images in the registry
+* [gyro container registry import](gyro_container_registry_import.md)	 - Import an image from another registry
+* [gyro container registry imports](gyro_container_registry_imports.md)	 - Image imports (progress and history)
 * [gyro container registry policy](gyro_container_registry_policy.md)	 - Image clean-up policy
 * [gyro container registry rotate](gyro_container_registry_rotate.md)	 - Rotate the registry password
 

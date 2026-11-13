@@ -3,7 +3,7 @@
 package spec
 
 // APIVersion is info.version of the spec this table was generated from.
-const APIVersion = "2.21.0"
+const APIVersion = "2.22.0"
 
 // Ops lists every API operation.
 var Ops = []Op{
@@ -275,6 +275,33 @@ var Ops = []Op{
 		},
 		Body: []Field{
 			{Name: "confirm", Type: "boolean", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
+		},
+	},
+	{ID: "listContainerImageImports", Method: "GET", Path: "/cloud/containers/{id}/registry/imports", Tag: "Containers",
+		Summary: "Image imports (progress and history)", SummaryTR: "İmaj içe aktarmaları (ilerleme ve geçmiş)",
+		Desc: "`active` = the running import (or null) with `phase`, `bytes_done`/`bytes_total`, `layers_done`/`layers`; `jobs` = the last 20 imports (newest first) with `state` and, when failed, `error` + `message`; `limits`.", DescTR: "`active` = süren içe aktarma (ya da null): `phase`, bayt ve katman ilerlemesi; `jobs` = son 20 içe aktarma (yeniden eskiye), başarısızsa `error` + `message`; `limits`.",
+		Scope: "services_read", Command: []string{"container", "registry", "imports"},
+		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
+		Columns: []string{"active"},
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Container environment (service) id", DescTR: ""},
+		},
+	},
+	{ID: "importContainerImage", Method: "POST", Path: "/cloud/containers/{id}/registry/imports", Tag: "Containers",
+		Summary: "Import an image from another registry", SummaryTR: "Başka bir depodan imaj içe aktar",
+		Desc: "Copies an image (e.g. `nginx:1.27`, `docker.io/library/redis:7`, `ghcr.io/gyro-ornek/uygulama:1.0`) into the environment's Gyro registry without `docker push`. HTTPS registries only; only the linux/amd64 variant of multi-platform images is copied. `repo` (default: last part of the source name) and `tag` (default: source tag) name the copy under `<host>/<code>/`; an existing name:tag needs `overwrite: true`. Private images: `username` + `password` (token) are used only for this copy, never stored or returned, and redacted in the API log. Runs in the background: poll GET .../registry/imports. Limits: 1 running import per environment (409 `import_running`), 10 per hour (429 `import_rate_limited`), 15 minutes, 128 layers, size within the free registry space (50 GB cap, 2 GB free, then the usual €0.05/GB-month). Sources that resolve to private, internal or Gyro infrastructure addresses are refused (`source_blocked`).", DescTR: "Bir imajı (ör. `nginx:1.27`, `ghcr.io/gyro-ornek/uygulama:1.0`) `docker push` gerekmeden ortamın Gyro imaj deposuna kopyalar. Yalnız https depolar; çok mimarili imajlarda yalnız linux/amd64 kopyalanır. `repo` (varsayılan: kaynak adının son parçası) ve `tag` (varsayılan: kaynak etiketi) kopyanın adıdır; var olan ad:etiket için `overwrite: true` gerekir. Özel imaj: `username` + `password` (token) yalnız bu kopya için kullanılır, saklanmaz, geri dönmez, API günlüğünde karartılır. Arka planda çalışır: GET .../registry/imports ile izleyin. Sınırlar: ortam başına aynı anda 1 (409 `import_running`), saatte 10 (429 `import_rate_limited`), 15 dakika, 128 katman, boyut deponuzdaki boş alanı aşamaz. İç/özel/Gyro altyapı adreslerine çözülen kaynaklar reddedilir (`source_blocked`).",
+		Scope: "services_write", Command: []string{"container", "registry", "import"},
+		HasBody: true, BodyRequired: true, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Container environment (service) id", DescTR: ""},
+		},
+		Body: []Field{
+			{Name: "source", Type: "string", Items: "", Enum: nil, Default: "", Required: true, Desc: "source image (host/repo:tag or @sha256:...); docker.io when no host", DescTR: "kaynak imaj (host/depo:etiket ya da @sha256:...); host yoksa docker.io"},
+			{Name: "repo", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "target name under your prefix (lowercase, max 3 levels)", DescTR: "hedef ad (küçük harf, en çok 3 seviye)"},
+			{Name: "tag", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "target tag (default: source tag, `latest` for a digest)", DescTR: "hedef etiket"},
+			{Name: "username", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "private source: username (not stored)", DescTR: "özel kaynak: kullanıcı adı (saklanmaz)"},
+			{Name: "password", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "private source: token / password (not stored, redacted in logs)", DescTR: "özel kaynak: token / parola (saklanmaz)"},
+			{Name: "overwrite", Type: "boolean", Items: "", Enum: nil, Default: "false", Required: false, Desc: "replace an existing name:tag", DescTR: "var olan ad:etiketin üzerine yaz"},
 		},
 	},
 	{ID: "typed_put_containers__id__registry_policy", Method: "PUT", Path: "/cloud/containers/{id}/registry/policy", Tag: "Containers",
