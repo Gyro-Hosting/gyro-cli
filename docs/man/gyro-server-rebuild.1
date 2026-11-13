@@ -14,12 +14,24 @@ Reinstall the OS - WIPES THE DISK
 
 
 .SH OPTIONS
+\fB--app\fP=""
+	one-click app to install on the new system (id from 'gyro app list'; API 2.19.1)
+
+.PP
+\fB--app-domain\fP=""
+	domain for the app (A record must point to the server)
+
+.PP
 \fB-h\fP, \fB--help\fP[=false]
 	help for rebuild
 
 .PP
 \fB--image\fP=""
 	OS image slug (required)
+
+.PP
+\fB--user-data\fP=""
+	cloud-init for the new system: text, @file or @- (tr-ist-1)
 
 .PP
 \fB--wait\fP[=false]

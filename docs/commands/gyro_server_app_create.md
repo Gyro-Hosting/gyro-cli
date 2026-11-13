@@ -6,6 +6,8 @@ Install an app (rebuilds the disk; confirm required; 3 per server per day)
 
 Install an app (rebuilds the disk; confirm required; 3 per server per day)
 
+**2.19.1**: also on tr-ist-1 (Gyro Cloud Istanbul) servers. Equivalent to `POST /cloud/servers/{id}/actions/rebuild` with `app`.
+
 API: POST /cloud/servers/{id}/app (operationId installApp, scope cloud_write)
 
 ```

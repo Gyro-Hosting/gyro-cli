@@ -9,8 +9,11 @@ gyro server rebuild <SERVER> [flags]
 ### Options
 
 ```
+      --app string              one-click app to install on the new system (id from 'gyro app list'; API 2.19.1)
+      --app-domain string       domain for the app (A record must point to the server)
   -h, --help                    help for rebuild
       --image string            OS image slug (required)
+      --user-data string        cloud-init for the new system: text, @file or @- (tr-ist-1)
       --wait                    wait until the server runs again
       --wait-timeout duration   maximum time for --wait (default 20m0s)
 ```

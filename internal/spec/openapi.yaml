@@ -2,7 +2,7 @@
 openapi: 3.1.0
 info:
   title: Gyro Public API
-  version: 2.19.0
+  version: 2.19.1
   summary: Manage Gyro cloud servers, SSH keys and billing programmatically.
   x-summary-tr: Gyro bulut sunucularınızı, SSH anahtarlarınızı ve faturalarınızı programla yönetin.
   description: "The Gyro Public API lets you automate everything you do in the Gyro client area:\norder and manage cloud servers, keep SSH keys, read invoices and\
@@ -35,7 +35,8 @@ info:
     \ automatic on tr-ist-1; one narrow key per mount; free). Additive.\n\n**2.18.0**: projects: `/cloud/projects` (list/create/get/update/delete, move services),\
     \ `PUT /cloud/services/{id}/project`, `project` on every service, `?project=` filter, optional `project_id` on order endpoints. Additive.\n\n**2.19.0**: additional\
     \ disks for tr-ist-1 servers: `GET/POST /cloud/servers/{id}/disks`, `PUT/DELETE /cloud/servers/{id}/disks/{disk}` (ssd or hdd class, per GB, hourly from the prepaid\
-    \ balance; up to 4 disks per server, grow only).\n"
+    \ balance; up to 4 disks per server, grow only).\n\n**2.19.1**: `POST /cloud/servers/{id}/actions/rebuild` accepts `app` and `app_domain` (one-click app on top\
+    \ of the reinstall; response `app_install_id`); `POST /cloud/servers/{id}/app` also on tr-ist-1. Install status `kaldirildi` = removed by a later reinstall. Additive.\n"
   x-description-tr: "Gyro Public API, müşteri panelinde yaptığınız her işi otomatikleştirmenizi sağlar:\nbulut sunucu siparişi ve yönetimi, SSH anahtarları, fatura\
     \ ve bakiye okuma.\nResmi Terraform sağlayıcısı (`gyro-hosting/gyro`) ve `gyroctl` bu API'yi kullanır.\n\n* **Taban adres** `https://www.gyrohosting.com/api/v1/client`\n\
     * **Kimlik** `Authorization: Bearer wck_...` (anahtarı *Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri* bölümünden oluşturun)\n* **Biçim** JSON\
@@ -66,7 +67,9 @@ info:
     \ (tek satır kurulum, tr-ist-1'de otomatik; bağlantı başına dar anahtar; ücretsiz). Geriye uyumlu.\n\n**2.18.0**: projeler: `/cloud/projects` (listele/oluştur/getir/güncelle/sil,\
     \ hizmet taşı), `PUT /cloud/services/{id}/project`, her hizmette `project`, `?project=` süzgeci, sipariş uçlarında isteğe bağlı `project_id`. Geriye uyumlu.\n\
     \n**2.19.0**: tr-ist-1 sunucularına ek disk: `GET/POST /cloud/servers/{id}/disks`, `PUT/DELETE /cloud/servers/{id}/disks/{disk}` (ssd ya da hdd sınıfı, GB başına,\
-    \ ön ödemeli bakiyeden saatlik; sunucu başına en çok 4 disk, yalnız büyür).\n"
+    \ ön ödemeli bakiyeden saatlik; sunucu başına en çok 4 disk, yalnız büyür).\n\n**2.19.1**: `POST /cloud/servers/{id}/actions/rebuild` `app` ve `app_domain` alır\
+    \ (yeniden kurulum + tek tıkla uygulama; yanıtta `app_install_id`); `POST /cloud/servers/{id}/app` tr-ist-1'de de çalışır. Kurulum durumu `kaldirildi` = sonraki\
+    \ yeniden kurulumla kaldırıldı. Geriye uyumlu.\n"
   contact:
     name: Gyro Hosting
     url: https://www.gyrohosting.com
@@ -812,7 +815,14 @@ paths:
 
 
         **2.14.0 (Gyro Compute, tr-ist-1)**: `reset` (hard reset) is available too; `rebuild` accepts `user_data` and installs the server''s SSH keys again; `poweroff`
-        is a hard power off (shutdown = graceful). rescue actions answer 422 `action_not_supported`.'
+        is a hard power off (shutdown = graceful). rescue actions answer 422 `action_not_supported`.
+
+
+        **2.19.1 (rebuild + app)**: `rebuild` accepts `app` (+ optional `app_domain`) on cloud servers: the disk is wiped, the new system is installed and the app
+        is set up on it (progress in GET /cloud/servers/{id}/app, `/app/log`; login details once in the app status). A rebuild **without** `app` closes the server''s
+        previous app record (its automatic address is removed). What a rebuild keeps: IP addresses (incl. additional IPv4), server name, plan, SSH keys, firewall
+        rules; tr-ist-1 deletes additional disks and snapshots, EU/US/SG keeps volumes, snapshots and backups. Errors: `app_with_user_data`, `invalid_app`, `invalid_app_domain`,
+        `app_not_supported` (legacy VDS), `tool_action_failed` with the reason (app not available for the image, hourly limit).'
       x-description-tr: 'Ağır işlemler (yeniden kurulum, reset, kurtarma, snapshot''tan dönüş, parola sıfırlama) sunucu başına günlük sınırlıdır.
 
         Tek seferlik `root_password` yalnız istekte `Idempotency-Key` **yoksa** döner (tekrar için saklanan yanıtlara sır yazılmaz;
@@ -825,7 +835,13 @@ paths:
 
 
         **2.14.0 (Gyro Compute, tr-ist-1)**: `reset` (sert yeniden başlatma) da var; `rebuild` `user_data` kabul eder ve sunucunun SSH anahtarlarını yeniden kurar;
-        `poweroff` sert kapatmadır (shutdown = düzgün kapatma).'
+        `poweroff` sert kapatmadır (shutdown = düzgün kapatma).
+
+
+        **2.19.1 (yeniden kurulum + uygulama)**: bulut sunucularda `rebuild` `app` (+ isteğe bağlı `app_domain`) alır: disk silinir, yeni sistem kurulur ve uygulama
+        üstüne kurulur (ilerleme GET /cloud/servers/{id}/app ve `/app/log`; giriş bilgileri uygulama durumunda bir kez). `app` **olmadan** yeniden kurulum sunucunun
+        önceki uygulama kaydını kapatır (otomatik adresi silinir). Korunanlar: IP adresleri (ek IPv4 dahil), sunucu adı, paket, SSH anahtarları, güvenlik duvarı kuralları;
+        tr-ist-1''de ek diskler ve snapshot''lar silinir, AB/ABD/SG''de volume, snapshot ve yedekler kalır.'
       x-scope: cloud_write
       requestBody:
         content:
@@ -840,6 +856,22 @@ paths:
                 confirm:
                   type: boolean
                   description: required for reset and rebuild
+                user_data:
+                  type: string
+                  maxLength: 32768
+                  description: 'rebuild only (tr-ist-1 Gyro Compute): cloud-init for the new system; must start with `#cloud-config` or `#!`. Cannot be combined with
+                    `app`.'
+                app:
+                  type: string
+                  description: 'rebuild only: one-click app id from GET /cloud/apps, installed automatically on top of the new system (cloud servers: Gyro Cloud EU/US/SG
+                    and Istanbul). The image must be one the app supports (`os` of the app). Follow the install with GET /cloud/servers/{id}/app and /app/log. Cannot
+                    be combined with `user_data`; at most 3 app installs per server per hour.'
+                  example: uptime-kuma
+                app_domain:
+                  type: string
+                  maxLength: 190
+                  description: 'rebuild with `app` only: your domain for the app (its A record must point to the server); empty = automatic `<ip-with-dashes>.gyroapp.net`
+                    address.'
       responses:
         '202':
           description: Accepted
@@ -2799,6 +2831,14 @@ paths:
           $ref: '#/components/responses/Validation'
         '429':
           description: install_limit
+      description: '
+
+
+        **2.19.1**: also on tr-ist-1 (Gyro Cloud Istanbul) servers. Equivalent to `POST /cloud/servers/{id}/actions/rebuild` with `app`.'
+      x-description-tr: '
+
+
+        **2.19.1**: tr-ist-1 (Gyro Bulut İstanbul) sunucularında da. `POST /cloud/servers/{id}/actions/rebuild` + `app` ile aynıdır.'
   /cloud/servers/{id}/app/log:
     parameters:
     - $ref: '#/components/parameters/ServerId'
@@ -19714,6 +19754,9 @@ components:
           description: One-time secret (rebuild without SSH key, reset_password, enable_rescue)
         root_password_withheld:
           type: boolean
+        app_install_id:
+          type: integer
+          description: 'rebuild with `app`: id of the started app install (GET /cloud/servers/{id}/app)'
     Snapshot:
       type: object
       properties:

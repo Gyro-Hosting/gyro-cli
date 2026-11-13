@@ -6,6 +6,8 @@ Uygulama kur (diski yeniden kurar; confirm zorunlu; sunucu başına günde 3)
 
 Uygulama kur (diski yeniden kurar; confirm zorunlu; sunucu başına günde 3)
 
+**2.19.1**: tr-ist-1 (Gyro Bulut İstanbul) sunucularında da. `POST /cloud/servers/{id}/actions/rebuild` + `app` ile aynıdır.
+
 API: POST /cloud/servers/{id}/app (operationId installApp, scope cloud_write)
 
 ```
