@@ -1086,7 +1086,7 @@ func addServerMaintenance(a *App, srv *cobra.Command) {
 	rebuild.Flags().StringVar(&image, "image", "", i18n.S("OS image slug (required)", "imaj (zorunlu)"))
 	_ = rebuild.MarkFlagRequired("image")
 	_ = rebuild.RegisterFlagCompletionFunc("image", completeField(a, "/cloud/images", "slug"))
-	rebuild.Flags().StringVar(&rbApp, "app", "", i18n.S("one-click app to install on the new system (id from 'gyro app list'; API 2.19.1)", "yeni sisteme kurulacak tek tıkla uygulama ('gyro app list' kimliği; API 2.19.1)"))
+	rebuild.Flags().StringVar(&rbApp, "app", "", i18n.S("one-click app to install on the new system (id from GET /cloud/apps, e.g. wordpress, docker, uptime-kuma; API 2.19.1)", "yeni sisteme kurulacak tek tıkla uygulama (GET /cloud/apps kimliği, ör. wordpress, docker, uptime-kuma; API 2.19.1)"))
 	rebuild.Flags().StringVar(&rbAppDomain, "app-domain", "", i18n.S("domain for the app (A record must point to the server)", "uygulama alan adı (A kaydı sunucuyu göstermeli)"))
 	rebuild.Flags().StringVar(&rbUserData, "user-data", "", i18n.S("cloud-init for the new system: text, @file or @- (tr-ist-1)", "yeni sistem için cloud-init: metin, @dosya ya da @- (tr-ist-1)"))
 	_ = rebuild.RegisterFlagCompletionFunc("app", completeField(a, "/cloud/apps", "id"))
