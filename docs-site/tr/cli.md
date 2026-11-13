@@ -265,6 +265,12 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro plan list` | Sipariş verilebilen bulut sunucu ürünlerini listele | `GET /cloud/products` |
 | `gyro product category list` | Kategorileri Listeleme | `GET /products/categories` |
 | `gyro product get` | Ürün Detayı ve Sipariş Şeması | `GET /products/{id}` |
+| `gyro project create` | Proje oluştur | `POST /cloud/projects` |
+| `gyro project delete` | Projeyi sil | `DELETE /cloud/projects/{id}` |
+| `gyro project get` | Projeyi hizmet numaralarıyla getir | `GET /cloud/projects/{id}` |
+| `gyro project list` | Projeleri listele | `GET /cloud/projects` |
+| `gyro project move` | Hizmetleri projeye taşı | `POST /cloud/projects/{id}/services` |
+| `gyro project rename` | Projeyi yeniden adlandır / renklendir | `PATCH /cloud/projects/{id}` |
 | `gyro reference country list` | Get countries | `GET /reference/countries` |
 | `gyro reference country state list` | Get states | `GET /reference/countries/{code}/states` |
 | `gyro reference state city list` | Get cities | `GET /reference/states/{id}/cities` |
@@ -349,6 +355,7 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro service metrics update` | Ölçümü Açma ve Kapatma | `PATCH /services/{id}/metrics/{key}` |
 | `gyro service module-method` | Modül Metodu Çalıştırma | `POST /services/{id}/module-method` |
 | `gyro service password` | Panel Parolasını Değiştirme | `POST /services/{id}/password` |
+| `gyro service project set` | Hizmetin projesini ayarla | `PUT /cloud/services/{id}/project` |
 | `gyro service renew` | Yenileme Faturası Kesme | `POST /services/{id}/renew` |
 | `gyro service resize` | Paketi yükselt (bakiyeden ödenir) | `POST /cloud/services/{id}/resize` |
 | `gyro service resize-option list` | Hizmetin yükseltilebileceği ürünler ve fiyatları | `GET /cloud/services/{id}/resize-options` |

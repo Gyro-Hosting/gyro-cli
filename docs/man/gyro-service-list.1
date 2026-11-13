@@ -41,6 +41,10 @@ API: GET /cloud/services (operationId listServices, scope services_read)
 	 (cloud_server|vds|dedicated_server|mail|monitor|storage|license|app)
 
 .PP
+\fB--project\fP=0
+	Only services in this project (0 = default project). Unknown project: 404 \fBproject_not_found\fR\&.
+
+.PP
 \fB--status\fP=""
 
 

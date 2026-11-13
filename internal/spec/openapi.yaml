@@ -2,7 +2,7 @@
 openapi: 3.1.0
 info:
   title: Gyro Public API
-  version: 2.17.5
+  version: 2.18.0
   summary: Manage Gyro cloud servers, SSH keys and billing programmatically.
   x-summary-tr: Gyro bulut sunucularınızı, SSH anahtarlarınızı ve faturalarınızı programla yönetin.
   description: "The Gyro Public API lets you automate everything you do in the Gyro client area:\norder and manage cloud servers, keep SSH keys, read invoices and\
@@ -32,7 +32,8 @@ info:
     \ Gyro Containers Serverless: `GET /cloud/billing/container-sizes` (vCPU / memory pairs and prices), `POST /cloud/billing/estimate` accepts `{\"type\": \"serverless\"\
     , \"cpu_m\", \"memory_mi\", \"count\", \"hours\"}` (no monthly cap, `capped` flag on every item). Additive.\n\n**2.17.5**: mount a Gyro Object Storage bucket\
     \ on a server: `GET/POST /cloud/servers/{id}/storage-mounts`, `GET/DELETE /cloud/servers/{id}/storage-mounts/{mid}`, `POST .../{mid}/command` (one-line installer,\
-    \ automatic on tr-ist-1; one narrow key per mount; free). Additive.\n"
+    \ automatic on tr-ist-1; one narrow key per mount; free). Additive.\n\n**2.18.0**: projects: `/cloud/projects` (list/create/get/update/delete, move services),\
+    \ `PUT /cloud/services/{id}/project`, `project` on every service, `?project=` filter, optional `project_id` on order endpoints. Additive.\n"
   x-description-tr: "Gyro Public API, müşteri panelinde yaptığınız her işi otomatikleştirmenizi sağlar:\nbulut sunucu siparişi ve yönetimi, SSH anahtarları, fatura\
     \ ve bakiye okuma.\nResmi Terraform sağlayıcısı (`gyro-hosting/gyro`) ve `gyroctl` bu API'yi kullanır.\n\n* **Taban adres** `https://www.gyrohosting.com/api/v1/client`\n\
     * **Kimlik** `Authorization: Bearer wck_...` (anahtarı *Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri* bölümünden oluşturun)\n* **Biçim** JSON\
@@ -60,7 +61,8 @@ info:
     \ silinen de). Yalnız metin.\n\n**2.17.4**: Gyro Kapsayıcı Sunucusuz: `GET /cloud/billing/container-sizes` (vCPU / bellek çiftleri ve fiyatlar), `POST /cloud/billing/estimate`\
     \ `{\"type\": \"serverless\", \"cpu_m\", \"memory_mi\", \"count\", \"hours\"}` kabul eder (aylık tavan yok, her kalemde `capped`). Geriye uyumlu.\n\n**2.17.5**:\
     \ Nesne Depolama kovasını sunucuya bağlama: `GET/POST /cloud/servers/{id}/storage-mounts`, `GET/DELETE /cloud/servers/{id}/storage-mounts/{mid}`, `POST .../{mid}/command`\
-    \ (tek satır kurulum, tr-ist-1'de otomatik; bağlantı başına dar anahtar; ücretsiz). Geriye uyumlu.\n"
+    \ (tek satır kurulum, tr-ist-1'de otomatik; bağlantı başına dar anahtar; ücretsiz). Geriye uyumlu.\n\n**2.18.0**: projeler: `/cloud/projects` (listele/oluştur/getir/güncelle/sil,\
+    \ hizmet taşı), `PUT /cloud/services/{id}/project`, her hizmette `project`, `?project=` süzgeci, sipariş uçlarında isteğe bağlı `project_id`. Geriye uyumlu.\n"
   contact:
     name: Gyro Hosting
     url: https://www.gyrohosting.com
@@ -202,6 +204,11 @@ tags:
 - name: Templates
   description: Custom templates from your own tr-ist-1 servers (no image upload)
   x-description-tr: Kendi tr-ist-1 sunucularınızdan özel şablonlar (dışarıdan imaj yüklenmez)
+- name: Projects
+  description: Group your services into projects (e.g. one per business, client or environment). Every service is in exactly one project; services without one are
+    in the default project (id 0). Invoices are not split by project.
+  x-description-tr: Hizmetlerinizi projelere ayırın (iş, müşteri ya da ortam başına). Her hizmet tek bir projededir; atanmamış hizmetler varsayılan projededir (id
+    0). Faturalar projeye göre bölünmez.
 paths:
   /whoami:
     get:
@@ -1345,6 +1352,12 @@ paths:
         description: Reseller main key only
       - $ref: '#/components/parameters/Page'
       - $ref: '#/components/parameters/Limit'
+      - name: project
+        in: query
+        schema:
+          type: integer
+          minimum: 0
+        description: 'Only services in this project (0 = default project). Unknown project: 404 `project_not_found`.'
       responses:
         '200':
           description: Services
@@ -3422,6 +3435,11 @@ paths:
                   type: boolean
                 confirm:
                   type: boolean
+                project_id: &id045
+                  type: integer
+                  minimum: 0
+                  description: 'Optional project for the new service(s) (0 = default project). Checked before the order: unknown id = 404 `project_not_found` (GyroAPI
+                    order endpoints) or 422 `checkout_blocked` with `[project_not_found]` (POST /orders).'
       responses:
         '201':
           description: Ordered
@@ -15328,6 +15346,7 @@ paths:
                 card_id:
                   type: integer
                   description: Çekilecek kartın numarası. Verilmezse hesabın varsayılan kartı çekilir.
+                project_id: *id045
               required:
               - cycle
               - items
@@ -17036,8 +17055,8 @@ paths:
         / legal hold versions and the latest end date). Protected Storage only: a standard Object Storage service answers 409 `feature_not_available`.'
       x-description-tr: 'Kilitli kova hakkı (Nesne Kilidi ek hizmeti) ve kullanımı, kovaların varsayılan saklaması ve son kilit taraması (COMPLIANCE / GOVERNANCE
         / legal hold sürüm sayısı, en geç bitiş). Yalnız Korumalı Depolama: standart Nesne Depolama hizmeti 409 `feature_not_available` döner.'
-      parameters: &id045
-      - &id046
+      parameters: &id046
+      - &id047
         name: id
         in: path
         required: true
@@ -17077,7 +17096,7 @@ paths:
         confirm: false
       description: 'Counts locked versions in every locked bucket (up to 25 s / 5000 versions; `complete: false` when cut short).'
       x-description-tr: 'Kilitli kovalardaki kilitli sürümleri sayar (en çok 25 sn / 5000 sürüm; yarım kalırsa `complete: false`).'
-      parameters: *id045
+      parameters: *id046
       responses:
         '202':
           description: OK
@@ -17119,8 +17138,8 @@ paths:
       x-description-tr: Bir klasördeki sürümler ve silme işaretleri (sayfa 50, ayraç `/`; alt klasörler `folders`). `truncated` true iken önceki sayfanın `key_marker`
         + `version_id_marker` değerleriyle devam edin. Kilitli kovalarda her sürümde `lock_mode`, `retain_until`, `legal_hold` bulunur.
       parameters:
-      - *id046
-      - &id047
+      - *id047
+      - &id048
         name: bucket
         in: path
         required: true
@@ -17180,8 +17199,8 @@ paths:
       x-description-tr: Bir sürümü ya da silme işaretini kalıcı siler (geri alınamaz). GOVERNANCE / COMPLIANCE saklamasında ya da legal hold'daki sürüm bitiş tarihiyle
         reddedilir. `confirm=true` gerekir.
       parameters:
-      - *id046
       - *id047
+      - *id048
       - name: key
         in: query
         required: true
@@ -17243,9 +17262,9 @@ paths:
         confirm: false
       description: Copies the version as the new current version (the old one stays). Max 5 GB; delete markers cannot be restored (use undelete).
       x-description-tr: Sürümü yeni güncel sürüm olarak kopyalar (eskisi durur). En çok 5 GB; silme işareti geri yüklenmez (undelete kullanın).
-      parameters: &id048
-      - *id046
+      parameters: &id049
       - *id047
+      - *id048
       responses:
         '202':
           description: OK
@@ -17284,7 +17303,7 @@ paths:
           application/json:
             schema:
               type: object
-              properties: &id049
+              properties: &id050
                 key:
                   type: string
                   description: Object key
@@ -17307,7 +17326,7 @@ paths:
         confirm: false
       description: Removes the latest delete marker of the key, so the previous version becomes current again. `version_id` must be that delete marker.
       x-description-tr: Anahtarın en güncel silme işaretini kaldırır; önceki sürüm yeniden güncel olur. `version_id` o silme işareti olmalıdır.
-      parameters: *id048
+      parameters: *id049
       responses:
         '202':
           description: OK
@@ -17343,7 +17362,7 @@ paths:
           application/json:
             schema:
               type: object
-              properties: *id049
+              properties: *id050
               required:
               - key
               - version_id
@@ -17360,7 +17379,7 @@ paths:
         confirm: false
       description: '`object_lock` (set at creation, cannot change) and `default_retention` (null = none): new objects get this retention automatically.'
       x-description-tr: '`object_lock` (açılışta seçilir, değişmez) ve `default_retention` (null = yok): yeni nesneler bu saklamayı kendiliğinden alır.'
-      parameters: *id048
+      parameters: *id049
       responses:
         '200':
           description: OK
@@ -17397,7 +17416,7 @@ paths:
       x-description-tr: 'Yalnız kilitli kovalar. `mode` GOVERNANCE ya da COMPLIANCE ve `days` 1-3650, ya da OFF (yeni nesnelere otomatik saklama yok; mevcut kilitler
         sürer). GOVERNANCE: yalnız Gyro personeli talep üzerine aşabilir. COMPLIANCE kilidi süresi dolana kadar kimse (Gyro dahil) kısaltamaz, GOVERNANCE''a çeviremez,
         kaldıramaz; veri saklanır ve iptalde bile süre sonuna kadar ücret sürer. `"confirm": true` ve `"acknowledge": "COMPLIANCE"` gönderin.'
-      parameters: *id048
+      parameters: *id049
       responses:
         '202':
           description: OK
@@ -17460,8 +17479,8 @@ paths:
       description: Lock mode, end date and legal hold of one version (`version_id` empty = current version).
       x-description-tr: Bir sürümün kilit kipi, bitiş tarihi ve legal hold durumu (`version_id` boş = güncel sürüm).
       parameters:
-      - *id046
       - *id047
+      - *id048
       - name: key
         in: query
         required: true
@@ -17510,7 +17529,7 @@ paths:
       x-description-tr: 'Bir sürümün saklamasını şimdiden itibaren `days` (1-3650) gün olarak koyar ya da uzatır (`version_id` boş = güncel). Saklama yalnız uzatılabilir;
         COMPLIANCE GOVERNANCE''a çevrilemez. COMPLIANCE kilidi süresi dolana kadar kimse (Gyro dahil) kısaltamaz, GOVERNANCE''a çeviremez, kaldıramaz; veri saklanır
         ve iptalde bile süre sonuna kadar ücret sürer. `"confirm": true` ve `"acknowledge": "COMPLIANCE"` gönderin.'
-      parameters: *id048
+      parameters: *id049
       responses:
         '202':
           description: OK
@@ -17578,8 +17597,8 @@ paths:
       description: '`legal_hold` true = the version cannot be deleted until the hold is removed (no end date).'
       x-description-tr: '`legal_hold` true = kaldırılana kadar sürüm silinemez (bitiş tarihi yok).'
       parameters:
-      - *id046
       - *id047
+      - *id048
       - name: key
         in: query
         required: true
@@ -17633,7 +17652,7 @@ paths:
         confirm: false
       description: '`status` on / off (locked buckets only). A legal hold blocks deletion with no end date, independent of retention; you can remove it yourself.'
       x-description-tr: '`status` on / off (yalnız kilitli kovalar). Legal hold, saklamadan bağımsız ve bitiş tarihsiz silmeyi engeller; kendiniz kaldırabilirsiniz.'
-      parameters: *id048
+      parameters: *id049
       responses:
         '202':
           description: OK
@@ -17696,7 +17715,7 @@ paths:
         confirm: false
       description: 'Days after which non-current versions are deleted (new buckets: 30). 0 / null = kept until you delete them (they count toward the quota).'
       x-description-tr: Eski (güncel olmayan) sürümlerin kaç gün sonra silineceği (yeni kovalarda 30). 0 / null = siz silene kadar durur (kotadan düşer).
-      parameters: *id048
+      parameters: *id049
       responses:
         '200':
           description: OK
@@ -17730,7 +17749,7 @@ paths:
       description: '`days` 1-3650, or 0 to keep old versions. Locked versions are deleted only after their retention ends. Other lifecycle rules of the bucket are
         kept.'
       x-description-tr: '`days` 1-3650 ya da 0 (eski sürümler durur). Kilitli sürümler saklaması bitince silinir. Kovanın diğer yaşam döngüsü kuralları korunur.'
-      parameters: *id048
+      parameters: *id049
       responses:
         '202':
           description: OK
@@ -17823,7 +17842,7 @@ paths:
       description: Another account's template answers 404.
       x-description-tr: Başka hesabın şablonu 404 döner.
       parameters:
-      - &id050
+      - &id051
         name: id
         in: path
         required: true
@@ -17862,7 +17881,7 @@ paths:
       description: Name 1-60 characters (letters, digits, space . _ -).
       x-description-tr: Ad 1-60 karakter (harf, rakam, boşluk . _ -).
       parameters:
-      - *id050
+      - *id051
       responses:
         '200':
           description: OK
@@ -17910,7 +17929,7 @@ paths:
       description: Permanent. Servers created from it are not affected; the charge stops from the next hour.
       x-description-tr: Kalıcıdır. Şablondan açılmış sunucular etkilenmez; ücret sonraki saatten durur.
       parameters:
-      - *id050
+      - *id051
       responses:
         '202':
           description: OK
@@ -18025,7 +18044,7 @@ paths:
       x-description-tr: 'Şablondan kurulan normal ön ödemeli tr-ist-1 siparişi (24 saat bakiye kuralı, hesap sınırları). `product_id` (ya da `plan`) GET /cloud/products?region=tr-ist-1''den;
         diski şablonun `min_disk_gb` değerinden küçük olamaz. `"confirm": true` ve `Idempotency-Key` başlığı gerekir (teklif için `dry_run`).'
       parameters:
-      - *id050
+      - *id051
       responses:
         '202':
           description: OK
@@ -18069,6 +18088,7 @@ paths:
                   type: boolean
                 dry_run:
                   type: boolean
+                project_id: *id045
               required: []
   /cloud/templates/{id}/rebuild:
     post:
@@ -18086,7 +18106,7 @@ paths:
       x-description-tr: 'tr-ist-1 sunucunuzun kök diskini şablonla değiştirir (disk en az `min_disk_gb` olmalı); sunucunun SSH anahtarları yeniden kurulur, yeni root
         parolası döner (Idempotency-Key gönderilirse dönmez). `"confirm": true` gerekir.'
       parameters:
-      - *id050
+      - *id051
       responses:
         '202':
           description: OK
@@ -18157,7 +18177,7 @@ paths:
         çıkarıldığı saate kadar. Sunucu başına en çok `max` (varsayılan 5). Adres sunucuya otomatik tanımlanır (birincil arayüze /32, yeniden başlatma ve yeniden
         kurulumda korunur); ters DNS: PUT /cloud/servers/{id}/rdns. '
       parameters:
-      - &id051
+      - &id052
         name: id
         in: path
         required: true
@@ -18211,7 +18231,7 @@ paths:
         çıkarıldığı saate kadar. Sunucu başına en çok `max` (varsayılan 5). Adres sunucuya otomatik tanımlanır (birincil arayüze /32, yeniden başlatma ve yeniden
         kurulumda korunur); ters DNS: PUT /cloud/servers/{id}/rdns. Yalnız ön ödemeli tr-ist-1 sunucuları; askıdayken eklenemez.'
       parameters:
-      - *id051
+      - *id052
       requestBody:
         required: false
         content:
@@ -18269,7 +18289,7 @@ paths:
         düşülür; aynı adresi yeniden almak yeni bir asgari süre başlatır. Bir sunucuya 60 dakikada en çok `adds_per_hour` (varsayılan 10) adres eklenebilir. Adres
         sunucudan kaldırılır ve havuza döner (aynı adresi geri alma garantisi yok); ücret bırakınca durur (asgari süre yine uygulanır). `confirm=true` gerekir.'
       parameters:
-      - *id051
+      - *id052
       - name: ip
         in: path
         required: true
@@ -18359,7 +18379,7 @@ paths:
         bağlantıyla birlikte silinir. Gyro Bulut İstanbul (tr-ist-1) sunucularında otomatik uygulanır (`automatic: true`); diğer sunucularda `install_command` bir
         kez çalıştırılır. Ücretsizdir; S3 trafiği depolama hizmetinden sayılır. Korumalı Depolama (nesne kilidi) kovaları bağlanamaz.'
       parameters:
-      - &id052
+      - &id053
         name: id
         in: path
         required: true
@@ -18415,7 +18435,7 @@ paths:
         kez çalıştırılır. Ücretsizdir; S3 trafiği depolama hizmetinden sayılır. Korumalı Depolama (nesne kilidi) kovaları bağlanamaz. Yanıtta `install_command` döner
         (tek kullanımlık, 60 dakika).'
       parameters:
-      - *id052
+      - *id053
       requestBody:
         required: true
         content:
@@ -18478,8 +18498,8 @@ paths:
       x-cli:
         command: server storage-mount get
       parameters:
-      - *id052
-      - &id053
+      - *id053
+      - &id054
         name: mid
         in: path
         required: true
@@ -18528,8 +18548,8 @@ paths:
       x-description-tr: Bağlantı anahtarı hemen silinir (sunucu kovaya erişemez; kovadaki dosyalar silinmez). tr-ist-1 sunucularında birim otomatik kaldırılır; diğerlerinde
         `remove_command` çalıştırın.
       parameters:
-      - *id052
       - *id053
+      - *id054
       responses:
         '202':
           description: OK
@@ -18572,8 +18592,8 @@ paths:
       x-description-tr: Bağlantı için yeni erişim anahtarı ve yeni tek kullanımlık komut üretir (eski anahtar hemen durur). Sunucu yeniden kurulduğunda ya da komutun
         süresi dolduğunda kullanın.
       parameters:
-      - *id052
       - *id053
+      - *id054
       responses:
         '202':
           description: OK
@@ -18601,6 +18621,289 @@ paths:
           description: rate_limited
         '503':
           description: storage_mount_unavailable
+  /cloud/projects:
+    get:
+      tags:
+      - Projects
+      operationId: listProjects
+      summary: List projects
+      x-summary-tr: Projeleri listele
+      x-scope: services_read
+      description: Your projects; the default project (id 0) is always first. Counts follow the key's service scope.
+      x-description-tr: Projeleriniz; varsayılan proje (id 0) her zaman ilk sırada. Sayılar anahtarın hizmet kapsamına göredir.
+      responses:
+        '200':
+          description: Projects
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Project'
+        '401': &id055
+          $ref: '#/components/responses/Unauthorized'
+        '403': &id056
+          $ref: '#/components/responses/Forbidden'
+      x-cli:
+        command: project list
+    post:
+      tags:
+      - Projects
+      operationId: createProject
+      summary: Create a project
+      x-summary-tr: Proje oluştur
+      x-scope: services_write
+      description: 'At most 50 projects per account (409 `project_limit`). Optional `service_ids` move services in at once. Writes: 60 per minute per key (429 `rate_limited`).
+        Sub-account keys cannot create, rename or delete projects (403 `subkey_forbidden`). Errors: 422 `invalid_name`, `name_reserved`, `invalid_color`, `invalid_icon`,
+        `invalid_description`, `invalid_service_ids`; 409 `name_taken`; 404 `service_not_found`.'
+      x-description-tr: 'Hesap başına en çok 50 proje (409 `project_limit`). İsteğe bağlı `service_ids` hizmetleri hemen taşır. Yazma: anahtar başına dakikada 60
+        (429 `rate_limited`). Alt hesap anahtarları proje oluşturamaz, yeniden adlandıramaz, silemez (403 `subkey_forbidden`).'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectCreate'
+            example:
+              name: İşin Olacak
+              color: blue
+              icon: rocket-takeoff
+              service_ids:
+              - 17488
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Project'
+        '409':
+          description: name_taken / project_limit
+        '422':
+          description: Validation error
+        '401': *id055
+        '403': *id056
+        '404': &id057
+          $ref: '#/components/responses/NotFound'
+        '429': &id058
+          $ref: '#/components/responses/RateLimited'
+      x-cli:
+        command: project create
+  /cloud/projects/{id}:
+    parameters: &id059
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+        minimum: 0
+      description: Project id (0 = default project)
+    get:
+      tags:
+      - Projects
+      operationId: getProject
+      summary: Get a project with its service ids
+      x-summary-tr: Projeyi hizmet numaralarıyla getir
+      x-scope: services_read
+      description: Another account's project answers 404 `project_not_found`.
+      x-description-tr: Başka hesabın projesi 404 `project_not_found` döner.
+      responses:
+        '200':
+          description: Project
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Project'
+        '401': *id055
+        '403': *id056
+        '404': *id057
+        '429': *id058
+      x-cli:
+        command: project get
+    patch:
+      tags:
+      - Projects
+      operationId: updateProject
+      summary: Rename / recolour a project
+      x-summary-tr: Projeyi yeniden adlandır / renklendir
+      x-scope: services_write
+      description: 'Send any of name, description, color, icon. The default project cannot be changed (409 `default_project`). Writes: 60 per minute per key (429
+        `rate_limited`). Sub-account keys cannot create, rename or delete projects (403 `subkey_forbidden`).'
+      x-description-tr: 'name, description, color, icon alanlarından istediğinizi gönderin. Varsayılan proje değiştirilemez (409 `default_project`). Yazma: anahtar
+        başına dakikada 60 (429 `rate_limited`). Alt hesap anahtarları proje oluşturamaz, yeniden adlandıramaz, silemez (403 `subkey_forbidden`).'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectUpdate'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Project'
+        '409':
+          description: name_taken / default_project
+        '401': *id055
+        '403': *id056
+        '404': *id057
+        '429': *id058
+      x-cli:
+        command: project rename
+    delete:
+      tags:
+      - Projects
+      operationId: deleteProject
+      summary: Delete a project
+      x-summary-tr: Projeyi sil
+      x-scope: services_write
+      description: 'Only the project is deleted: its services go back to the default project, nothing else changes. Writes: 60 per minute per key (429 `rate_limited`).
+        Sub-account keys cannot create, rename or delete projects (403 `subkey_forbidden`).'
+      x-description-tr: 'Yalnız proje silinir: hizmetleri varsayılan projeye döner, başka hiçbir şey değişmez. Yazma: anahtar başına dakikada 60 (429 `rate_limited`).
+        Alt hesap anahtarları proje oluşturamaz, yeniden adlandıramaz, silemez (403 `subkey_forbidden`).'
+      responses:
+        '200':
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      deleted:
+                        type: boolean
+                      moved_to_default:
+                        type: integer
+        '409':
+          description: default_project
+        '401': *id055
+        '403': *id056
+        '404': *id057
+        '429': *id058
+      x-cli:
+        command: project delete
+        confirm: true
+  /cloud/projects/{id}/services:
+    parameters: *id059
+    post:
+      tags:
+      - Projects
+      operationId: moveServicesToProject
+      summary: Move services into a project
+      x-summary-tr: Hizmetleri projeye taşı
+      x-scope: services_write
+      description: 'All ids must be your services within the key''s scope, else 404 `service_not_found` and nothing moves. Up to 500 per call; id 0 = default project.
+        Sub-account keys need the `project:move` action. Writes: 60 per minute per key (429 `rate_limited`).'
+      x-description-tr: Tüm numaralar anahtarın kapsamındaki hizmetleriniz olmalı, yoksa 404 `service_not_found` ve hiçbir şey taşınmaz. Çağrı başına en çok 500;
+        id 0 = varsayılan proje. Alt hesap anahtarı `project:move` eylemi ister.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - service_ids
+              properties:
+                service_ids:
+                  type: array
+                  maxItems: 500
+                  items:
+                    type: integer
+            example:
+              service_ids:
+              - 17488
+              - 17489
+      responses:
+        '200':
+          description: Moved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      project_id:
+                        type: integer
+                      moved:
+                        type: integer
+                      service_ids:
+                        type: array
+                        items:
+                          type: integer
+        '401': *id055
+        '403': *id056
+        '404': *id057
+        '429': *id058
+      x-cli:
+        command: project move
+  /cloud/services/{id}/project:
+    parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: Service id
+    put:
+      tags:
+      - Projects
+      operationId: setServiceProject
+      summary: Set the project of a service
+      x-summary-tr: Hizmetin projesini ayarla
+      x-scope: services_write
+      description: '`project_id` 0 = default project. Answers the service (with `project`). Sub-account keys need the `project:move` action.'
+      x-description-tr: '`project_id` 0 = varsayılan proje. Hizmeti (`project` ile) döner. Alt hesap anahtarı `project:move` eylemi ister.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - project_id
+              properties:
+                project_id:
+                  type: integer
+                  minimum: 0
+      responses:
+        '200':
+          description: Service
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Service'
+        '422':
+          description: project_id_required / invalid_project_id
+        '401': *id055
+        '403': *id056
+        '404': *id057
+        '429': *id058
+      x-cli:
+        command: service project set
 components:
   securitySchemes:
     bearerAuth:
@@ -19118,6 +19421,7 @@ components:
         end_customer_id:
           type: integer
           description: 'Reseller main key: assign the new server to this end-customer'
+        project_id: *id045
     Quote:
       type: object
       properties:
@@ -19438,6 +19742,8 @@ components:
           description: Customer-defined colour tags (see `/cloud/services/{id}/label`); empty when not set
           items:
             $ref: '#/components/schemas/ServiceLabelTag'
+        project:
+          $ref: '#/components/schemas/ProjectRef'
     ServiceLabelTag:
       type: object
       required:
@@ -20917,3 +21223,136 @@ components:
         remove_command:
           type: string
           example: sudo gyro-s3mount remove backups
+    Project:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: 0 = default project
+        name:
+          type: string
+          maxLength: 40
+        description:
+          type:
+          - string
+          - 'null'
+          maxLength: 255
+        color:
+          type: string
+          enum: &id060
+          - gray
+          - blue
+          - green
+          - red
+          - orange
+          - yellow
+          - purple
+          - pink
+          - teal
+          - indigo
+        icon:
+          type: string
+          description: Bootstrap Icons name (without the bi- prefix)
+        is_default:
+          type: boolean
+        service_count:
+          type: integer
+          description: Live services (active, suspended, in process, waiting) visible to this key
+        service_total:
+          type: integer
+          description: All services incl. cancelled ones visible to this key
+        service_ids:
+          type: array
+          items:
+            type: integer
+          description: Only on GET /cloud/projects/{id} and create/update responses
+        created_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        updated_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+      example:
+        id: 6
+        name: Unibum
+        description: Mobile app backend
+        color: purple
+        icon: controller
+        is_default: false
+        service_count: 12
+        service_total: 13
+        created_at: '2026-11-13T02:00:00+03:00'
+        updated_at: '2026-11-13T02:00:00+03:00'
+    ProjectCreate:
+      type: object
+      required:
+      - name
+      properties:
+        name: &id061
+          type: string
+          minLength: 1
+          maxLength: 40
+          description: 'Letter or digit first; then letters, digits, space and . _ - / + # & ( ). Unique per account (case-insensitive). Reserved: Genel, General,
+            Default.'
+        description: &id062
+          type:
+          - string
+          - 'null'
+          maxLength: 255
+        color: &id063
+          type: string
+          enum: *id060
+          default: blue
+        icon: &id064
+          type: string
+          enum:
+          - folder
+          - briefcase
+          - building
+          - cart3
+          - cloud
+          - code-slash
+          - controller
+          - globe2
+          - heart
+          - house
+          - kanban
+          - lightning
+          - people
+          - rocket-takeoff
+          - shield-lock
+          - shop
+          - star
+          - tools
+          - truck
+          - box-seam
+          - mortarboard
+          - camera
+          default: folder
+        service_ids:
+          type: array
+          maxItems: 500
+          items:
+            type: integer
+          description: 'Optional: move these services into the new project at once'
+    ProjectUpdate:
+      type: object
+      properties:
+        name: *id061
+        description: *id062
+        color: *id063
+        icon: *id064
+    ProjectRef:
+      type:
+      - object
+      - 'null'
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+      description: Project of the service (id 0 = default project); null when projects are not available

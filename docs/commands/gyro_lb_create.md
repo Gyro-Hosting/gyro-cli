@@ -17,16 +17,17 @@ gyro lb create [flags]
 ### Options
 
 ```
-      --cycle string             cycle
-      --data string              request body as JSON, @file or @- (stdin)
-      --dry-run                  show the price quote / request without changing anything
-      --end-customer-id int      end_customer_id
-  -h, --help                     help for create
-      --idempotency-key string   idempotency key (automatic for money operations)
-      --product-id int           product_id
-      --region string            region (eu-de-1|eu-de-2|eu-fi-1)
-      --set stringArray          extra body field key=value (repeatable)
-      --size string              size (small|medium|large)
+      --cycle string                   cycle
+      --data string                    request body as JSON, @file or @- (stdin)
+      --dry-run                        show the price quote / request without changing anything
+      --end-customer-id int            end_customer_id
+  -h, --help                           help for create
+      --idempotency-key string         idempotency key (automatic for money operations)
+      --product-id int                 product_id
+      --project-id project_not_found   Optional project for the new service(s) (0 = default project). Checked before the order: unknown id = 404 project_not_found (GyroAPI order endpoints) or 422 `checkout_blocked` with `[project_not_found]` (POST /orders).
+      --region string                  region (eu-de-1|eu-de-2|eu-fi-1)
+      --set stringArray                extra body field key=value (repeatable)
+      --size string                    size (small|medium|large)
 ```
 
 ### Options inherited from parent commands

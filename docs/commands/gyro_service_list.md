@@ -15,13 +15,14 @@ gyro service list [flags]
 ### Options
 
 ```
-      --all                   fetch every page
-      --customer-id int       Reseller main key only
-  -h, --help                  help for list
-      --limit int             items per page (max 100)
-      --page int              page number (default 1)
-      --product-line string    (cloud_server|vds|dedicated_server|mail|monitor|storage|license|app)
-      --status string         
+      --all                         fetch every page
+      --customer-id int             Reseller main key only
+  -h, --help                        help for list
+      --limit int                   items per page (max 100)
+      --page int                    page number (default 1)
+      --product-line string          (cloud_server|vds|dedicated_server|mail|monitor|storage|license|app)
+      --project project_not_found   Only services in this project (0 = default project). Unknown project: 404 project_not_found.
+      --status string               
 ```
 
 ### Options inherited from parent commands

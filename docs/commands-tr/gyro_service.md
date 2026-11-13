@@ -43,6 +43,7 @@ gyro service [flags]
 * [gyro service metrics](gyro_service_metrics.md)	 - Ölçümleri Okuma
 * [gyro service module-method](gyro_service_module-method.md)	 - Modül Metodu Çalıştırma
 * [gyro service password](gyro_service_password.md)	 - Panel Parolasını Değiştirme
+* [gyro service project](gyro_service_project.md)	 - Hizmetin projesini ayarla
 * [gyro service renew](gyro_service_renew.md)	 - Yenileme Faturası Kesme
 * [gyro service resize](gyro_service_resize.md)	 - Paketi yükselt (bakiyeden ödenir)
 * [gyro service resize-option](gyro_service_resize-option.md)	 - Hizmetin yükseltilebileceği ürünler ve fiyatları

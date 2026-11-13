@@ -48,6 +48,10 @@ API: POST /cloud/templates/{id}/servers (operationId createServerFromTemplate, s
 	product_id
 
 .PP
+\fB--project-id\fP=0
+	Optional project for the new service(s) (0 = default project). Checked before the order: unknown id = 404 \fBproject_not_found\fR (GyroAPI order endpoints) or 422 \fBcheckout_blocked\fR with \fB[project_not_found]\fR (POST /orders).
+
+.PP
 \fB--set\fP=[]
 	extra body field key=value (repeatable)
 

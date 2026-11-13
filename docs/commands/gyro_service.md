@@ -43,6 +43,7 @@ gyro service [flags]
 * [gyro service metrics](gyro_service_metrics.md)	 - Get service metrics (path: {id})
 * [gyro service module-method](gyro_service_module-method.md)	 - Use service module method (path: {id})
 * [gyro service password](gyro_service_password.md)	 - Change service password (path: {id})
+* [gyro service project](gyro_service_project.md)	 - Set the project of a service
 * [gyro service renew](gyro_service_renew.md)	 - Renew service (path: {id})
 * [gyro service resize](gyro_service_resize.md)	 - Upgrade the plan (paid from balance)
 * [gyro service resize-option](gyro_service_resize-option.md)	 - Products this service can be upgraded to, with prices

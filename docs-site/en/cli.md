@@ -265,6 +265,12 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro plan list` | List orderable cloud server products | `GET /cloud/products` |
 | `gyro product category list` | List product categories | `GET /products/categories` |
 | `gyro product get` | Get product (path: {id}) | `GET /products/{id}` |
+| `gyro project create` | Create a project | `POST /cloud/projects` |
+| `gyro project delete` | Delete a project | `DELETE /cloud/projects/{id}` |
+| `gyro project get` | Get a project with its service ids | `GET /cloud/projects/{id}` |
+| `gyro project list` | List projects | `GET /cloud/projects` |
+| `gyro project move` | Move services into a project | `POST /cloud/projects/{id}/services` |
+| `gyro project rename` | Rename / recolour a project | `PATCH /cloud/projects/{id}` |
 | `gyro reference country list` | List countries | `GET /reference/countries` |
 | `gyro reference country state list` | List states (path: {code}) | `GET /reference/countries/{code}/states` |
 | `gyro reference state city list` | List cities (path: {id}) | `GET /reference/states/{id}/cities` |
@@ -349,6 +355,7 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro service metrics update` | Update service metric (path: {id}, {key}) | `PATCH /services/{id}/metrics/{key}` |
 | `gyro service module-method` | Use service module method (path: {id}) | `POST /services/{id}/module-method` |
 | `gyro service password` | Change service password (path: {id}) | `POST /services/{id}/password` |
+| `gyro service project set` | Set the project of a service | `PUT /cloud/services/{id}/project` |
 | `gyro service renew` | Renew service (path: {id}) | `POST /services/{id}/renew` |
 | `gyro service resize` | Upgrade the plan (paid from balance) | `POST /cloud/services/{id}/resize` |
 | `gyro service resize-option list` | Products this service can be upgraded to, with prices | `GET /cloud/services/{id}/resize-options` |

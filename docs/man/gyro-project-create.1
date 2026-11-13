@@ -1,0 +1,113 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-project-create - Create a project
+
+
+.SH SYNOPSIS
+\fBgyro project create [flags]\fP
+
+
+.SH DESCRIPTION
+Create a project
+
+.PP
+At most 50 projects per account (409 \fBproject_limit\fR). Optional \fBservice_ids\fR move services in at once. Writes: 60 per minute per key (429 \fBrate_limited\fR). Sub-account keys cannot create, rename or delete projects (403 \fBsubkey_forbidden\fR). Errors: 422 \fBinvalid_name\fR, \fBname_reserved\fR, \fBinvalid_color\fR, \fBinvalid_icon\fR, \fBinvalid_description\fR, \fBinvalid_service_ids\fR; 409 \fBname_taken\fR; 404 \fBservice_not_found\fR\&.
+
+.PP
+API: POST /cloud/projects (operationId createProject, scope services_write)
+
+
+.SH OPTIONS
+\fB--color\fP=""
+	color (gray|blue|green|red|orange|yellow|purple|pink|teal|indigo)
+
+.PP
+\fB--data\fP=""
+	request body as JSON, @file or @- (stdin)
+
+.PP
+\fB--description\fP=""
+	description
+
+.PP
+\fB--dry-run\fP[=false]
+	show the price quote / request without changing anything
+
+.PP
+\fB-h\fP, \fB--help\fP[=false]
+	help for create
+
+.PP
+\fB--icon\fP=""
+	icon (folder|briefcase|building|cart3|cloud|code-slash|controller|globe2|heart|house|kanban|lightning|people|rocket-takeoff|shield-lock|shop|star|tools|truck|box-seam|mortarboard|camera)
+
+.PP
+\fB--idempotency-key\fP=""
+	idempotency key (automatic for money operations)
+
+.PP
+\fB--name\fP=""
+	Letter or digit first; then letters, digits, space and . _ - / + # & ( ). Unique per account (case-insensitive). Reserved: Genel, General, Default.
+
+.PP
+\fB--service-ids\fP=[]
+	Optional: move these services into the new project at once
+
+.PP
+\fB--set\fP=[]
+	extra body field key=value (repeatable)
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH SEE ALSO
+\fBgyro-project(1)\fP
