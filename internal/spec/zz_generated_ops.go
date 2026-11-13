@@ -3,7 +3,7 @@
 package spec
 
 // APIVersion is info.version of the spec this table was generated from.
-const APIVersion = "2.24.1"
+const APIVersion = "2.24.2"
 
 // Ops lists every API operation.
 var Ops = []Op{
@@ -49,7 +49,7 @@ var Ops = []Op{
 	},
 	{ID: "estimatePrepaidCost", Method: "POST", Path: "/cloud/billing/estimate", Tag: "Billing",
 		Summary: "Hourly / daily / monthly cost of prepaid plans and serverless containers, and how long the balance lasts", SummaryTR: "",
-		Desc: "Prepaid (hourly, from the account balance) services: Gyro Containers (ECS) and Gyro Cloud Istanbul (tr-ist-1). Times are Europe/Istanbul. Usage is never invoiced: invoices are issued for balance top-ups. Server and dedicated-node plans: hourly = monthly / 672, capped at the monthly price (`capped: true`). Serverless containers (`{\"type\": \"serverless\", \"cpu_m\": 250, \"memory_mi\": 512, \"count\": 2, \"hours\": 672}`): charged by measured use, at most 672 hours a calendar month (`capped: true`), `monthly_cap` = 672 hours, `total` = min(`hours`, 672) x hourly (`billed_hours`). Errors 422: `unknown_plan`, `region_not_prepaid`, `too_many_items`, `invalid_cpu`, `invalid_memory`, `serverless_not_available`.", DescTR: "Sunucu ve ayrılmış düğüm planları: saatlik = aylık / 672, aylık fiyatla sınırlı (`capped: true`). Sunucusuz kapsayıcı (`type: serverless`, `cpu_m`, `memory_mi`, `count`, `hours`): ölçülen kullanıma göre, bir takvim ayında en çok 672 saat ücretlenir (`capped: true`), `monthly_cap` = 672 saat, `total` = min(`hours`, 672) x saatlik (`billed_hours`).",
+		Desc: "Prepaid (hourly, from the account balance) services: Gyro Containers (ECS) and Gyro Cloud Istanbul (tr-ist-1). Times are Europe/Istanbul. Usage is never invoiced: invoices are issued for balance top-ups. Server and dedicated-node plans: hourly = monthly / 672, capped at the monthly price (`capped: true`). Serverless containers (`{\"type\": \"serverless\", \"cpu_m\": 250, \"memory_mi\": 512, \"count\": 2, \"hours\": 730}`): charged by measured use with no monthly cap (`capped: false`), `monthly_cap` = a full month (730 hours) of running time, `total` = `hours` x hourly (`billed_hours` = `hours`). Errors 422: `unknown_plan`, `region_not_prepaid`, `too_many_items`, `invalid_cpu`, `invalid_memory`, `serverless_not_available`.", DescTR: "Sunucu ve ayrılmış düğüm planları: saatlik = aylık / 672, aylık fiyatla sınırlı (`capped: true`). Sunucusuz kapsayıcı (`type: serverless`, `cpu_m`, `memory_mi`, `count`, `hours`): ölçülen kullanıma göre, aylık tavan yok (`capped: false`), `monthly_cap` = tam ay (730 saat) çalışma, `total` = `hours` x saatlik (`billed_hours` = `hours`).",
 		Scope: "billing_read", Command: []string{"billing", "estimate"},
 		HasBody: true, BodyRequired: true, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
 		Body: []Field{
