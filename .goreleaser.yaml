@@ -81,25 +81,9 @@ nfpms:
         dst: /usr/share/fish/vendor_completions.d/gyro.fish
     recommends: [openssh-client]
 
-# Homebrew: brew install gyro-hosting/tap/gyro  (tap repo Gyro-Hosting/homebrew-tap, token HOMEBREW_TAP_TOKEN)
-homebrew_casks:
-  - name: gyro
-    ids: [gyro]
-    repository:
-      owner: Gyro-Hosting
-      name: homebrew-tap
-      token: '{{ envOrDefault "HOMEBREW_TAP_TOKEN" "" }}'
-    directory: Casks
-    homepage: https://www.gyrohosting.com/developers/
-    description: Official command-line interface for Gyro Hosting
-    license: MPL-2.0
-    binaries: [gyro]
-    manpages: [man/gyro.1]
-    completions:
-      bash: completions/gyro.bash
-      zsh: completions/_gyro
-      fish: completions/gyro.fish
-    skip_upload: '{{ if isEnvSet "HOMEBREW_TAP_TOKEN" }}false{{ else }}true{{ end }}'
+# Homebrew: brew install gyro-hosting/tap/gyro
+# The formula lives in Gyro-Hosting/homebrew-tap (Formula/gyro.rb) and is regenerated there hourly by
+# its own workflow from the latest release's GPG-signed SHA256SUMS. No token is needed in this repo.
 
 # Scoop: scoop bucket add gyro https://github.com/Gyro-Hosting/scoop-bucket ; scoop install gyro
 scoops:
