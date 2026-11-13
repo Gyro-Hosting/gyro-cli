@@ -19,6 +19,7 @@ T = {
    ("install", "Kurulum", """<table><tr><th>Yöntem</th><th>Komut</th></tr>
 <tr><td>Linux / macOS</td><td><code>curl -fsSL https://www.gyrohosting.com/cli/install.sh | sh</code></td></tr>
 <tr><td>Homebrew</td><td><code>brew install gyro-hosting/tap/gyro</code></td></tr>
+<tr><td>npm (Node.js ≥16)</td><td><code>npm install -g @gyro-hosting/cli</code><br><code>npx @gyro-hosting/cli --version</code></td></tr>
 <tr><td>Windows (Scoop)</td><td><code>scoop bucket add gyro https://github.com/Gyro-Hosting/scoop-bucket</code><br><code>scoop install gyro</code></td></tr>
 <tr><td>Debian / Ubuntu</td><td><code>sudo apt install ./gyro_&lt;sürüm&gt;_linux_amd64.deb</code></td></tr>
 <tr><td>RHEL / Alma / Rocky</td><td><code>sudo dnf install ./gyro_&lt;sürüm&gt;_linux_amd64.rpm</code></td></tr>
@@ -83,6 +84,7 @@ gyro service tool run 48001 &lt;araç&gt; &lt;eylem&gt; --set alan=değer</code>
    ("install", "Install", """<table><tr><th>Method</th><th>Command</th></tr>
 <tr><td>Linux / macOS</td><td><code>curl -fsSL https://www.gyrohosting.com/cli/install.sh | sh</code></td></tr>
 <tr><td>Homebrew</td><td><code>brew install gyro-hosting/tap/gyro</code></td></tr>
+<tr><td>npm (Node.js ≥16)</td><td><code>npm install -g @gyro-hosting/cli</code><br><code>npx @gyro-hosting/cli --version</code></td></tr>
 <tr><td>Windows (Scoop)</td><td><code>scoop bucket add gyro https://github.com/Gyro-Hosting/scoop-bucket</code><br><code>scoop install gyro</code></td></tr>
 <tr><td>Debian / Ubuntu</td><td><code>sudo apt install ./gyro_&lt;version&gt;_linux_amd64.deb</code></td></tr>
 <tr><td>RHEL / Alma / Rocky</td><td><code>sudo dnf install ./gyro_&lt;version&gt;_linux_amd64.rpm</code></td></tr>

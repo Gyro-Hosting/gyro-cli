@@ -14,6 +14,7 @@ A single static binary for Linux, macOS and Windows (amd64, arm64).
 |---|---|
 | Script (Linux/macOS) | `curl -fsSL https://www.gyrohosting.com/cli/install.sh \| sh` |
 | Homebrew | `brew install gyro-hosting/tap/gyro` |
+| npm (Node.js ≥16) | `npm install -g @gyro-hosting/cli` or `npx @gyro-hosting/cli --version` |
 | Scoop (Windows) | `scoop bucket add gyro https://github.com/Gyro-Hosting/scoop-bucket && scoop install gyro` |
 | Debian/Ubuntu | `.deb` from the release page: `sudo apt install ./gyro_<version>_linux_amd64.deb` |
 | RHEL/Alma/Rocky | `sudo dnf install ./gyro_<version>_linux_amd64.rpm` |

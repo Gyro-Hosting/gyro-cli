@@ -15,6 +15,7 @@ Tek dosyalık, bağımlılıksız bir programdır (Linux, macOS, Windows; amd64 
 |---|---|
 | Betik (Linux/macOS) | `curl -fsSL https://www.gyrohosting.com/cli/install.sh \| sh` |
 | Homebrew | `brew install gyro-hosting/tap/gyro` |
+| npm (Node.js ≥16) | `npm install -g @gyro-hosting/cli` ya da `npx @gyro-hosting/cli --version` |
 | Scoop (Windows) | `scoop bucket add gyro https://github.com/Gyro-Hosting/scoop-bucket && scoop install gyro` |
 | Debian/Ubuntu | sürüm sayfasındaki `.deb`: `sudo apt install ./gyro_<sürüm>_linux_amd64.deb` |
 | RHEL/Alma/Rocky | `sudo dnf install ./gyro_<sürüm>_linux_amd64.rpm` |
