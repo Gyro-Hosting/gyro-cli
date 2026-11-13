@@ -2,7 +2,7 @@
 openapi: 3.1.0
 info:
   title: Gyro Public API
-  version: 2.20.0
+  version: 2.20.1
   summary: Manage Gyro cloud servers, SSH keys and billing programmatically.
   x-summary-tr: Gyro bulut sunucularınızı, SSH anahtarlarınızı ve faturalarınızı programla yönetin.
   description: "The Gyro Public API lets you automate everything you do in the Gyro client area:\norder and manage cloud servers, keep SSH keys, read invoices and\
@@ -39,7 +39,7 @@ info:
     \ of the reinstall; response `app_install_id`); `POST /cloud/servers/{id}/app` also on tr-ist-1. Install status `kaldirildi` = removed by a later reinstall. Additive.\n\
     \n**2.20.0**: Protected Storage buckets can be mounted on servers (`/cloud/servers/{id}/storage-mounts`, read-only by default, read/write needs `accept_versioning:\
     \ true`, field `protected`) and renamed (`POST /cloud/storage/{id}/buckets/{bucket}/rename`: display name + website address change, S3 name stays, `s3_name` in\
-    \ bucket lists). Additive.\n"
+    \ bucket lists). Additive.\n\n**2.20.1**: documentation only (example values). No functional change.\n"
   x-description-tr: "Gyro Public API, müşteri panelinde yaptığınız her işi otomatikleştirmenizi sağlar:\nbulut sunucu siparişi ve yönetimi, SSH anahtarları, fatura\
     \ ve bakiye okuma.\nResmi Terraform sağlayıcısı (`gyro-hosting/gyro`) ve `gyroctl` bu API'yi kullanır.\n\n* **Taban adres** `https://www.gyrohosting.com/api/v1/client`\n\
     * **Kimlik** `Authorization: Bearer wck_...` (anahtarı *Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri* bölümünden oluşturun)\n* **Biçim** JSON\
@@ -73,7 +73,8 @@ info:
     \ ön ödemeli bakiyeden saatlik; sunucu başına en çok 4 disk, yalnız büyür).\n\n**2.19.1**: `POST /cloud/servers/{id}/actions/rebuild` `app` ve `app_domain` alır\
     \ (yeniden kurulum + tek tıkla uygulama; yanıtta `app_install_id`); `POST /cloud/servers/{id}/app` tr-ist-1'de de çalışır. Kurulum durumu `kaldirildi` = sonraki\
     \ yeniden kurulumla kaldırıldı. Geriye uyumlu.\n\n**2.20.0**: Korumalı Depolama kovaları sunucuya bağlanabilir (varsayılan salt okuma, okuma-yazma `accept_versioning:\
-    \ true` ister, `protected` alanı) ve adı değiştirilebilir (görünen ad + web adresi değişir, S3 adı sabit, kova listelerinde `s3_name`). Geriye uyumlu.\n"
+    \ true` ister, `protected` alanı) ve adı değiştirilebilir (görünen ad + web adresi değişir, S3 adı sabit, kova listelerinde `s3_name`). Geriye uyumlu.\n\n**2.20.1**:\
+    \ yalnız belge (örnek değerler). İşlev değişikliği yok.\n"
   contact:
     name: Gyro Hosting
     url: https://www.gyrohosting.com
@@ -1635,7 +1636,7 @@ paths:
                     $ref: '#/components/schemas/ServiceLabel'
               example:
                 data:
-                  service_id: 17488
+                  service_id: 12345
                   nickname: Accounting server
                   tags:
                   - name: production
@@ -18726,11 +18727,11 @@ paths:
             schema:
               $ref: '#/components/schemas/ProjectCreate'
             example:
-              name: İşin Olacak
+              name: Gyro Proje
               color: blue
               icon: rocket-takeoff
               service_ids:
-              - 17488
+              - 12345
       responses:
         '201':
           description: Created
@@ -18888,8 +18889,8 @@ paths:
                     type: integer
             example:
               service_ids:
-              - 17488
-              - 17489
+              - 12345
+              - 12346
       responses:
         '200':
           description: Moved
@@ -21564,7 +21565,7 @@ components:
           format: date-time
       example:
         id: 6
-        name: Unibum
+        name: Gyro Test
         description: Mobile app backend
         color: purple
         icon: controller

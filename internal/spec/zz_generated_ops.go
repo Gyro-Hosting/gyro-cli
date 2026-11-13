@@ -3,7 +3,7 @@
 package spec
 
 // APIVersion is info.version of the spec this table was generated from.
-const APIVersion = "2.20.0"
+const APIVersion = "2.20.1"
 
 // Ops lists every API operation.
 var Ops = []Op{
