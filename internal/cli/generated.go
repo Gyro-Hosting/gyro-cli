@@ -345,11 +345,17 @@ func genCommand(a *App, op *spec.Op) *cobra.Command {
 			_ = cmd.RegisterFlagCompletionFunc(fn, fixedCompletion(f.Enum...))
 		}
 	}
-	if _, ok := o.flagName["b:quantity"]; ok { // 2.21.0: --count is the friendlier name of the batch size
-		qn := o.flagName["b:quantity"]
+	// friendlier flag names: --count = batch size (2.21.0), --target = Dockerfile stage of a pipeline (2.28.0, body build_target)
+	alias := map[string]string{}
+	for short, field := range map[string]string{"count": "b:quantity", "target": "b:build_target"} {
+		if fn, ok := o.flagName[field]; ok && !used[short] {
+			alias[short] = fn
+		}
+	}
+	if len(alias) > 0 {
 		fs.SetNormalizeFunc(func(_ *pflag.FlagSet, name string) pflag.NormalizedName {
-			if name == "count" {
-				return pflag.NormalizedName(qn)
+			if fn, ok := alias[name]; ok {
+				return pflag.NormalizedName(fn)
 			}
 			return pflag.NormalizedName(name)
 		})
