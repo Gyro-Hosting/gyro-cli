@@ -13,7 +13,7 @@ gyro-container-service-get - Get a container service
 Get a container service
 
 .PP
-Spec, state, problem code (ImagePullBackOff, CrashLoopBackOff, OOMKilled, Unschedulable ...), instances, revision, domains and the names of secrets (values are never returned). \fBautoscaling\fR = settings + live status (current/desired replicas, current CPU/memory %, at_max), \fBcapacity\fR = {blocked, fits}.
+Spec, state, problem code (ImagePullBackOff, CrashLoopBackOff, OOMKilled, Unschedulable ...), instances, revision, domains and the names of secrets (values are never returned). \fBautoscaling\fR = settings + live status (current/desired replicas, current CPU/memory %, at_max), \fBcapacity\fR = {blocked, fits}. The answer carries \fBnamespace\fR and, for services with a port, \fBinternal\fR = \fB{host, short, port: 80, target_port, address, url}\fR: other services of the same environment reach it at \fBinternal.address\fR (\fB<name>.<namespace>.svc.cluster.local:80\fR) or \fB<name>:80\fR\&.
 
 .PP
 API: GET /cloud/containers/{id}/services/{name} (operationId typed_get_containers\fBid\fPservices__name, scope services_read)

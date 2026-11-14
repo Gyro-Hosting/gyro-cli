@@ -1,0 +1,77 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-container-egress-ips - Egress IPs of a container environment
+
+
+.SH SYNOPSIS
+\fBgyro container egress-ips  [flags]\fP
+
+
+.SH DESCRIPTION
+Egress IPs of a container environment
+
+.PP
+Current public IPv4 addresses the containers reach the internet from - add them to the IP allow list of an external service. Egress IPs of a \fBdedicated\fP environment = the public IPs of its own nodes + the shared pool node(s) used while an update rolls out (the new copy starts there for about a minute, then moves back to your node). \fBServerless\fP = the shared sandboxed pool nodes (the pool can grow: a new address can appear). Build machines of Gyro Pipeline are listed separately (\fBbuild_ips\fR). The list changes when the nodes change (plan change, node replacement, pool scaling); the owner is notified (Alerts channels, event \fBegress\fR). No IPv6 egress; outbound TCP 25 is closed. A fixed egress address is not offered yet.
+
+.PP
+API: GET /cloud/containers/{id}/egress-ips (operationId getContainerEgressIps, scope services_read)
+
+
+.SH OPTIONS
+\fB-h\fP, \fB--help\fP[=false]
+	help for egress-ips
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH SEE ALSO
+\fBgyro-container(1)\fP

@@ -34,9 +34,11 @@ gyro container [flags]
 * [gyro](gyro.md)	 - Gyro Hosting command-line interface
 * [gyro container create](gyro_container_create.md)	 - Create container environments (batch)
 * [gyro container domain](gyro_container_domain.md)	 - Domains of a service
+* [gyro container egress-ips](gyro_container_egress-ips.md)	 - Egress IPs of a container environment
 * [gyro container env](gyro_container_env.md)	 - Set environment variables
 * [gyro container events](gyro_container_events.md)	 - Recent warnings
 * [gyro container external-registry](gyro_container_external-registry.md)	 - Remove external registry credentials
+* [gyro container get](gyro_container_get.md)	 - Container environment detail (namespace, internal addressing, egress IPs)
 * [gyro container logs](gyro_container_logs.md)	 - Service logs
 * [gyro container metrics](gyro_container_metrics.md)	 - Service CPU / memory
 * [gyro container nodes](gyro_container_nodes.md)	 - Node pool

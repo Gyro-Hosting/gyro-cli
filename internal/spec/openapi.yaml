@@ -2,7 +2,7 @@
 openapi: 3.1.0
 info:
   title: Gyro Public API
-  version: 2.26.0
+  version: 2.27.0
   summary: Manage Gyro cloud servers, SSH keys and billing programmatically.
   x-summary-tr: Gyro bulut sunucularınızı, SSH anahtarlarınızı ve faturalarınızı programla yönetin.
   description: "The Gyro Public API lets you automate everything you do in the Gyro client area:\norder and manage cloud servers, keep SSH keys, read invoices and\
@@ -68,7 +68,10 @@ info:
     \ `gyro ticket create`). Every refusal caused by a limit carries `error.details.limit_exceeded: true`, `limit_key`, `limit`, `current`, `how_to_increase` and\
     \ a ready `support_ticket` request.\n\n**2.26.0**: `GET /cloud/account/limits`; structured limit hint in limit errors (new-account limit of the prepaid cloud\
     \ now answers `limit_exceeded` instead of `checkout_blocked`, original code in `details.reason`); dry-run quotes of servers, container environments and templates\
-    \ show `quote.limit_exceeded`; new-account limit raised to 5 servers. Additive.\n"
+    \ show `quote.limit_exceeded`; new-account limit raised to 5 servers. Additive.\n\n**2.27.0**: `GET /cloud/containers/{id}` (environment detail: Kubernetes `namespace`,\
+    \ in-cluster addressing `cluster_dns`, `egress_ips`) and `GET /cloud/containers/{id}/egress-ips` (current egress IPv4 addresses for IP allow lists; dedicated\
+    \ = own nodes + shared pool during updates, serverless = shared pool); service detail has `internal` (`<service>.<namespace>.svc.cluster.local:80`), service list\
+    \ `internal_address`; egress IP changes are notified (alert event `egress`). Additive.\n"
   x-description-tr: "Gyro Public API, müşteri panelinde yaptığınız her işi otomatikleştirmenizi sağlar:\nbulut sunucu siparişi ve yönetimi, SSH anahtarları, fatura\
     \ ve bakiye okuma.\nResmi Terraform sağlayıcısı (`gyro-hosting/gyro`) ve `gyroctl` bu API'yi kullanır.\n\n* **Taban adres** `https://www.gyrohosting.com/api/v1/client`\n\
     * **Kimlik** `Authorization: Bearer wck_...` (anahtarı *Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri* bölümünden oluşturun)\n* **Biçim** JSON\
@@ -131,7 +134,10 @@ info:
     \ talebiyle artırılır** (`POST /api/v1/client/tickets`, `gyro ticket create`). Sınır kaynaklı her ret `error.details.limit_exceeded: true`, `limit_key`, `limit`,\
     \ `current`, `how_to_increase` ve hazır `support_ticket` isteğini taşır.\n\n**2.26.0**: `GET /cloud/account/limits`; sınır hatalarında yapılandırılmış ipucu (ön\
     \ ödemeli bulutun yeni hesap sınırı artık `checkout_blocked` yerine `limit_exceeded`, eski kod `details.reason`); sunucu, kapsayıcı ortamı ve şablon dry-run tekliflerinde\
-    \ `quote.limit_exceeded`; yeni hesap sınırı 5 sunucu. Geriye uyumlu.\n"
+    \ `quote.limit_exceeded`; yeni hesap sınırı 5 sunucu. Geriye uyumlu.\n\n**2.27.0**: `GET /cloud/containers/{id}` (ortam ayrıntısı: Kubernetes `namespace`, iç\
+    \ adresleme `cluster_dns`, `egress_ips`) ve `GET /cloud/containers/{id}/egress-ips` (IP beyaz listesi için güncel çıkış IPv4 adresleri; ayrılmış = kendi düğümleri\
+    \ + güncellemede paylaşımlı havuz, sunucusuz = paylaşımlı havuz); servis ayrıntısında `internal` (`<servis>.<namespace>.svc.cluster.local:80`), servis listesinde\
+    \ `internal_address`; çıkış IP değişikliği bildirilir (uyarı olayı `egress`). Geriye uyumlu.\n"
   contact:
     name: Gyro Hosting
     url: https://www.gyrohosting.com
@@ -8726,7 +8732,9 @@ paths:
       x-summary-tr: Kapsayıcı servislerini listele
       x-scope: services_read
       description: Services of the environment with state (running, deploying, failing, pending, stopped, suspended), ready/desired instances, size and public URL.
-      x-description-tr: 'Ortamdaki servisler: durum, hazır/istenen örnek, boyut, genel adres.'
+        Each item carries `internal_address` (services with a port); the list carries `namespace` and `cluster_dns`.
+      x-description-tr: 'Ortamdaki servisler: durum, hazır/istenen örnek, boyut, genel adres. Her öğede `internal_address` (portu olan servisler), listede `namespace`
+        ve `cluster_dns` bulunur.'
       parameters:
       - name: id
         in: path
@@ -8908,9 +8916,13 @@ paths:
       summary: Get a container service
       x-summary-tr: Kapsayıcı servisini getir
       x-scope: services_read
-      description: Spec, state, problem code (ImagePullBackOff, CrashLoopBackOff, OOMKilled, Unschedulable ...), instances, revision, domains and the names of secrets
+      description: 'Spec, state, problem code (ImagePullBackOff, CrashLoopBackOff, OOMKilled, Unschedulable ...), instances, revision, domains and the names of secrets
         (values are never returned). `autoscaling` = settings + live status (current/desired replicas, current CPU/memory %, at_max), `capacity` = {blocked, fits}.
-      x-description-tr: Tanım, durum, sorun kodu, örnekler, sürüm, alan adları ve gizli değer adları (değerler asla dönmez).
+        The answer carries `namespace` and, for services with a port, `internal` = `{host, short, port: 80, target_port, address, url}`: other services of the same
+        environment reach it at `internal.address` (`<name>.<namespace>.svc.cluster.local:80`) or `<name>:80`.'
+      x-description-tr: 'Tanım, durum, sorun kodu, örnekler, sürüm, alan adları ve gizli değer adları (değerler asla dönmez). Yanıtta `namespace` ve portu olan servislerde
+        `internal` = `{host, short, port: 80, target_port, address, url}` bulunur: aynı ortamdaki servisler `internal.address` (`<ad>.<namespace>.svc.cluster.local:80`)
+        ya da `<ad>:80` ile ulaşır.'
       parameters:
       - name: id
         in: path
@@ -9866,11 +9878,11 @@ paths:
       x-scope: services_read
       description: '`settings` (channels, events, cooldown; the webhook secret is never returned), `conditions` = what is wrong right now, `history` = last 30 alerts.
         Events: down (no ready replica for >3 min), crashloop (keeps restarting / image pull fails / out of memory), replicas_low (below alerts.min_ready), scale_max
-        (autoscaling wants more than max), capacity (replicas wait for room in the node pool). An event is announced after ~2 minutes, at most once per cooldown per
-        service + event (flapping included), with a ''resolved'' message.'
+        (autoscaling wants more than max), capacity (replicas wait for room in the node pool), egress (the egress IPs of the environment changed; one message, no
+        resolved). An event is announced after ~2 minutes, at most once per cooldown per service + event (flapping included), with a ''resolved'' message.'
       x-description-tr: '`settings` (kanallar, olaylar, tekrar aralığı; webhook anahtarı dönmez), `conditions` = şu an süren sorunlar, `history` = son 30 uyarı. Olaylar:
-        down, crashloop, replicas_low, scale_max, capacity. Olay ~2 dakika sürünce bildirilir; aynı servis + olay tekrar aralığında bir kez (gidip gelenler dahil),
-        düzelince ''düzeldi'' mesajı.'
+        down, crashloop, replicas_low, scale_max, capacity, egress (çıkış IP''leri değişti). Olay ~2 dakika sürünce bildirilir; aynı servis + olay tekrar aralığında
+        bir kez (gidip gelenler dahil), düzelince ''düzeldi'' mesajı.'
       parameters:
       - name: id
         in: path
@@ -9953,7 +9965,7 @@ paths:
                   description: 'https URL of a public server; JSON POST signed with X-Gyro-Signature: sha256=HMAC(secret, X-Gyro-Timestamp + ''.'' + body)'
                 events:
                   type: string
-                  description: 'Comma separated: down, crashloop, replicas_low, scale_max, capacity'
+                  description: 'Comma separated: down, crashloop, replicas_low, scale_max, capacity, egress'
                 cooldown:
                   type: integer
                   description: Minutes between two announcements of the same service + event (5-1440, default 30)
@@ -10069,8 +10081,10 @@ paths:
       summary: Node pool
       x-summary-tr: Düğüm havuzu
       x-scope: services_read
-      description: Your dedicated nodes (aliases node-1..n), pool capacity and usage, ingress IPs for apex A records, private registry (user only).
-      x-description-tr: Size ayrılmış düğümler, havuz kapasitesi/kullanımı, kök alan adı A kaydı için IP'ler, özel depo (yalnız kullanıcı).
+      description: Your dedicated nodes (aliases node-1..n), pool capacity and usage, ingress IPs for apex A records, private registry (user only). Also `namespace`,
+        `cluster_dns` and `egress` (schema ContainerEgress).
+      x-description-tr: Size ayrılmış düğümler, havuz kapasitesi/kullanımı, kök alan adı A kaydı için IP'ler, özel depo (yalnız kullanıcı). Ayrıca `namespace`, `cluster_dns`
+        ve `egress` (ContainerEgress şeması).
       parameters:
       - name: id
         in: path
@@ -10097,6 +10111,91 @@ paths:
           $ref: '#/components/responses/Validation'
       x-cli:
         command: container nodes
+        confirm: false
+  /cloud/containers/{id}:
+    get:
+      tags:
+      - Containers
+      operationId: getContainerEnvironment
+      summary: Container environment detail (namespace, internal addressing, egress IPs)
+      x-summary-tr: Kapsayıcı ortamı ayrıntısı (namespace, iç adresleme, çıkış IP'leri)
+      x-scope: services_read
+      description: 'Environment code, Kubernetes **namespace**, in-cluster addressing (`cluster_dns`), plan limits, nodes, quota, ingress IPs and the current **egress
+        IPs**. Egress IPs of a **dedicated** environment = the public IPs of its own nodes + the shared pool node(s) used while an update rolls out (the new copy
+        starts there for about a minute, then moves back to your node). **Serverless** = the shared sandboxed pool nodes (the pool can grow: a new address can appear).
+        Build machines of Gyro Pipeline are listed separately (`build_ips`). The list changes when the nodes change (plan change, node replacement, pool scaling);
+        the owner is notified (Alerts channels, event `egress`). No IPv6 egress; outbound TCP 25 is closed. A fixed egress address is not offered yet.'
+      x-description-tr: Ortam kodu, Kubernetes **namespace** adı, iç adresleme (`cluster_dns`), paket sınırları, düğümler, kota, giriş IP'leri ve güncel **çıkış IP'leri**.
+        **Ayrılmış** ortamın çıkış IP'leri = kendi düğümlerinin IP'leri + güncelleme sırasında kullanılan paylaşımlı havuz düğümü (yeni kopya yaklaşık bir dakika
+        orada başlar, sonra düğümünüze döner). **Sunucusuz** = paylaşımlı yalıtılmış havuz düğümleri (havuz büyürse yeni adres eklenebilir). Gyro Pipeline derleme
+        makineleri ayrı listelenir (`build_ips`). Düğümler değişince (paket değişimi, düğüm yenileme, havuz ölçeklemesi) liste değişir ve ortam sahibine bildirim
+        gider (Uyarılar kanalları, `egress` olayı). IPv6 çıkışı yok; TCP 25 kapalı.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ContainerEnvironment'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-cli:
+        command: container get
+        confirm: false
+  /cloud/containers/{id}/egress-ips:
+    get:
+      tags:
+      - Containers
+      operationId: getContainerEgressIps
+      summary: Egress IPs of a container environment
+      x-summary-tr: Kapsayıcı ortamının çıkış IP'leri
+      x-scope: services_read
+      description: 'Current public IPv4 addresses the containers reach the internet from - add them to the IP allow list of an external service. Egress IPs of a **dedicated**
+        environment = the public IPs of its own nodes + the shared pool node(s) used while an update rolls out (the new copy starts there for about a minute, then
+        moves back to your node). **Serverless** = the shared sandboxed pool nodes (the pool can grow: a new address can appear). Build machines of Gyro Pipeline
+        are listed separately (`build_ips`). The list changes when the nodes change (plan change, node replacement, pool scaling); the owner is notified (Alerts channels,
+        event `egress`). No IPv6 egress; outbound TCP 25 is closed. A fixed egress address is not offered yet.'
+      x-description-tr: Kapsayıcıların internete çıktığı güncel IPv4 adresleri - harici bir servisin IP beyaz listesine ekleyin. **Ayrılmış** ortamın çıkış IP'leri
+        = kendi düğümlerinin IP'leri + güncelleme sırasında kullanılan paylaşımlı havuz düğümü (yeni kopya yaklaşık bir dakika orada başlar, sonra düğümünüze döner).
+        **Sunucusuz** = paylaşımlı yalıtılmış havuz düğümleri (havuz büyürse yeni adres eklenebilir). Gyro Pipeline derleme makineleri ayrı listelenir (`build_ips`).
+        Düğümler değişince (paket değişimi, düğüm yenileme, havuz ölçeklemesi) liste değişir ve ortam sahibine bildirim gider (Uyarılar kanalları, `egress` olayı).
+        IPv6 çıkışı yok; TCP 25 kapalı.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    allOf:
+                    - $ref: '#/components/schemas/ContainerEgress'
+                    - type: object
+                      properties:
+                        namespace:
+                          type: string
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-cli:
+        command: container egress-ips
         confirm: false
   /cloud/containers/{id}/events:
     get:
@@ -24594,3 +24693,120 @@ components:
                 type:
                 - integer
                 - 'null'
+    ContainerEgress:
+      type: object
+      description: 'Public IPv4 addresses the containers of the environment reach the internet from (no NAT gateway: traffic leaves from the node the container runs
+        on).'
+      x-description-tr: 'Ortamdaki kapsayıcıların internete çıktığı IPv4 adresleri (NAT kapısı yok: trafik kapsayıcının çalıştığı düğümden çıkar).'
+      properties:
+        mode:
+          type: string
+          enum:
+          - dedicated
+          - serverless
+        ips:
+          type: array
+          items:
+            type: string
+            format: ipv4
+          description: Put ALL of them on the IP allow list of an external service.
+          example:
+          - 31.58.248.114
+          - 45.87.174.168
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              ip:
+                type: string
+              source:
+                type: string
+                enum:
+                - node
+                - rollout
+                - shared_pool
+                description: node = a node of the dedicated pool (always used); rollout = shared pool where the new copy starts during an update (about a minute)
+                  before it moves back; shared_pool = serverless pool node
+              node:
+                type: string
+                example: node-1
+        build_ips:
+          type: array
+          items:
+            type: string
+          description: Gyro Pipeline build machines (git clone / archive download only)
+        hash:
+          type: string
+          description: changes whenever `ips` change (compare to detect a change)
+        ipv6:
+          type: boolean
+          const: false
+          description: no IPv6 egress
+        note:
+          type: string
+    ContainerEnvironment:
+      type: object
+      properties:
+        code:
+          type: string
+          example: ab12cd
+        namespace:
+          type: string
+          example: t-canli-12345
+          description: Kubernetes namespace of the environment
+        mode:
+          type: string
+          enum:
+          - dedicated
+          - serverless
+        cluster_dns:
+          type: object
+          description: 'in-cluster addressing: from the same environment a service is reached at `<service>.<namespace>.svc.cluster.local:80` or `<service>:80` (port
+            80 is forwarded to the container port; only services with a port)'
+          properties:
+            namespace:
+              type: string
+            service_domain:
+              type: string
+              example: t-canli-12345.svc.cluster.local
+            service_port:
+              type: integer
+              const: 80
+            pattern:
+              type: string
+              example: <service>.t-canli-12345.svc.cluster.local:80
+            short_pattern:
+              type: string
+              example: <service>:80
+        host_suffix:
+          type: string
+          example: -ab12cd.gyroapp.net
+        suspended:
+          type: boolean
+        services:
+          type: integer
+        ready_replicas:
+          type: integer
+        limits:
+          type: object
+        nodes:
+          type: array
+          items:
+            type: object
+        quota:
+          type: object
+        ingress_ips:
+          type: array
+          items:
+            type: string
+          description: inbound address (apex A record of a custom domain)
+        egress_ips:
+          type: array
+          items:
+            type: string
+          description: same as egress.ips
+        egress_note:
+          type: string
+        egress:
+          $ref: '#/components/schemas/ContainerEgress'

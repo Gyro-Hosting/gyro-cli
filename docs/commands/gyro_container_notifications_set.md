@@ -21,7 +21,7 @@ gyro container notifications set <ID> [flags]
       --data string              request body as JSON, @file or @- (stdin)
       --dry-run                  show the price quote / request without changing anything
       --email                    Account e-mail (default on)
-      --events string            Comma separated: down, crashloop, replicas_low, scale_max, capacity
+      --events string            Comma separated: down, crashloop, replicas_low, scale_max, capacity, egress
   -h, --help                     help for set
       --idempotency-key string   idempotency key (automatic for money operations)
       --resolved                 Send a 'resolved' message (default on)

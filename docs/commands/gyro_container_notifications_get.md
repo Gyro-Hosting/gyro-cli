@@ -6,7 +6,7 @@ Notification settings and current alerts
 
 Notification settings and current alerts
 
-`settings` (channels, events, cooldown; the webhook secret is never returned), `conditions` = what is wrong right now, `history` = last 30 alerts. Events: down (no ready replica for >3 min), crashloop (keeps restarting / image pull fails / out of memory), replicas_low (below alerts.min_ready), scale_max (autoscaling wants more than max), capacity (replicas wait for room in the node pool). An event is announced after ~2 minutes, at most once per cooldown per service + event (flapping included), with a 'resolved' message.
+`settings` (channels, events, cooldown; the webhook secret is never returned), `conditions` = what is wrong right now, `history` = last 30 alerts. Events: down (no ready replica for >3 min), crashloop (keeps restarting / image pull fails / out of memory), replicas_low (below alerts.min_ready), scale_max (autoscaling wants more than max), capacity (replicas wait for room in the node pool), egress (the egress IPs of the environment changed; one message, no resolved). An event is announced after ~2 minutes, at most once per cooldown per service + event (flapping included), with a 'resolved' message.
 
 API: GET /cloud/containers/{id}/notifications (operationId typed_get_containers__id__notifications, scope services_read)
 

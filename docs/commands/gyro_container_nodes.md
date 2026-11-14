@@ -6,7 +6,7 @@ Node pool
 
 Node pool
 
-Your dedicated nodes (aliases node-1..n), pool capacity and usage, ingress IPs for apex A records, private registry (user only).
+Your dedicated nodes (aliases node-1..n), pool capacity and usage, ingress IPs for apex A records, private registry (user only). Also `namespace`, `cluster_dns` and `egress` (schema ContainerEgress).
 
 API: GET /cloud/containers/{id}/nodes (operationId typed_get_containers__id__nodes, scope services_read)
 

@@ -6,7 +6,7 @@ Get a container service
 
 Get a container service
 
-Spec, state, problem code (ImagePullBackOff, CrashLoopBackOff, OOMKilled, Unschedulable ...), instances, revision, domains and the names of secrets (values are never returned). `autoscaling` = settings + live status (current/desired replicas, current CPU/memory %, at_max), `capacity` = {blocked, fits}.
+Spec, state, problem code (ImagePullBackOff, CrashLoopBackOff, OOMKilled, Unschedulable ...), instances, revision, domains and the names of secrets (values are never returned). `autoscaling` = settings + live status (current/desired replicas, current CPU/memory %, at_max), `capacity` = {blocked, fits}. The answer carries `namespace` and, for services with a port, `internal` = `{host, short, port: 80, target_port, address, url}`: other services of the same environment reach it at `internal.address` (`<name>.<namespace>.svc.cluster.local:80`) or `<name>:80`.
 
 API: GET /cloud/containers/{id}/services/{name} (operationId typed_get_containers__id__services__name, scope services_read)
 

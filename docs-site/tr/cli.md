@@ -90,10 +90,12 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro container domain list` | Servisin alan adları | `GET /cloud/containers/{id}/services/{name}/domains` |
 | `gyro container domain remove` | Alan adını kaldır | `DELETE /cloud/containers/{id}/services/{name}/domains/{domain}` |
 | `gyro container domain verify` | Bekleyen alan adlarını kontrol et | `POST /cloud/containers/{id}/services/{name}/domains/verify` |
+| `gyro container egress-ips` | Kapsayıcı ortamının çıkış IP'leri | `GET /cloud/containers/{id}/egress-ips` |
 | `gyro container env set` | Ortam değişkenlerini ayarla | `PUT /cloud/containers/{id}/services/{name}/env` |
 | `gyro container events` | Son uyarılar | `GET /cloud/containers/{id}/events` |
 | `gyro container external-registry delete` | Özel depo bilgisini sil | `DELETE /cloud/containers/{id}/external-registry` |
 | `gyro container external-registry set` | Harici özel depo bilgisi | `PUT /cloud/containers/{id}/external-registry` |
+| `gyro container get` | Kapsayıcı ortamı ayrıntısı (namespace, iç adresleme, çıkış IP'leri) | `GET /cloud/containers/{id}` |
 | `gyro container logs` | Servis logları | `GET /cloud/containers/{id}/services/{name}/logs` |
 | `gyro container metrics` | Servis işlemci / bellek | `GET /cloud/containers/{id}/services/{name}/metrics` |
 | `gyro container nodes` | Düğüm havuzu | `GET /cloud/containers/{id}/nodes` |

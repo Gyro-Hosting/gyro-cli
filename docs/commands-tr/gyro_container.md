@@ -34,9 +34,11 @@ gyro container [flags]
 * [gyro](gyro.md)	 - Gyro Hosting komut satırı aracı
 * [gyro container create](gyro_container_create.md)	 - Kapsayıcı ortamı oluştur (toplu)
 * [gyro container domain](gyro_container_domain.md)	 - Servisin alan adları
+* [gyro container egress-ips](gyro_container_egress-ips.md)	 - Kapsayıcı ortamının çıkış IP'leri
 * [gyro container env](gyro_container_env.md)	 - Ortam değişkenlerini ayarla
 * [gyro container events](gyro_container_events.md)	 - Son uyarılar
 * [gyro container external-registry](gyro_container_external-registry.md)	 - Özel depo bilgisini sil
+* [gyro container get](gyro_container_get.md)	 - Kapsayıcı ortamı ayrıntısı (namespace, iç adresleme, çıkış IP'leri)
 * [gyro container logs](gyro_container_logs.md)	 - Servis logları
 * [gyro container metrics](gyro_container_metrics.md)	 - Servis işlemci / bellek
 * [gyro container nodes](gyro_container_nodes.md)	 - Düğüm havuzu

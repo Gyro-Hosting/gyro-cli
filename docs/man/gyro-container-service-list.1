@@ -13,7 +13,7 @@ gyro-container-service-list - List container services
 List container services
 
 .PP
-Services of the environment with state (running, deploying, failing, pending, stopped, suspended), ready/desired instances, size and public URL.
+Services of the environment with state (running, deploying, failing, pending, stopped, suspended), ready/desired instances, size and public URL. Each item carries \fBinternal_address\fR (services with a port); the list carries \fBnamespace\fR and \fBcluster_dns\fR\&.
 
 .PP
 API: GET /cloud/containers/{id}/services (operationId typed_get_containers\fBid\fPservices, scope services_read)

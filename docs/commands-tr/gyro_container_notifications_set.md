@@ -21,7 +21,7 @@ gyro container notifications set <ID> [flags]
       --data string              istek gövdesi JSON, @dosya ya da @- (stdin)
       --dry-run                  hiçbir şeyi değiştirmeden teklifi / isteği göster
       --email                    Account e-mail (default on)
-      --events string            Comma separated: down, crashloop, replicas_low, scale_max, capacity
+      --events string            Comma separated: down, crashloop, replicas_low, scale_max, capacity, egress
   -h, --help                     help for set
       --idempotency-key string   tekrar güvenliği anahtarı (para işlemlerinde otomatik)
       --resolved                 Send a 'resolved' message (default on)

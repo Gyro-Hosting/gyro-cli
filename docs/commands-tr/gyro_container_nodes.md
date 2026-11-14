@@ -6,7 +6,7 @@ Düğüm havuzu
 
 Düğüm havuzu
 
-Size ayrılmış düğümler, havuz kapasitesi/kullanımı, kök alan adı A kaydı için IP'ler, özel depo (yalnız kullanıcı).
+Size ayrılmış düğümler, havuz kapasitesi/kullanımı, kök alan adı A kaydı için IP'ler, özel depo (yalnız kullanıcı). Ayrıca `namespace`, `cluster_dns` ve `egress` (ContainerEgress şeması).
 
 API: GET /cloud/containers/{id}/nodes (operationId typed_get_containers__id__nodes, scope services_read)
 

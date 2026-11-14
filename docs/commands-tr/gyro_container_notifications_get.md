@@ -6,7 +6,7 @@ Bildirim ayarları ve süren uyarılar
 
 Bildirim ayarları ve süren uyarılar
 
-`settings` (kanallar, olaylar, tekrar aralığı; webhook anahtarı dönmez), `conditions` = şu an süren sorunlar, `history` = son 30 uyarı. Olaylar: down, crashloop, replicas_low, scale_max, capacity. Olay ~2 dakika sürünce bildirilir; aynı servis + olay tekrar aralığında bir kez (gidip gelenler dahil), düzelince 'düzeldi' mesajı.
+`settings` (kanallar, olaylar, tekrar aralığı; webhook anahtarı dönmez), `conditions` = şu an süren sorunlar, `history` = son 30 uyarı. Olaylar: down, crashloop, replicas_low, scale_max, capacity, egress (çıkış IP'leri değişti). Olay ~2 dakika sürünce bildirilir; aynı servis + olay tekrar aralığında bir kez (gidip gelenler dahil), düzelince 'düzeldi' mesajı.
 
 API: GET /cloud/containers/{id}/notifications (operationId typed_get_containers__id__notifications, scope services_read)
 

@@ -6,7 +6,7 @@ Kapsayıcı servisini getir
 
 Kapsayıcı servisini getir
 
-Tanım, durum, sorun kodu, örnekler, sürüm, alan adları ve gizli değer adları (değerler asla dönmez).
+Tanım, durum, sorun kodu, örnekler, sürüm, alan adları ve gizli değer adları (değerler asla dönmez). Yanıtta `namespace` ve portu olan servislerde `internal` = `{host, short, port: 80, target_port, address, url}` bulunur: aynı ortamdaki servisler `internal.address` (`<ad>.<namespace>.svc.cluster.local:80`) ya da `<ad>:80` ile ulaşır.
 
 API: GET /cloud/containers/{id}/services/{name} (operationId typed_get_containers__id__services__name, scope services_read)
 

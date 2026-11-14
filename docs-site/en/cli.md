@@ -90,10 +90,12 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro container domain list` | Domains of a service | `GET /cloud/containers/{id}/services/{name}/domains` |
 | `gyro container domain remove` | Detach a domain | `DELETE /cloud/containers/{id}/services/{name}/domains/{domain}` |
 | `gyro container domain verify` | Re-check pending domains | `POST /cloud/containers/{id}/services/{name}/domains/verify` |
+| `gyro container egress-ips` | Egress IPs of a container environment | `GET /cloud/containers/{id}/egress-ips` |
 | `gyro container env set` | Set environment variables | `PUT /cloud/containers/{id}/services/{name}/env` |
 | `gyro container events` | Recent warnings | `GET /cloud/containers/{id}/events` |
 | `gyro container external-registry delete` | Remove external registry credentials | `DELETE /cloud/containers/{id}/external-registry` |
 | `gyro container external-registry set` | External private registry credentials | `PUT /cloud/containers/{id}/external-registry` |
+| `gyro container get` | Container environment detail (namespace, internal addressing, egress IPs) | `GET /cloud/containers/{id}` |
 | `gyro container logs` | Service logs | `GET /cloud/containers/{id}/services/{name}/logs` |
 | `gyro container metrics` | Service CPU / memory | `GET /cloud/containers/{id}/services/{name}/metrics` |
 | `gyro container nodes` | Node pool | `GET /cloud/containers/{id}/nodes` |

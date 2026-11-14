@@ -6,7 +6,7 @@ List container services
 
 List container services
 
-Services of the environment with state (running, deploying, failing, pending, stopped, suspended), ready/desired instances, size and public URL.
+Services of the environment with state (running, deploying, failing, pending, stopped, suspended), ready/desired instances, size and public URL. Each item carries `internal_address` (services with a port); the list carries `namespace` and `cluster_dns`.
 
 API: GET /cloud/containers/{id}/services (operationId typed_get_containers__id__services, scope services_read)
 

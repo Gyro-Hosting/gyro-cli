@@ -3,7 +3,7 @@
 package spec
 
 // APIVersion is info.version of the spec this table was generated from.
-const APIVersion = "2.26.0"
+const APIVersion = "2.27.0"
 
 // Ops lists every API operation.
 var Ops = []Op{
@@ -145,6 +145,27 @@ var Ops = []Op{
 		HasBody: false, BodyRequired: false, ListResponse: true, Paginated: false, Confirm: false, Money: false, Hidden: false,
 		Columns: []string{"id", "plan", "name", "serverless", "region", "nodes", "node_cores", "node_memory_gb", "node_disk_gb", "max_services", "max_replicas", "max_domains", "billing", "currency", "monthly_cap_eur", "hourly_eur"},
 	},
+	{ID: "getContainerEnvironment", Method: "GET", Path: "/cloud/containers/{id}", Tag: "Containers",
+		Summary: "Container environment detail (namespace, internal addressing, egress IPs)", SummaryTR: "Kapsayıcı ortamı ayrıntısı (namespace, iç adresleme, çıkış IP'leri)",
+		Desc: "Environment code, Kubernetes **namespace**, in-cluster addressing (`cluster_dns`), plan limits, nodes, quota, ingress IPs and the current **egress IPs**. Egress IPs of a **dedicated** environment = the public IPs of its own nodes + the shared pool node(s) used while an update rolls out (the new copy starts there for about a minute, then moves back to your node). **Serverless** = the shared sandboxed pool nodes (the pool can grow: a new address can appear). Build machines of Gyro Pipeline are listed separately (`build_ips`). The list changes when the nodes change (plan change, node replacement, pool scaling); the owner is notified (Alerts channels, event `egress`). No IPv6 egress; outbound TCP 25 is closed. A fixed egress address is not offered yet.", DescTR: "Ortam kodu, Kubernetes **namespace** adı, iç adresleme (`cluster_dns`), paket sınırları, düğümler, kota, giriş IP'leri ve güncel **çıkış IP'leri**. **Ayrılmış** ortamın çıkış IP'leri = kendi düğümlerinin IP'leri + güncelleme sırasında kullanılan paylaşımlı havuz düğümü (yeni kopya yaklaşık bir dakika orada başlar, sonra düğümünüze döner). **Sunucusuz** = paylaşımlı yalıtılmış havuz düğümleri (havuz büyürse yeni adres eklenebilir). Gyro Pipeline derleme makineleri ayrı listelenir (`build_ips`). Düğümler değişince (paket değişimi, düğüm yenileme, havuz ölçeklemesi) liste değişir ve ortam sahibine bildirim gider (Uyarılar kanalları, `egress` olayı). IPv6 çıkışı yok; TCP 25 kapalı.",
+		Scope: "services_read", Command: []string{"container", "get"},
+		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
+		Columns: []string{"code", "namespace", "mode", "host_suffix", "suspended", "services", "ready_replicas", "egress_note"},
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Service id", DescTR: ""},
+		},
+	},
+	{ID: "getContainerEgressIps", Method: "GET", Path: "/cloud/containers/{id}/egress-ips", Tag: "Containers",
+		Summary: "Egress IPs of a container environment", SummaryTR: "Kapsayıcı ortamının çıkış IP'leri",
+		Desc: "Current public IPv4 addresses the containers reach the internet from - add them to the IP allow list of an external service. Egress IPs of a **dedicated** environment = the public IPs of its own nodes + the shared pool node(s) used while an update rolls out (the new copy starts there for about a minute, then moves back to your node). **Serverless** = the shared sandboxed pool nodes (the pool can grow: a new address can appear). Build machines of Gyro Pipeline are listed separately (`build_ips`). The list changes when the nodes change (plan change, node replacement, pool scaling); the owner is notified (Alerts channels, event `egress`). No IPv6 egress; outbound TCP 25 is closed. A fixed egress address is not offered yet.", DescTR: "Kapsayıcıların internete çıktığı güncel IPv4 adresleri - harici bir servisin IP beyaz listesine ekleyin. **Ayrılmış** ortamın çıkış IP'leri = kendi düğümlerinin IP'leri + güncelleme sırasında kullanılan paylaşımlı havuz düğümü (yeni kopya yaklaşık bir dakika orada başlar, sonra düğümünüze döner). **Sunucusuz** = paylaşımlı yalıtılmış havuz düğümleri (havuz büyürse yeni adres eklenebilir). Gyro Pipeline derleme makineleri ayrı listelenir (`build_ips`). Düğümler değişince (paket değişimi, düğüm yenileme, havuz ölçeklemesi) liste değişir ve ortam sahibine bildirim gider (Uyarılar kanalları, `egress` olayı). IPv6 çıkışı yok; TCP 25 kapalı.",
+		Scope: "services_read", Command: []string{"container", "egress-ips"},
+		HasBody: false, BodyRequired: false, ListResponse: true, Paginated: false, Confirm: false, Money: false, Hidden: false,
+		ItemsKey: "items",
+		Columns:  []string{"ip", "source", "node"},
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Service id", DescTR: ""},
+		},
+	},
 	{ID: "typed_get_containers__id__events", Method: "GET", Path: "/cloud/containers/{id}/events", Tag: "Containers",
 		Summary: "Recent warnings", SummaryTR: "Son uyarılar",
 		Desc: "Last 50 platform warnings of the environment (pull errors, crashes, capacity).", DescTR: "Ortamın son 50 platform uyarısı.",
@@ -183,7 +204,7 @@ var Ops = []Op{
 	},
 	{ID: "typed_get_containers__id__nodes", Method: "GET", Path: "/cloud/containers/{id}/nodes", Tag: "Containers",
 		Summary: "Node pool", SummaryTR: "Düğüm havuzu",
-		Desc: "Your dedicated nodes (aliases node-1..n), pool capacity and usage, ingress IPs for apex A records, private registry (user only).", DescTR: "Size ayrılmış düğümler, havuz kapasitesi/kullanımı, kök alan adı A kaydı için IP'ler, özel depo (yalnız kullanıcı).",
+		Desc: "Your dedicated nodes (aliases node-1..n), pool capacity and usage, ingress IPs for apex A records, private registry (user only). Also `namespace`, `cluster_dns` and `egress` (schema ContainerEgress).", DescTR: "Size ayrılmış düğümler, havuz kapasitesi/kullanımı, kök alan adı A kaydı için IP'ler, özel depo (yalnız kullanıcı). Ayrıca `namespace`, `cluster_dns` ve `egress` (ContainerEgress şeması).",
 		Scope: "services_read", Command: []string{"container", "nodes"},
 		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
 		Params: []Param{
@@ -192,7 +213,7 @@ var Ops = []Op{
 	},
 	{ID: "typed_get_containers__id__notifications", Method: "GET", Path: "/cloud/containers/{id}/notifications", Tag: "Containers",
 		Summary: "Notification settings and current alerts", SummaryTR: "Bildirim ayarları ve süren uyarılar",
-		Desc: "`settings` (channels, events, cooldown; the webhook secret is never returned), `conditions` = what is wrong right now, `history` = last 30 alerts. Events: down (no ready replica for >3 min), crashloop (keeps restarting / image pull fails / out of memory), replicas_low (below alerts.min_ready), scale_max (autoscaling wants more than max), capacity (replicas wait for room in the node pool). An event is announced after ~2 minutes, at most once per cooldown per service + event (flapping included), with a 'resolved' message.", DescTR: "`settings` (kanallar, olaylar, tekrar aralığı; webhook anahtarı dönmez), `conditions` = şu an süren sorunlar, `history` = son 30 uyarı. Olaylar: down, crashloop, replicas_low, scale_max, capacity. Olay ~2 dakika sürünce bildirilir; aynı servis + olay tekrar aralığında bir kez (gidip gelenler dahil), düzelince 'düzeldi' mesajı.",
+		Desc: "`settings` (channels, events, cooldown; the webhook secret is never returned), `conditions` = what is wrong right now, `history` = last 30 alerts. Events: down (no ready replica for >3 min), crashloop (keeps restarting / image pull fails / out of memory), replicas_low (below alerts.min_ready), scale_max (autoscaling wants more than max), capacity (replicas wait for room in the node pool), egress (the egress IPs of the environment changed; one message, no resolved). An event is announced after ~2 minutes, at most once per cooldown per service + event (flapping included), with a 'resolved' message.", DescTR: "`settings` (kanallar, olaylar, tekrar aralığı; webhook anahtarı dönmez), `conditions` = şu an süren sorunlar, `history` = son 30 uyarı. Olaylar: down, crashloop, replicas_low, scale_max, capacity, egress (çıkış IP'leri değişti). Olay ~2 dakika sürünce bildirilir; aynı servis + olay tekrar aralığında bir kez (gidip gelenler dahil), düzelince 'düzeldi' mesajı.",
 		Scope: "services_read", Command: []string{"container", "notifications", "get"},
 		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
 		Params: []Param{
@@ -212,7 +233,7 @@ var Ops = []Op{
 			{Name: "sms", Type: "boolean", Items: "", Enum: nil, Default: "", Required: false, Desc: "Account phone", DescTR: ""},
 			{Name: "telegram", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "Telegram chat id (send /start to the platform bot, e.g. @gyrouptime_bot); empty = off", DescTR: ""},
 			{Name: "webhook_url", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "https URL of a public server; JSON POST signed with X-Gyro-Signature: sha256=HMAC(secret, X-Gyro-Timestamp + '.' + body)", DescTR: ""},
-			{Name: "events", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "Comma separated: down, crashloop, replicas_low, scale_max, capacity", DescTR: ""},
+			{Name: "events", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "Comma separated: down, crashloop, replicas_low, scale_max, capacity, egress", DescTR: ""},
 			{Name: "cooldown", Type: "integer", Items: "", Enum: nil, Default: "", Required: false, Desc: "Minutes between two announcements of the same service + event (5-1440, default 30)", DescTR: ""},
 			{Name: "resolved", Type: "boolean", Items: "", Enum: nil, Default: "", Required: false, Desc: "Send a 'resolved' message (default on)", DescTR: ""},
 			{Name: "confirm", Type: "boolean", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
@@ -685,7 +706,7 @@ var Ops = []Op{
 	},
 	{ID: "typed_get_containers__id__services", Method: "GET", Path: "/cloud/containers/{id}/services", Tag: "Containers",
 		Summary: "List container services", SummaryTR: "Kapsayıcı servislerini listele",
-		Desc: "Services of the environment with state (running, deploying, failing, pending, stopped, suspended), ready/desired instances, size and public URL.", DescTR: "Ortamdaki servisler: durum, hazır/istenen örnek, boyut, genel adres.",
+		Desc: "Services of the environment with state (running, deploying, failing, pending, stopped, suspended), ready/desired instances, size and public URL. Each item carries `internal_address` (services with a port); the list carries `namespace` and `cluster_dns`.", DescTR: "Ortamdaki servisler: durum, hazır/istenen örnek, boyut, genel adres. Her öğede `internal_address` (portu olan servisler), listede `namespace` ve `cluster_dns` bulunur.",
 		Scope: "services_read", Command: []string{"container", "service", "list"},
 		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
 		Params: []Param{
@@ -720,7 +741,7 @@ var Ops = []Op{
 	},
 	{ID: "typed_get_containers__id__services__name", Method: "GET", Path: "/cloud/containers/{id}/services/{name}", Tag: "Containers",
 		Summary: "Get a container service", SummaryTR: "Kapsayıcı servisini getir",
-		Desc: "Spec, state, problem code (ImagePullBackOff, CrashLoopBackOff, OOMKilled, Unschedulable ...), instances, revision, domains and the names of secrets (values are never returned). `autoscaling` = settings + live status (current/desired replicas, current CPU/memory %, at_max), `capacity` = {blocked, fits}.", DescTR: "Tanım, durum, sorun kodu, örnekler, sürüm, alan adları ve gizli değer adları (değerler asla dönmez).",
+		Desc: "Spec, state, problem code (ImagePullBackOff, CrashLoopBackOff, OOMKilled, Unschedulable ...), instances, revision, domains and the names of secrets (values are never returned). `autoscaling` = settings + live status (current/desired replicas, current CPU/memory %, at_max), `capacity` = {blocked, fits}. The answer carries `namespace` and, for services with a port, `internal` = `{host, short, port: 80, target_port, address, url}`: other services of the same environment reach it at `internal.address` (`<name>.<namespace>.svc.cluster.local:80`) or `<name>:80`.", DescTR: "Tanım, durum, sorun kodu, örnekler, sürüm, alan adları ve gizli değer adları (değerler asla dönmez). Yanıtta `namespace` ve portu olan servislerde `internal` = `{host, short, port: 80, target_port, address, url}` bulunur: aynı ortamdaki servisler `internal.address` (`<ad>.<namespace>.svc.cluster.local:80`) ya da `<ad>:80` ile ulaşır.",
 		Scope: "services_read", Command: []string{"container", "service", "get"},
 		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
 		Params: []Param{
