@@ -560,7 +560,18 @@ func runGenerated(a *App, cmd *cobra.Command, op *spec.Op, o *genOpts, args []st
 		if isOrderOp(op) {
 			orderItems(body)
 		}
+		if err := pipelineSourceCheck(op, body, func(n string) string {
+			if fn := o.flagName["b:"+n]; fn != "" {
+				return fn
+			}
+			return strings.ReplaceAll(n, "_", "-")
+		}); err != nil {
+			return err
+		}
 		for _, f := range op.Body {
+			if f.Name == "repo" && op.ID == "pipeline_create" {
+				continue // 1.29.3: required for git providers only, checked in pipelineSourceCheck
+			}
 			if isOrderOp(op) && orderLineField[f.Name] {
 				continue
 			}
