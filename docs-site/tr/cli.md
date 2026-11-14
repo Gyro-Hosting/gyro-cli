@@ -86,10 +86,13 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro billing topup-url get` | Browser link of the balance top-up page (top-ups are invoiced with VAT; usage is not) | `GET /cloud/billing/topup-url` |
 | `gyro bulk` | Bir eylemi 50 sunucuya kadar toplu çalıştır | `POST /cloud/bulk` |
 | `gyro container create` | Kapsayıcı ortamı oluştur (toplu) | `POST /cloud/containers` |
+| `gyro container delete` | Kapsayıcı ortamını sil (ön ödemeli) | `DELETE /cloud/containers/{id}` |
 | `gyro container domain add` | Alan adı bağla | `POST /cloud/containers/{id}/services/{name}/domains` |
 | `gyro container domain list` | Servisin alan adları | `GET /cloud/containers/{id}/services/{name}/domains` |
 | `gyro container domain remove` | Alan adını kaldır | `DELETE /cloud/containers/{id}/services/{name}/domains/{domain}` |
 | `gyro container domain verify` | Bekleyen alan adlarını kontrol et | `POST /cloud/containers/{id}/services/{name}/domains/verify` |
+| `gyro container egress-approval set` | Çıkış IP değişikliği onay adımı | `PUT /cloud/containers/{id}/egress-approval` |
+| `gyro container egress-change approve` | Bekleyen çıkış IP değişikliğini onayla | `POST /cloud/containers/{id}/egress-change/approve` |
 | `gyro container egress-ips` | Kapsayıcı ortamının çıkış IP'leri | `GET /cloud/containers/{id}/egress-ips` |
 | `gyro container env set` | Ortam değişkenlerini ayarla | `PUT /cloud/containers/{id}/services/{name}/env` |
 | `gyro container events` | Son uyarılar | `GET /cloud/containers/{id}/events` |
@@ -99,6 +102,7 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro container logs` | Servis logları | `GET /cloud/containers/{id}/services/{name}/logs` |
 | `gyro container metrics` | Servis işlemci / bellek | `GET /cloud/containers/{id}/services/{name}/metrics` |
 | `gyro container nodes` | Düğüm havuzu | `GET /cloud/containers/{id}/nodes` |
+| `gyro container nodes set` | Ek düğüm sayısını ayarla | `PUT /cloud/containers/{id}/nodes` |
 | `gyro container notifications get` | Bildirim ayarları ve süren uyarılar | `GET /cloud/containers/{id}/notifications` |
 | `gyro container notifications set` | Bildirim kanallarını ayarla | `PUT /cloud/containers/{id}/notifications` |
 | `gyro container notifications test` | Test bildirimi gönder | `POST /cloud/containers/{id}/notifications/test` |
@@ -355,11 +359,17 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro server ip remove` | Ek IPv4 adresini bırak | `DELETE /cloud/servers/{id}/ips/{ip}` |
 | `gyro server list` | Bulut sunucuları listele | `GET /cloud/servers` |
 | `gyro server metrics` | CPU, disk ve ağ zaman serileri | `GET /cloud/servers/{id}/metrics` |
+| `gyro server nic attach` | Sunucuyu subnete bağla | `POST /cloud/servers/{id}/nics` |
+| `gyro server nic detach` | Özel ağ kartını çıkar | `DELETE /cloud/servers/{id}/nics/{nic_id}` |
+| `gyro server nic list` | Sunucunun özel ağ kartları | `GET /cloud/servers/{id}/nics` |
 | `gyro server power off` | Sunucu işlemi çalıştır | `POST /cloud/servers/{id}/actions/{action}` |
 | `gyro server power on` | Sunucu işlemi çalıştır | `POST /cloud/servers/{id}/actions/{action}` |
 | `gyro server power reboot` | Sunucu işlemi çalıştır | `POST /cloud/servers/{id}/actions/{action}` |
 | `gyro server power reset` | Sunucu işlemi çalıştır | `POST /cloud/servers/{id}/actions/{action}` |
 | `gyro server power shutdown` | Sunucu işlemi çalıştır | `POST /cloud/servers/{id}/actions/{action}` |
+| `gyro server public-ip get` | Public IPv4 durumu | `GET /cloud/servers/{id}/public-ip` |
+| `gyro server public-ip off` | Public IPv4'ü kapat | `DELETE /cloud/servers/{id}/public-ip` |
+| `gyro server public-ip on` | Public IPv4'ü aç | `POST /cloud/servers/{id}/public-ip` |
 | `gyro server rdns list` | Ters DNS kayıtlarını listele | `GET /cloud/servers/{id}/rdns` |
 | `gyro server rdns set` | Bir adresin PTR kaydını ayarla (veya sıfırla) | `PUT /cloud/servers/{id}/rdns` |
 | `gyro server rebuild` | Sunucu işlemi çalıştır | `POST /cloud/servers/{id}/actions/{action}` |
@@ -470,6 +480,19 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro user list` | Alt kullanıcıları listele | `GET /cloud/users` |
 | `gyro user resend-invite` | Daveti yeniden gönder | `POST /cloud/users/{id}/resend-invite` |
 | `gyro user update` | Alt kullanıcıyı güncelle | `PATCH /cloud/users/{id}` |
+| `gyro vpc create` | Özel ağ oluştur | `POST /cloud/vpcs` |
+| `gyro vpc delete` | Özel ağı sil | `DELETE /cloud/vpcs/{vpc_id}` |
+| `gyro vpc gateway get` | VPC kapısını getir | `GET /cloud/vpcs/{vpc_id}/gateway` |
+| `gyro vpc gateway set` | VPC kapısını aç/kapat, ayarla | `PUT /cloud/vpcs/{vpc_id}/gateway` |
+| `gyro vpc get` | Özel ağı getir | `GET /cloud/vpcs/{vpc_id}` |
+| `gyro vpc list` | Özel ağları listele | `GET /cloud/vpcs` |
+| `gyro vpc port-forward add` | Kapının dış portunu yönlendir | `POST /cloud/vpcs/{vpc_id}/port-forwards` |
+| `gyro vpc port-forward list` | Port yönlendirmeleri listele | `GET /cloud/vpcs/{vpc_id}/port-forwards` |
+| `gyro vpc port-forward remove` | Port yönlendirmeyi sil | `DELETE /cloud/vpcs/{vpc_id}/port-forwards/{pf_id}` |
+| `gyro vpc subnet create` | Subnet ekle | `POST /cloud/vpcs/{vpc_id}/subnets` |
+| `gyro vpc subnet delete` | Subneti sil | `DELETE /cloud/vpcs/{vpc_id}/subnets/{subnet_id}` |
+| `gyro vpc subnet list` | Subnetleri listele | `GET /cloud/vpcs/{vpc_id}/subnets` |
+| `gyro vpc update` | Özel ağın adını değiştir | `PATCH /cloud/vpcs/{vpc_id}` |
 | `gyro webhook create` | Webhook oluştur (gizli anahtar bir kez döner) | `POST /cloud/webhooks` |
 | `gyro webhook delete` | Webhook'u sil | `DELETE /cloud/webhooks/{id}` |
 | `gyro webhook delivery list` | Son 100 teslim | `GET /cloud/webhooks/{id}/deliveries` |

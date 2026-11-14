@@ -44,7 +44,9 @@ gyro server [flags]
 * [gyro server ip](gyro_server_ip.md)	 - Sunucunun genel IPv4 adresini (ya da --ipv6) yaz
 * [gyro server list](gyro_server_list.md)	 - Sunucularınızı listeleyin
 * [gyro server metrics](gyro_server_metrics.md)	 - CPU, disk ve ağ ölçümleri (özet)
+* [gyro server nic](gyro_server_nic.md)	 - Sunucunun özel ağ kartları
 * [gyro server power](gyro_server_power.md)	 - Sunucuyu aç, kapat, ACPI kapat, yeniden başlat ya da resetle
+* [gyro server public-ip](gyro_server_public-ip.md)	 - Public IPv4 durumu
 * [gyro server rdns](gyro_server_rdns.md)	 - Ters DNS kayıtlarını listele
 * [gyro server rebuild](gyro_server_rebuild.md)	 - İşletim sistemini yeniden kur - DİSK SİLİNİR
 * [gyro server rename](gyro_server_rename.md)	 - Sunucu adını değiştir

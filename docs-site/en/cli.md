@@ -86,10 +86,13 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro billing topup-url get` | Browser link of the balance top-up page (top-ups are invoiced with VAT; usage is not) | `GET /cloud/billing/topup-url` |
 | `gyro bulk` | Run one action on up to 50 servers | `POST /cloud/bulk` |
 | `gyro container create` | Create container environments (batch) | `POST /cloud/containers` |
+| `gyro container delete` | Delete a container environment (prepaid) | `DELETE /cloud/containers/{id}` |
 | `gyro container domain add` | Attach a domain | `POST /cloud/containers/{id}/services/{name}/domains` |
 | `gyro container domain list` | Domains of a service | `GET /cloud/containers/{id}/services/{name}/domains` |
 | `gyro container domain remove` | Detach a domain | `DELETE /cloud/containers/{id}/services/{name}/domains/{domain}` |
 | `gyro container domain verify` | Re-check pending domains | `POST /cloud/containers/{id}/services/{name}/domains/verify` |
+| `gyro container egress-approval set` | Approval step for egress changes | `PUT /cloud/containers/{id}/egress-approval` |
+| `gyro container egress-change approve` | Approve the pending egress change | `POST /cloud/containers/{id}/egress-change/approve` |
 | `gyro container egress-ips` | Egress IPs of a container environment | `GET /cloud/containers/{id}/egress-ips` |
 | `gyro container env set` | Set environment variables | `PUT /cloud/containers/{id}/services/{name}/env` |
 | `gyro container events` | Recent warnings | `GET /cloud/containers/{id}/events` |
@@ -99,6 +102,7 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro container logs` | Service logs | `GET /cloud/containers/{id}/services/{name}/logs` |
 | `gyro container metrics` | Service CPU / memory | `GET /cloud/containers/{id}/services/{name}/metrics` |
 | `gyro container nodes` | Node pool | `GET /cloud/containers/{id}/nodes` |
+| `gyro container nodes set` | Set the extra node count | `PUT /cloud/containers/{id}/nodes` |
 | `gyro container notifications get` | Notification settings and current alerts | `GET /cloud/containers/{id}/notifications` |
 | `gyro container notifications set` | Set notification channels | `PUT /cloud/containers/{id}/notifications` |
 | `gyro container notifications test` | Send a test notification | `POST /cloud/containers/{id}/notifications/test` |
@@ -355,11 +359,17 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro server ip remove` | Release an additional IPv4 address | `DELETE /cloud/servers/{id}/ips/{ip}` |
 | `gyro server list` | List cloud servers | `GET /cloud/servers` |
 | `gyro server metrics` | CPU, disk and network time series | `GET /cloud/servers/{id}/metrics` |
+| `gyro server nic attach` | Attach the server to a subnet | `POST /cloud/servers/{id}/nics` |
+| `gyro server nic detach` | Detach a private network card | `DELETE /cloud/servers/{id}/nics/{nic_id}` |
+| `gyro server nic list` | List the server's private network cards | `GET /cloud/servers/{id}/nics` |
 | `gyro server power off` | Run a server action | `POST /cloud/servers/{id}/actions/{action}` |
 | `gyro server power on` | Run a server action | `POST /cloud/servers/{id}/actions/{action}` |
 | `gyro server power reboot` | Run a server action | `POST /cloud/servers/{id}/actions/{action}` |
 | `gyro server power reset` | Run a server action | `POST /cloud/servers/{id}/actions/{action}` |
 | `gyro server power shutdown` | Run a server action | `POST /cloud/servers/{id}/actions/{action}` |
+| `gyro server public-ip get` | Public IPv4 state | `GET /cloud/servers/{id}/public-ip` |
+| `gyro server public-ip off` | Turn the public IPv4 off | `DELETE /cloud/servers/{id}/public-ip` |
+| `gyro server public-ip on` | Turn the public IPv4 on | `POST /cloud/servers/{id}/public-ip` |
 | `gyro server rdns list` | List reverse DNS entries | `GET /cloud/servers/{id}/rdns` |
 | `gyro server rdns set` | Set (or reset) the PTR record of one address | `PUT /cloud/servers/{id}/rdns` |
 | `gyro server rebuild` | Run a server action | `POST /cloud/servers/{id}/actions/{action}` |
@@ -470,6 +480,19 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro user list` | List sub-users | `GET /cloud/users` |
 | `gyro user resend-invite` | Resend the invitation e-mail | `POST /cloud/users/{id}/resend-invite` |
 | `gyro user update` | Update a sub-user (label, status, permissions) | `PATCH /cloud/users/{id}` |
+| `gyro vpc create` | Create a private network | `POST /cloud/vpcs` |
+| `gyro vpc delete` | Delete a private network | `DELETE /cloud/vpcs/{vpc_id}` |
+| `gyro vpc gateway get` | Get the VPC gateway | `GET /cloud/vpcs/{vpc_id}/gateway` |
+| `gyro vpc gateway set` | Turn the VPC gateway on/off and change its settings | `PUT /cloud/vpcs/{vpc_id}/gateway` |
+| `gyro vpc get` | Get a private network | `GET /cloud/vpcs/{vpc_id}` |
+| `gyro vpc list` | List private networks | `GET /cloud/vpcs` |
+| `gyro vpc port-forward add` | Forward a public port of the gateway | `POST /cloud/vpcs/{vpc_id}/port-forwards` |
+| `gyro vpc port-forward list` | List port forwards | `GET /cloud/vpcs/{vpc_id}/port-forwards` |
+| `gyro vpc port-forward remove` | Delete a port forward | `DELETE /cloud/vpcs/{vpc_id}/port-forwards/{pf_id}` |
+| `gyro vpc subnet create` | Add a subnet | `POST /cloud/vpcs/{vpc_id}/subnets` |
+| `gyro vpc subnet delete` | Delete a subnet | `DELETE /cloud/vpcs/{vpc_id}/subnets/{subnet_id}` |
+| `gyro vpc subnet list` | List subnets | `GET /cloud/vpcs/{vpc_id}/subnets` |
+| `gyro vpc update` | Rename a private network | `PATCH /cloud/vpcs/{vpc_id}` |
 | `gyro webhook create` | Create a webhook (secret returned once) | `POST /cloud/webhooks` |
 | `gyro webhook delete` | Delete a webhook | `DELETE /cloud/webhooks/{id}` |
 | `gyro webhook delivery list` | Last 100 deliveries | `GET /cloud/webhooks/{id}/deliveries` |

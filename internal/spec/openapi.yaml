@@ -2,7 +2,7 @@
 openapi: 3.1.0
 info:
   title: Gyro Public API
-  version: 2.28.2
+  version: 2.30.0
   summary: Manage Gyro cloud servers, SSH keys and billing programmatically.
   x-summary-tr: Gyro bulut sunucularınızı, SSH anahtarlarınızı ve faturalarınızı programla yönetin.
   description: "The Gyro Public API lets you automate everything you do in the Gyro client area:\norder and manage cloud servers, keep SSH keys, read invoices and\
@@ -79,7 +79,12 @@ info:
     \ it. Module limits now name their `limit_key` (e.g. `compute.extra_ips`, `s3.max_buckets`, `dns.max_zones`, `gfw.rules_per_server`); plan limits answer `how_to_increase:\
     \ upgrade_plan`, hourly ones `wait`.\n\n**2.28.2**: pipeline create no longer lists `repo` as required: it is required for git providers and must be left out\
     \ for `provider: archive`. Container services: `alerts` given on create / update is applied (the service view now also shows it at the top level, `alerts.min_ready`,\
-    \ 0 = off); unknown fields inside `alerts` or `autoscaling` are refused with 422 `invalid_alerts` / `invalid_autoscaling` instead of being ignored.\n"
+    \ 0 = off); unknown fields inside `alerts` or `autoscaling` are refused with 422 `invalid_alerts` / `invalid_autoscaling` instead of being ignored.\n\n**2.29.0**:\
+    \ private networks (VPC) for tr-ist-1: `/cloud/vpcs` (create, rename, delete), subnets, the VPC gateway (NAT, port forwards, inter-subnet rule; hourly prepaid\
+    \ while on, 4.99 EUR/month cap), server cards `/cloud/servers/{id}/nics` and turning the public IPv4 off/on `/cloud/servers/{id}/public-ip`. Additive.\n\n**2.30.0**:\
+    \ container extra nodes `PUT /cloud/containers/{id}/nodes` (same price as a plan node, hourly; removal drains first), egress change advance notice (`egress_change`,\
+    \ `pending_egress_ips`) with an optional approval step (`PUT .../egress-approval`, `POST .../egress-change/approve`), and `DELETE /cloud/containers/{id}` (prepaid\
+    \ environment delete, same as the panel). Additive.\n"
   x-description-tr: "Gyro Public API, müşteri panelinde yaptığınız her işi otomatikleştirmenizi sağlar:\nbulut sunucu siparişi ve yönetimi, SSH anahtarları, fatura\
     \ ve bakiye okuma.\nResmi Terraform sağlayıcısı (`gyro-hosting/gyro`) ve `gyroctl` bu API'yi kullanır.\n\n* **Taban adres** `https://www.gyrohosting.com/api/v1/client`\n\
     * **Kimlik** `Authorization: Bearer wck_...` (anahtarı *Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri* bölümünden oluşturun)\n* **Biçim** JSON\
@@ -153,7 +158,12 @@ info:
     \ Modül sınırları `limit_key` adını verir (ör. `compute.extra_ips`, `s3.max_buckets`, `dns.max_zones`, `gfw.rules_per_server`); paket sınırlarında `how_to_increase:\
     \ upgrade_plan`, saatlik olanlarda `wait`.\n\n**2.28.2**: pipeline oluştururken `repo` artık her zaman zorunlu değil: git sağlayıcıları için zorunlu, `provider:\
     \ archive` için gönderilmez. Kapsayıcı servisleri: oluştur / güncellemede verilen `alerts` uygulanır (servis görünümünde artık üst düzeyde de `alerts.min_ready`\
-    \ var, 0 = kapalı); `alerts` ya da `autoscaling` içindeki bilinmeyen alan yok sayılmak yerine 422 `invalid_alerts` / `invalid_autoscaling` ile reddedilir.\n"
+    \ var, 0 = kapalı); `alerts` ya da `autoscaling` içindeki bilinmeyen alan yok sayılmak yerine 422 `invalid_alerts` / `invalid_autoscaling` ile reddedilir.\n\n\
+    **2.29.0**: tr-ist-1 için özel ağlar (VPC): `/cloud/vpcs` (oluştur, adlandır, sil), subnetler, VPC kapısı (NAT, port yönlendirme, subnetler arası kural; açıkken\
+    \ saatlik ön ödemeli, ayda en çok 4,99 €), sunucu kartları `/cloud/servers/{id}/nics` ve public IPv4 kapat/aç `/cloud/servers/{id}/public-ip`. Geriye uyumlu.\n\
+    \n**2.30.0**: kapsayıcı ek düğüm `PUT /cloud/containers/{id}/nodes` (paketteki düğümle aynı fiyat, saatlik; çıkarma önce boşaltır), çıkış IP değişikliğinin önceden\
+    \ duyurusu (`egress_change`, `pending_egress_ips`) ve isteğe bağlı onay adımı (`PUT .../egress-approval`, `POST .../egress-change/approve`), `DELETE /cloud/containers/{id}`\
+    \ (ön ödemeli ortamı silme, panelle aynı). Geriye uyumlu.\n"
   contact:
     name: Gyro Hosting
     url: https://www.gyrohosting.com
@@ -303,6 +313,13 @@ tags:
 - name: Account limits
   description: 'Every limit of your account and its current usage in one place. Limits are raised on request: open a support ticket.'
   x-description-tr: 'Hesabınızın tüm sınırları ve şu anki kullanım tek yerde. Sınırlar talep üzerine artırılır: destek talebi açın.'
+- name: Private networks
+  description: 'Private networks (VPC) for Gyro Cloud Istanbul (tr-ist-1) servers: subnets, private network cards, turning a server''s public IPv4 off, and the VPC
+    gateway (NAT internet access, port forwarding, inter-subnet rule). VPCs, subnets and private traffic are free; the gateway is billed hourly from the prepaid balance
+    while it is on (4.99 EUR per month at most).'
+  x-description-tr: 'Gyro Bulut İstanbul (tr-ist-1) sunucuları için özel ağlar (VPC): subnetler, özel ağ kartları, sunucunun public IPv4''ünü kapatma ve VPC kapısı
+    (NAT ile internet çıkışı, port yönlendirme, subnetler arası kural). VPC, subnet ve özel trafik ücretsiz; kapı açıkken ön ödemeli bakiyeden saatlik ücretlenir
+    (ayda en çok 4,99 €).'
 paths:
   /whoami:
     get:
@@ -10144,6 +10161,73 @@ paths:
       x-cli:
         command: container nodes
         confirm: false
+    put:
+      tags:
+      - Containers
+      operationId: setContainerNodes
+      summary: Set the extra node count
+      x-summary-tr: Ek düğüm sayısını ayarla
+      x-scope: services_write
+      description: 'Adds or removes extra nodes of the plan''s node size (absolute `extra_nodes`, 0 = plan only; at most 20 nodes per environment in total, GyroKota
+        may lower it). An extra node costs the same as a plan node, billed hourly from the prepaid balance. Removing drains first: replicas move to the remaining
+        nodes (services restart one by one, health checked), then the node is deleted; it is not billed while drained. Refused with 409 `quota_in_use` when the remaining
+        nodes cannot hold the running services. Serverless environments have no nodes. Needs `"confirm": true`. Every change of a dedicated environment''s node set
+        (plan change, extra node added or removed) is announced BEFORE the old nodes go: as soon as the new nodes'' addresses are known (usually under a minute) the
+        owner is notified (Alerts channels, event `egress`) and `egress_change` / `pending_egress_ips` show them. With the approval step on (`PUT /cloud/containers/{id}/egress-approval`,
+        1-72 hours, 24 recommended) the new nodes take no traffic and the old nodes keep serving until `POST /cloud/containers/{id}/egress-change/approve` or the
+        deadline (then it continues by itself). A removal only never waits.'
+      x-description-tr: 'Paketin düğüm boyutunda ek düğüm ekler ya da çıkarır (mutlak `extra_nodes`, 0 = yalnız paket; ortam başına toplam en çok 20 düğüm, GyroKota
+        düşürebilir). Ek düğüm paketteki düğümle aynı fiyattır, ön ödemeli bakiyeden saatlik düşer. Çıkarma önce boşaltır: kopyalar kalan düğümlere taşınır (servisler
+        sırayla, sağlık kontrollü yeniden başlar), sonra düğüm silinir; boşaltılırken ücretlenmez. Kalan düğümler çalışan servislere yetmiyorsa 409 `quota_in_use`.
+        Sunucusuz ortamlarda düğüm yoktur. `"confirm": true` gerekir. Ayrılmış ortamın düğüm takımı her değiştiğinde (paket değişikliği, ek düğüm ekleme / çıkarma)
+        değişiklik eski düğümler kapanmadan ÖNCE duyurulur: yeni düğümlerin adresleri belli olur olmaz (genellikle bir dakikadan kısa) ortam sahibine bildirim gider
+        (Uyarılar kanalları, `egress` olayı), `egress_change` / `pending_egress_ips` alanlarında görünür. Onay adımı açıksa (`PUT /cloud/containers/{id}/egress-approval`,
+        1-72 saat, önerilen 24) yeni düğümler trafik almaz, eski düğümler çalışmaya devam eder; `POST /cloud/containers/{id}/egress-change/approve` ya da süre dolunca
+        geçiş devam eder. Yalnız düğüm çıkarma onay beklemez.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                extra_nodes:
+                  type: integer
+                  minimum: 0
+                  maximum: 19
+                  example: 1
+                confirm:
+                  type: boolean
+              required:
+              - extra_nodes
+      x-cli:
+        command: container nodes set
+        confirm: true
+        money: true
   /cloud/containers/{id}:
     get:
       tags:
@@ -10184,6 +10268,84 @@ paths:
       x-cli:
         command: container get
         confirm: false
+    delete:
+      tags:
+      - Containers
+      operationId: deleteContainerEnvironment
+      summary: Delete a container environment (prepaid)
+      x-summary-tr: Kapsayıcı ortamını sil (ön ödemeli)
+      x-scope: cloud_delete
+      x-cli:
+        command: container delete
+        confirm: true
+      description: 'Same as the panel''s Spending > Delete: hourly charges stop at once and the environment is deleted right away with every service, node, registry
+        image, pipeline and custom domain binding (no retention period). Needs `"confirm": true` (body or query) and an `Idempotency-Key` header; repeating returns
+        202 `deleted`. Environments billed by invoice answer 409 `not_prepaid`. Terraform: destroying `gyro_container_environment` calls this.'
+      x-description-tr: 'Paneldeki Harcamalar > Sil ile aynı: saatlik ücret hemen durur, ortam tüm servis, düğüm, imaj deposu, pipeline ve özel alan adı bağlarıyla
+        hemen silinir (saklama süresi yok). `"confirm": true` (gövde ya da sorgu) ve `Idempotency-Key` başlığı gerekir; tekrar çağrı 202 `deleted` döner. Faturalı
+        ortamlar 409 `not_prepaid`. Terraform: `gyro_container_environment` silinince bu çağrılır.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: Idempotency-Key
+        in: header
+        required: true
+        schema:
+          type: string
+          minLength: 8
+          maxLength: 191
+      - name: confirm
+        in: query
+        required: false
+        schema:
+          type: boolean
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                confirm:
+                  type: boolean
+      responses:
+        '202':
+          description: Deleting
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        enum:
+                        - deleting
+                        - deleted
+                      container_id:
+                        type: integer
+                      already_deleted:
+                        type: boolean
+                      note:
+                        type: string
+        '400':
+          description: idempotency_key_required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
   /cloud/containers/{id}/egress-ips:
     get:
       tags:
@@ -10266,6 +10428,126 @@ paths:
       x-cli:
         command: container events
         confirm: false
+  /cloud/containers/{id}/egress-approval:
+    put:
+      tags:
+      - Containers
+      operationId: setContainerEgressApproval
+      summary: Approval step for egress changes
+      x-summary-tr: Çıkış IP değişikliği onay adımı
+      x-scope: services_write
+      description: '`hours` 1-72 turns the approval step on (24 recommended), 0 turns it off. Every change of a dedicated environment''s node set (plan change, extra
+        node added or removed) is announced BEFORE the old nodes go: as soon as the new nodes'' addresses are known (usually under a minute) the owner is notified
+        (Alerts channels, event `egress`) and `egress_change` / `pending_egress_ips` show them. With the approval step on (`PUT /cloud/containers/{id}/egress-approval`,
+        1-72 hours, 24 recommended) the new nodes take no traffic and the old nodes keep serving until `POST /cloud/containers/{id}/egress-change/approve` or the
+        deadline (then it continues by itself). A removal only never waits.'
+      x-description-tr: '`hours` 1-72 onay adımını açar (önerilen 24), 0 kapatır. Ayrılmış ortamın düğüm takımı her değiştiğinde (paket değişikliği, ek düğüm ekleme
+        / çıkarma) değişiklik eski düğümler kapanmadan ÖNCE duyurulur: yeni düğümlerin adresleri belli olur olmaz (genellikle bir dakikadan kısa) ortam sahibine bildirim
+        gider (Uyarılar kanalları, `egress` olayı), `egress_change` / `pending_egress_ips` alanlarında görünür. Onay adımı açıksa (`PUT /cloud/containers/{id}/egress-approval`,
+        1-72 saat, önerilen 24) yeni düğümler trafik almaz, eski düğümler çalışmaya devam eder; `POST /cloud/containers/{id}/egress-change/approve` ya da süre dolunca
+        geçiş devam eder. Yalnız düğüm çıkarma onay beklemez.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                hours:
+                  type: integer
+                  minimum: 0
+                  maximum: 72
+                  example: 24
+                confirm:
+                  type: boolean
+              required:
+              - hours
+      x-cli:
+        command: container egress-approval set
+        confirm: true
+  /cloud/containers/{id}/egress-change/approve:
+    post:
+      tags:
+      - Containers
+      operationId: approveContainerEgressChange
+      summary: Approve the pending egress change
+      x-summary-tr: Bekleyen çıkış IP değişikliğini onayla
+      x-scope: services_write
+      description: 'Continue now: the new nodes start taking traffic, the old ones are drained and removed. `id` (optional) must match `egress_change.id` (409 `change_mismatch`
+        when a newer change replaced it). 409 `no_pending_change` / `change_preparing`. Every change of a dedicated environment''s node set (plan change, extra node
+        added or removed) is announced BEFORE the old nodes go: as soon as the new nodes'' addresses are known (usually under a minute) the owner is notified (Alerts
+        channels, event `egress`) and `egress_change` / `pending_egress_ips` show them. With the approval step on (`PUT /cloud/containers/{id}/egress-approval`, 1-72
+        hours, 24 recommended) the new nodes take no traffic and the old nodes keep serving until `POST /cloud/containers/{id}/egress-change/approve` or the deadline
+        (then it continues by itself). A removal only never waits.'
+      x-description-tr: 'Şimdi devam et: yeni düğümler trafik almaya başlar, eskiler boşaltılıp kaldırılır. `id` (isteğe bağlı) `egress_change.id` ile aynı olmalı
+        (yenisi geldiyse 409 `change_mismatch`). 409 `no_pending_change` / `change_preparing`. Ayrılmış ortamın düğüm takımı her değiştiğinde (paket değişikliği,
+        ek düğüm ekleme / çıkarma) değişiklik eski düğümler kapanmadan ÖNCE duyurulur: yeni düğümlerin adresleri belli olur olmaz (genellikle bir dakikadan kısa)
+        ortam sahibine bildirim gider (Uyarılar kanalları, `egress` olayı), `egress_change` / `pending_egress_ips` alanlarında görünür. Onay adımı açıksa (`PUT /cloud/containers/{id}/egress-approval`,
+        1-72 saat, önerilen 24) yeni düğümler trafik almaz, eski düğümler çalışmaya devam eder; `POST /cloud/containers/{id}/egress-change/approve` ya da süre dolunca
+        geçiş devam eder. Yalnız düğüm çıkarma onay beklemez.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      responses:
+        '202':
+          description: Tool data / result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                confirm:
+                  type: boolean
+              required: []
+      x-cli:
+        command: container egress-change approve
+        confirm: true
   /cloud/containers/{id}/external-registry:
     put:
       tags:
@@ -12007,7 +12289,7 @@ paths:
                   data:
                     type: object
                     properties:
-                      deploy_key: &id093
+                      deploy_key: &id098
                         type: object
                         nullable: true
                         properties:
@@ -21515,6 +21797,1018 @@ paths:
                           $ref: '#/components/schemas/AccountLimit'
         '401':
           $ref: '#/components/responses/Unauthorized'
+  /cloud/vpcs:
+    get:
+      tags: &id089
+      - Private networks
+      operationId: listVpcs
+      summary: List private networks
+      x-summary-tr: Özel ağları listele
+      x-scope: cloud_read
+      x-cli:
+        command: vpc list
+      description: 'tr-ist-1 only. Limits (GET /cloud/vpcs `limits`, raised with a support ticket): 3 VPCs per account, 4 subnets per VPC, 3 private cards per server,
+        20 port forwards per VPC; a server is attached to one VPC at a time (to several of its subnets). Another account''s object answers 404. Also returns `limits`
+        and `pricing`.'
+      x-description-tr: 'Yalnız tr-ist-1. Sınırlar (GET /cloud/vpcs `limits`, destek talebiyle artırılır): hesap başına 3 VPC, VPC başına 4 subnet, sunucu başına
+        3 özel kart, VPC başına 20 port yönlendirme; bir sunucu aynı anda tek VPC''ye (o VPC''nin birden çok subnetine) bağlanır. Başka hesabın nesnesi 404 döner.
+        `limits` ve `pricing` de döner.'
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      vpcs:
+                        type: array
+                        items: &id090
+                          $ref: '#/components/schemas/Vpc'
+                      count:
+                        type: integer
+                      limits:
+                        type: object
+                        properties:
+                          max_vpcs:
+                            type: integer
+                          max_subnets_per_vpc:
+                            type: integer
+                          max_nics_per_server:
+                            type: integer
+                          max_port_forwards:
+                            type: integer
+                      pricing:
+                        type: object
+                        properties:
+                          billing:
+                            type: string
+                          gateway_monthly_eur:
+                            type: number
+                          gateway_hourly_eur:
+                            type: number
+                          minimum_hours:
+                            type: integer
+        '403':
+          description: not_available (private networks are not enabled for this account yet) / forbidden (key limited to some servers)
+          content: &id088
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'conflict: limit_exceeded, vpc_in_use, subnet_in_use, last_subnet, gateway_disabled, gateway_in_use, port_in_use, already_attached, other_vpc,
+            extra_ips, no_private_network, no_egress, already_off, already_on, last_network, no_billing_server, suspended, busy'
+          content: *id088
+        '422':
+          $ref: '#/components/responses/Validation'
+        '503':
+          description: capacity / pool_exhausted (try again later)
+          content: *id088
+    post:
+      tags: *id089
+      operationId: createVpc
+      summary: Create a private network
+      x-summary-tr: Özel ağ oluştur
+      x-scope: cloud_write
+      x-cli:
+        command: vpc create
+      description: 'tr-ist-1 only. Limits (GET /cloud/vpcs `limits`, raised with a support ticket): 3 VPCs per account, 4 subnets per VPC, 3 private cards per server,
+        20 port forwards per VPC; a server is attached to one VPC at a time (to several of its subnets). Another account''s object answers 404. Private range /16
+        to /24 inside 10.0.0.0/8, 172.16.0.0/12 or 192.168.0.0/16; the network address must be given (10.10.0.0/16, not 10.10.0.5/16). Reserved by the platform: 10.42.0.0/16,
+        10.43.0.0/16, 10.200.0.0/16, 10.250.0.0/16, 10.255.0.0/16. The first subnet is created with it: `subnet.cidr` or, when left out, the first /24 of the range
+        (name `default`). Free.'
+      x-description-tr: 'Yalnız tr-ist-1. Sınırlar (GET /cloud/vpcs `limits`, destek talebiyle artırılır): hesap başına 3 VPC, VPC başına 4 subnet, sunucu başına
+        3 özel kart, VPC başına 20 port yönlendirme; bir sunucu aynı anda tek VPC''ye (o VPC''nin birden çok subnetine) bağlanır. Başka hesabın nesnesi 404 döner.
+        10.0.0.0/8, 172.16.0.0/12 ya da 192.168.0.0/16 içinde /16 - /24 özel aralık; ağ adresi yazılır (10.10.0.0/16, 10.10.0.5/16 değil). Platforma ayrılmış: 10.42.0.0/16,
+        10.43.0.0/16, 10.200.0.0/16, 10.250.0.0/16, 10.255.0.0/16. İlk subnet birlikte açılır: `subnet.cidr` ya da verilmezse aralığın ilk /24''ü (ad `default`).
+        Ücretsiz.'
+      parameters: []
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: *id090
+        '403':
+          description: not_available (private networks are not enabled for this account yet) / forbidden (key limited to some servers)
+          content: *id088
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'conflict: limit_exceeded, vpc_in_use, subnet_in_use, last_subnet, gateway_disabled, gateway_in_use, port_in_use, already_attached, other_vpc,
+            extra_ips, no_private_network, no_egress, already_off, already_on, last_network, no_billing_server, suspended, busy'
+          content: *id088
+        '422':
+          $ref: '#/components/responses/Validation'
+        '503':
+          description: capacity / pool_exhausted (try again later)
+          content: *id088
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  maxLength: 48
+                cidr:
+                  type: string
+                  example: 10.10.0.0/16
+                project_id:
+                  type: integer
+                subnet:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      maxLength: 48
+                    cidr:
+                      type: string
+                      example: 10.10.1.0/24
+              required:
+              - name
+              - cidr
+  /cloud/vpcs/{vpc_id}:
+    get:
+      tags: *id089
+      operationId: getVpc
+      summary: Get a private network
+      x-summary-tr: Özel ağı getir
+      x-scope: cloud_read
+      x-cli:
+        command: vpc get
+      description: Subnets, attached servers and the gateway.
+      x-description-tr: Subnetler, bağlı sunucular ve kapı.
+      parameters:
+      - &id091
+        name: vpc_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: VPC id (from GET /cloud/vpcs)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: *id090
+        '403':
+          description: not_available (private networks are not enabled for this account yet) / forbidden (key limited to some servers)
+          content: *id088
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'conflict: limit_exceeded, vpc_in_use, subnet_in_use, last_subnet, gateway_disabled, gateway_in_use, port_in_use, already_attached, other_vpc,
+            extra_ips, no_private_network, no_egress, already_off, already_on, last_network, no_billing_server, suspended, busy'
+          content: *id088
+        '422':
+          $ref: '#/components/responses/Validation'
+        '503':
+          description: capacity / pool_exhausted (try again later)
+          content: *id088
+    patch:
+      tags: *id089
+      operationId: updateVpc
+      summary: Rename a private network
+      x-summary-tr: Özel ağın adını değiştir
+      x-scope: cloud_write
+      x-cli:
+        command: vpc update
+      description: Only the name changes (the range never changes).
+      x-description-tr: Yalnız ad değişir (aralık değişmez).
+      parameters:
+      - *id091
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: *id090
+        '403':
+          description: not_available (private networks are not enabled for this account yet) / forbidden (key limited to some servers)
+          content: *id088
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'conflict: limit_exceeded, vpc_in_use, subnet_in_use, last_subnet, gateway_disabled, gateway_in_use, port_in_use, already_attached, other_vpc,
+            extra_ips, no_private_network, no_egress, already_off, already_on, last_network, no_billing_server, suspended, busy'
+          content: *id088
+        '422':
+          $ref: '#/components/responses/Validation'
+        '503':
+          description: capacity / pool_exhausted (try again later)
+          content: *id088
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  maxLength: 48
+              required:
+              - name
+    delete:
+      tags: *id089
+      operationId: deleteVpc
+      summary: Delete a private network
+      x-summary-tr: Özel ağı sil
+      x-scope: cloud_write
+      x-cli:
+        command: vpc delete
+        confirm: true
+      description: 'Permanent. Detach the server cards and delete the port forwards first (409 `vpc_in_use`); an open gateway is turned off. Needs `"confirm": true`
+        (body or query).'
+      x-description-tr: 'Kalıcıdır. Önce sunucu kartlarını çıkarın ve port yönlendirmelerini silin (409 `vpc_in_use`); açık kapı kapatılır. `"confirm": true` gerekir
+        (gövde ya da sorgu).'
+      parameters:
+      - *id091
+      - name: confirm
+        in: query
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      deleted:
+                        type: boolean
+        '403':
+          description: not_available (private networks are not enabled for this account yet) / forbidden (key limited to some servers)
+          content: *id088
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'conflict: limit_exceeded, vpc_in_use, subnet_in_use, last_subnet, gateway_disabled, gateway_in_use, port_in_use, already_attached, other_vpc,
+            extra_ips, no_private_network, no_egress, already_off, already_on, last_network, no_billing_server, suspended, busy'
+          content: *id088
+        '422':
+          $ref: '#/components/responses/Validation'
+        '503':
+          description: capacity / pool_exhausted (try again later)
+          content: *id088
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                confirm:
+                  type: boolean
+              required: []
+  /cloud/vpcs/{vpc_id}/subnets:
+    get:
+      tags: *id089
+      operationId: listVpcSubnets
+      summary: List subnets
+      x-summary-tr: Subnetleri listele
+      x-scope: cloud_read
+      x-cli:
+        command: vpc subnet list
+      description: ''
+      x-description-tr: ''
+      parameters:
+      - *id091
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      subnets:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/VpcSubnet'
+                      count:
+                        type: integer
+        '403':
+          description: not_available (private networks are not enabled for this account yet) / forbidden (key limited to some servers)
+          content: *id088
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'conflict: limit_exceeded, vpc_in_use, subnet_in_use, last_subnet, gateway_disabled, gateway_in_use, port_in_use, already_attached, other_vpc,
+            extra_ips, no_private_network, no_egress, already_off, already_on, last_network, no_billing_server, suspended, busy'
+          content: *id088
+        '422':
+          $ref: '#/components/responses/Validation'
+        '503':
+          description: capacity / pool_exhausted (try again later)
+          content: *id088
+    post:
+      tags: *id089
+      operationId: createVpcSubnet
+      summary: Add a subnet
+      x-summary-tr: Subnet ekle
+      x-scope: cloud_write
+      x-cli:
+        command: vpc subnet create
+      description: /20 to /28 inside the VPC range, not overlapping another subnet. Give `cidr`, or `prefix` (default 24) for the next free range. In every subnet
+        .1 is the gateway; .0-.4 and the last address are reserved.
+      x-description-tr: VPC aralığı içinde /20 - /28, başka subnetle çakışmadan. `cidr` verin ya da sıradaki boş aralık için `prefix` (varsayılan 24). Her subnette
+        .1 kapıdır; .0-.4 ve son adres ayrılmıştır.
+      parameters:
+      - *id091
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/VpcSubnet'
+        '403':
+          description: not_available (private networks are not enabled for this account yet) / forbidden (key limited to some servers)
+          content: *id088
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'conflict: limit_exceeded, vpc_in_use, subnet_in_use, last_subnet, gateway_disabled, gateway_in_use, port_in_use, already_attached, other_vpc,
+            extra_ips, no_private_network, no_egress, already_off, already_on, last_network, no_billing_server, suspended, busy'
+          content: *id088
+        '422':
+          $ref: '#/components/responses/Validation'
+        '503':
+          description: capacity / pool_exhausted (try again later)
+          content: *id088
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  maxLength: 48
+                cidr:
+                  type: string
+                prefix:
+                  type: integer
+                  minimum: 20
+                  maximum: 28
+              required:
+              - name
+  /cloud/vpcs/{vpc_id}/subnets/{subnet_id}:
+    delete:
+      tags: *id089
+      operationId: deleteVpcSubnet
+      summary: Delete a subnet
+      x-summary-tr: Subneti sil
+      x-scope: cloud_write
+      x-cli:
+        command: vpc subnet delete
+      description: Refused while cards are attached or a port forward targets it (409 `subnet_in_use`); the last subnet cannot be deleted (delete the VPC).
+      x-description-tr: Bağlı kart ya da ona yönlenen port yönlendirme varken reddedilir (409 `subnet_in_use`); son subnet silinmez (VPC'yi silin).
+      parameters:
+      - *id091
+      - name: subnet_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Subnet id
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      deleted:
+                        type: boolean
+        '403':
+          description: not_available (private networks are not enabled for this account yet) / forbidden (key limited to some servers)
+          content: *id088
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'conflict: limit_exceeded, vpc_in_use, subnet_in_use, last_subnet, gateway_disabled, gateway_in_use, port_in_use, already_attached, other_vpc,
+            extra_ips, no_private_network, no_egress, already_off, already_on, last_network, no_billing_server, suspended, busy'
+          content: *id088
+        '422':
+          $ref: '#/components/responses/Validation'
+        '503':
+          description: capacity / pool_exhausted (try again later)
+          content: *id088
+  /cloud/vpcs/{vpc_id}/gateway:
+    get:
+      tags: *id089
+      operationId: getVpcGateway
+      summary: Get the VPC gateway
+      x-summary-tr: VPC kapısını getir
+      x-scope: cloud_read
+      x-cli:
+        command: vpc gateway get
+      description: 'The gateway gives private-only servers internet access (NAT), port forwarding and the inter-subnet rule. While it is on it is billed hourly from
+        the prepaid balance (`monthly_eur` / 672, at least 1 hour, never more than `monthly_eur` a month) and needs at least one prepaid tr-ist-1 server on the account
+        (409 `no_billing_server`). Turning it off releases its public IP; refused while port forwards exist, or while private-only servers use it (409 `gateway_in_use`,
+        repeat with `allow_no_egress: true`). Outgoing connections are logged as required by Turkish Law No. 5651 (2 years). '
+      x-description-tr: 'Kapı; public IP''si kapalı sunucuların internete çıkışını (NAT), port yönlendirmeyi ve subnetler arası kuralı sağlar. Açıkken ön ödemeli
+        bakiyeden saatlik ücretlenir (`monthly_eur` / 672, en az 1 saat, ayda en çok `monthly_eur`) ve hesapta en az bir ön ödemeli tr-ist-1 sunucusu gerekir (409
+        `no_billing_server`). Kapatınca public IP bırakılır; port yönlendirme varken ya da public IP''si kapalı sunucular kullanırken reddedilir (409 `gateway_in_use`,
+        `allow_no_egress: true` ile tekrarlayın). Dışarı çıkan bağlantılar 5651 sayılı Kanun gereği kaydedilir (2 yıl). '
+      parameters:
+      - *id091
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/VpcGateway'
+        '403':
+          description: not_available (private networks are not enabled for this account yet) / forbidden (key limited to some servers)
+          content: *id088
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'conflict: limit_exceeded, vpc_in_use, subnet_in_use, last_subnet, gateway_disabled, gateway_in_use, port_in_use, already_attached, other_vpc,
+            extra_ips, no_private_network, no_egress, already_off, already_on, last_network, no_billing_server, suspended, busy'
+          content: *id088
+        '422':
+          $ref: '#/components/responses/Validation'
+        '503':
+          description: capacity / pool_exhausted (try again later)
+          content: *id088
+    put:
+      tags: *id089
+      operationId: setVpcGateway
+      summary: Turn the VPC gateway on/off and change its settings
+      x-summary-tr: VPC kapısını aç/kapat, ayarla
+      x-scope: cloud_write
+      x-cli:
+        command: vpc gateway set
+        money: true
+      description: 'The gateway gives private-only servers internet access (NAT), port forwarding and the inter-subnet rule. While it is on it is billed hourly from
+        the prepaid balance (`monthly_eur` / 672, at least 1 hour, never more than `monthly_eur` a month) and needs at least one prepaid tr-ist-1 server on the account
+        (409 `no_billing_server`). Turning it off releases its public IP; refused while port forwards exist, or while private-only servers use it (409 `gateway_in_use`,
+        repeat with `allow_no_egress: true`). Outgoing connections are logged as required by Turkish Law No. 5651 (2 years). Only the given fields change.'
+      x-description-tr: 'Kapı; public IP''si kapalı sunucuların internete çıkışını (NAT), port yönlendirmeyi ve subnetler arası kuralı sağlar. Açıkken ön ödemeli
+        bakiyeden saatlik ücretlenir (`monthly_eur` / 672, en az 1 saat, ayda en çok `monthly_eur`) ve hesapta en az bir ön ödemeli tr-ist-1 sunucusu gerekir (409
+        `no_billing_server`). Kapatınca public IP bırakılır; port yönlendirme varken ya da public IP''si kapalı sunucular kullanırken reddedilir (409 `gateway_in_use`,
+        `allow_no_egress: true` ile tekrarlayın). Dışarı çıkan bağlantılar 5651 sayılı Kanun gereği kaydedilir (2 yıl). Yalnız verilen alanlar değişir.'
+      parameters:
+      - *id091
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/VpcGateway'
+        '403':
+          description: not_available (private networks are not enabled for this account yet) / forbidden (key limited to some servers)
+          content: *id088
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'conflict: limit_exceeded, vpc_in_use, subnet_in_use, last_subnet, gateway_disabled, gateway_in_use, port_in_use, already_attached, other_vpc,
+            extra_ips, no_private_network, no_egress, already_off, already_on, last_network, no_billing_server, suspended, busy'
+          content: *id088
+        '422':
+          $ref: '#/components/responses/Validation'
+        '503':
+          description: capacity / pool_exhausted (try again later)
+          content: *id088
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                enabled:
+                  type: boolean
+                nat:
+                  type: boolean
+                inter_subnet:
+                  type: string
+                  enum:
+                  - allow
+                  - deny
+                allow_no_egress:
+                  type: boolean
+              required: []
+  /cloud/vpcs/{vpc_id}/port-forwards:
+    get:
+      tags: *id089
+      operationId: listVpcPortForwards
+      summary: List port forwards
+      x-summary-tr: Port yönlendirmeleri listele
+      x-scope: cloud_read
+      x-cli:
+        command: vpc port-forward list
+      description: ''
+      x-description-tr: ''
+      parameters:
+      - *id091
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      port_forwards:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/VpcPortForward'
+                      count:
+                        type: integer
+        '403':
+          description: not_available (private networks are not enabled for this account yet) / forbidden (key limited to some servers)
+          content: *id088
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'conflict: limit_exceeded, vpc_in_use, subnet_in_use, last_subnet, gateway_disabled, gateway_in_use, port_in_use, already_attached, other_vpc,
+            extra_ips, no_private_network, no_egress, already_off, already_on, last_network, no_billing_server, suspended, busy'
+          content: *id088
+        '422':
+          $ref: '#/components/responses/Validation'
+        '503':
+          description: capacity / pool_exhausted (try again later)
+          content: *id088
+    post:
+      tags: *id089
+      operationId: createVpcPortForward
+      summary: Forward a public port of the gateway
+      x-summary-tr: Kapının dış portunu yönlendir
+      x-scope: cloud_write
+      x-cli:
+        command: vpc port-forward add
+      description: public_ip:public_port of the gateway -> target_ip:target_port inside the VPC. The gateway must be on (409 `gateway_disabled`); one forward per
+        protocol + public port; at most 20.
+      x-description-tr: Kapının public_ip:public_port adresi -> VPC içinde target_ip:target_port. Kapı açık olmalı (409 `gateway_disabled`); protokol + dış port başına
+        bir yönlendirme; en çok 20.
+      parameters:
+      - *id091
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/VpcPortForward'
+        '403':
+          description: not_available (private networks are not enabled for this account yet) / forbidden (key limited to some servers)
+          content: *id088
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'conflict: limit_exceeded, vpc_in_use, subnet_in_use, last_subnet, gateway_disabled, gateway_in_use, port_in_use, already_attached, other_vpc,
+            extra_ips, no_private_network, no_egress, already_off, already_on, last_network, no_billing_server, suspended, busy'
+          content: *id088
+        '422':
+          $ref: '#/components/responses/Validation'
+        '503':
+          description: capacity / pool_exhausted (try again later)
+          content: *id088
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                protocol:
+                  type: string
+                  enum:
+                  - tcp
+                  - udp
+                public_port:
+                  type: integer
+                  minimum: 1
+                  maximum: 65535
+                target_ip:
+                  type: string
+                target_port:
+                  type: integer
+                  minimum: 1
+                  maximum: 65535
+              required:
+              - protocol
+              - public_port
+              - target_ip
+              - target_port
+  /cloud/vpcs/{vpc_id}/port-forwards/{pf_id}:
+    delete:
+      tags: *id089
+      operationId: deleteVpcPortForward
+      summary: Delete a port forward
+      x-summary-tr: Port yönlendirmeyi sil
+      x-scope: cloud_write
+      x-cli:
+        command: vpc port-forward remove
+      description: ''
+      x-description-tr: ''
+      parameters:
+      - *id091
+      - name: pf_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Port forward id
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      deleted:
+                        type: boolean
+        '403':
+          description: not_available (private networks are not enabled for this account yet) / forbidden (key limited to some servers)
+          content: *id088
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'conflict: limit_exceeded, vpc_in_use, subnet_in_use, last_subnet, gateway_disabled, gateway_in_use, port_in_use, already_attached, other_vpc,
+            extra_ips, no_private_network, no_egress, already_off, already_on, last_network, no_billing_server, suspended, busy'
+          content: *id088
+        '422':
+          $ref: '#/components/responses/Validation'
+        '503':
+          description: capacity / pool_exhausted (try again later)
+          content: *id088
+  /cloud/servers/{id}/nics:
+    get:
+      tags:
+      - Private networks
+      operationId: listServerNics
+      summary: List the server's private network cards
+      x-summary-tr: Sunucunun özel ağ kartları
+      x-scope: cloud_read
+      x-cli:
+        command: server nic list
+      description: 'Private network cards of a tr-ist-1 server. Attaching is hot (no restart): the card is ready in about 10-60 s on a running server (`state` attaching
+        -> ready); on a stopped server the settings apply at boot. A server can join one VPC at a time (409 `other_vpc`), at most 3 cards. `ip` empty = automatic. '
+      x-description-tr: 'tr-ist-1 sunucusunun özel ağ kartları. Takma sıcak yapılır (yeniden başlatma yok): açık sunucuda yaklaşık 10-60 sn''de hazır (`state` attaching
+        -> ready); kapalı sunucuda ayarlar açılışta uygulanır. Bir sunucu aynı anda tek VPC''ye bağlanır (409 `other_vpc`), en çok 3 kart. `ip` boş = otomatik. '
+      parameters:
+      - *id078
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      server_id:
+                        type: integer
+                      nics:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ServerNic'
+                      count:
+                        type: integer
+                      max_nics:
+                        type: integer
+                      public_ip:
+                        type: string
+                      public_enabled:
+                        type: boolean
+                      applied:
+                        type: boolean
+                        description: the server applied the latest network settings
+        '403':
+          description: not_available (private networks are not enabled for this account yet) / forbidden (key limited to some servers)
+          content: *id088
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'conflict: limit_exceeded, vpc_in_use, subnet_in_use, last_subnet, gateway_disabled, gateway_in_use, port_in_use, already_attached, other_vpc,
+            extra_ips, no_private_network, no_egress, already_off, already_on, last_network, no_billing_server, suspended, busy'
+          content: *id088
+        '422':
+          $ref: '#/components/responses/Validation'
+        '503':
+          description: capacity / pool_exhausted (try again later)
+          content: *id088
+    post:
+      tags: *id089
+      operationId: attachServerNic
+      summary: Attach the server to a subnet
+      x-summary-tr: Sunucuyu subnete bağla
+      x-scope: cloud_write
+      x-cli:
+        command: server nic attach
+      description: 'Private network cards of a tr-ist-1 server. Attaching is hot (no restart): the card is ready in about 10-60 s on a running server (`state` attaching
+        -> ready); on a stopped server the settings apply at boot. A server can join one VPC at a time (409 `other_vpc`), at most 3 cards. `ip` empty = automatic. '
+      x-description-tr: 'tr-ist-1 sunucusunun özel ağ kartları. Takma sıcak yapılır (yeniden başlatma yok): açık sunucuda yaklaşık 10-60 sn''de hazır (`state` attaching
+        -> ready); kapalı sunucuda ayarlar açılışta uygulanır. Bir sunucu aynı anda tek VPC''ye bağlanır (409 `other_vpc`), en çok 3 kart. `ip` boş = otomatik. '
+      parameters:
+      - *id078
+      responses:
+        '202':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      server_id:
+                        type: integer
+                      nic:
+                        $ref: '#/components/schemas/ServerNic'
+                      task_id:
+                        type: integer
+        '403':
+          description: not_available (private networks are not enabled for this account yet) / forbidden (key limited to some servers)
+          content: *id088
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'conflict: limit_exceeded, vpc_in_use, subnet_in_use, last_subnet, gateway_disabled, gateway_in_use, port_in_use, already_attached, other_vpc,
+            extra_ips, no_private_network, no_egress, already_off, already_on, last_network, no_billing_server, suspended, busy'
+          content: *id088
+        '422':
+          $ref: '#/components/responses/Validation'
+        '503':
+          description: capacity / pool_exhausted (try again later)
+          content: *id088
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                subnet_id:
+                  type: string
+                ip:
+                  type: string
+              required:
+              - subnet_id
+  /cloud/servers/{id}/nics/{nic_id}:
+    delete:
+      tags: *id089
+      operationId: detachServerNic
+      summary: Detach a private network card
+      x-summary-tr: Özel ağ kartını çıkar
+      x-scope: cloud_write
+      x-cli:
+        command: server nic detach
+      description: The address is held for 10 minutes. While the public IP is off the last card cannot be detached (409 `last_network`).
+      x-description-tr: Adres 10 dakika başka sunucuya verilmez. Public IP kapalıyken son kart çıkarılamaz (409 `last_network`).
+      parameters:
+      - *id078
+      - name: nic_id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Network card id (from GET /cloud/servers/{id}/nics)
+      responses:
+        '202':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      server_id:
+                        type: integer
+                      id:
+                        type: string
+                      state:
+                        type: string
+                      task_id:
+                        type: integer
+        '403':
+          description: not_available (private networks are not enabled for this account yet) / forbidden (key limited to some servers)
+          content: *id088
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'conflict: limit_exceeded, vpc_in_use, subnet_in_use, last_subnet, gateway_disabled, gateway_in_use, port_in_use, already_attached, other_vpc,
+            extra_ips, no_private_network, no_egress, already_off, already_on, last_network, no_billing_server, suspended, busy'
+          content: *id088
+        '422':
+          $ref: '#/components/responses/Validation'
+        '503':
+          description: capacity / pool_exhausted (try again later)
+          content: *id088
+  /cloud/servers/{id}/public-ip:
+    get:
+      tags:
+      - Private networks
+      operationId: getServerPublicIp
+      summary: Public IPv4 state
+      x-summary-tr: Public IPv4 durumu
+      x-scope: cloud_read
+      x-cli:
+        command: server public-ip get
+      description: 'Turning the public IPv4 off makes the server reachable only from its VPC, through a gateway port forward or with the web console (which always
+        works). Confirm with the server''s current IP (`confirm_ip`). Needs a ready private card (409 `no_private_network`) and no additional IPv4 (409 `extra_ips`).
+        If the VPC gateway (NAT) is off the server loses internet access: refused with 409 `no_egress` unless `allow_no_egress: true`. The address stays reserved
+        for the server; turning it on brings the same IP. '
+      x-description-tr: 'Public IPv4 kapanınca sunucuya yalnız VPC''den, kapı port yönlendirmesinden ya da web konsoldan (her zaman çalışır) erişilir. Onay için sunucunun
+        mevcut IP''si (`confirm_ip`) yazılır. Hazır bir özel kart (409 `no_private_network`) gerekir ve ek IPv4 olmamalı (409 `extra_ips`). VPC kapısı (NAT) kapalıysa
+        sunucu internete çıkamaz: `allow_no_egress: true` verilmezse 409 `no_egress`. Adres sunucuya ayrılmış kalır; açınca aynı IP gelir. '
+      parameters:
+      - *id078
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: &id092
+                    type: object
+                    properties:
+                      server_id:
+                        type: integer
+                      ip:
+                        type: string
+                      enabled:
+                        type: boolean
+                      extra_ips:
+                        type: integer
+                      private_ready:
+                        type: boolean
+                      task_id:
+                        type: integer
+        '403':
+          description: not_available (private networks are not enabled for this account yet) / forbidden (key limited to some servers)
+          content: *id088
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'conflict: limit_exceeded, vpc_in_use, subnet_in_use, last_subnet, gateway_disabled, gateway_in_use, port_in_use, already_attached, other_vpc,
+            extra_ips, no_private_network, no_egress, already_off, already_on, last_network, no_billing_server, suspended, busy'
+          content: *id088
+        '422':
+          $ref: '#/components/responses/Validation'
+        '503':
+          description: capacity / pool_exhausted (try again later)
+          content: *id088
+    delete:
+      tags: *id089
+      operationId: disableServerPublicIp
+      summary: Turn the public IPv4 off
+      x-summary-tr: Public IPv4'ü kapat
+      x-scope: cloud_write
+      x-cli:
+        command: server public-ip off
+        confirm: true
+      description: 'Turning the public IPv4 off makes the server reachable only from its VPC, through a gateway port forward or with the web console (which always
+        works). Confirm with the server''s current IP (`confirm_ip`). Needs a ready private card (409 `no_private_network`) and no additional IPv4 (409 `extra_ips`).
+        If the VPC gateway (NAT) is off the server loses internet access: refused with 409 `no_egress` unless `allow_no_egress: true`. The address stays reserved
+        for the server; turning it on brings the same IP. '
+      x-description-tr: 'Public IPv4 kapanınca sunucuya yalnız VPC''den, kapı port yönlendirmesinden ya da web konsoldan (her zaman çalışır) erişilir. Onay için sunucunun
+        mevcut IP''si (`confirm_ip`) yazılır. Hazır bir özel kart (409 `no_private_network`) gerekir ve ek IPv4 olmamalı (409 `extra_ips`). VPC kapısı (NAT) kapalıysa
+        sunucu internete çıkamaz: `allow_no_egress: true` verilmezse 409 `no_egress`. Adres sunucuya ayrılmış kalır; açınca aynı IP gelir. '
+      parameters:
+      - *id078
+      responses:
+        '202':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: *id092
+        '403':
+          description: not_available (private networks are not enabled for this account yet) / forbidden (key limited to some servers)
+          content: *id088
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'conflict: limit_exceeded, vpc_in_use, subnet_in_use, last_subnet, gateway_disabled, gateway_in_use, port_in_use, already_attached, other_vpc,
+            extra_ips, no_private_network, no_egress, already_off, already_on, last_network, no_billing_server, suspended, busy'
+          content: *id088
+        '422':
+          $ref: '#/components/responses/Validation'
+        '503':
+          description: capacity / pool_exhausted (try again later)
+          content: *id088
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                confirm_ip:
+                  type: string
+                allow_no_egress:
+                  type: boolean
+              required:
+              - confirm_ip
+    post:
+      tags: *id089
+      operationId: enableServerPublicIp
+      summary: Turn the public IPv4 on
+      x-summary-tr: Public IPv4'ü aç
+      x-scope: cloud_write
+      x-cli:
+        command: server public-ip on
+      description: Brings the same address back.
+      x-description-tr: Aynı adres geri gelir.
+      parameters:
+      - *id078
+      responses:
+        '202':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: *id092
+        '403':
+          description: not_available (private networks are not enabled for this account yet) / forbidden (key limited to some servers)
+          content: *id088
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'conflict: limit_exceeded, vpc_in_use, subnet_in_use, last_subnet, gateway_disabled, gateway_in_use, port_in_use, already_attached, other_vpc,
+            extra_ips, no_private_network, no_egress, already_off, already_on, last_network, no_billing_server, suspended, busy'
+          content: *id088
+        '422':
+          $ref: '#/components/responses/Validation'
+        '503':
+          description: capacity / pool_exhausted (try again later)
+          content: *id088
 components:
   securitySchemes:
     bearerAuth:
@@ -23917,7 +25211,7 @@ components:
           maxLength: 255
         color:
           type: string
-          enum: &id088
+          enum: &id093
           - gray
           - blue
           - green
@@ -23970,22 +25264,22 @@ components:
       required:
       - name
       properties:
-        name: &id089
+        name: &id094
           type: string
           minLength: 1
           maxLength: 40
           description: 'Letter or digit first; then letters, digits, space and . _ - / + # & ( ). Unique per account (case-insensitive). Reserved: Genel, General,
             Default.'
-        description: &id090
+        description: &id095
           type:
           - string
           - 'null'
           maxLength: 255
-        color: &id091
+        color: &id096
           type: string
-          enum: *id088
+          enum: *id093
           default: blue
-        icon: &id092
+        icon: &id097
           type: string
           enum:
           - folder
@@ -24020,10 +25314,10 @@ components:
     ProjectUpdate:
       type: object
       properties:
-        name: *id089
-        description: *id090
-        color: *id091
-        icon: *id092
+        name: *id094
+        description: *id095
+        color: *id096
+        icon: *id097
     ProjectRef:
       type:
       - object
@@ -24373,7 +25667,7 @@ components:
                   fingerprint:
                     type: string
                     example: SHA256:+DiY3wvvV6TuJJhbpZisF/zLDA0zPMSvHdkr4UvCOqU
-            deploy_key: *id093
+            deploy_key: *id098
         archive:
           type: object
           properties:
@@ -24801,6 +26095,16 @@ components:
           description: no IPv6 egress
         note:
           type: string
+        egress_change:
+          $ref: '#/components/schemas/ContainerEgressChange'
+        pending_egress_ips: &id100
+          type: array
+          items:
+            type: string
+          description: new egress IPs announced but not in use for sure yet; add them to your allow lists now
+        egress_hold_hours: &id099
+          type: integer
+          description: approval window (0 = off)
     ContainerEnvironment:
       type: object
       properties:
@@ -24866,3 +26170,230 @@ components:
           type: string
         egress:
           $ref: '#/components/schemas/ContainerEgress'
+        base_nodes:
+          type: integer
+          description: nodes of the plan
+        extra_nodes:
+          type: integer
+        node_count:
+          type: integer
+        max_extra_nodes:
+          type: integer
+        max_nodes:
+          type: integer
+          const: 20
+        node_monthly_eur:
+          type: number
+          description: price of one node per month (an extra node costs the same)
+        egress_hold_hours: *id099
+        egress_change:
+          $ref: '#/components/schemas/ContainerEgressChange'
+        pending_egress_ips: *id100
+    VpcPortForward:
+      type: object
+      properties:
+        id:
+          type: string
+        protocol:
+          type: string
+          enum:
+          - tcp
+          - udp
+        public_port:
+          type: integer
+        target_ip:
+          type: string
+        target_port:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+    VpcGateway:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+        nat:
+          type: boolean
+          description: internet access for the VPC's servers
+        inter_subnet:
+          type: string
+          enum:
+          - allow
+          - deny
+          description: traffic between the VPC's subnets
+        public_ip:
+          type: string
+          description: gateway IPv4 (empty while off)
+        status:
+          type: string
+          enum:
+          - 'off'
+          - active
+          - syncing
+        port_forwards:
+          type: array
+          items:
+            $ref: '#/components/schemas/VpcPortForward'
+        monthly_eur:
+          type: number
+          description: price while on, per month (cap)
+        hourly_eur:
+          type: number
+    VpcSubnet:
+      type: object
+      properties:
+        id:
+          type: string
+        vpc_id:
+          type: string
+        name:
+          type: string
+        cidr:
+          type: string
+        gateway_ip:
+          type: string
+          description: the .1 address of the subnet
+        used:
+          type: integer
+        capacity:
+          type: integer
+        state:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+    Vpc:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        cidr:
+          type: string
+        region:
+          type: string
+          example: tr-ist-1
+        project_id:
+          type: integer
+        state:
+          type: string
+        subnets:
+          type: array
+          items:
+            $ref: '#/components/schemas/VpcSubnet'
+        servers:
+          type: array
+          items:
+            type: object
+            properties:
+              server_id:
+                type: integer
+              name:
+                type: string
+              nic_id:
+                type: string
+              subnet_id:
+                type: string
+              ip:
+                type: string
+              state:
+                type: string
+        attachments:
+          type: integer
+        gateway:
+          $ref: '#/components/schemas/VpcGateway'
+        created_at:
+          type: string
+          format: date-time
+    ServerNic:
+      type: object
+      properties:
+        id:
+          type: string
+        vpc_id:
+          type: string
+        subnet_id:
+          type: string
+        subnet_name:
+          type: string
+        subnet_cidr:
+          type: string
+        ip:
+          type: string
+        gateway_ip:
+          type: string
+        mac:
+          type: string
+        state:
+          type: string
+          enum:
+          - attaching
+          - ready
+          - detaching
+          - error
+        error:
+          type: string
+    ContainerEgressChange:
+      type:
+      - object
+      - 'null'
+      description: Announced change of the egress IPs (plan change, node added / removed). Null when none.
+      x-description-tr: Duyurulan çıkış IP değişikliği (paket değişikliği, düğüm ekleme / çıkarma). Yoksa null.
+      properties:
+        id:
+          type: string
+          example: cm3k9x2a1
+        kind:
+          type: string
+          enum:
+          - plan
+          - add
+          - remove
+          - mixed
+        state:
+          type: string
+          enum:
+          - preparing
+          - pending
+          - approved
+          - applied
+          description: preparing = new addresses not known yet; pending = announced (waits for approval when approval_required); approved = old nodes are being drained;
+            applied = done (kept 24 h)
+        new_ips:
+          type: array
+          items:
+            type: string
+        remove_ips:
+          type: array
+          items:
+            type: string
+        keep_ips:
+          type: array
+          items:
+            type: string
+        approval_required:
+          type: boolean
+        awaiting_approval:
+          type: boolean
+        hold_hours:
+          type: integer
+        pending_since:
+          type: string
+          format: date-time
+        deadline:
+          type: string
+          format: date-time
+          description: the change continues by itself at this time without approval
+        approved_at:
+          type: string
+        approved_by:
+          type: string
+          enum:
+          - ''
+          - owner
+          - deadline
+          - automatic
+        applied_at:
+          type: string

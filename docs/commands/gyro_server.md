@@ -44,7 +44,9 @@ gyro server [flags]
 * [gyro server ip](gyro_server_ip.md)	 - Print the public IPv4 (or --ipv6) of a server
 * [gyro server list](gyro_server_list.md)	 - List your servers
 * [gyro server metrics](gyro_server_metrics.md)	 - CPU, disk and network metrics (summary)
+* [gyro server nic](gyro_server_nic.md)	 - List the server's private network cards
 * [gyro server power](gyro_server_power.md)	 - Power on, off, shutdown, reboot or reset a server
+* [gyro server public-ip](gyro_server_public-ip.md)	 - Public IPv4 state
 * [gyro server rdns](gyro_server_rdns.md)	 - List reverse DNS entries
 * [gyro server rebuild](gyro_server_rebuild.md)	 - Reinstall the OS - WIPES THE DISK
 * [gyro server rename](gyro_server_rename.md)	 - Change the host name

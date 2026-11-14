@@ -1,0 +1,97 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-container-egress-change-approve - Approve the pending egress change
+
+
+.SH SYNOPSIS
+\fBgyro container egress-change approve  [flags]\fP
+
+
+.SH DESCRIPTION
+Approve the pending egress change
+
+.PP
+Continue now: the new nodes start taking traffic, the old ones are drained and removed. \fBid\fR (optional) must match \fBegress_change.id\fR (409 \fBchange_mismatch\fR when a newer change replaced it). 409 \fBno_pending_change\fR / \fBchange_preparing\fR\&. Every change of a dedicated environment's node set (plan change, extra node added or removed) is announced BEFORE the old nodes go: as soon as the new nodes' addresses are known (usually under a minute) the owner is notified (Alerts channels, event \fBegress\fR) and \fBegress_change\fR / \fBpending_egress_ips\fR show them. With the approval step on (\fBPUT /cloud/containers/{id}/egress-approval\fR, 1-72 hours, 24 recommended) the new nodes take no traffic and the old nodes keep serving until \fBPOST /cloud/containers/{id}/egress-change/approve\fR or the deadline (then it continues by itself). A removal only never waits.
+
+.PP
+API: POST /cloud/containers/{id}/egress-change/approve (operationId approveContainerEgressChange, scope services_write)
+
+
+.SH OPTIONS
+\fB--data\fP=""
+	request body as JSON, @file or @- (stdin)
+
+.PP
+\fB--dry-run\fP[=false]
+	show the price quote / request without changing anything
+
+.PP
+\fB-h\fP, \fB--help\fP[=false]
+	help for approve
+
+.PP
+\fB--id\fP=""
+	id
+
+.PP
+\fB--idempotency-key\fP=""
+	idempotency key (automatic for money operations)
+
+.PP
+\fB--set\fP=[]
+	extra body field key=value (repeatable)
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH SEE ALSO
+\fBgyro-container-egress-change(1)\fP

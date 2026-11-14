@@ -1,0 +1,77 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-vpc-gateway-get - Get the VPC gateway
+
+
+.SH SYNOPSIS
+\fBgyro vpc gateway get  [flags]\fP
+
+
+.SH DESCRIPTION
+Get the VPC gateway
+
+.PP
+The gateway gives private-only servers internet access (NAT), port forwarding and the inter-subnet rule. While it is on it is billed hourly from the prepaid balance (\fBmonthly_eur\fR / 672, at least 1 hour, never more than \fBmonthly_eur\fR a month) and needs at least one prepaid tr-ist-1 server on the account (409 \fBno_billing_server\fR). Turning it off releases its public IP; refused while port forwards exist, or while private-only servers use it (409 \fBgateway_in_use\fR, repeat with \fBallow_no_egress: true\fR). Outgoing connections are logged as required by Turkish Law No. 5651 (2 years).
+
+.PP
+API: GET /cloud/vpcs/{vpc_id}/gateway (operationId getVpcGateway, scope cloud_read)
+
+
+.SH OPTIONS
+\fB-h\fP, \fB--help\fP[=false]
+	help for get
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH SEE ALSO
+\fBgyro-vpc-gateway(1)\fP

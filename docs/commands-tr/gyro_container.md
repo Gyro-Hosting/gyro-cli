@@ -33,7 +33,10 @@ gyro container [flags]
 
 * [gyro](gyro.md)	 - Gyro Hosting komut satırı aracı
 * [gyro container create](gyro_container_create.md)	 - Kapsayıcı ortamı oluştur (toplu)
+* [gyro container delete](gyro_container_delete.md)	 - Kapsayıcı ortamını sil (ön ödemeli)
 * [gyro container domain](gyro_container_domain.md)	 - Servisin alan adları
+* [gyro container egress-approval](gyro_container_egress-approval.md)	 - Çıkış IP değişikliği onay adımı
+* [gyro container egress-change](gyro_container_egress-change.md)	 - Bekleyen çıkış IP değişikliğini onayla
 * [gyro container egress-ips](gyro_container_egress-ips.md)	 - Kapsayıcı ortamının çıkış IP'leri
 * [gyro container env](gyro_container_env.md)	 - Ortam değişkenlerini ayarla
 * [gyro container events](gyro_container_events.md)	 - Son uyarılar

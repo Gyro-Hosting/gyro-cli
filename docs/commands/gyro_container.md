@@ -33,7 +33,10 @@ gyro container [flags]
 
 * [gyro](gyro.md)	 - Gyro Hosting command-line interface
 * [gyro container create](gyro_container_create.md)	 - Create container environments (batch)
+* [gyro container delete](gyro_container_delete.md)	 - Delete a container environment (prepaid)
 * [gyro container domain](gyro_container_domain.md)	 - Domains of a service
+* [gyro container egress-approval](gyro_container_egress-approval.md)	 - Approval step for egress changes
+* [gyro container egress-change](gyro_container_egress-change.md)	 - Approve the pending egress change
 * [gyro container egress-ips](gyro_container_egress-ips.md)	 - Egress IPs of a container environment
 * [gyro container env](gyro_container_env.md)	 - Set environment variables
 * [gyro container events](gyro_container_events.md)	 - Recent warnings

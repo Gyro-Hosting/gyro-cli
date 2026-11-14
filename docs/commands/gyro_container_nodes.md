@@ -40,4 +40,5 @@ gyro container nodes <ID> [flags]
 ### SEE ALSO
 
 * [gyro container](gyro_container.md)	 - Gyro Containers (ECS), Istanbul: services, versions, logs, domains
+* [gyro container nodes set](gyro_container_nodes_set.md)	 - Set the extra node count
 

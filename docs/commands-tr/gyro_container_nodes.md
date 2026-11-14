@@ -40,4 +40,5 @@ gyro container nodes <ID> [flags]
 ### SEE ALSO
 
 * [gyro container](gyro_container.md)	 - Gyro Kapsayıcı (ECS), İstanbul: servisler, sürümler, loglar, alan adları
+* [gyro container nodes set](gyro_container_nodes_set.md)	 - Ek düğüm sayısını ayarla
 
