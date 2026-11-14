@@ -345,7 +345,7 @@ func genCommand(a *App, op *spec.Op) *cobra.Command {
 			_ = cmd.RegisterFlagCompletionFunc(fn, fixedCompletion(f.Enum...))
 		}
 	}
-	if _, ok := o.flagName["b:quantity"]; ok {   // 2.21.0: --count is the friendlier name of the batch size
+	if _, ok := o.flagName["b:quantity"]; ok { // 2.21.0: --count is the friendlier name of the batch size
 		qn := o.flagName["b:quantity"]
 		fs.SetNormalizeFunc(func(_ *pflag.FlagSet, name string) pflag.NormalizedName {
 			if name == "count" {
@@ -507,17 +507,57 @@ func runGenerated(a *App, cmd *cobra.Command, op *spec.Op, o *genOpts, args []st
 		for _, f := range op.Body {
 			key := "b:" + f.Name
 			if ptr, ok := o.flagVals[key]; ok && cmd.Flags().Changed(o.flagName[key]) {
-				body[f.Name] = flagValue(ptr, f.Type)
+				v := flagValue(ptr, f.Type)
+				if sp, isStr := ptr.(*string); isStr && (f.Type == "object" || (f.Type == "string" && f.Name == "items" && isOrderOp(op))) {
+					// 1.26.3: JSON object/array flags accept @file and @- and fail loudly on bad JSON (used to be sent as a plain string)
+					raw, rerr := a.ReadValue(*sp)
+					if rerr != nil {
+						return rerr
+					}
+					var x any
+					if jerr := json.Unmarshal([]byte(raw), &x); jerr != nil {
+						return &ExitErr{ExitUsage, fmt.Errorf("--%s: %s: %w", o.flagName[key], i18n.S("expected JSON", "JSON bekleniyor"), jerr)}
+					}
+					v = x
+				}
+				body[f.Name] = v
 			}
 		}
 		extra, err := ParseKV(o.set)
 		if err != nil {
 			return err
 		}
+		if setF, ok := op.Field("set"); ok && setF.Type == "object" && len(o.set) > 0 {
+			// 1.26.3: on operations whose body has its own "set" object (container env set), --set KEY=VALUE fills that object
+			m, _ := body["set"].(map[string]any)
+			if m == nil {
+				m = map[string]any{}
+			}
+			for _, kv := range o.set {
+				k, val, okKV := strings.Cut(kv, "=")
+				if !okKV || strings.TrimSpace(k) == "" {
+					return &ExitErr{ExitUsage, fmt.Errorf("--set %q: %s", kv, i18n.S("expected KEY=VALUE", "ANAHTAR=DEĞER bekleniyor"))}
+				}
+				if strings.HasPrefix(val, "@") {
+					if val, err = a.ReadValue(val); err != nil {
+						return err
+					}
+				}
+				m[k] = val
+			}
+			body["set"] = m
+			extra = nil
+		}
 		for k, v := range extra {
 			body[k] = v
 		}
+		if isOrderOp(op) {
+			orderItems(body)
+		}
 		for _, f := range op.Body {
+			if isOrderOp(op) && orderLineField[f.Name] {
+				continue
+			}
 			if f.Required && f.Name != "confirm" && f.Name != "dry_run" {
 				if _, ok := body[f.Name]; !ok {
 					return &ExitErr{ExitUsage, fmt.Errorf("--%s %s", o.flagName["b:"+f.Name], i18n.S("is required", "zorunlu"))}
@@ -565,7 +605,7 @@ func runGenerated(a *App, cmd *cobra.Command, op *spec.Op, o *genOpts, args []st
 		if err := a.Confirm(question); err != nil {
 			return err
 		}
-		if bodyConfirm {
+		if bodyConfirm || (op.ID == "coreCreateOrder" && body != nil) { // 1.26.3: money rule AK-40 needs "confirm": true in the order body
 			body["confirm"] = true
 		}
 		if queryConfirm {
@@ -664,5 +704,49 @@ func warnSecrets(a *App, data json.RawMessage) {
 	sort.Strings(found)
 	if len(found) > 0 {
 		a.Info("%s", i18n.F("Store %s now: it is shown only once.", "%s bilgisini şimdi saklayın: yalnız bir kez gösterilir.", strings.Join(found, ", ")))
+	}
+}
+
+// orderLineField are the fields of one order line that the reference spec flattens next to "items" (1.26.3).
+var orderLineField = map[string]bool{"product_id": true, "cycle": true, "quantity": true, "addons": true, "addons_qty": true,
+	"requirements": true, "requirement_files": true, "metrics": true, "domain": true, "method": true, "card_id": true}
+
+func isOrderOp(op *spec.Op) bool { return op.ID == "coreCreateOrder" || op.ID == "corePreviewOrder" }
+
+// orderItems turns the single-line shortcut (--product-id/--cycle/--quantity...) into items[] and --method into payment.
+func orderItems(body map[string]any) {
+	if _, ok := body["items"]; !ok {
+		if _, has := body["product_id"]; has {
+			line := map[string]any{}
+			for k := range orderLineField {
+				if k == "method" || k == "card_id" {
+					continue
+				}
+				if v, ok := body[k]; ok {
+					line[k] = v
+					delete(body, k)
+				}
+			}
+			body["items"] = []any{line}
+		}
+	} else {
+		for k := range orderLineField {
+			if k != "method" && k != "card_id" {
+				delete(body, k)
+			}
+		}
+	}
+	if m, ok := body["method"]; ok {
+		pay, _ := body["payment"].(map[string]any)
+		if pay == nil {
+			pay = map[string]any{}
+		}
+		pay["method"] = m
+		if c, ok := body["card_id"]; ok {
+			pay["card_id"] = c
+		}
+		body["payment"] = pay
+		delete(body, "method")
+		delete(body, "card_id")
 	}
 }
