@@ -109,7 +109,7 @@ API: PATCH /cloud/containers/{id}/pipelines/{pipeline} (operationId pipeline_upd
 
 .PP
 \fB--repo\fP=""
-	https clone URL (no credentials) or SSH address git@host:org/repo.git / ssh://user@host[:port]/path (needs a deploy key); empty for provider archive
+	Required for github / gitlab / gitea / git: https clone URL (no credentials) or SSH address git@host:org/repo.git / ssh://user@host[:port]/path (needs a deploy key). Leave it out for provider \fBarchive\fR (an archive pipeline has no repository; a value sent with \fBarchive\fR is ignored and the answer shows \fBrepo\fR empty).
 
 .PP
 \fB--repo-file\fP[=false]

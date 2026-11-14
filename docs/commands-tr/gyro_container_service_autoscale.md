@@ -6,7 +6,7 @@ Servisin otomatik ölçekleme / uyarı eşiği
 
 Servisin otomatik ölçekleme / uyarı eşiği
 
-Gövde `{"autoscaling": {...}, "alerts": {"min_ready": 2}}`. Ortalama kullanım hedefi aşınca kopya eklenir (30 sn'de en çok iki katı), 3 dakika sakin kalınca dakikada bir azaltılır. En çok kopya paket sınırını aşamaz; havuza sığmayan kopyalar bekler. Sürüm oluşturmaz. Kapatınca mevcut kopya sayısı (ya da `replicas`) kalır. Sayı servis başına 0..en fazla kopya aralığı dışındaysa 422 `invalid_replicas` (`details.max` = planınızın sınırı).
+Gövde `{"autoscaling": {...}, "alerts": {"min_ready": 2}}`. Ortalama kullanım hedefi aşınca kopya eklenir (30 sn'de en çok iki katı), 3 dakika sakin kalınca dakikada bir azaltılır. En çok kopya paket sınırını aşamaz; havuza sığmayan kopyalar bekler. Sürüm oluşturmaz. Kapatınca mevcut kopya sayısı (ya da `replicas`) kalır. Sayı servis başına 0..en fazla kopya aralığı dışındaysa 422 `invalid_replicas` (`details.max` = planınızın sınırı). `alerts` tek alan alır, `min_ready` (0 = kapalı); `autoscaling` enabled, min, max, cpu_percent, memory_percent alır. İçlerindeki başka alan 422 `invalid_alerts` / `invalid_autoscaling` ile reddedilir (eskiden sessizce düşüyordu).
 
 API: PUT /cloud/containers/{id}/services/{name}/autoscaling (operationId typed_put_containers__id__services__name__autoscaling, scope services_write)
 

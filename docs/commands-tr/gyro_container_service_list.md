@@ -6,7 +6,7 @@ Kapsayıcı servislerini listele
 
 Kapsayıcı servislerini listele
 
-Ortamdaki servisler: durum, hazır/istenen örnek, boyut, genel adres. Her öğede `internal_address` (portu olan servisler), listede `namespace` ve `cluster_dns` bulunur.
+Ortamdaki servisler: durum, hazır/istenen örnek, boyut, genel adres. Her öğede `internal_address` (portu olan servisler), listede `namespace` ve `cluster_dns` bulunur. Her serviste üst düzeyde `alerts` = {"min_ready": N} vardır (0 = kapalı; `spec.alerts` ile aynı).
 
 API: GET /cloud/containers/{id}/services (operationId typed_get_containers__id__services, scope services_read)
 

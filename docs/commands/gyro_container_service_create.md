@@ -6,7 +6,7 @@ Create a container service
 
 Create a container service
 
-Starts a new service on your dedicated node pool. Name: lowercase letters, digits and '-', max 40. Fails with 409 `quota_exceeded` when the pool has no room. Secret values are set separately (PUT .../secrets). **Serverless environments:** `cpu_m` / `memory_mi` must be one of the pairs from `GET /cloud/billing/container-sizes` (0.25-4 vCPU); billing is per running copy per hour (`POST /cloud/billing/estimate` with `type: serverless`). Refused with 422 `invalid_replicas` (`details.max` = your plan's limit) when the count is outside 0..max copies per service.
+Starts a new service on your dedicated node pool. Name: lowercase letters, digits and '-', max 40. Fails with 409 `quota_exceeded` when the pool has no room. Secret values are set separately (PUT .../secrets). **Serverless environments:** `cpu_m` / `memory_mi` must be one of the pairs from `GET /cloud/billing/container-sizes` (0.25-4 vCPU); billing is per running copy per hour (`POST /cloud/billing/estimate` with `type: serverless`). Refused with 422 `invalid_replicas` (`details.max` = your plan's limit) when the count is outside 0..max copies per service. `alerts` takes one field, `min_ready` (0 = off); `autoscaling` takes enabled, min, max, cpu_percent, memory_percent. Any other field inside them is refused with 422 `invalid_alerts` / `invalid_autoscaling` (it used to be dropped silently).
 
 API: POST /cloud/containers/{id}/services (operationId typed_post_containers__id__services, scope services_write)
 

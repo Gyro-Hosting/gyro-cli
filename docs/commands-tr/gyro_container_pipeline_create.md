@@ -6,7 +6,7 @@ Pipeline oluştur
 
 Pipeline oluştur
 
-Depoyu bağlar. Yanıtta `webhook_url` ve `webhook_secret` (yalnız burada ve GET .../webhook) vardır; ikisini deponun webhook ayarına ekleyin. Özel depo için `token`.
+Depoyu bağlar. Yanıtta `webhook_url` ve `webhook_secret` (yalnız burada ve GET .../webhook) vardır; ikisini deponun webhook ayarına ekleyin. Özel depo için `token`. `provider` `archive` değilse `repo` zorunludur (arşiv pipeline'ı yalnız yüklenen arşivi derler: POST .../uploads, ardından `upload_id` ile çalıştırma).
 
 API: POST /cloud/containers/{id}/pipelines (operationId pipeline_create, scope services_write)
 
@@ -39,7 +39,7 @@ gyro container pipeline create <ID> [flags]
       --name string                               Görünen ad (1-48)
       --notify strings                            Notifications (channels: the environment's alert settings)
       --provider string                           provider (github|gitlab|gitea|git|archive)
-      --repo string                               https klon adresi (kimlik bilgisi yok) ya da SSH adresi git@sunucu:kurum/depo.git / ssh://kullanici@sunucu[:port]/yol (deploy key gerekir); provider archive için boş
+      --repo archive                              github / gitlab / gitea / git için zorunlu: https klon adresi (kimlik bilgisi yok) ya da SSH adresi git@sunucu:kurum/depo.git / ssh://kullanici@sunucu[:port]/yol (deploy key gerekir). provider archive için göndermeyin (arşiv pipeline deposuz çalışır; `archive` ile gönderilen değer yok sayılır, yanıtta `repo` boş görünür).
       --repo-file                                 Read gyro-pipeline.yml from the repository (GitHub, GitLab, Gitea)
       --set stringArray                           ek gövde alanı anahtar=değer (tekrarlanabilir)
       --tags string                               Derlenen etiketler (glob, ör. v*)

@@ -2,7 +2,7 @@
 openapi: 3.1.0
 info:
   title: Gyro Public API
-  version: 2.28.1
+  version: 2.28.2
   summary: Manage Gyro cloud servers, SSH keys and billing programmatically.
   x-summary-tr: Gyro bulut sunucularınızı, SSH anahtarlarınızı ve faturalarınızı programla yönetin.
   description: "The Gyro Public API lets you automate everything you do in the Gyro client area:\norder and manage cloud servers, keep SSH keys, read invoices and\
@@ -77,7 +77,9 @@ info:
     \ in gyro-pipeline.yml. Additive.\n\n**2.28.1**: the limit hint (`details.limit_exceeded`, `how_to_increase`, \"This limit can be raised with a support ticket\"\
     ) is added only to real account / plan limit refusals; input validation errors that mention a maximum length or count (\"at most 64 characters\") no longer get\
     \ it. Module limits now name their `limit_key` (e.g. `compute.extra_ips`, `s3.max_buckets`, `dns.max_zones`, `gfw.rules_per_server`); plan limits answer `how_to_increase:\
-    \ upgrade_plan`, hourly ones `wait`.\n"
+    \ upgrade_plan`, hourly ones `wait`.\n\n**2.28.2**: pipeline create no longer lists `repo` as required: it is required for git providers and must be left out\
+    \ for `provider: archive`. Container services: `alerts` given on create / update is applied (the service view now also shows it at the top level, `alerts.min_ready`,\
+    \ 0 = off); unknown fields inside `alerts` or `autoscaling` are refused with 422 `invalid_alerts` / `invalid_autoscaling` instead of being ignored.\n"
   x-description-tr: "Gyro Public API, müşteri panelinde yaptığınız her işi otomatikleştirmenizi sağlar:\nbulut sunucu siparişi ve yönetimi, SSH anahtarları, fatura\
     \ ve bakiye okuma.\nResmi Terraform sağlayıcısı (`gyro-hosting/gyro`) ve `gyroctl` bu API'yi kullanır.\n\n* **Taban adres** `https://www.gyrohosting.com/api/v1/client`\n\
     * **Kimlik** `Authorization: Bearer wck_...` (anahtarı *Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri* bölümünden oluşturun)\n* **Biçim** JSON\
@@ -149,7 +151,9 @@ info:
     \ gyro-pipeline.yml'de `build_target:`. Geriye uyumlu.\n\n**2.28.1**: sınır ipucu (`details.limit_exceeded`, `how_to_increase`, \"Bu sınır destek talebiyle artırılabilir\"\
     ) yalnız gerçek hesap / paket sınırı retlerine eklenir; en fazla uzunluk ya da sayı söyleyen girdi doğrulama hataları (\"en fazla 64 karakter\") artık almaz.\
     \ Modül sınırları `limit_key` adını verir (ör. `compute.extra_ips`, `s3.max_buckets`, `dns.max_zones`, `gfw.rules_per_server`); paket sınırlarında `how_to_increase:\
-    \ upgrade_plan`, saatlik olanlarda `wait`.\n"
+    \ upgrade_plan`, saatlik olanlarda `wait`.\n\n**2.28.2**: pipeline oluştururken `repo` artık her zaman zorunlu değil: git sağlayıcıları için zorunlu, `provider:\
+    \ archive` için gönderilmez. Kapsayıcı servisleri: oluştur / güncellemede verilen `alerts` uygulanır (servis görünümünde artık üst düzeyde de `alerts.min_ready`\
+    \ var, 0 = kapalı); `alerts` ya da `autoscaling` içindeki bilinmeyen alan yok sayılmak yerine 422 `invalid_alerts` / `invalid_autoscaling` ile reddedilir.\n"
   contact:
     name: Gyro Hosting
     url: https://www.gyrohosting.com
@@ -8743,10 +8747,11 @@ paths:
       summary: List container services
       x-summary-tr: Kapsayıcı servislerini listele
       x-scope: services_read
-      description: Services of the environment with state (running, deploying, failing, pending, stopped, suspended), ready/desired instances, size and public URL.
-        Each item carries `internal_address` (services with a port); the list carries `namespace` and `cluster_dns`.
+      description: 'Services of the environment with state (running, deploying, failing, pending, stopped, suspended), ready/desired instances, size and public URL.
+        Each item carries `internal_address` (services with a port); the list carries `namespace` and `cluster_dns`. Each service has `alerts` = {"min_ready": N}
+        at the top level (0 = off; the same value as `spec.alerts`).'
       x-description-tr: 'Ortamdaki servisler: durum, hazır/istenen örnek, boyut, genel adres. Her öğede `internal_address` (portu olan servisler), listede `namespace`
-        ve `cluster_dns` bulunur.'
+        ve `cluster_dns` bulunur. Her serviste üst düzeyde `alerts` = {"min_ready": N} vardır (0 = kapalı; `spec.alerts` ile aynı).'
       parameters:
       - name: id
         in: path
@@ -8784,11 +8789,14 @@ paths:
       description: 'Starts a new service on your dedicated node pool. Name: lowercase letters, digits and ''-'', max 40. Fails with 409 `quota_exceeded` when the
         pool has no room. Secret values are set separately (PUT .../secrets). **Serverless environments:** `cpu_m` / `memory_mi` must be one of the pairs from `GET
         /cloud/billing/container-sizes` (0.25-4 vCPU); billing is per running copy per hour (`POST /cloud/billing/estimate` with `type: serverless`). Refused with
-        422 `invalid_replicas` (`details.max` = your plan''s limit) when the count is outside 0..max copies per service.'
+        422 `invalid_replicas` (`details.max` = your plan''s limit) when the count is outside 0..max copies per service. `alerts` takes one field, `min_ready` (0
+        = off); `autoscaling` takes enabled, min, max, cpu_percent, memory_percent. Any other field inside them is refused with 422 `invalid_alerts` / `invalid_autoscaling`
+        (it used to be dropped silently).'
       x-description-tr: 'Size ayrılmış düğüm havuzunda yeni servis başlatır. Ad: küçük harf, rakam, ''-'', en çok 40. Havuzda yer yoksa 409 `quota_exceeded`. Gizli
         değerler ayrıca (PUT .../secrets). **Sunucusuz ortam:** `cpu_m` / `memory_mi` `GET /cloud/billing/container-sizes` çiftlerinden biri olmalı (0,25-4 vCPU);
         ücret çalışan kopya başına saatliktir (`POST /cloud/billing/estimate`, `type: serverless`). Sayı servis başına 0..en fazla kopya aralığı dışındaysa 422 `invalid_replicas`
-        (`details.max` = planınızın sınırı).'
+        (`details.max` = planınızın sınırı). `alerts` tek alan alır, `min_ready` (0 = kapalı); `autoscaling` enabled, min, max, cpu_percent, memory_percent alır.
+        İçlerindeki başka alan 422 `invalid_alerts` / `invalid_autoscaling` ile reddedilir (eskiden sessizce düşüyordu).'
       parameters:
       - name: id
         in: path
@@ -8931,10 +8939,11 @@ paths:
       description: 'Spec, state, problem code (ImagePullBackOff, CrashLoopBackOff, OOMKilled, Unschedulable ...), instances, revision, domains and the names of secrets
         (values are never returned). `autoscaling` = settings + live status (current/desired replicas, current CPU/memory %, at_max), `capacity` = {blocked, fits}.
         The answer carries `namespace` and, for services with a port, `internal` = `{host, short, port: 80, target_port, address, url}`: other services of the same
-        environment reach it at `internal.address` (`<name>.<namespace>.svc.cluster.local:80`) or `<name>:80`.'
+        environment reach it at `internal.address` (`<name>.<namespace>.svc.cluster.local:80`) or `<name>:80`. Each service has `alerts` = {"min_ready": N} at the
+        top level (0 = off; the same value as `spec.alerts`).'
       x-description-tr: 'Tanım, durum, sorun kodu, örnekler, sürüm, alan adları ve gizli değer adları (değerler asla dönmez). Yanıtta `namespace` ve portu olan servislerde
         `internal` = `{host, short, port: 80, target_port, address, url}` bulunur: aynı ortamdaki servisler `internal.address` (`<ad>.<namespace>.svc.cluster.local:80`)
-        ya da `<ad>:80` ile ulaşır.'
+        ya da `<ad>:80` ile ulaşır. Her serviste üst düzeyde `alerts` = {"min_ready": N} vardır (0 = kapalı; `spec.alerts` ile aynı).'
       parameters:
       - name: id
         in: path
@@ -8978,10 +8987,14 @@ paths:
       description: 'Send only the fields to change (e.g. `image`). Every change except `replicas` creates a new revision and rolls out instance by instance without
         downtime. With autoscaling on, `replicas` is ignored (the autoscaler owns it). `autoscaling` / `alerts` are settings, not revisions. **Serverless environments:**
         `cpu_m` / `memory_mi` must be one of the pairs from `GET /cloud/billing/container-sizes` (0.25-4 vCPU); billing is per running copy per hour (`POST /cloud/billing/estimate`
-        with `type: serverless`). Refused with 422 `invalid_replicas` (`details.max` = your plan''s limit) when the count is outside 0..max copies per service.'
+        with `type: serverless`). Refused with 422 `invalid_replicas` (`details.max` = your plan''s limit) when the count is outside 0..max copies per service. `alerts`
+        takes one field, `min_ready` (0 = off); `autoscaling` takes enabled, min, max, cpu_percent, memory_percent. Any other field inside them is refused with 422
+        `invalid_alerts` / `invalid_autoscaling` (it used to be dropped silently).'
       x-description-tr: 'Yalnız değişecek alanları gönderin (ör. `image`). `replicas` dışındaki her değişiklik yeni sürüm oluşturur ve kesintisiz dağıtılır. **Sunucusuz
         ortam:** `cpu_m` / `memory_mi` `GET /cloud/billing/container-sizes` çiftlerinden biri olmalı (0,25-4 vCPU); ücret çalışan kopya başına saatliktir (`POST /cloud/billing/estimate`,
-        `type: serverless`). Sayı servis başına 0..en fazla kopya aralığı dışındaysa 422 `invalid_replicas` (`details.max` = planınızın sınırı).'
+        `type: serverless`). Sayı servis başına 0..en fazla kopya aralığı dışındaysa 422 `invalid_replicas` (`details.max` = planınızın sınırı). `alerts` tek alan
+        alır, `min_ready` (0 = kapalı); `autoscaling` enabled, min, max, cpu_percent, memory_percent alır. İçlerindeki başka alan 422 `invalid_alerts` / `invalid_autoscaling`
+        ile reddedilir (eskiden sessizce düşüyordu).'
       parameters:
       - name: id
         in: path
@@ -9831,10 +9844,14 @@ paths:
       description: 'Body `{"autoscaling": {"enabled": true, "min": 1, "max": 5, "cpu_percent": 70, "memory_percent": 0}, "alerts": {"min_ready": 2}}`. Replicas are
         added when the average use exceeds the target (at most double per 30 s) and removed one per minute after 3 calm minutes. Max cannot exceed the plan replica
         limit; replicas that do not fit in the node pool wait (`warnings: max_exceeds_capacity`, alert `capacity`). Not a revision. Switching off keeps the current
-        replica count (or `replicas`). Refused with 422 `invalid_replicas` (`details.max` = your plan''s limit) when the count is outside 0..max copies per service.'
+        replica count (or `replicas`). Refused with 422 `invalid_replicas` (`details.max` = your plan''s limit) when the count is outside 0..max copies per service.
+        `alerts` takes one field, `min_ready` (0 = off); `autoscaling` takes enabled, min, max, cpu_percent, memory_percent. Any other field inside them is refused
+        with 422 `invalid_alerts` / `invalid_autoscaling` (it used to be dropped silently).'
       x-description-tr: 'Gövde `{"autoscaling": {...}, "alerts": {"min_ready": 2}}`. Ortalama kullanım hedefi aşınca kopya eklenir (30 sn''de en çok iki katı), 3
         dakika sakin kalınca dakikada bir azaltılır. En çok kopya paket sınırını aşamaz; havuza sığmayan kopyalar bekler. Sürüm oluşturmaz. Kapatınca mevcut kopya
-        sayısı (ya da `replicas`) kalır. Sayı servis başına 0..en fazla kopya aralığı dışındaysa 422 `invalid_replicas` (`details.max` = planınızın sınırı).'
+        sayısı (ya da `replicas`) kalır. Sayı servis başına 0..en fazla kopya aralığı dışındaysa 422 `invalid_replicas` (`details.max` = planınızın sınırı). `alerts`
+        tek alan alır, `min_ready` (0 = kapalı); `autoscaling` enabled, min, max, cpu_percent, memory_percent alır. İçlerindeki başka alan 422 `invalid_alerts` /
+        `invalid_autoscaling` ile reddedilir (eskiden sessizce düşüyordu).'
       parameters:
       - name: id
         in: path
@@ -10829,9 +10846,11 @@ paths:
       x-scope: services_write
       description: 'Connects a repository. The answer contains `webhook_url` and (only here and in GET .../webhook) `webhook_secret`: add both to the repository''s
         webhook (GitHub: application/json + Secret, push event; GitLab: Secret token, push + tag push; Gitea: secret; other: X-Gyro-Signature HMAC). Optional `token`
-        for a private repository. '
+        for a private repository.  `repo` is required unless `provider` is `archive` (archive pipelines build only uploaded archives: POST .../uploads, then a run
+        with `upload_id`).'
       x-description-tr: 'Depoyu bağlar. Yanıtta `webhook_url` ve `webhook_secret` (yalnız burada ve GET .../webhook) vardır; ikisini deponun webhook ayarına ekleyin.
-        Özel depo için `token`. '
+        Özel depo için `token`.  `provider` `archive` değilse `repo` zorunludur (arşiv pipeline''ı yalnız yüklenen arşivi derler: POST .../uploads, ardından `upload_id`
+        ile çalıştırma).'
       parameters:
       - name: id
         in: path
@@ -10880,10 +10899,12 @@ paths:
                   default: github
                 repo: &id045
                   type: string
-                  description: https clone URL (no credentials) or SSH address git@host:org/repo.git / ssh://user@host[:port]/path (needs a deploy key); empty for
-                    provider archive
-                  x-description-tr: https klon adresi (kimlik bilgisi yok) ya da SSH adresi git@sunucu:kurum/depo.git / ssh://kullanici@sunucu[:port]/yol (deploy
-                    key gerekir); provider archive için boş
+                  description: 'Required for github / gitlab / gitea / git: https clone URL (no credentials) or SSH address git@host:org/repo.git / ssh://user@host[:port]/path
+                    (needs a deploy key). Leave it out for provider `archive` (an archive pipeline has no repository; a value sent with `archive` is ignored and the
+                    answer shows `repo` empty).'
+                  x-description-tr: 'github / gitlab / gitea / git için zorunlu: https klon adresi (kimlik bilgisi yok) ya da SSH adresi git@sunucu:kurum/depo.git
+                    / ssh://kullanici@sunucu[:port]/yol (deploy key gerekir). provider `archive` için göndermeyin (arşiv pipeline deposuz çalışır; `archive` ile gönderilen
+                    değer yok sayılır, yanıtta `repo` boş görünür).'
                   example: https://github.com/gyro-ornek/uygulama
                 token: &id046
                   type: string
@@ -10988,7 +11009,6 @@ paths:
                   type: boolean
               required:
               - name
-              - repo
               - image
       x-cli:
         command: container pipeline create

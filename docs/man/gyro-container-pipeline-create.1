@@ -13,7 +13,7 @@ gyro-container-pipeline-create - Create a pipeline
 Create a pipeline
 
 .PP
-Connects a repository. The answer contains \fBwebhook_url\fR and (only here and in GET .../webhook) \fBwebhook_secret\fR: add both to the repository's webhook (GitHub: application/json + Secret, push event; GitLab: Secret token, push + tag push; Gitea: secret; other: X-Gyro-Signature HMAC). Optional \fBtoken\fR for a private repository.
+Connects a repository. The answer contains \fBwebhook_url\fR and (only here and in GET .../webhook) \fBwebhook_secret\fR: add both to the repository's webhook (GitHub: application/json + Secret, push event; GitLab: Secret token, push + tag push; Gitea: secret; other: X-Gyro-Signature HMAC). Optional \fBtoken\fR for a private repository. \fBrepo\fR is required unless \fBprovider\fR is \fBarchive\fR (archive pipelines build only uploaded archives: POST .../uploads, then a run with \fBupload_id\fR).
 
 .PP
 API: POST /cloud/containers/{id}/pipelines (operationId pipeline_create, scope services_write)
@@ -109,7 +109,7 @@ API: POST /cloud/containers/{id}/pipelines (operationId pipeline_create, scope s
 
 .PP
 \fB--repo\fP=""
-	https clone URL (no credentials) or SSH address git@host:org/repo.git / ssh://user@host[:port]/path (needs a deploy key); empty for provider archive
+	Required for github / gitlab / gitea / git: https clone URL (no credentials) or SSH address git@host:org/repo.git / ssh://user@host[:port]/path (needs a deploy key). Leave it out for provider \fBarchive\fR (an archive pipeline has no repository; a value sent with \fBarchive\fR is ignored and the answer shows \fBrepo\fR empty).
 
 .PP
 \fB--repo-file\fP[=false]

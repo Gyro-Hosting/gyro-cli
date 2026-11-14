@@ -6,7 +6,7 @@ Create a pipeline
 
 Create a pipeline
 
-Connects a repository. The answer contains `webhook_url` and (only here and in GET .../webhook) `webhook_secret`: add both to the repository's webhook (GitHub: application/json + Secret, push event; GitLab: Secret token, push + tag push; Gitea: secret; other: X-Gyro-Signature HMAC). Optional `token` for a private repository.
+Connects a repository. The answer contains `webhook_url` and (only here and in GET .../webhook) `webhook_secret`: add both to the repository's webhook (GitHub: application/json + Secret, push event; GitLab: Secret token, push + tag push; Gitea: secret; other: X-Gyro-Signature HMAC). Optional `token` for a private repository. `repo` is required unless `provider` is `archive` (archive pipelines build only uploaded archives: POST .../uploads, then a run with `upload_id`).
 
 API: POST /cloud/containers/{id}/pipelines (operationId pipeline_create, scope services_write)
 
@@ -39,7 +39,7 @@ gyro container pipeline create <ID> [flags]
       --name string                               Display name (1-48)
       --notify strings                            Notifications (channels: the environment's alert settings)
       --provider string                           provider (github|gitlab|gitea|git|archive)
-      --repo string                               https clone URL (no credentials) or SSH address git@host:org/repo.git / ssh://user@host[:port]/path (needs a deploy key); empty for provider archive
+      --repo archive                              Required for github / gitlab / gitea / git: https clone URL (no credentials) or SSH address git@host:org/repo.git / ssh://user@host[:port]/path (needs a deploy key). Leave it out for provider archive (an archive pipeline has no repository; a value sent with `archive` is ignored and the answer shows `repo` empty).
       --repo-file                                 Read gyro-pipeline.yml from the repository (GitHub, GitLab, Gitea)
       --set stringArray                           extra body field key=value (repeatable)
       --tags string                               Tags that build (globs, e.g. v*)
