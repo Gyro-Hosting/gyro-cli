@@ -48,6 +48,10 @@ API: POST /cloud/containers/{id}/pipelines (operationId pipeline_create, scope s
 	Image that runs \fBcommands\fR (e.g. node:22-alpine)
 
 .PP
+\fB--build-target\fP=""
+	Stage of a multi-stage Dockerfile to build (\fBFROM node:20 AS production\fR -> \fBproduction\fR, same as \fBdocker build --target\fR). Empty = the last stage. Stage names are case-insensitive (stored lowercase). A stage the Dockerfile does not have fails the run with \fBbuild_target_not_found\fR\&. gyro-pipeline.yml: \fBbuild_target:\fR overrides it per run. CLI: \fB--target\fR (or \fB--build-target\fR).
+
+.PP
 \fB--commands\fP=[]
 	Shell commands run in the repository root before the Dockerfile (tests, npm ci ...); build secrets are environment variables here
 

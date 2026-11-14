@@ -3,7 +3,7 @@
 package spec
 
 // APIVersion is info.version of the spec this table was generated from.
-const APIVersion = "2.27.1"
+const APIVersion = "2.28.0"
 
 // Ops lists every API operation.
 var Ops = []Op{
@@ -368,6 +368,7 @@ var Ops = []Op{
 			{Name: "image", Type: "string", Items: "", Enum: nil, Default: "", Required: true, Desc: "Image name in the environment registry (<registry>/<code>/<image>:<sha7> + :latest)", DescTR: "Ortam deposundaki imaj adı"},
 			{Name: "dockerfile", Type: "string", Items: "", Enum: nil, Default: "Dockerfile", Required: false, Desc: "", DescTR: ""},
 			{Name: "context", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "Build folder (empty = repository root)", DescTR: ""},
+			{Name: "build_target", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "Stage of a multi-stage Dockerfile to build (`FROM node:20 AS production` -> `production`, same as `docker build --target`). Empty = the last stage. Stage names are case-insensitive (stored lowercase). A stage the Dockerfile does not have fails the run with `build_target_not_found`. gyro-pipeline.yml: `build_target:` overrides it per run. CLI: `--target` (or `--build-target`).", DescTR: "Çok aşamalı Dockerfile'da derlenecek aşama (`FROM node:20 AS production` -> `production`, `docker build --target` ile aynı). Boş = son aşama. Aşama adı büyük/küçük harf duyarsızdır (küçük harfle saklanır). Dockerfile'da olmayan aşama `build_target_not_found` hatasıyla çalıştırmayı durdurur. gyro-pipeline.yml: `build_target:` çalıştırma için bunu ezer. CLI: `--target` (ya da `--build-target`)."},
 			{Name: "targets", Type: "array", Items: "string", Enum: nil, Default: "", Required: false, Desc: "Services that get the new image (empty = build only)", DescTR: "Yeni imaja geçecek servisler (boş = yalnız derle)"},
 			{Name: "approval", Type: "boolean", Items: "", Enum: nil, Default: "false", Required: false, Desc: "Wait for approval before deploying (24 h)", DescTR: ""},
 			{Name: "auto_rollback", Type: "boolean", Items: "", Enum: nil, Default: "true", Required: false, Desc: "Roll back when the new version is unhealthy", DescTR: ""},
@@ -388,7 +389,7 @@ var Ops = []Op{
 		Desc: "Settings, webhook address, build secret names (values never returned).", DescTR: "Ayarlar, webhook adresi, gizli değer adları (değerler dönmez).",
 		Scope: "services_read", Command: []string{"container", "pipeline", "get"},
 		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
-		Columns: []string{"id", "name", "provider", "repo", "git_user", "branch", "tags", "auto", "repo_file", "dockerfile", "context", "image", "approval", "auto_rollback", "build_image", "cpu_m", "memory_mi", "timeout_min", "verify_min", "webhook_url", "has_token", "registry_image", "created", "updated", "auth"},
+		Columns: []string{"id", "name", "provider", "repo", "git_user", "branch", "tags", "auto", "repo_file", "dockerfile", "context", "image", "approval", "auto_rollback", "build_image", "cpu_m", "memory_mi", "timeout_min", "verify_min", "webhook_url", "has_token", "registry_image", "created", "updated", "auth", "build_target"},
 		Params: []Param{
 			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Service id", DescTR: ""},
 			{Name: "pipeline", In: "path", Type: "string", Items: "", Enum: nil, Default: "", Required: true, Desc: "Pipeline id (p + 8)", DescTR: ""},
@@ -416,6 +417,7 @@ var Ops = []Op{
 			{Name: "image", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "Image name in the environment registry (<registry>/<code>/<image>:<sha7> + :latest)", DescTR: "Ortam deposundaki imaj adı"},
 			{Name: "dockerfile", Type: "string", Items: "", Enum: nil, Default: "Dockerfile", Required: false, Desc: "", DescTR: ""},
 			{Name: "context", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "Build folder (empty = repository root)", DescTR: ""},
+			{Name: "build_target", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "Stage of a multi-stage Dockerfile to build (`FROM node:20 AS production` -> `production`, same as `docker build --target`). Empty = the last stage. Stage names are case-insensitive (stored lowercase). A stage the Dockerfile does not have fails the run with `build_target_not_found`. gyro-pipeline.yml: `build_target:` overrides it per run. CLI: `--target` (or `--build-target`).", DescTR: "Çok aşamalı Dockerfile'da derlenecek aşama (`FROM node:20 AS production` -> `production`, `docker build --target` ile aynı). Boş = son aşama. Aşama adı büyük/küçük harf duyarsızdır (küçük harfle saklanır). Dockerfile'da olmayan aşama `build_target_not_found` hatasıyla çalıştırmayı durdurur. gyro-pipeline.yml: `build_target:` çalıştırma için bunu ezer. CLI: `--target` (ya da `--build-target`)."},
 			{Name: "targets", Type: "array", Items: "string", Enum: nil, Default: "", Required: false, Desc: "Services that get the new image (empty = build only)", DescTR: "Yeni imaja geçecek servisler (boş = yalnız derle)"},
 			{Name: "approval", Type: "boolean", Items: "", Enum: nil, Default: "false", Required: false, Desc: "Wait for approval before deploying (24 h)", DescTR: ""},
 			{Name: "auto_rollback", Type: "boolean", Items: "", Enum: nil, Default: "true", Required: false, Desc: "Roll back when the new version is unhealthy", DescTR: ""},

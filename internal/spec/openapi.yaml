@@ -2,7 +2,7 @@
 openapi: 3.1.0
 info:
   title: Gyro Public API
-  version: 2.27.1
+  version: 2.28.0
   summary: Manage Gyro cloud servers, SSH keys and billing programmatically.
   x-summary-tr: Gyro bulut sunucularınızı, SSH anahtarlarınızı ve faturalarınızı programla yönetin.
   description: "The Gyro Public API lets you automate everything you do in the Gyro client area:\norder and manage cloud servers, keep SSH keys, read invoices and\
@@ -72,7 +72,9 @@ info:
     \ in-cluster addressing `cluster_dns`, `egress_ips`) and `GET /cloud/containers/{id}/egress-ips` (current egress IPv4 addresses for IP allow lists; dedicated\
     \ = own nodes + shared pool during updates, serverless = shared pool); service detail has `internal` (`<service>.<namespace>.svc.cluster.local:80`), service list\
     \ `internal_address`; egress IP changes are notified (alert event `egress`). Additive.\n\n**2.27.1**: `PUT /cloud/containers/{id}/services/{name}/env` rejects\
-    \ unknown fields and empty changes with 422 `invalid_env` (was: success without change).\n"
+    \ unknown fields and empty changes with 422 `invalid_env` (was: success without change).\n\n**2.28.0**: Gyro Pipeline `build_target` (create / update / get):\
+    \ build a named stage of a multi-stage Dockerfile (`docker build --target`); empty = last stage; unknown stage = run error `build_target_not_found`; also `build_target:`\
+    \ in gyro-pipeline.yml. Additive.\n"
   x-description-tr: "Gyro Public API, müşteri panelinde yaptığınız her işi otomatikleştirmenizi sağlar:\nbulut sunucu siparişi ve yönetimi, SSH anahtarları, fatura\
     \ ve bakiye okuma.\nResmi Terraform sağlayıcısı (`gyro-hosting/gyro`) ve `gyroctl` bu API'yi kullanır.\n\n* **Taban adres** `https://www.gyrohosting.com/api/v1/client`\n\
     * **Kimlik** `Authorization: Bearer wck_...` (anahtarı *Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri* bölümünden oluşturun)\n* **Biçim** JSON\
@@ -139,7 +141,9 @@ info:
     \ adresleme `cluster_dns`, `egress_ips`) ve `GET /cloud/containers/{id}/egress-ips` (IP beyaz listesi için güncel çıkış IPv4 adresleri; ayrılmış = kendi düğümleri\
     \ + güncellemede paylaşımlı havuz, sunucusuz = paylaşımlı havuz); servis ayrıntısında `internal` (`<servis>.<namespace>.svc.cluster.local:80`), servis listesinde\
     \ `internal_address`; çıkış IP değişikliği bildirilir (uyarı olayı `egress`). Geriye uyumlu.\n\n**2.27.1**: `PUT /cloud/containers/{id}/services/{name}/env` bilinmeyen\
-    \ alanı ve boş değişikliği 422 `invalid_env` ile reddeder (önce: değişiklik olmadan başarı).\n"
+    \ alanı ve boş değişikliği 422 `invalid_env` ile reddeder (önce: değişiklik olmadan başarı).\n\n**2.28.0**: Gyro Pipeline `build_target` (oluştur / değiştir /\
+    \ oku): çok aşamalı Dockerfile'ın adı verilen aşamasını derler (`docker build --target`); boş = son aşama; olmayan aşama = çalıştırma hatası `build_target_not_found`;\
+    \ gyro-pipeline.yml'de `build_target:`. Geriye uyumlu.\n"
   contact:
     name: Gyro Hosting
     url: https://www.gyrohosting.com
@@ -3616,7 +3620,7 @@ paths:
                   type: boolean
                 confirm:
                   type: boolean
-                project_id: &id070
+                project_id: &id071
                   type: integer
                   minimum: 0
                   description: 'Optional project for the new service(s) (0 = default project). Checked before the order: unknown id = 404 `project_not_found` (GyroAPI
@@ -10910,51 +10914,61 @@ paths:
                 context: &id054
                   type: string
                   description: Build folder (empty = repository root)
-                targets: &id055
+                build_target: &id055
+                  type: string
+                  pattern: ^[A-Za-z0-9._-]{0,64}$
+                  example: production
+                  description: 'Stage of a multi-stage Dockerfile to build (`FROM node:20 AS production` -> `production`, same as `docker build --target`). Empty
+                    = the last stage. Stage names are case-insensitive (stored lowercase). A stage the Dockerfile does not have fails the run with `build_target_not_found`.
+                    gyro-pipeline.yml: `build_target:` overrides it per run. CLI: `--target` (or `--build-target`).'
+                  x-description-tr: 'Çok aşamalı Dockerfile''da derlenecek aşama (`FROM node:20 AS production` -> `production`, `docker build --target` ile aynı).
+                    Boş = son aşama. Aşama adı büyük/küçük harf duyarsızdır (küçük harfle saklanır). Dockerfile''da olmayan aşama `build_target_not_found` hatasıyla
+                    çalıştırmayı durdurur. gyro-pipeline.yml: `build_target:` çalıştırma için bunu ezer. CLI: `--target` (ya da `--build-target`).'
+                targets: &id056
                   type: array
                   items:
                     type: string
                   description: Services that get the new image (empty = build only)
                   x-description-tr: Yeni imaja geçecek servisler (boş = yalnız derle)
-                approval: &id056
+                approval: &id057
                   type: boolean
                   default: false
                   description: Wait for approval before deploying (24 h)
-                auto_rollback: &id057
+                auto_rollback: &id058
                   type: boolean
                   default: true
                   description: Roll back when the new version is unhealthy
-                build_image: &id058
+                build_image: &id059
                   type: string
                   description: Image that runs `commands` (e.g. node:22-alpine)
-                commands: &id059
+                commands: &id060
                   type: array
                   items:
                     type: string
                   description: Shell commands run in the repository root before the Dockerfile (tests, npm ci ...); build secrets are environment variables here
-                build_env: &id060
+                build_env: &id061
                   type: object
                   additionalProperties:
                     type: string
                   description: Variables for `commands`
-                build_args: &id061
+                build_args: &id062
                   type: object
                   additionalProperties:
                     type: string
                   description: Dockerfile ARG values (visible in the image history)
-                cpu_m: &id062
+                cpu_m: &id063
                   type: integer
                   description: Build CPU (millicores, plan limit)
-                memory_mi: &id063
+                memory_mi: &id064
                   type: integer
                   description: Build memory (MiB, plan limit)
-                timeout_min: &id064
+                timeout_min: &id065
                   type: integer
                   description: Build time limit (minutes, plan limit)
-                verify_min: &id065
+                verify_min: &id066
                   type: integer
                   description: Health wait after deploy (1-30 minutes)
-                notify: &id066
+                notify: &id067
                   type: array
                   items:
                     type: string
@@ -11075,18 +11089,19 @@ paths:
                 image: *id052
                 dockerfile: *id053
                 context: *id054
-                targets: *id055
-                approval: *id056
-                auto_rollback: *id057
-                build_image: *id058
-                commands: *id059
-                build_env: *id060
-                build_args: *id061
-                cpu_m: *id062
-                memory_mi: *id063
-                timeout_min: *id064
-                verify_min: *id065
-                notify: *id066
+                build_target: *id055
+                targets: *id056
+                approval: *id057
+                auto_rollback: *id058
+                build_image: *id059
+                commands: *id060
+                build_env: *id061
+                build_args: *id062
+                cpu_m: *id063
+                memory_mi: *id064
+                timeout_min: *id065
+                verify_min: *id066
+                notify: *id067
                 confirm:
                   type: boolean
       x-cli:
@@ -11966,7 +11981,7 @@ paths:
                   data:
                     type: object
                     properties:
-                      deploy_key: &id092
+                      deploy_key: &id093
                         type: object
                         nullable: true
                         properties:
@@ -12252,7 +12267,7 @@ paths:
                   type: boolean
   /cloud/security-groups:
     get:
-      tags: &id067
+      tags: &id068
       - Security groups
       operationId: listSecurityGroups
       summary: List security groups
@@ -12274,7 +12289,7 @@ paths:
                       $ref: '#/components/schemas/SecurityGroup'
         '401': *id003
     post:
-      tags: *id067
+      tags: *id068
       operationId: createSecurityGroup
       summary: Create a security group
       x-summary-tr: Güvenlik grubu oluştur
@@ -12314,7 +12329,7 @@ paths:
         '422': *id005
   /cloud/security-groups/{sg}:
     parameters:
-    - &id068
+    - &id069
       name: sg
       in: path
       required: true
@@ -12322,7 +12337,7 @@ paths:
         type: string
         pattern: ^sg-[a-f0-9]{8}$
     get:
-      tags: *id067
+      tags: *id068
       operationId: getSecurityGroup
       summary: Get a security group
       x-summary-tr: Güvenlik grubunu getir
@@ -12342,7 +12357,7 @@ paths:
         '401': *id003
         '404': *id004
     patch:
-      tags: *id067
+      tags: *id068
       operationId: updateSecurityGroup
       summary: Rename / describe a security group
       x-summary-tr: Güvenlik grubunun adını / açıklamasını değiştir
@@ -12376,7 +12391,7 @@ paths:
         '404': *id004
         '422': *id005
     delete:
-      tags: *id067
+      tags: *id068
       operationId: deleteSecurityGroup
       summary: Delete a security group
       x-summary-tr: Güvenlik grubunu sil
@@ -12406,9 +12421,9 @@ paths:
         '422': *id005
   /cloud/security-groups/{sg}/rules:
     parameters:
-    - *id068
+    - *id069
     put:
-      tags: *id067
+      tags: *id068
       operationId: putSecurityGroupRules
       summary: Replace the rules of a security group
       x-summary-tr: Güvenlik grubunun kurallarını değiştir
@@ -12463,9 +12478,9 @@ paths:
         '422': *id005
   /cloud/security-groups/{sg}/confirm:
     parameters:
-    - *id068
+    - *id069
     post:
-      tags: *id067
+      tags: *id068
       operationId: confirmSecurityGroup
       summary: Make the running rule trial permanent
       x-summary-tr: Kural denemesini kalıcı yap
@@ -12487,10 +12502,10 @@ paths:
         '422': *id005
   /cloud/servers/{id}/security-groups:
     parameters:
-    - &id069
+    - &id070
       $ref: '#/components/parameters/ServerId'
     get:
-      tags: *id067
+      tags: *id068
       operationId: listServerSecurityGroups
       summary: Security groups attached to a server
       x-summary-tr: Sunucuya bağlı güvenlik grupları
@@ -12512,7 +12527,7 @@ paths:
         '409':
           description: firewall_not_enabled
     put:
-      tags: *id067
+      tags: *id068
       operationId: setServerSecurityGroups
       summary: Set the exact list of attached groups
       x-summary-tr: Bağlı grupları tam liste olarak ayarla
@@ -12554,10 +12569,10 @@ paths:
         '422': *id005
   /cloud/servers/{id}/security-groups/{sg}:
     parameters:
+    - *id070
     - *id069
-    - *id068
     post:
-      tags: *id067
+      tags: *id068
       operationId: attachSecurityGroup
       summary: Attach a security group to a server
       x-summary-tr: Güvenlik grubunu sunucuya bağla
@@ -12580,7 +12595,7 @@ paths:
           description: firewall_not_enabled
         '422': *id005
     delete:
-      tags: *id067
+      tags: *id068
       operationId: detachSecurityGroup
       summary: Detach a security group from a server
       x-summary-tr: Güvenlik grubunu sunucudan ayır
@@ -17189,7 +17204,7 @@ paths:
                 card_id:
                   type: integer
                   description: Çekilecek kartın numarası. Verilmezse hesabın varsayılan kartı çekilir.
-                project_id: *id070
+                project_id: *id071
               required:
               - cycle
               - items
@@ -18908,8 +18923,8 @@ paths:
         / legal hold versions and the latest end date). Protected Storage only: a standard Object Storage service answers 409 `feature_not_available`.'
       x-description-tr: 'Kilitli kova hakkı (Nesne Kilidi ek hizmeti) ve kullanımı, kovaların varsayılan saklaması ve son kilit taraması (COMPLIANCE / GOVERNANCE
         / legal hold sürüm sayısı, en geç bitiş). Yalnız Korumalı Depolama: standart Nesne Depolama hizmeti 409 `feature_not_available` döner.'
-      parameters: &id071
-      - &id072
+      parameters: &id072
+      - &id073
         name: id
         in: path
         required: true
@@ -18949,7 +18964,7 @@ paths:
         confirm: false
       description: 'Counts locked versions in every locked bucket (up to 25 s / 5000 versions; `complete: false` when cut short).'
       x-description-tr: 'Kilitli kovalardaki kilitli sürümleri sayar (en çok 25 sn / 5000 sürüm; yarım kalırsa `complete: false`).'
-      parameters: *id071
+      parameters: *id072
       responses:
         '202':
           description: OK
@@ -18991,8 +19006,8 @@ paths:
       x-description-tr: Bir klasördeki sürümler ve silme işaretleri (sayfa 50, ayraç `/`; alt klasörler `folders`). `truncated` true iken önceki sayfanın `key_marker`
         + `version_id_marker` değerleriyle devam edin. Kilitli kovalarda her sürümde `lock_mode`, `retain_until`, `legal_hold` bulunur.
       parameters:
-      - *id072
-      - &id073
+      - *id073
+      - &id074
         name: bucket
         in: path
         required: true
@@ -19052,8 +19067,8 @@ paths:
       x-description-tr: Bir sürümü ya da silme işaretini kalıcı siler (geri alınamaz). GOVERNANCE / COMPLIANCE saklamasında ya da legal hold'daki sürüm bitiş tarihiyle
         reddedilir. `confirm=true` gerekir.
       parameters:
-      - *id072
       - *id073
+      - *id074
       - name: key
         in: query
         required: true
@@ -19115,9 +19130,9 @@ paths:
         confirm: false
       description: Copies the version as the new current version (the old one stays). Max 5 GB; delete markers cannot be restored (use undelete).
       x-description-tr: Sürümü yeni güncel sürüm olarak kopyalar (eskisi durur). En çok 5 GB; silme işareti geri yüklenmez (undelete kullanın).
-      parameters: &id074
-      - *id072
+      parameters: &id075
       - *id073
+      - *id074
       responses:
         '202':
           description: OK
@@ -19156,7 +19171,7 @@ paths:
           application/json:
             schema:
               type: object
-              properties: &id075
+              properties: &id076
                 key:
                   type: string
                   description: Object key
@@ -19179,7 +19194,7 @@ paths:
         confirm: false
       description: Removes the latest delete marker of the key, so the previous version becomes current again. `version_id` must be that delete marker.
       x-description-tr: Anahtarın en güncel silme işaretini kaldırır; önceki sürüm yeniden güncel olur. `version_id` o silme işareti olmalıdır.
-      parameters: *id074
+      parameters: *id075
       responses:
         '202':
           description: OK
@@ -19215,7 +19230,7 @@ paths:
           application/json:
             schema:
               type: object
-              properties: *id075
+              properties: *id076
               required:
               - key
               - version_id
@@ -19232,7 +19247,7 @@ paths:
         confirm: false
       description: '`object_lock` (set at creation, cannot change) and `default_retention` (null = none): new objects get this retention automatically.'
       x-description-tr: '`object_lock` (açılışta seçilir, değişmez) ve `default_retention` (null = yok): yeni nesneler bu saklamayı kendiliğinden alır.'
-      parameters: *id074
+      parameters: *id075
       responses:
         '200':
           description: OK
@@ -19269,7 +19284,7 @@ paths:
       x-description-tr: 'Yalnız kilitli kovalar. `mode` GOVERNANCE ya da COMPLIANCE ve `days` 1-3650, ya da OFF (yeni nesnelere otomatik saklama yok; mevcut kilitler
         sürer). GOVERNANCE: yalnız Gyro personeli talep üzerine aşabilir. COMPLIANCE kilidi süresi dolana kadar kimse (Gyro dahil) kısaltamaz, GOVERNANCE''a çeviremez,
         kaldıramaz; veri saklanır ve iptalde bile süre sonuna kadar ücret sürer. `"confirm": true` ve `"acknowledge": "COMPLIANCE"` gönderin.'
-      parameters: *id074
+      parameters: *id075
       responses:
         '202':
           description: OK
@@ -19332,8 +19347,8 @@ paths:
       description: Lock mode, end date and legal hold of one version (`version_id` empty = current version).
       x-description-tr: Bir sürümün kilit kipi, bitiş tarihi ve legal hold durumu (`version_id` boş = güncel sürüm).
       parameters:
-      - *id072
       - *id073
+      - *id074
       - name: key
         in: query
         required: true
@@ -19382,7 +19397,7 @@ paths:
       x-description-tr: 'Bir sürümün saklamasını şimdiden itibaren `days` (1-3650) gün olarak koyar ya da uzatır (`version_id` boş = güncel). Saklama yalnız uzatılabilir;
         COMPLIANCE GOVERNANCE''a çevrilemez. COMPLIANCE kilidi süresi dolana kadar kimse (Gyro dahil) kısaltamaz, GOVERNANCE''a çeviremez, kaldıramaz; veri saklanır
         ve iptalde bile süre sonuna kadar ücret sürer. `"confirm": true` ve `"acknowledge": "COMPLIANCE"` gönderin.'
-      parameters: *id074
+      parameters: *id075
       responses:
         '202':
           description: OK
@@ -19450,8 +19465,8 @@ paths:
       description: '`legal_hold` true = the version cannot be deleted until the hold is removed (no end date).'
       x-description-tr: '`legal_hold` true = kaldırılana kadar sürüm silinemez (bitiş tarihi yok).'
       parameters:
-      - *id072
       - *id073
+      - *id074
       - name: key
         in: query
         required: true
@@ -19505,7 +19520,7 @@ paths:
         confirm: false
       description: '`status` on / off (locked buckets only). A legal hold blocks deletion with no end date, independent of retention; you can remove it yourself.'
       x-description-tr: '`status` on / off (yalnız kilitli kovalar). Legal hold, saklamadan bağımsız ve bitiş tarihsiz silmeyi engeller; kendiniz kaldırabilirsiniz.'
-      parameters: *id074
+      parameters: *id075
       responses:
         '202':
           description: OK
@@ -19568,7 +19583,7 @@ paths:
         confirm: false
       description: 'Days after which non-current versions are deleted (new buckets: 30). 0 / null = kept until you delete them (they count toward the quota).'
       x-description-tr: Eski (güncel olmayan) sürümlerin kaç gün sonra silineceği (yeni kovalarda 30). 0 / null = siz silene kadar durur (kotadan düşer).
-      parameters: *id074
+      parameters: *id075
       responses:
         '200':
           description: OK
@@ -19602,7 +19617,7 @@ paths:
       description: '`days` 1-3650, or 0 to keep old versions. Locked versions are deleted only after their retention ends. Other lifecycle rules of the bucket are
         kept.'
       x-description-tr: '`days` 1-3650 ya da 0 (eski sürümler durur). Kilitli sürümler saklaması bitince silinir. Kovanın diğer yaşam döngüsü kuralları korunur.'
-      parameters: *id074
+      parameters: *id075
       responses:
         '202':
           description: OK
@@ -19695,7 +19710,7 @@ paths:
       description: Another account's template answers 404.
       x-description-tr: Başka hesabın şablonu 404 döner.
       parameters:
-      - &id076
+      - &id077
         name: id
         in: path
         required: true
@@ -19734,7 +19749,7 @@ paths:
       description: Name 1-60 characters (letters, digits, space . _ -).
       x-description-tr: Ad 1-60 karakter (harf, rakam, boşluk . _ -).
       parameters:
-      - *id076
+      - *id077
       responses:
         '200':
           description: OK
@@ -19782,7 +19797,7 @@ paths:
       description: Permanent. Servers created from it are not affected; the charge stops from the next hour.
       x-description-tr: Kalıcıdır. Şablondan açılmış sunucular etkilenmez; ücret sonraki saatten durur.
       parameters:
-      - *id076
+      - *id077
       responses:
         '202':
           description: OK
@@ -19897,7 +19912,7 @@ paths:
       x-description-tr: 'Şablondan kurulan normal ön ödemeli tr-ist-1 siparişi (24 saat bakiye kuralı, hesap sınırları). `product_id` (ya da `plan`) GET /cloud/products?region=tr-ist-1''den;
         diski şablonun `min_disk_gb` değerinden küçük olamaz. `"confirm": true` ve `Idempotency-Key` başlığı gerekir (teklif için `dry_run`).'
       parameters:
-      - *id076
+      - *id077
       responses:
         '202':
           description: OK
@@ -19946,7 +19961,7 @@ paths:
                   type: boolean
                 dry_run:
                   type: boolean
-                project_id: *id070
+                project_id: *id071
               required: []
   /cloud/templates/{id}/rebuild:
     post:
@@ -19964,7 +19979,7 @@ paths:
       x-description-tr: 'tr-ist-1 sunucunuzun kök diskini şablonla değiştirir (disk en az `min_disk_gb` olmalı); sunucunun SSH anahtarları yeniden kurulur, yeni root
         parolası döner (Idempotency-Key gönderilirse dönmez). `"confirm": true` gerekir.'
       parameters:
-      - *id076
+      - *id077
       responses:
         '202':
           description: OK
@@ -20035,7 +20050,7 @@ paths:
         çıkarıldığı saate kadar. Sunucu başına en çok `max` (varsayılan 5). Adres sunucuya otomatik tanımlanır (birincil arayüze /32, yeniden başlatma ve yeniden
         kurulumda korunur); ters DNS: PUT /cloud/servers/{id}/rdns. '
       parameters:
-      - &id077
+      - &id078
         name: id
         in: path
         required: true
@@ -20089,7 +20104,7 @@ paths:
         çıkarıldığı saate kadar. Sunucu başına en çok `max` (varsayılan 5). Adres sunucuya otomatik tanımlanır (birincil arayüze /32, yeniden başlatma ve yeniden
         kurulumda korunur); ters DNS: PUT /cloud/servers/{id}/rdns. Yalnız ön ödemeli tr-ist-1 sunucuları; askıdayken eklenemez.'
       parameters:
-      - *id077
+      - *id078
       requestBody:
         required: false
         content:
@@ -20147,7 +20162,7 @@ paths:
         düşülür; aynı adresi yeniden almak yeni bir asgari süre başlatır. Bir sunucuya 60 dakikada en çok `adds_per_hour` (varsayılan 10) adres eklenebilir. Adres
         sunucudan kaldırılır ve havuza döner (aynı adresi geri alma garantisi yok); ücret bırakınca durur (asgari süre yine uygulanır). `confirm=true` gerekir.'
       parameters:
-      - *id077
+      - *id078
       - name: ip
         in: path
         required: true
@@ -20237,7 +20252,7 @@ paths:
         bağlantıyla birlikte silinir. Gyro Bulut İstanbul (tr-ist-1) sunucularında otomatik uygulanır (`automatic: true`); diğer sunucularda `install_command` bir
         kez çalıştırılır. Ücretsizdir; S3 trafiği depolama hizmetinden sayılır. Korumalı Depolama kovaları: varsayılan salt okuma (2.20.0).'
       parameters:
-      - &id078
+      - &id079
         name: id
         in: path
         required: true
@@ -20293,7 +20308,7 @@ paths:
         kez çalıştırılır. Ücretsizdir; S3 trafiği depolama hizmetinden sayılır.  Yanıtta `install_command` döner (tek kullanımlık, 60 dakika). **Korumalı Depolama
         (2.20.0):** desteklenir; `read_only: false` ve `accept_versioning: true` verilmedikçe salt okuma bağlanır.'
       parameters:
-      - *id078
+      - *id079
       requestBody:
         required: true
         content:
@@ -20361,8 +20376,8 @@ paths:
       x-cli:
         command: server storage-mount get
       parameters:
-      - *id078
-      - &id079
+      - *id079
+      - &id080
         name: mid
         in: path
         required: true
@@ -20411,8 +20426,8 @@ paths:
       x-description-tr: Bağlantı anahtarı hemen silinir (sunucu kovaya erişemez; kovadaki dosyalar silinmez). tr-ist-1 sunucularında birim otomatik kaldırılır; diğerlerinde
         `remove_command` çalıştırın.
       parameters:
-      - *id078
       - *id079
+      - *id080
       responses:
         '202':
           description: OK
@@ -20455,8 +20470,8 @@ paths:
       x-description-tr: Bağlantı için yeni erişim anahtarı ve yeni tek kullanımlık komut üretir (eski anahtar hemen durur). Sunucu yeniden kurulduğunda ya da komutun
         süresi dolduğunda kullanın.
       parameters:
-      - *id078
       - *id079
+      - *id080
       responses:
         '202':
           description: OK
@@ -20506,9 +20521,9 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Project'
-        '401': &id080
+        '401': &id081
           $ref: '#/components/responses/Unauthorized'
-        '403': &id081
+        '403': &id082
           $ref: '#/components/responses/Forbidden'
       x-cli:
         command: project list
@@ -20550,16 +20565,16 @@ paths:
           description: name_taken / project_limit
         '422':
           description: Validation error
-        '401': *id080
-        '403': *id081
-        '404': &id082
+        '401': *id081
+        '403': *id082
+        '404': &id083
           $ref: '#/components/responses/NotFound'
-        '429': &id083
+        '429': &id084
           $ref: '#/components/responses/RateLimited'
       x-cli:
         command: project create
   /cloud/projects/{id}:
-    parameters: &id084
+    parameters: &id085
     - name: id
       in: path
       required: true
@@ -20586,10 +20601,10 @@ paths:
                 properties:
                   data:
                     $ref: '#/components/schemas/Project'
-        '401': *id080
-        '403': *id081
-        '404': *id082
-        '429': *id083
+        '401': *id081
+        '403': *id082
+        '404': *id083
+        '429': *id084
       x-cli:
         command: project get
     patch:
@@ -20621,10 +20636,10 @@ paths:
                     $ref: '#/components/schemas/Project'
         '409':
           description: name_taken / default_project
-        '401': *id080
-        '403': *id081
-        '404': *id082
-        '429': *id083
+        '401': *id081
+        '403': *id082
+        '404': *id083
+        '429': *id084
       x-cli:
         command: project rename
     delete:
@@ -20657,15 +20672,15 @@ paths:
                         type: integer
         '409':
           description: default_project
-        '401': *id080
-        '403': *id081
-        '404': *id082
-        '429': *id083
+        '401': *id081
+        '403': *id082
+        '404': *id083
+        '429': *id084
       x-cli:
         command: project delete
         confirm: true
   /cloud/projects/{id}/services:
-    parameters: *id084
+    parameters: *id085
     post:
       tags:
       - Projects
@@ -20714,10 +20729,10 @@ paths:
                         type: array
                         items:
                           type: integer
-        '401': *id080
-        '403': *id081
-        '404': *id082
-        '429': *id083
+        '401': *id081
+        '403': *id082
+        '404': *id083
+        '429': *id084
       x-cli:
         command: project move
   /cloud/services/{id}/project:
@@ -20761,10 +20776,10 @@ paths:
                     $ref: '#/components/schemas/Service'
         '422':
           description: project_id_required / invalid_project_id
-        '401': *id080
-        '403': *id081
-        '404': *id082
-        '429': *id083
+        '401': *id081
+        '403': *id082
+        '404': *id083
+        '429': *id084
       x-cli:
         command: service project set
   /cloud/servers/{id}/disks:
@@ -20786,7 +20801,7 @@ paths:
         saat. Sunucu başına en çok 4 disk ve sınıf başına `classes.<sınıf>.max_gb` GB; boyutlar `step_gb` katları. Yeni disk boştur (sunucu içinde bölümlendirip biçimlendirin
         ve bağlayın). Yeniden kurulum ek diskleri siler. '
       parameters:
-      - *id077
+      - *id078
       responses:
         '200':
           description: OK
@@ -20832,7 +20847,7 @@ paths:
         saat. Sunucu başına en çok 4 disk ve sınıf başına `classes.<sınıf>.max_gb` GB; boyutlar `step_gb` katları. Yeni disk boştur (sunucu içinde bölümlendirip biçimlendirin
         ve bağlayın). Yeniden kurulum ek diskleri siler. Yalnız ön ödemeli tr-ist-1 sunucuları; askıdayken eklenemez.'
       parameters:
-      - *id077
+      - *id078
       requestBody:
         required: true
         content:
@@ -20894,8 +20909,8 @@ paths:
       description: Grows the disk to `size_gb` (never shrinks; not while snapshots exist). Extend the partition / file system inside the server afterwards.
       x-description-tr: Diski `size_gb` boyutuna büyütür (küçültmez; snapshot varken olmaz). Sonra sunucu içinde bölümü / dosya sistemini genişletin.
       parameters:
-      - *id077
-      - &id085
+      - *id078
+      - &id086
         name: disk
         in: path
         required: true
@@ -20955,8 +20970,8 @@ paths:
       description: Detaches and deletes the disk with all its data (cannot be undone); billing stops after the current hour (minimum hours apply). Needs `confirm=true`.
       x-description-tr: Diski tüm verisiyle siler (geri alınamaz); ücret içinde bulunulan saatten sonra durur (asgari süre geçerli). `confirm=true` gerekir.
       parameters:
-      - *id077
-      - *id085
+      - *id078
+      - *id086
       - name: confirm
         in: query
         required: true
@@ -21331,7 +21346,7 @@ paths:
       description: Service row plus `storage` (plan, kind, limits, S3 endpoint, region).
       x-description-tr: Hizmet satırı ve `storage` (paket, tür, sınırlar, S3 uç noktası, bölge).
       parameters:
-      - &id086
+      - &id087
         name: id
         in: path
         required: true
@@ -21360,7 +21375,7 @@ paths:
         tüm kovalar ve nesneler dakikalar içinde kalıcı olarak silinir (geri alınamaz; Korumalı Depolama''da COMPLIANCE kilidi ya da legal hold altındaki sürümler
         kilit bitene kadar kalır ve ücretlenir). `immediate` olmadan iptal talebi açılır, işlenene kadar hizmet çalışır.'
       parameters:
-      - *id086
+      - *id087
       - name: confirm
         in: query
         required: true
@@ -21995,7 +22010,7 @@ components:
         end_customer_id:
           type: integer
           description: 'Reseller main key: assign the new server to this end-customer'
-        project_id: *id070
+        project_id: *id071
         quantity:
           type: integer
           minimum: 1
@@ -23748,10 +23763,10 @@ components:
           example: EUR
         vcpu_hour_eur:
           type: number
-          example: 0.0298
+          example: 0.0212
         gb_hour_eur:
           type: number
-          example: 0.0024
+          example: 0.0017
         vcpu_hour_list_eur:
           type: number
         gb_hour_list_eur:
@@ -23875,7 +23890,7 @@ components:
           maxLength: 255
         color:
           type: string
-          enum: &id087
+          enum: &id088
           - gray
           - blue
           - green
@@ -23928,22 +23943,22 @@ components:
       required:
       - name
       properties:
-        name: &id088
+        name: &id089
           type: string
           minLength: 1
           maxLength: 40
           description: 'Letter or digit first; then letters, digits, space and . _ - / + # & ( ). Unique per account (case-insensitive). Reserved: Genel, General,
             Default.'
-        description: &id089
+        description: &id090
           type:
           - string
           - 'null'
           maxLength: 255
-        color: &id090
+        color: &id091
           type: string
-          enum: *id087
+          enum: *id088
           default: blue
-        icon: &id091
+        icon: &id092
           type: string
           enum:
           - folder
@@ -23978,10 +23993,10 @@ components:
     ProjectUpdate:
       type: object
       properties:
-        name: *id088
-        description: *id089
-        color: *id090
-        icon: *id091
+        name: *id089
+        description: *id090
+        color: *id091
+        icon: *id092
     ProjectRef:
       type:
       - object
@@ -24331,7 +24346,7 @@ components:
                   fingerprint:
                     type: string
                     example: SHA256:+DiY3wvvV6TuJJhbpZisF/zLDA0zPMSvHdkr4UvCOqU
-            deploy_key: *id092
+            deploy_key: *id093
         archive:
           type: object
           properties:
@@ -24343,6 +24358,10 @@ components:
             retention_hours:
               type: integer
               example: 24
+        build_target:
+          type: string
+          description: Dockerfile stage that is built (empty = last stage)
+          x-description-tr: Derlenen Dockerfile aşaması (boş = son aşama)
     ContainerPipelineRun:
       type: object
       properties:
@@ -24403,10 +24422,11 @@ components:
           - verify
         error:
           type: string
-          description: 'repo_auth, repo_not_found, repo_unreachable, repo_blocked, ref_not_found, target_missing, clone_failed, commands_failed, build_failed, push_failed,
-            timeout, out_of_memory, no_capacity, build_image_pull, deploy_unhealthy, deploy_timeout, deploy_failed, minutes_exhausted, pipeline_file_invalid, cancelled,
-            rejected, approval_expired, internal, archive_invalid (detail says why: links, ../ paths, device files, > 20 000 files, > 2 GB unpacked, damaged), archive_download,
-            upload_not_found, archive_format, archive_too_large, host_key_unconfirmed, host_key_mismatch, deploy_key_missing'
+          description: 'repo_auth, repo_not_found, repo_unreachable, repo_blocked, ref_not_found, target_missing, clone_failed, commands_failed, build_failed, build_target_not_found
+            (detail = the stage name), invalid_build_target, push_failed, timeout, out_of_memory, no_capacity, build_image_pull, deploy_unhealthy, deploy_timeout,
+            deploy_failed, minutes_exhausted, pipeline_file_invalid, cancelled, rejected, approval_expired, internal, archive_invalid (detail says why: links, ../
+            paths, device files, > 20 000 files, > 2 GB unpacked, damaged), archive_download, upload_not_found, archive_format, archive_too_large, host_key_unconfirmed,
+            host_key_mismatch, deploy_key_missing'
         image:
           type: string
           example: registry.ist.gyrohosting.com/ab12cd/web:1a2b3c4

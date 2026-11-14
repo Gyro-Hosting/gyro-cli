@@ -17,35 +17,36 @@ gyro container pipeline update <ID> <PIPELINE> [flags]
 ### Options
 
 ```
-      --approval                 Wait for approval before deploying (24 h)
-      --auto                     Webhook pushes start runs
-      --auto-rollback            Roll back when the new version is unhealthy
-      --branch string            Push'u derlenen dallar (virgüllü glob, boş = yok)
-      --build-args string        Dockerfile ARG values (visible in the image history) (JSON)
-      --build-env commands       Variables for commands (JSON)
-      --build-image commands     Image that runs commands (e.g. node:22-alpine)
-      --commands strings         Shell commands run in the repository root before the Dockerfile (tests, npm ci ...); build secrets are environment variables here
-      --context string           Build folder (empty = repository root)
-      --cpu-m int                Build CPU (millicores, plan limit)
-      --data string              istek gövdesi JSON, @dosya ya da @- (stdin)
-      --dockerfile string        dockerfile
-      --dry-run                  hiçbir şeyi değiştirmeden teklifi / isteği göster
-      --git-user string          User name for the token (default: x-access-token / oauth2 / git)
-  -h, --help                     help for update
-      --idempotency-key string   tekrar güvenliği anahtarı (para işlemlerinde otomatik)
-      --image string             Ortam deposundaki imaj adı
-      --memory-mi int            Build memory (MiB, plan limit)
-      --name string              Görünen ad (1-48)
-      --notify strings           Notifications (channels: the environment's alert settings)
-      --provider string          provider (github|gitlab|gitea|git|archive)
-      --repo string              https klon adresi (kimlik bilgisi yok) ya da SSH adresi git@sunucu:kurum/depo.git / ssh://kullanici@sunucu[:port]/yol (deploy key gerekir); provider archive için boş
-      --repo-file                Read gyro-pipeline.yml from the repository (GitHub, GitLab, Gitea)
-      --set stringArray          ek gövde alanı anahtar=değer (tekrarlanabilir)
-      --tags string              Derlenen etiketler (glob, ör. v*)
-      --targets strings          Yeni imaja geçecek servisler (boş = yalnız derle)
-      --timeout-min int          Build time limit (minutes, plan limit)
-      --token string             Özel depo için yalnız okuma erişim belirteci (şifreli saklanır, geri dönmez; güncellemede "-" siler)
-      --verify-min int           Health wait after deploy (1-30 minutes)
+      --approval                                  Wait for approval before deploying (24 h)
+      --auto                                      Webhook pushes start runs
+      --auto-rollback                             Roll back when the new version is unhealthy
+      --branch string                             Push'u derlenen dallar (virgüllü glob, boş = yok)
+      --build-args string                         Dockerfile ARG values (visible in the image history) (JSON)
+      --build-env commands                        Variables for commands (JSON)
+      --build-image commands                      Image that runs commands (e.g. node:22-alpine)
+      --build-target FROM node:20 AS production   Çok aşamalı Dockerfile'da derlenecek aşama (FROM node:20 AS production -> `production`, `docker build --target` ile aynı). Boş = son aşama. Aşama adı büyük/küçük harf duyarsızdır (küçük harfle saklanır). Dockerfile'da olmayan aşama `build_target_not_found` hatasıyla çalıştırmayı durdurur. gyro-pipeline.yml: `build_target:` çalıştırma için bunu ezer. CLI: `--target` (ya da `--build-target`).
+      --commands strings                          Shell commands run in the repository root before the Dockerfile (tests, npm ci ...); build secrets are environment variables here
+      --context string                            Build folder (empty = repository root)
+      --cpu-m int                                 Build CPU (millicores, plan limit)
+      --data string                               istek gövdesi JSON, @dosya ya da @- (stdin)
+      --dockerfile string                         dockerfile
+      --dry-run                                   hiçbir şeyi değiştirmeden teklifi / isteği göster
+      --git-user string                           User name for the token (default: x-access-token / oauth2 / git)
+  -h, --help                                      help for update
+      --idempotency-key string                    tekrar güvenliği anahtarı (para işlemlerinde otomatik)
+      --image string                              Ortam deposundaki imaj adı
+      --memory-mi int                             Build memory (MiB, plan limit)
+      --name string                               Görünen ad (1-48)
+      --notify strings                            Notifications (channels: the environment's alert settings)
+      --provider string                           provider (github|gitlab|gitea|git|archive)
+      --repo string                               https klon adresi (kimlik bilgisi yok) ya da SSH adresi git@sunucu:kurum/depo.git / ssh://kullanici@sunucu[:port]/yol (deploy key gerekir); provider archive için boş
+      --repo-file                                 Read gyro-pipeline.yml from the repository (GitHub, GitLab, Gitea)
+      --set stringArray                           ek gövde alanı anahtar=değer (tekrarlanabilir)
+      --tags string                               Derlenen etiketler (glob, ör. v*)
+      --targets strings                           Yeni imaja geçecek servisler (boş = yalnız derle)
+      --timeout-min int                           Build time limit (minutes, plan limit)
+      --token string                              Özel depo için yalnız okuma erişim belirteci (şifreli saklanır, geri dönmez; güncellemede "-" siler)
+      --verify-min int                            Health wait after deploy (1-30 minutes)
 ```
 
 ### Options inherited from parent commands
