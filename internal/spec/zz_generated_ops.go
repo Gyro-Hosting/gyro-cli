@@ -3,7 +3,7 @@
 package spec
 
 // APIVersion is info.version of the spec this table was generated from.
-const APIVersion = "2.24.2"
+const APIVersion = "2.24.3"
 
 // Ops lists every API operation.
 var Ops = []Op{
@@ -2324,14 +2324,14 @@ var Ops = []Op{
 		Summary: "List security groups", SummaryTR: "Güvenlik gruplarını listele",
 		Scope: "cloud_read", Command: []string{"security-group", "list"},
 		HasBody: false, BodyRequired: false, ListResponse: true, Paginated: false, Confirm: false, Money: false, Hidden: false,
-		Columns: []string{"id", "name", "description", "status", "trial_seconds_left", "created_at"},
+		Columns: []string{"id", "name", "description", "status", "trial_seconds_left", "created_at", "trial"},
 	},
 	{ID: "createSecurityGroup", Method: "POST", Path: "/cloud/security-groups", Tag: "Security groups",
 		Summary: "Create a security group", SummaryTR: "Güvenlik grubu oluştur",
 		Desc: "Name unique per account (2-64 characters). Without `rules` the group has one outbound rule (all traffic) and no inbound rule.", DescTR: "Ad hesap içinde benzersiz (2-64 karakter). `rules` verilmezse grupta tek giden kural (tüm trafik) olur, gelen kural olmaz.",
 		Scope: "cloud_write", Command: []string{"security-group", "create"},
 		HasBody: true, BodyRequired: true, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
-		Columns: []string{"id", "name", "description", "status", "trial_seconds_left", "created_at"},
+		Columns: []string{"id", "name", "description", "status", "trial_seconds_left", "created_at", "trial"},
 		Body: []Field{
 			{Name: "name", Type: "string", Items: "", Enum: nil, Default: "", Required: true, Desc: "", DescTR: ""},
 			{Name: "description", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
@@ -2342,7 +2342,7 @@ var Ops = []Op{
 		Summary: "Get a security group", SummaryTR: "Güvenlik grubunu getir",
 		Scope: "cloud_read", Command: []string{"security-group", "get"},
 		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
-		Columns: []string{"id", "name", "description", "status", "trial_seconds_left", "created_at"},
+		Columns: []string{"id", "name", "description", "status", "trial_seconds_left", "created_at", "trial"},
 		Params: []Param{
 			{Name: "sg", In: "path", Type: "string", Items: "", Enum: nil, Default: "", Required: true, Desc: "", DescTR: ""},
 		},
@@ -2352,7 +2352,7 @@ var Ops = []Op{
 		Desc: "Only the display name and description change; the group id and its rules stay.", DescTR: "Yalnız görünen ad ve açıklama değişir; grup kimliği ve kuralları aynı kalır.",
 		Scope: "cloud_write", Command: []string{"security-group", "update"},
 		HasBody: true, BodyRequired: true, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
-		Columns: []string{"id", "name", "description", "status", "trial_seconds_left", "created_at"},
+		Columns: []string{"id", "name", "description", "status", "trial_seconds_left", "created_at", "trial"},
 		Params: []Param{
 			{Name: "sg", In: "path", Type: "string", Items: "", Enum: nil, Default: "", Required: true, Desc: "", DescTR: ""},
 		},
@@ -2375,17 +2375,17 @@ var Ops = []Op{
 		Summary: "Make the running rule trial permanent", SummaryTR: "Kural denemesini kalıcı yap",
 		Scope: "cloud_write", Command: []string{"security-group", "confirm"},
 		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
-		Columns: []string{"id", "name", "description", "status", "trial_seconds_left", "created_at"},
+		Columns: []string{"id", "name", "description", "status", "trial_seconds_left", "created_at", "trial"},
 		Params: []Param{
 			{Name: "sg", In: "path", Type: "string", Items: "", Enum: nil, Default: "", Required: true, Desc: "", DescTR: ""},
 		},
 	},
 	{ID: "putSecurityGroupRules", Method: "PUT", Path: "/cloud/security-groups/{sg}/rules", Tag: "Security groups",
 		Summary: "Replace the rules of a security group", SummaryTR: "Güvenlik grubunun kurallarını değiştir",
-		Desc: "Full replace (inbound + outbound), max 60 rules. Applied to every attached server. If the change could cut SSH/RDP access on an attached server it runs as a 5 minute trial (`trial: true`): confirm with POST .../confirm, otherwise the previous rules return. A server's rules (own + all attached groups) must fit its allowance (422 err_sg_quota).", DescTR: "Tam değiştirme (gelen + giden), en çok 60 kural. Bağlı tüm sunuculara uygulanır. Bağlı bir sunucuda SSH/RDP erişimini kesebilecekse 5 dakikalık deneme olur (`trial: true`): .../confirm ile onaylayın, yoksa önceki kurallar döner. Sunucunun kuralları (kendi + bağlı tüm gruplar) hakkına sığmalı (422 err_sg_quota).",
+		Desc: "Full replace (inbound + outbound), max 60 rules. Applied to every attached server. If the change removes or narrows SSH (22) / RDP (3389) access for any source on an attached server, or cuts the calling address, it runs as a 5 minute trial (`trial: true`, `trial_seconds_left`) - the same rule as the panel, CLI and Terraform: confirm with POST .../confirm, otherwise the previous rules return. A server's rules (own + all attached groups) must fit its allowance (422 err_sg_quota).", DescTR: "Tam değiştirme (gelen + giden), en çok 60 kural. Bağlı tüm sunuculara uygulanır. Bağlı bir sunucuda herhangi bir kaynağın SSH (22) / RDP (3389) erişimini kaldırıyor ya da daraltıyorsa veya çağıran adresi kesiyorsa 5 dakikalık deneme olur (`trial: true`, `trial_seconds_left`) - panel, CLI ve Terraform ile aynı kural: .../confirm ile onaylayın, yoksa önceki kurallar döner. Sunucunun kuralları (kendi + bağlı tüm gruplar) hakkına sığmalı (422 err_sg_quota).",
 		Scope: "cloud_write", Command: []string{"security-group", "rules", "set"},
 		HasBody: true, BodyRequired: true, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
-		Columns: []string{"id", "name", "description", "status", "trial_seconds_left", "created_at"},
+		Columns: []string{"id", "name", "description", "status", "trial_seconds_left", "created_at", "trial"},
 		Params: []Param{
 			{Name: "sg", In: "path", Type: "string", Items: "", Enum: nil, Default: "", Required: true, Desc: "", DescTR: ""},
 		},

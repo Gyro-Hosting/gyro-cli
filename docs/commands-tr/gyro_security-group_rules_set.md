@@ -6,7 +6,7 @@ Güvenlik grubunun kurallarını değiştir
 
 Güvenlik grubunun kurallarını değiştir
 
-Tam değiştirme (gelen + giden), en çok 60 kural. Bağlı tüm sunuculara uygulanır. Bağlı bir sunucuda SSH/RDP erişimini kesebilecekse 5 dakikalık deneme olur (`trial: true`): .../confirm ile onaylayın, yoksa önceki kurallar döner. Sunucunun kuralları (kendi + bağlı tüm gruplar) hakkına sığmalı (422 err_sg_quota).
+Tam değiştirme (gelen + giden), en çok 60 kural. Bağlı tüm sunuculara uygulanır. Bağlı bir sunucuda herhangi bir kaynağın SSH (22) / RDP (3389) erişimini kaldırıyor ya da daraltıyorsa veya çağıran adresi kesiyorsa 5 dakikalık deneme olur (`trial: true`, `trial_seconds_left`) - panel, CLI ve Terraform ile aynı kural: .../confirm ile onaylayın, yoksa önceki kurallar döner. Sunucunun kuralları (kendi + bağlı tüm gruplar) hakkına sığmalı (422 err_sg_quota).
 
 API: PUT /cloud/security-groups/{sg}/rules (operationId putSecurityGroupRules, scope cloud_write)
 

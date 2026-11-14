@@ -2,7 +2,7 @@
 openapi: 3.1.0
 info:
   title: Gyro Public API
-  version: 2.24.2
+  version: 2.24.3
   summary: Manage Gyro cloud servers, SSH keys and billing programmatically.
   x-summary-tr: Gyro bulut sunucularınızı, SSH anahtarlarınızı ve faturalarınızı programla yönetin.
   description: "The Gyro Public API lets you automate everything you do in the Gyro client area:\norder and manage cloud servers, keep SSH keys, read invoices and\
@@ -54,7 +54,10 @@ info:
     \ back); the response carries `rollout`: `seamless` | `brief_interruption`. Service `state` may be `preparing` (the environment's node is being installed) with\
     \ `eta_s`. Serverless: at most 672 charged hours a calendar month; billing estimate default `hours` 672, `billed_hours`. Additive.\n\n**2.24.2**: Serverless containers\
     \ are billed for the full month again: no monthly cap (`capped: false`), billing estimate default `hours` 730 (a full month), `monthly_cap` = 730 hours, `total`\
-    \ = `hours` x hourly; `billed_hours` kept (= `hours`). Replaces the 672-hour serverless ceiling announced in 2.24.1. Capped plans (servers, dedicated nodes) unchanged.\n"
+    \ = `hours` x hourly; `billed_hours` kept (= `hours`). Replaces the 672-hour serverless ceiling announced in 2.24.1. Capped plans (servers, dedicated nodes) unchanged.\n\
+    \n**2.24.3**: Security groups: a rule change that removes or narrows SSH/RDP access for a source on an attached server is a 5 minute trial on every path (API\
+    \ included; before only when the caller's own address was cut); the group object has `trial` and `trial_seconds_left` also while `applying`. Deleting a server\
+    \ removes its group attachments, so the group can be deleted. Group changes are written to each attached server's change log.\n"
   x-description-tr: "Gyro Public API, müşteri panelinde yaptığınız her işi otomatikleştirmenizi sağlar:\nbulut sunucu siparişi ve yönetimi, SSH anahtarları, fatura\
     \ ve bakiye okuma.\nResmi Terraform sağlayıcısı (`gyro-hosting/gyro`) ve `gyroctl` bu API'yi kullanır.\n\n* **Taban adres** `https://www.gyrohosting.com/api/v1/client`\n\
     * **Kimlik** `Authorization: Bearer wck_...` (anahtarı *Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri* bölümünden oluşturun)\n* **Biçim** JSON\
@@ -104,7 +107,10 @@ info:
     \ Servis `state` değeri `preparing` olabilir (ortamın düğümü kuruluyor), `eta_s` ile. Sunucusuz: bir takvim ayında en çok 672 saat ücretlenir; ücret tahmininde\
     \ varsayılan `hours` 672, `billed_hours`. Geriye uyumlu.\n\n**2.24.2**: Sunucusuz kapsayıcılar yeniden tam ay ücretlenir: aylık tavan yok (`capped: false`), ücret\
     \ tahmininde varsayılan `hours` 730 (tam ay), `monthly_cap` = 730 saat, `total` = `hours` x saatlik; `billed_hours` korunur (= `hours`). 2.24.1'deki 672 saatlik\
-    \ Sunucusuz tavanının yerine geçer. Tavanlı planlar (sunucu, ayrılmış düğüm) değişmedi.\n"
+    \ Sunucusuz tavanının yerine geçer. Tavanlı planlar (sunucu, ayrılmış düğüm) değişmedi.\n\n**2.24.3**: Güvenlik grupları: bağlı bir sunucuda bir kaynağın SSH/RDP\
+    \ erişimini kaldıran ya da daraltan kural değişikliği her yoldan (API dahil; önceden yalnız çağıranın kendi adresi kesilince) 5 dakikalık denemedir; grup nesnesinde\
+    \ `trial` ve `trial_seconds_left` `applying` sırasında da dolu. Sunucu silinince grup bağları kalkar, grup silinebilir. Grup değişiklikleri bağlı her sunucunun\
+    \ değişiklik kaydına yazılır.\n"
   contact:
     name: Gyro Hosting
     url: https://www.gyrohosting.com
@@ -12218,12 +12224,13 @@ paths:
       x-scope: cloud_write
       x-cli:
         command: security-group rules set
-      description: 'Full replace (inbound + outbound), max 60 rules. Applied to every attached server. If the change could cut SSH/RDP access on an attached server
-        it runs as a 5 minute trial (`trial: true`): confirm with POST .../confirm, otherwise the previous rules return. A server''s rules (own + all attached groups)
-        must fit its allowance (422 err_sg_quota).'
-      x-description-tr: 'Tam değiştirme (gelen + giden), en çok 60 kural. Bağlı tüm sunuculara uygulanır. Bağlı bir sunucuda SSH/RDP erişimini kesebilecekse 5 dakikalık
-        deneme olur (`trial: true`): .../confirm ile onaylayın, yoksa önceki kurallar döner. Sunucunun kuralları (kendi + bağlı tüm gruplar) hakkına sığmalı (422
-        err_sg_quota).'
+      description: 'Full replace (inbound + outbound), max 60 rules. Applied to every attached server. If the change removes or narrows SSH (22) / RDP (3389) access
+        for any source on an attached server, or cuts the calling address, it runs as a 5 minute trial (`trial: true`, `trial_seconds_left`) - the same rule as the
+        panel, CLI and Terraform: confirm with POST .../confirm, otherwise the previous rules return. A server''s rules (own + all attached groups) must fit its allowance
+        (422 err_sg_quota).'
+      x-description-tr: 'Tam değiştirme (gelen + giden), en çok 60 kural. Bağlı tüm sunuculara uygulanır. Bağlı bir sunucuda herhangi bir kaynağın SSH (22) / RDP
+        (3389) erişimini kaldırıyor ya da daraltıyorsa veya çağıran adresi kesiyorsa 5 dakikalık deneme olur (`trial: true`, `trial_seconds_left`) - panel, CLI ve
+        Terraform ile aynı kural: .../confirm ile onaylayın, yoksa önceki kurallar döner. Sunucunun kuralları (kendi + bağlı tüm gruplar) hakkına sığmalı (422 err_sg_quota).'
       requestBody:
         required: true
         content:
@@ -22644,6 +22651,7 @@ components:
           - trial
         trial_seconds_left:
           type: integer
+          description: Seconds until an unconfirmed trial reverts (also during `applying`), else 0
         rules:
           type: array
           items:
@@ -22655,6 +22663,9 @@ components:
           description: Your servers the group is attached to
         created_at:
           type: string
+        trial:
+          type: boolean
+          description: 'A rule change is running as a 5 minute trial (also while it is still being applied, `status: applying`); confirm with POST .../confirm'
     ServerSecurityGroups:
       type: object
       properties:

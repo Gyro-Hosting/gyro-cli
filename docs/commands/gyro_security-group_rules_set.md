@@ -6,7 +6,7 @@ Replace the rules of a security group
 
 Replace the rules of a security group
 
-Full replace (inbound + outbound), max 60 rules. Applied to every attached server. If the change could cut SSH/RDP access on an attached server it runs as a 5 minute trial (`trial: true`): confirm with POST .../confirm, otherwise the previous rules return. A server's rules (own + all attached groups) must fit its allowance (422 err_sg_quota).
+Full replace (inbound + outbound), max 60 rules. Applied to every attached server. If the change removes or narrows SSH (22) / RDP (3389) access for any source on an attached server, or cuts the calling address, it runs as a 5 minute trial (`trial: true`, `trial_seconds_left`) - the same rule as the panel, CLI and Terraform: confirm with POST .../confirm, otherwise the previous rules return. A server's rules (own + all attached groups) must fit its allowance (422 err_sg_quota).
 
 API: PUT /cloud/security-groups/{sg}/rules (operationId putSecurityGroupRules, scope cloud_write)
 
