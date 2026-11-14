@@ -759,6 +759,7 @@ tr-ist-1'de (İstanbul) en çok 10 --ssh-key ve --user-data oluşturmada cloud-i
 				Hourly float64 `json:"hourly_eur"`
 				Cap    float64 `json:"monthly_cap_eur"`
 			} `json:"prepaid"`
+			LimitExceeded map[string]any `json:"limit_exceeded"` // API 2.26.0: the real order would be refused by an account limit
 		}
 		var wrapped struct {
 			Quote *json.RawMessage `json:"quote"`
@@ -779,8 +780,15 @@ tr-ist-1'de (İstanbul) en çok 10 --ssh-key ve --user-data oluşturmada cloud-i
 			if quote.Prepaid != nil {
 				fmt.Fprintf(a.Err, "  %-12s %.4f EUR / %s (%s %.2f EUR)\n", i18n.S("Prepaid", "Ön ödemeli")+":", quote.Prepaid.Hourly, i18n.S("hour", "saat"), i18n.S("monthly at most", "aylık en çok"), quote.Prepaid.Cap)
 			}
+			if quote.LimitExceeded != nil {
+				e := quoteLimitError(quote.LimitExceeded)
+				fmt.Fprintf(a.Err, "%s %s\n  %s\n", i18n.S("Warning:", "Uyarı:"), e.Message, limitHint(e))
+			}
 			a.Info("%s", i18n.S("Dry run: nothing was ordered.", "Deneme: sipariş verilmedi."))
 			return nil
+		}
+		if quote.LimitExceeded != nil {
+			return quoteLimitError(quote.LimitExceeded) // refuse before asking for confirmation
 		}
 		if !a.Machine() {
 			printQuote(a, prod, img, hostname, quote.Total, quote.Tax, quote.Balance, cycle)

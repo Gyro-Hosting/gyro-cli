@@ -107,6 +107,15 @@ Full list: `gyro api operations` (every endpoint and its command) and [docs/comm
 - Retries with exponential backoff on 429/5xx for safe requests, honouring `Retry-After`.
 - Errors show the API error code, HTTP status and request id. `--debug` logs HTTP traffic with secrets masked.
 
+## Limits
+
+**Account limits are raised with a support ticket.** `gyro limits` lists every limit with its usage (new accounts, first 7 days: 5 Istanbul servers, 1 container environment). A command refused because of a limit prints the limit, the usage and the ready ticket command:
+
+```sh
+gyro limits
+gyro ticket create --department-id 3 --subject "Limit increase: new_account.servers" --message "Requested limit: 10. Reason: ..."
+```
+
 ## Exit codes
 
 0 ok · 1 error · 2 usage · 3 auth (401/403) · 4 not found · 5 conflict (409) · 6 payment · 7 not confirmed · 8 rate limited · 9 `--wait` timeout.

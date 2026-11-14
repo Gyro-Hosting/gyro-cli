@@ -13,7 +13,7 @@ gyro-ticket-create - Create ticket
 Create ticket
 
 .PP
-Create ticket. Support ticket of the calling account. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/destek-isteme).
+Create ticket. Support ticket of the calling account. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/destek-isteme). \fBLimit increase\fP: account limits (GET /cloud/account/limits) are raised through a ticket: department_id 3, subject \fBLimit increase: <limit_key>\fR, message with the requested number and what you are building. CLI: \fBgyro ticket create --department-id 3 --subject ... --message ...\fR\&.
 
 .PP
 API: POST /tickets (operationId coreCreateTicket, scope Tickets/CreateTicket)

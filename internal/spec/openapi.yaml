@@ -2,7 +2,7 @@
 openapi: 3.1.0
 info:
   title: Gyro Public API
-  version: 2.25.0
+  version: 2.26.0
   summary: Manage Gyro cloud servers, SSH keys and billing programmatically.
   x-summary-tr: Gyro bulut sunucularınızı, SSH anahtarlarınızı ve faturalarınızı programla yönetin.
   description: "The Gyro Public API lets you automate everything you do in the Gyro client area:\norder and manage cloud servers, keep SSH keys, read invoices and\
@@ -63,7 +63,12 @@ info:
     \ `state: none` when no key was given) instead of null.\n\n**2.25.0**: Object Storage and Protected Storage can be ordered through the API: `GET /cloud/storage/plans`,\
     \ `POST /cloud/storage` (plan, cycle, quantity, extra_traffic, object_lock_buckets, name/tags/project_id; paid from the balance), `GET /cloud/storage`, `GET|DELETE\
     \ /cloud/storage/{id}`. Plan change: documented data safety, `data_preserved`/`disk`/`restart` in the answer, resize-options marks smaller-disk plans `allowed:\
-    \ false` and a smaller disk is refused with 409 `disk_shrink` already in `dry_run`; clearer `recreate_required` message. Additive.\n"
+    \ false` and a smaller disk is refused with 409 `disk_shrink` already in `dry_run`; clearer `recreate_required` message. Additive.\n\n**Limits**: every account\
+    \ limit and its usage is listed by `GET /cloud/account/limits` (`gyro limits`). **Account limits are raised with a support ticket** (`POST /api/v1/client/tickets`,\
+    \ `gyro ticket create`). Every refusal caused by a limit carries `error.details.limit_exceeded: true`, `limit_key`, `limit`, `current`, `how_to_increase` and\
+    \ a ready `support_ticket` request.\n\n**2.26.0**: `GET /cloud/account/limits`; structured limit hint in limit errors (new-account limit of the prepaid cloud\
+    \ now answers `limit_exceeded` instead of `checkout_blocked`, original code in `details.reason`); dry-run quotes of servers, container environments and templates\
+    \ show `quote.limit_exceeded`; new-account limit raised to 5 servers. Additive.\n"
   x-description-tr: "Gyro Public API, müşteri panelinde yaptığınız her işi otomatikleştirmenizi sağlar:\nbulut sunucu siparişi ve yönetimi, SSH anahtarları, fatura\
     \ ve bakiye okuma.\nResmi Terraform sağlayıcısı (`gyro-hosting/gyro`) ve `gyroctl` bu API'yi kullanır.\n\n* **Taban adres** `https://www.gyrohosting.com/api/v1/client`\n\
     * **Kimlik** `Authorization: Bearer wck_...` (anahtarı *Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri* bölümünden oluşturun)\n* **Biçim** JSON\
@@ -122,7 +127,11 @@ info:
     \ Korumalı Depolama API'den sipariş edilebilir: `GET /cloud/storage/plans`, `POST /cloud/storage` (plan, cycle, quantity, extra_traffic, object_lock_buckets,\
     \ name/tags/project_id; bakiyeden ödenir), `GET /cloud/storage`, `GET|DELETE /cloud/storage/{id}`. Plan değişikliği: veri güvencesi belgelendi, yanıtta `data_preserved`/`disk`/`restart`,\
     \ resize-options daha küçük diskli planları `allowed: false` gösterir ve küçük disk `dry_run`'da da 409 `disk_shrink` ile reddedilir; `recreate_required` mesajı\
-    \ netleşti. Geriye uyumlu.\n"
+    \ netleşti. Geriye uyumlu.\n\n**Sınırlar**: hesabın tüm sınırları ve kullanımı `GET /cloud/account/limits` (`gyro limits`) ile listelenir. **Hesap sınırları destek\
+    \ talebiyle artırılır** (`POST /api/v1/client/tickets`, `gyro ticket create`). Sınır kaynaklı her ret `error.details.limit_exceeded: true`, `limit_key`, `limit`,\
+    \ `current`, `how_to_increase` ve hazır `support_ticket` isteğini taşır.\n\n**2.26.0**: `GET /cloud/account/limits`; sınır hatalarında yapılandırılmış ipucu (ön\
+    \ ödemeli bulutun yeni hesap sınırı artık `checkout_blocked` yerine `limit_exceeded`, eski kod `details.reason`); sunucu, kapsayıcı ortamı ve şablon dry-run tekliflerinde\
+    \ `quote.limit_exceeded`; yeni hesap sınırı 5 sunucu. Geriye uyumlu.\n"
   contact:
     name: Gyro Hosting
     url: https://www.gyrohosting.com
@@ -269,6 +278,9 @@ tags:
     in the default project (id 0). Invoices are not split by project.
   x-description-tr: Hizmetlerinizi projelere ayırın (iş, müşteri ya da ortam başına). Her hizmet tek bir projededir; atanmamış hizmetler varsayılan projededir (id
     0). Faturalar projeye göre bölünmez.
+- name: Account limits
+  description: 'Every limit of your account and its current usage in one place. Limits are raised on request: open a support ticket.'
+  x-description-tr: 'Hesabınızın tüm sınırları ve şu anki kullanım tek yerde. Sınırlar talep üzerine artırılır: destek talebi açın.'
 paths:
   /whoami:
     get:
@@ -648,8 +660,10 @@ paths:
         Provisioning is asynchronous (typically under a minute): poll `GET /cloud/servers/{id}` until\n`status` is `active` and `live.power_state` is `running`.\n\
         \n**Prepaid products** (`billing: prepaid`, e.g. tr-ist-1): `cycle` is ignored; the order total is 0 and usage is charged hourly from the balance (at most\
         \ the monthly price per month). The balance must cover the first 24 hours, otherwise 422 with the amount to top up (GET /cloud/billing/topup-url). During\
-        \ the first 7 days a new account may run at most 2 prepaid servers and 1 container environment.\n\n**Batch (2.21.0):** `quantity` creates N servers in one\
-        \ order (one invoice), each a separate service; `name` (with `{n}`) and `tags` label them. `app` installs a one-click app on each."
+        \ the first 7 days a new account may run at most 5 prepaid servers and 1 container environment (raised by a support ticket; see GET /cloud/account/limits).\
+        \ Over the limit: 422 `limit_exceeded` with `details.how_to_increase`; a `dry_run` quote shows the same as `quote.limit_exceeded`.\n\n**Batch (2.21.0):**\
+        \ `quantity` creates N servers in one order (one invoice), each a separate service; `name` (with `{n}`) and `tags` label them. `app` installs a one-click\
+        \ app on each."
       x-description-tr: "Sipariş oluşturur ve **hesap bakiyenizden** öder (kayıtlı karttan asla çekmez).\nGüvenlik kuralları:\n* önce `\"dry_run\": true` ile fiyat\
         \ teklifi alın; hiçbir şey oluşturulmaz;\n* gerçek sipariş için `\"confirm\": true` **ve** `Idempotency-Key` başlığı zorunludur — aynı anahtar ve\n  gövdeyle\
         \ tekrar denemek ikinci sipariş yerine ilk yanıtı döndürür (`Idempotency-Replayed: true`);\n* yönetici hesap başına sunucu sınırı koyabilir (`409 server_limit`).\n\
@@ -709,7 +723,12 @@ paths:
         '409':
           $ref: '#/components/responses/Conflict'
         '422':
-          $ref: '#/components/responses/Validation'
+          description: confirm_required | limit_exceeded (new-account limit of the prepaid cloud; details = LimitHint, raise it with a support ticket) | validation
+            errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
       x-cli: {}
   /cloud/servers/{id}:
     parameters:
@@ -17501,8 +17520,16 @@ paths:
       description: 'Create ticket. Support ticket of the calling account.
 
 
-        Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/destek-isteme).'
-      x-description-tr: Yeni bir destek talebi açar. — ek kabul eder
+        Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/destek-isteme).
+
+
+        **Limit increase**: account limits (GET /cloud/account/limits) are raised through a ticket: department_id 3, subject `Limit increase: <limit_key>`, message
+        with the requested number and what you are building. CLI: `gyro ticket create --department-id 3 --subject ... --message ...`.'
+      x-description-tr: 'Yeni bir destek talebi açar. — ek kabul eder
+
+
+        **Sınır artırma**: hesap sınırları (GET /cloud/account/limits) talep ile artırılır: department_id 3, konu `Limit increase: <limit_key>`, mesajda istenen sayı
+        ve ne yaptığınız. CLI: `gyro ticket create --department-id 3 --subject ... --message ...`.'
       responses:
         '200':
           description: Success
@@ -19786,7 +19813,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         '422':
-          $ref: '#/components/responses/Validation'
+          description: confirm_required | limit_exceeded (new-account limit of the prepaid cloud; details = LimitHint, raise it with a support ticket) | validation
+            errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
       requestBody:
         required: false
         content:
@@ -20985,7 +21017,12 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
         '422':
-          $ref: '#/components/responses/Validation'
+          description: confirm_required | limit_exceeded (new-account limit of the prepaid cloud; details = LimitHint, raise it with a support ticket) | validation
+            errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /cloud/storage/plans:
     get:
       tags:
@@ -21236,6 +21273,103 @@ paths:
           $ref: '#/components/responses/NotFound'
         '422':
           $ref: '#/components/responses/Validation'
+  /cloud/account/limits:
+    get:
+      tags:
+      - Account limits
+      operationId: getAccountLimits
+      summary: Account limits and usage
+      x-summary-tr: Hesap sınırları ve kullanım
+      x-scope: cloud_read
+      x-cli:
+        command: limits
+      description: 'Every limit that applies to your account with the current usage: the new-account limit of the prepaid cloud (first 7 days: 5 Gyro Cloud Istanbul
+        servers and 1 container environment), Gyro Cloud Istanbul servers, templates, additional IPv4 / disks per server, API order caps (servers, batch size, paid
+        operations per day), API keys, SSH keys, webhooks, firewall rules and security groups, storage buckets and keys, DNS zones, container plan limits, Gyro Pipeline,
+        uptime monitors and projects. **Limits are raised on request: open a support ticket** (`POST /api/v1/client/tickets` with `department_id` 3, or `gyro ticket
+        create`); `how_to_increase.support_ticket` is a ready request. Plan limits also grow with a bigger plan or an add-on. Answers are cached for 60 seconds (`fresh=1`
+        reads again). Every refusal caused by a limit carries the same hint in `error.details` (schema LimitHint).'
+      x-description-tr: 'Hesabınıza uygulanan tüm sınırlar ve şu anki kullanım: ön ödemeli bulutta yeni hesap sınırı (ilk 7 gün: 5 Gyro Bulut İstanbul sunucusu ve
+        1 kapsayıcı ortamı), Gyro Bulut İstanbul sunucuları, şablonlar, sunucu başına ek IPv4 / disk, API sipariş sınırları (sunucu, toplu adet, günlük ücretli işlem),
+        API anahtarları, SSH anahtarları, webhook''lar, güvenlik duvarı kuralları ve güvenlik grupları, depolama kovaları ve anahtarları, DNS zone''ları, kapsayıcı
+        paket sınırları, Gyro Pipeline, uptime izleyicileri ve projeler. **Sınırlar talep üzerine artırılır: destek talebi açın** (`POST /api/v1/client/tickets`,
+        `department_id` 3 ya da `gyro ticket create`); `how_to_increase.support_ticket` hazır istektir. Paket sınırları paketi yükselterek ya da ek hizmetle de büyür.
+        Yanıt 60 sn önbelleklidir (`fresh=1` yeniden okur). Sınır kaynaklı her ret `error.details` içinde aynı ipucunu taşır (LimitHint).'
+      parameters:
+      - name: fresh
+        in: query
+        schema:
+          type: boolean
+        description: bypass the 60 second cache
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      account_id:
+                        type: integer
+                      how_to_increase:
+                        type: object
+                        properties:
+                          summary:
+                            type: string
+                          summary_tr:
+                            type: string
+                          support_ticket:
+                            type: object
+                      new_account:
+                        type:
+                        - object
+                        - 'null'
+                        description: prepaid cloud new-account limit (null = not offered)
+                        properties:
+                          applies:
+                            type: boolean
+                            description: true while the account is in its first period_days days
+                          unlimited:
+                            type: boolean
+                          custom:
+                            type: boolean
+                          period_days:
+                            type: integer
+                            example: 7
+                          account_age_days:
+                            type:
+                            - number
+                            - 'null'
+                          ends_at:
+                            type:
+                            - string
+                            - 'null'
+                            description: Europe/Istanbul
+                          servers:
+                            type: object
+                            properties:
+                              limit:
+                                type: integer
+                                example: 5
+                              used:
+                                type: integer
+                          container_environments:
+                            type: object
+                            properties:
+                              limit:
+                                type: integer
+                                example: 1
+                              used:
+                                type: integer
+                      limits:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/AccountLimit'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
 components:
   securitySchemes:
     bearerAuth:
@@ -21352,6 +21486,9 @@ components:
             details:
               type: object
               additionalProperties: true
+              description: 'Extra data. Limit refusals add the LimitHint fields (`limit_exceeded: true`, `limit_key`, `limit`, `current`, `how_to_increase`, `support_ticket`,
+                `hint`): account limits are raised with a support ticket.'
+              x-description-tr: 'Ek veri. Sınır retlerinde LimitHint alanları gelir: hesap sınırları destek talebiyle artırılır.'
     PageMeta:
       type: object
       properties:
@@ -24320,3 +24457,140 @@ components:
               - object
               - 'null'
               description: 'protected plans: price per locked bucket per cycle (min 1, max 50)'
+    LimitHint:
+      type: object
+      description: Present in `error.details` of every refusal caused by a limit (and in dry-run quotes as `quote.limit_exceeded`).
+      x-description-tr: Sınır kaynaklı her retin `error.details` alanında (ve dry-run teklifinde `quote.limit_exceeded`) bulunur.
+      properties:
+        limit_exceeded:
+          type: boolean
+          const: true
+        limit_key:
+          type:
+          - string
+          - 'null'
+          example: new_account.servers
+          description: limit name as listed by GET /cloud/account/limits (null = module limit without a registry name)
+        limit:
+          type:
+          - integer
+          - 'null'
+          description: current limit
+        current:
+          type:
+          - integer
+          - 'null'
+          description: current usage
+        how_to_increase:
+          type: string
+          enum:
+          - open_support_ticket
+          - upgrade_plan
+          - wait
+          description: open_support_ticket = raised on request; upgrade_plan = a bigger plan or an add-on; wait = short rate limit, retry later
+        support_ticket:
+          type: object
+          description: ready-to-send ticket request (fill in <N> and the reason)
+          properties:
+            endpoint:
+              type: string
+              example: POST /api/v1/client/tickets
+            body:
+              type: object
+              properties:
+                department_id:
+                  type: integer
+                subject:
+                  type: string
+                message:
+                  type: string
+            cli:
+              type: string
+              example: 'gyro ticket create --department-id 3 --subject "Limit increase: new_account.servers" --message "..."'
+            departments:
+              type: string
+            scope:
+              type: string
+              example: Tickets/CreateTicket
+        limits_endpoint:
+          type: string
+          example: GET /api/v1/client/cloud/account/limits
+        hint:
+          type: string
+          example: This limit can be raised with a support ticket.
+        hint_tr:
+          type: string
+          example: Bu sınır destek talebiyle artırılabilir.
+        reason:
+          type: string
+          description: original error code when the code was changed (checkout_blocked -> limit_exceeded)
+    AccountLimit:
+      type: object
+      properties:
+        key:
+          type: string
+          example: compute.max_vms
+        group:
+          type: string
+          example: compute
+        scope:
+          type: string
+          enum:
+          - account
+          - service
+          description: account = one number for the account; service = applies to each service (see `services`)
+        limit:
+          type:
+          - integer
+          - 'null'
+          description: effective limit (null = depends on the plan of each service, see `services`, or no limit)
+        used:
+          type:
+          - integer
+          - 'null'
+        unit:
+          type: string
+        custom:
+          type: boolean
+          description: raised (or lowered) for your account
+        increasable:
+          type: boolean
+        how_to_increase:
+          type: string
+          enum:
+          - open_support_ticket
+          - upgrade_plan_or_open_support_ticket
+          - upgrade_plan
+          - wait
+          - fixed
+        description:
+          type: string
+        description_tr:
+          type: string
+        max_size:
+          type: object
+          description: compute.max_server_size only
+          properties:
+            vcpu:
+              type: integer
+            memory_gb:
+              type: integer
+            disk_gb:
+              type: integer
+        services:
+          type: array
+          items:
+            type: object
+            properties:
+              service_id:
+                type: integer
+              name:
+                type: string
+              limit:
+                type:
+                - integer
+                - 'null'
+              used:
+                type:
+                - integer
+                - 'null'

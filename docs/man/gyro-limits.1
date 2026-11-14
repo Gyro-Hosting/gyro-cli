@@ -1,0 +1,92 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-limits - Account limits and usage; how to raise them (support ticket)
+
+
+.SH SYNOPSIS
+\fBgyro limits [flags]\fP
+
+
+.SH DESCRIPTION
+Account limits: every limit of your account with the current usage (new-account limit of the prepaid cloud,
+Gyro Cloud Istanbul servers, templates, additional IPs and disks per server, API order caps, keys, webhooks,
+firewall rules and security groups, storage buckets and keys, DNS zones, container plans, Gyro Pipeline,
+uptime monitors, projects).
+
+.PP
+Limits are raised on request: open a support ticket.
+  gyro ticket create --department-id 3 --subject "Limit increase: " --message "Requested limit: \&. Reason: ..."
+Plan limits (buckets, zones, container services ...) also grow with a bigger plan or an add-on.
+When a command is refused because of a limit, the error shows the limit, the usage and the ready ticket command.
+
+
+.SH OPTIONS
+\fB--fresh\fP[=false]
+	read again (answers are cached for 60 s)
+
+.PP
+\fB-h\fP, \fB--help\fP[=false]
+	help for limits
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH EXAMPLE
+.EX
+  gyro limits
+  gyro limits -o json --query "limits[?key=='compute.max_vms']"
+  gyro ticket create --department-id 3 --subject "Limit increase: new_account.servers" --message "Requested limit: 10. Reason: ..."
+.EE
+
+
+.SH SEE ALSO
+\fBgyro(1)\fP

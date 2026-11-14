@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/signal"
 	"runtime"
+	"sort"
 	"strings"
 	"time"
 
@@ -294,6 +295,7 @@ func NewRoot(a *App) *cobra.Command {
 	addCatalog(a, root)
 	addBilling(a, root)
 	addPrepaidBilling(a, root)
+	addLimits(a, root)
 	addProductLines(a, root)
 	addDNS(a, root)
 	addGenerated(a, root)
@@ -324,7 +326,8 @@ Get started:
   gyro server create --plan standart-2-4 --location falkenstein --image ubuntu-24.04 --ssh-key mykey --wait
   gyro server ssh web-1
 
-Money and destructive actions ask for confirmation (use --yes in scripts, --dry-run for a quote).`,
+Money and destructive actions ask for confirmation (use --yes in scripts, --dry-run for a quote).
+Account limits (gyro limits) are raised with a support ticket: gyro ticket create --department-id 3 --subject "Limit increase: <key>" ...`,
 		`gyro, Gyro Hosting hizmetlerinizi terminalden yönetir: bulut sunucular, SSH anahtarları, faturalar,
 bakiye ve Gyro Public API'nin sunduğu her şey (API sürümü `+spec.APIVersion+`).
 
@@ -334,7 +337,8 @@ Başlarken:
   gyro server create --plan standart-2-4 --location falkenstein --image ubuntu-24.04 --ssh-key anahtarim --wait
   gyro server ssh web-1
 
-Para harcayan ve geri alınamayan işlemler onay sorar (betiklerde --yes, fiyat için --dry-run).`)
+Para harcayan ve geri alınamayan işlemler onay sorar (betiklerde --yes, fiyat için --dry-run).
+Hesap sınırları (gyro limits) destek talebiyle artırılır: gyro ticket create --department-id 3 --subject "Limit increase: <anahtar>" ...`)
 }
 
 func fixedCompletion(vals ...string) func(*cobra.Command, []string, string) ([]string, cobra.ShellCompDirective) {
@@ -392,11 +396,22 @@ func reportError(a *App, err error) int {
 		}
 		fmt.Fprintf(a.Err, "  (%s)\n", strings.Join(meta, ", "))
 		if len(e.Details) > 0 {
-			for k, v := range e.Details {
-				fmt.Fprintf(a.Err, "  %s: %v\n", k, v)
+			keys := make([]string, 0, len(e.Details))
+			for k := range e.Details {
+				keys = append(keys, k)
+			}
+			sort.Strings(keys)
+			for _, k := range keys {
+				if isLimitDetail(k) {
+					continue
+				}
+				fmt.Fprintf(a.Err, "  %s: %v\n", k, e.Details[k])
 			}
 		}
 		if h := hint(e); h != "" {
+			fmt.Fprintf(a.Err, "  %s\n", h)
+		}
+		if h := limitHint(e); h != "" {
 			fmt.Fprintf(a.Err, "  %s\n", h)
 		}
 		return code

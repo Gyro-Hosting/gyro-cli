@@ -26,6 +26,10 @@ gyro: manage Gyro Hosting services from your terminal.
 
 (HTML: cli.html#safety)
 
+## Limits and raising them
+
+(HTML: cli.html#limits)
+
 ## Every product
 
 (HTML: cli.html#lines)
@@ -52,6 +56,7 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro api request DELETE /cloud/mail/{id}/migrations/{jid}` | DELETE sync-jobs:delete (GyroMail) | `DELETE /cloud/mail/{id}/migrations/{jid}` |
 | `gyro api request DELETE /cloud/storage/{id}/buckets/{bucket}` | DELETE buckets:delete (GyroDepolama) | `DELETE /cloud/storage/{id}/buckets/{bucket}` |
 | `gyro api request DELETE /cloud/storage/{id}/keys/{key}` | DELETE access-keys:delete (GyroDepolama) | `DELETE /cloud/storage/{id}/keys/{key}` |
+| `gyro api request GET /cloud/account/limits` | Account limits and usage | `GET /cloud/account/limits` |
 | `gyro api request GET /cloud/apps` | List installable apps | `GET /cloud/apps` |
 | `gyro api request GET /cloud/billing/balance` | Balance, hourly cost of running prepaid services and estimated time left | `GET /cloud/billing/balance` |
 | `gyro api request GET /cloud/billing/statement/{month}` | Monthly usage statement (not an invoice); JSON, PDF or CSV | `GET /cloud/billing/statement/{month}` |

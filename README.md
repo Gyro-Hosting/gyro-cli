@@ -121,6 +121,15 @@ Tam liste: `gyro api operations` (her API ucu ve karşılığı olan komut) ve [
 - Hata mesajı API hata kodunu, HTTP durumunu ve istek numarasını içerir (destek talebinde iletin).
 - `--debug` HTTP trafiğini stderr'e yazar; anahtar ve sırlar maskelenir.
 
+## Sınırlar
+
+**Hesap sınırları destek talebiyle artırılır.** `gyro limits` tüm sınırları ve kullanımı gösterir (yeni hesap ilk 7 gün: 5 İstanbul sunucusu, 1 kapsayıcı ortamı). Sınır yüzünden reddedilen komut sınırı, kullanımı ve hazır talep komutunu yazar:
+
+```sh
+gyro limits
+gyro ticket create --department-id 3 --subject "Limit increase: new_account.servers" --message "İstenen sınır: 10. Gerekçe: ..."
+```
+
 ## Çıkış kodları
 
 | Kod | Anlam |

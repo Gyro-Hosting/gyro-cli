@@ -6,7 +6,7 @@ Talep Açma
 
 Talep Açma
 
-Yeni bir destek talebi açar. — ek kabul eder
+Yeni bir destek talebi açar. — ek kabul eder **Sınır artırma**: hesap sınırları (GET /cloud/account/limits) talep ile artırılır: department_id 3, konu `Limit increase: <limit_key>`, mesajda istenen sayı ve ne yaptığınız. CLI: `gyro ticket create --department-id 3 --subject ... --message ...`.
 
 API: POST /tickets (operationId coreCreateTicket, scope Tickets/CreateTicket)
 

@@ -6,7 +6,7 @@ Create ticket
 
 Create ticket
 
-Create ticket. Support ticket of the calling account. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/destek-isteme).
+Create ticket. Support ticket of the calling account. Core WISECP client endpoint (Turkish reference: https://dev.wisecp.com/tr/destek-isteme). **Limit increase**: account limits (GET /cloud/account/limits) are raised through a ticket: department_id 3, subject `Limit increase: <limit_key>`, message with the requested number and what you are building. CLI: `gyro ticket create --department-id 3 --subject ... --message ...`.
 
 API: POST /tickets (operationId coreCreateTicket, scope Tickets/CreateTicket)
 

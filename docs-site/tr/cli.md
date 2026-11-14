@@ -26,6 +26,10 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 
 (HTML: cli.html#safety)
 
+## Sınırlar ve sınır artırma
+
+(HTML: cli.html#limits)
+
 ## Tüm ürünler
 
 (HTML: cli.html#lines)
@@ -52,6 +56,7 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro api request DELETE /cloud/mail/{id}/migrations/{jid}` | sync-jobs:delete (GyroMail) | `DELETE /cloud/mail/{id}/migrations/{jid}` |
 | `gyro api request DELETE /cloud/storage/{id}/buckets/{bucket}` | buckets:delete (GyroDepolama) | `DELETE /cloud/storage/{id}/buckets/{bucket}` |
 | `gyro api request DELETE /cloud/storage/{id}/keys/{key}` | access-keys:delete (GyroDepolama) | `DELETE /cloud/storage/{id}/keys/{key}` |
+| `gyro api request GET /cloud/account/limits` | Hesap sınırları ve kullanım | `GET /cloud/account/limits` |
 | `gyro api request GET /cloud/apps` | Kurulabilir uygulamaları listele | `GET /cloud/apps` |
 | `gyro api request GET /cloud/billing/balance` | Balance, hourly cost of running prepaid services and estimated time left | `GET /cloud/billing/balance` |
 | `gyro api request GET /cloud/billing/statement/{month}` | Monthly usage statement (not an invoice); JSON, PDF or CSV | `GET /cloud/billing/statement/{month}` |

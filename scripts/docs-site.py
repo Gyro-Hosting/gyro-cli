@@ -66,6 +66,9 @@ $ gyro mail mailbox list example.com</code></pre>"""),
 <li>429/5xx yanıtlarında güvenli istekler artan beklemeyle tekrarlanır. Hatalar API kodu, HTTP durumu ve istek numarasıyla yazılır.</li></ul>
 <table><tr><th>Çıkış kodu</th><th>Anlam</th></tr><tr><td>0</td><td>başarılı</td></tr><tr><td>2</td><td>kullanım hatası</td></tr><tr><td>3</td><td>kimlik / yetki (401, 403)</td></tr>
 <tr><td>4</td><td>bulunamadı</td></tr><tr><td>5</td><td>çakışma (409)</td></tr><tr><td>6</td><td>ödeme</td></tr><tr><td>7</td><td>onay verilmedi</td></tr><tr><td>8</td><td>hız sınırı</td></tr><tr><td>9</td><td><code>--wait</code> zaman aşımı</td></tr></table>"""),
+   ("limits", "Sınırlar ve sınır artırma", """<p><b>Hesap sınırları destek talebiyle artırılır.</b> <code>gyro limits</code> tüm sınırları ve kullanımı gösterir (yeni hesap ilk 7 gün: 5 İstanbul sunucusu, 1 kapsayıcı ortamı). Sınır yüzünden reddedilen komut sınırı, kullanımı ve hazır talep komutunu yazar:</p>
+<pre><code>gyro limits
+gyro ticket create --department-id 3 --subject "Limit increase: new_account.servers" --message "İstenen sınır: 10. Gerekçe: ..."</code></pre>"""),
    ("lines", "Tüm ürünler", """<p>Mail, S3, izleme, lisans, VDS, fiziksel sunucu ve uygulama hizmetleri aynı köprüden yönetilir. Araçlar ve eylemler hizmetten okunur, yeni özellikler CLI güncellemesi beklemeden çalışır:</p>
 <pre><code>gyro mail list
 gyro mail tools example.com                       # araçlar, eylemler, onay/sır politikası
@@ -131,6 +134,9 @@ $ gyro mail mailbox list example.com</code></pre>"""),
 <li>Safe requests are retried with backoff on 429/5xx. Errors show the API code, HTTP status and request id.</li></ul>
 <table><tr><th>Exit code</th><th>Meaning</th></tr><tr><td>0</td><td>success</td></tr><tr><td>2</td><td>usage error</td></tr><tr><td>3</td><td>authentication / permission (401, 403)</td></tr>
 <tr><td>4</td><td>not found</td></tr><tr><td>5</td><td>conflict (409)</td></tr><tr><td>6</td><td>payment</td></tr><tr><td>7</td><td>not confirmed</td></tr><tr><td>8</td><td>rate limited</td></tr><tr><td>9</td><td><code>--wait</code> timeout</td></tr></table>"""),
+   ("limits", "Limits and raising them", """<p><b>Account limits are raised with a support ticket.</b> <code>gyro limits</code> lists every limit with its usage (new accounts, first 7 days: 5 Istanbul servers, 1 container environment). A command refused because of a limit prints the limit, the usage and the ready ticket command:</p>
+<pre><code>gyro limits
+gyro ticket create --department-id 3 --subject "Limit increase: new_account.servers" --message "Requested limit: 10. Reason: ..."</code></pre>"""),
    ("lines", "Every product", """<p>Mail, S3, monitors, licences, VDS, dedicated servers and apps use the same bridge. Tools and actions are read from the service, so new features work without a CLI update:</p>
 <pre><code>gyro mail list
 gyro mail tools example.com                       # tools, actions, confirm/secret policy
