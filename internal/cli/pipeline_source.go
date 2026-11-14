@@ -30,7 +30,7 @@ func pipelineSourceCheck(op *spec.Op, body map[string]any, flag func(string) str
 		if repo != "" {
 			return &ExitErr{ExitUsage, fmt.Errorf("%s", i18n.F(
 				"--%s is not used with --provider archive: an archive pipeline has no repository, it builds the archives you upload (gyro container pipeline upload). Remove --%s, or use a git provider (github, gitlab, gitea, git).",
-				"--%s, --provider archive ile kullanılmaz: arşiv pipeline'ının deposu yoktur, yüklediğiniz arşivleri derler (gyro container pipeline upload). --%s'yi kaldırın ya da bir git sağlayıcısı seçin (github, gitlab, gitea, git).",
+				"--%s, --provider archive ile kullanılmaz: arşiv pipeline'ının deposu yoktur, yüklediğiniz arşivleri derler (gyro container pipeline upload). --%s bayrağını kaldırın ya da bir git sağlayıcısı seçin (github, gitlab, gitea, git).",
 				flag("repo"), flag("repo")))}
 		}
 		if repoSet {
