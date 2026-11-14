@@ -13,7 +13,7 @@ gyro-container-env-set - Set environment variables
 Set environment variables
 
 .PP
-\fBset\fR merges variables (\fB{"KEY": "value"}\fR or KEY=VALUE lines), \fBunset\fR removes names, \fBreplace: 1\fR replaces the whole set. Creates a revision and restarts the service.
+\fBset\fR merges variables (\fB{"KEY": "value"}\fR or KEY=VALUE lines), \fBunset\fR removes names, \fBreplace: 1\fR replaces the whole set. Creates a revision and restarts the service. Only \fBset\fR, \fBunset\fR and \fBreplace\fR are accepted: an unknown field (e.g. \fBenv\fR) or a body that changes nothing (no \fBset\fR, no \fBunset\fR, no \fBreplace: 1\fR) is rejected with \fB422 \fBinvalid_env\fR\fP (\fBdetails.expected\fR lists the fields); nothing is saved and the service does not restart.
 
 .PP
 API: PUT /cloud/containers/{id}/services/{name}/env (operationId typed_put_containers\fBid\fPservices\fBname\fPenv, scope services_write)

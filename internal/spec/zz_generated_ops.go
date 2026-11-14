@@ -3,7 +3,7 @@
 package spec
 
 // APIVersion is info.version of the spec this table was generated from.
-const APIVersion = "2.27.0"
+const APIVersion = "2.27.1"
 
 // Ops lists every API operation.
 var Ops = []Op{
@@ -858,7 +858,7 @@ var Ops = []Op{
 	},
 	{ID: "typed_put_containers__id__services__name__env", Method: "PUT", Path: "/cloud/containers/{id}/services/{name}/env", Tag: "Containers",
 		Summary: "Set environment variables", SummaryTR: "Ortam değişkenlerini ayarla",
-		Desc: "`set` merges variables (`{\"KEY\": \"value\"}` or KEY=VALUE lines), `unset` removes names, `replace: 1` replaces the whole set. Creates a revision and restarts the service.", DescTR: "`set` değişken ekler/günceller (`{\"KEY\":\"değer\"}` ya da KEY=VALUE satırları), `unset` siler, `replace: 1` tümünü değiştirir. Sürüm oluşturur, servis yeniden başlar.",
+		Desc: "`set` merges variables (`{\"KEY\": \"value\"}` or KEY=VALUE lines), `unset` removes names, `replace: 1` replaces the whole set. Creates a revision and restarts the service. Only `set`, `unset` and `replace` are accepted: an unknown field (e.g. `env`) or a body that changes nothing (no `set`, no `unset`, no `replace: 1`) is rejected with **422 `invalid_env`** (`details.expected` lists the fields); nothing is saved and the service does not restart.", DescTR: "`set` değişken ekler/günceller (`{\"KEY\":\"değer\"}` ya da KEY=VALUE satırları), `unset` siler, `replace: 1` tümünü değiştirir. Sürüm oluşturur, servis yeniden başlar. Yalnız `set`, `unset` ve `replace` kabul edilir: bilinmeyen alan (ör. `env`) ya da hiçbir şeyi değiştirmeyen gövde (`set`, `unset`, `replace: 1` yok) **422 `invalid_env`** ile reddedilir (`details.expected` beklenen alanları verir); hiçbir şey kaydedilmez, servis yeniden başlamaz.",
 		Scope: "services_write", Command: []string{"container", "env", "set"},
 		HasBody: true, BodyRequired: true, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
 		Params: []Param{

@@ -6,7 +6,7 @@ Ortam değişkenlerini ayarla
 
 Ortam değişkenlerini ayarla
 
-`set` değişken ekler/günceller (`{"KEY":"değer"}` ya da KEY=VALUE satırları), `unset` siler, `replace: 1` tümünü değiştirir. Sürüm oluşturur, servis yeniden başlar.
+`set` değişken ekler/günceller (`{"KEY":"değer"}` ya da KEY=VALUE satırları), `unset` siler, `replace: 1` tümünü değiştirir. Sürüm oluşturur, servis yeniden başlar. Yalnız `set`, `unset` ve `replace` kabul edilir: bilinmeyen alan (ör. `env`) ya da hiçbir şeyi değiştirmeyen gövde (`set`, `unset`, `replace: 1` yok) **422 `invalid_env`** ile reddedilir (`details.expected` beklenen alanları verir); hiçbir şey kaydedilmez, servis yeniden başlamaz.
 
 API: PUT /cloud/containers/{id}/services/{name}/env (operationId typed_put_containers__id__services__name__env, scope services_write)
 

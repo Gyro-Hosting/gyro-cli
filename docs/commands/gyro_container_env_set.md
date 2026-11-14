@@ -6,7 +6,7 @@ Set environment variables
 
 Set environment variables
 
-`set` merges variables (`{"KEY": "value"}` or KEY=VALUE lines), `unset` removes names, `replace: 1` replaces the whole set. Creates a revision and restarts the service.
+`set` merges variables (`{"KEY": "value"}` or KEY=VALUE lines), `unset` removes names, `replace: 1` replaces the whole set. Creates a revision and restarts the service. Only `set`, `unset` and `replace` are accepted: an unknown field (e.g. `env`) or a body that changes nothing (no `set`, no `unset`, no `replace: 1`) is rejected with **422 `invalid_env`** (`details.expected` lists the fields); nothing is saved and the service does not restart.
 
 API: PUT /cloud/containers/{id}/services/{name}/env (operationId typed_put_containers__id__services__name__env, scope services_write)
 
