@@ -668,6 +668,11 @@ func cols(op *spec.Op, wide bool) []output.Column {
 
 func (a *App) printOpResult(op *spec.Op, resp *api.Response) error {
 	p := a.Printer()
+	if op.ID == opListContainerServices {
+		if done, err := a.printContainerServices(resp); done {
+			return err
+		}
+	}
 	if op.ListResponse && op.ItemsKey != "" && (p.Format == "table" || p.Format == "text" || p.Quiet) && a.Opt.Query == "" {
 		items, err := api.Items(resp.Data, op.ItemsKey)
 		if err != nil {

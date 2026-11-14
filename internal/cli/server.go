@@ -446,15 +446,25 @@ func (a *App) resolveImage(ctx context.Context, img, region string, productID in
 	return "", &ExitErr{ExitUsage, fmt.Errorf("%s %q: %s", i18n.S("unknown image", "bilinmeyen imaj"), img, strings.Join(slugs, ", "))}
 }
 
-// resolveSSHKey accepts an id, a name, a fingerprint or a path to a .pub file (uploaded when new).
-func (a *App) resolveSSHKey(ctx context.Context, arg string, dryRun bool) (int64, error) {
+// sshKeyRef is one --ssh-key value: an existing account key (ID > 0) or a local .pub file to upload (Pub != "").
+type sshKeyRef struct {
+	Arg  string
+	ID   int64
+	Name string
+	Pub  string
+}
+
+// lookupSSHKey accepts an id, a name, a fingerprint or a path to a .pub file. It never uploads: a new .pub file comes back
+// with ID 0 and Pub set, and is uploaded only once the order is confirmed (1.26.5: a refused order no longer leaves a key behind).
+func (a *App) lookupSSHKey(ctx context.Context, arg string) (sshKeyRef, error) {
+	ref := sshKeyRef{Arg: arg}
 	c, err := a.Client()
 	if err != nil {
-		return 0, err
+		return ref, err
 	}
 	items, err := c.All(ctx, "/cloud/ssh-keys", nil, "", 0)
 	if err != nil {
-		return 0, err
+		return ref, err
 	}
 	type key struct {
 		ID          int64  `json:"id"`
@@ -477,32 +487,62 @@ func (a *App) resolveSSHKey(ctx context.Context, arg string, dryRun bool) (int64
 	}
 	for _, k := range keys {
 		if fmt.Sprint(k.ID) == arg || strings.EqualFold(k.Name, arg) || k.Fingerprint == arg {
-			return k.ID, nil
+			ref.ID, ref.Name = k.ID, k.Name
+			return ref, nil
 		}
 		if pubFromFile != "" && sameKey(k.PublicKey, pubFromFile) {
-			return k.ID, nil
+			ref.ID, ref.Name = k.ID, k.Name
+			return ref, nil
 		}
 	}
 	if pubFromFile == "" {
-		return 0, &ExitErr{ExitNotFound, fmt.Errorf("%s %q (%s)", i18n.S("SSH key not found", "SSH anahtarı bulunamadı"), arg,
+		return ref, &ExitErr{ExitNotFound, fmt.Errorf("%s %q (%s)", i18n.S("SSH key not found", "SSH anahtarı bulunamadı"), arg,
 			i18n.S("give an id, a name or a path to a .pub file", "kimlik, ad ya da .pub dosya yolu verin"))}
 	}
-	if dryRun {
-		a.Info("%s", i18n.F("(dry run) %s would be uploaded as a new SSH key", "(deneme) %s yeni SSH anahtarı olarak yüklenecekti", arg))
-		return 0, nil
-	}
-	name := strings.TrimSuffix(filepath.Base(arg), ".pub")
+	ref.Pub = pubFromFile
+	ref.Name = strings.TrimSuffix(filepath.Base(arg), ".pub")
 	if f := strings.Fields(pubFromFile); len(f) >= 3 {
-		name = f[2]
+		ref.Name = f[2]
 	}
-	resp, err := c.Do(ctx, api.Request{Method: "POST", Path: "/cloud/ssh-keys", Body: map[string]any{"name": name, "public_key": pubFromFile}})
+	return ref, nil
+}
+
+// uploadSSHKey uploads a key found by lookupSSHKey (Pub set) and returns its new id.
+func (a *App) uploadSSHKey(ctx context.Context, ref sshKeyRef) (int64, error) {
+	c, err := a.Client()
 	if err != nil {
 		return 0, err
 	}
-	var k key
+	resp, err := c.Do(ctx, api.Request{Method: "POST", Path: "/cloud/ssh-keys", Body: map[string]any{"name": ref.Name, "public_key": ref.Pub}})
+	if err != nil {
+		return 0, err
+	}
+	var k struct {
+		ID int64 `json:"id"`
+	}
 	_ = json.Unmarshal(resp.Data, &k)
-	a.Info("%s", i18n.F("Uploaded SSH key %q (id %d).", "SSH anahtarı %q yüklendi (kimlik %d).", name, k.ID))
+	a.Info("%s", i18n.F("Uploaded SSH key %q (id %d).", "SSH anahtarı %q yüklendi (kimlik %d).", ref.Name, k.ID))
 	return k.ID, nil
+}
+
+// removeUploadedSSHKeys deletes keys uploaded for an order that was then refused (best effort, reported on stderr).
+func (a *App) removeUploadedSSHKeys(ids []int64) {
+	if len(ids) == 0 {
+		return
+	}
+	c, err := a.Client()
+	if err != nil {
+		return
+	}
+	ctx, cancel := a.Ctx()
+	defer cancel()
+	for _, id := range ids {
+		if _, err := c.Do(ctx, api.Request{Method: "DELETE", Path: fmt.Sprintf("/cloud/ssh-keys/%d", id)}); err != nil {
+			a.Info("%s", i18n.F("Could not remove the SSH key uploaded for this order (id %d): %v", "Bu sipariş için yüklenen SSH anahtarı silinemedi (kimlik %d): %v", id, err))
+			continue
+		}
+		a.Info("%s", i18n.F("The order was not placed; the SSH key uploaded for it was removed again (id %d).", "Sipariş verilmedi; bunun için yüklenen SSH anahtarı geri silindi (kimlik %d).", id))
+	}
 }
 
 func sameKey(a, b string) bool {
@@ -653,17 +693,33 @@ tr-ist-1'de (İstanbul) en çok 10 --ssh-key ve --user-data oluşturmada cloud-i
 			body["user_data"] = ud
 		}
 		var keyIDs []int64
+		var toUpload []sshKeyRef
 		for _, k := range keys {
-			id, err := a.resolveSSHKey(ctx, k, dry)
+			ref, err := a.lookupSSHKey(ctx, k)
 			if err != nil {
 				return err
 			}
-			if id > 0 {
-				keyIDs = append(keyIDs, id)
+			if ref.ID > 0 {
+				keyIDs = append(keyIDs, ref.ID)
+				continue
+			}
+			dup := false
+			for _, u := range toUpload {
+				if sameKey(u.Pub, ref.Pub) {
+					dup = true
+				}
+			}
+			if !dup {
+				toUpload = append(toUpload, ref)
 			}
 		}
 		if len(keyIDs) > 0 {
 			body["ssh_keys"] = keyIDs
+		}
+		if dry {
+			for _, u := range toUpload {
+				a.Info("%s", i18n.F("(dry run) %s would be uploaded as a new SSH key", "(deneme) %s yeni SSH anahtarı olarak yüklenecekti", u.Arg))
+			}
 		}
 		if app != "" {
 			fld := ""
@@ -748,12 +804,27 @@ tr-ist-1'de (İstanbul) en çok 10 --ssh-key ve --user-data oluşturmada cloud-i
 		} else if err := a.Confirm(i18n.F("Order this server and pay %s from your balance?", "Bu sunucu sipariş edilip bakiyenizden %s ödensin mi?", output.Scalar(quote.Total))); err != nil {
 			return err
 		}
+		// new .pub files are uploaded only now: after the quote and the confirmation (1.26.5)
+		var uploaded []int64
+		for _, u := range toUpload {
+			id, err := a.uploadSSHKey(ctx, u)
+			if err != nil {
+				a.removeUploadedSSHKeys(uploaded)
+				return err
+			}
+			uploaded = append(uploaded, id)
+			keyIDs = append(keyIDs, id)
+		}
+		if len(keyIDs) > 0 {
+			body["ssh_keys"] = keyIDs
+		}
 		body["confirm"] = true
 		if idem == "" {
 			idem = api.NewID()
 		}
 		resp, err := c.Do(ctx, api.Request{Method: "POST", Path: "/cloud/servers", Body: body, IdempotencyKey: idem})
 		if err != nil {
+			a.removeUploadedSSHKeys(uploaded)
 			return err
 		}
 		var res struct {
