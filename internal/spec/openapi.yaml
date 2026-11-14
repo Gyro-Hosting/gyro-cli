@@ -2,7 +2,7 @@
 openapi: 3.1.0
 info:
   title: Gyro Public API
-  version: 2.28.0
+  version: 2.28.1
   summary: Manage Gyro cloud servers, SSH keys and billing programmatically.
   x-summary-tr: Gyro bulut sunucularınızı, SSH anahtarlarınızı ve faturalarınızı programla yönetin.
   description: "The Gyro Public API lets you automate everything you do in the Gyro client area:\norder and manage cloud servers, keep SSH keys, read invoices and\
@@ -74,7 +74,10 @@ info:
     \ `internal_address`; egress IP changes are notified (alert event `egress`). Additive.\n\n**2.27.1**: `PUT /cloud/containers/{id}/services/{name}/env` rejects\
     \ unknown fields and empty changes with 422 `invalid_env` (was: success without change).\n\n**2.28.0**: Gyro Pipeline `build_target` (create / update / get):\
     \ build a named stage of a multi-stage Dockerfile (`docker build --target`); empty = last stage; unknown stage = run error `build_target_not_found`; also `build_target:`\
-    \ in gyro-pipeline.yml. Additive.\n"
+    \ in gyro-pipeline.yml. Additive.\n\n**2.28.1**: the limit hint (`details.limit_exceeded`, `how_to_increase`, \"This limit can be raised with a support ticket\"\
+    ) is added only to real account / plan limit refusals; input validation errors that mention a maximum length or count (\"at most 64 characters\") no longer get\
+    \ it. Module limits now name their `limit_key` (e.g. `compute.extra_ips`, `s3.max_buckets`, `dns.max_zones`, `gfw.rules_per_server`); plan limits answer `how_to_increase:\
+    \ upgrade_plan`, hourly ones `wait`.\n"
   x-description-tr: "Gyro Public API, müşteri panelinde yaptığınız her işi otomatikleştirmenizi sağlar:\nbulut sunucu siparişi ve yönetimi, SSH anahtarları, fatura\
     \ ve bakiye okuma.\nResmi Terraform sağlayıcısı (`gyro-hosting/gyro`) ve `gyroctl` bu API'yi kullanır.\n\n* **Taban adres** `https://www.gyrohosting.com/api/v1/client`\n\
     * **Kimlik** `Authorization: Bearer wck_...` (anahtarı *Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri* bölümünden oluşturun)\n* **Biçim** JSON\
@@ -143,7 +146,10 @@ info:
     \ `internal_address`; çıkış IP değişikliği bildirilir (uyarı olayı `egress`). Geriye uyumlu.\n\n**2.27.1**: `PUT /cloud/containers/{id}/services/{name}/env` bilinmeyen\
     \ alanı ve boş değişikliği 422 `invalid_env` ile reddeder (önce: değişiklik olmadan başarı).\n\n**2.28.0**: Gyro Pipeline `build_target` (oluştur / değiştir /\
     \ oku): çok aşamalı Dockerfile'ın adı verilen aşamasını derler (`docker build --target`); boş = son aşama; olmayan aşama = çalıştırma hatası `build_target_not_found`;\
-    \ gyro-pipeline.yml'de `build_target:`. Geriye uyumlu.\n"
+    \ gyro-pipeline.yml'de `build_target:`. Geriye uyumlu.\n\n**2.28.1**: sınır ipucu (`details.limit_exceeded`, `how_to_increase`, \"Bu sınır destek talebiyle artırılabilir\"\
+    ) yalnız gerçek hesap / paket sınırı retlerine eklenir; en fazla uzunluk ya da sayı söyleyen girdi doğrulama hataları (\"en fazla 64 karakter\") artık almaz.\
+    \ Modül sınırları `limit_key` adını verir (ör. `compute.extra_ips`, `s3.max_buckets`, `dns.max_zones`, `gfw.rules_per_server`); paket sınırlarında `how_to_increase:\
+    \ upgrade_plan`, saatlik olanlarda `wait`.\n"
   contact:
     name: Gyro Hosting
     url: https://www.gyrohosting.com
@@ -21606,8 +21612,9 @@ components:
               type: object
               additionalProperties: true
               description: 'Extra data. Limit refusals add the LimitHint fields (`limit_exceeded: true`, `limit_key`, `limit`, `current`, `how_to_increase`, `support_ticket`,
-                `hint`): account limits are raised with a support ticket.'
-              x-description-tr: 'Ek veri. Sınır retlerinde LimitHint alanları gelir: hesap sınırları destek talebiyle artırılır.'
+                `hint`): account limits are raised with a support ticket. Validation errors (length, format) never carry the limit hint.'
+              x-description-tr: 'Ek veri. Sınır retlerinde LimitHint alanları gelir: hesap sınırları destek talebiyle artırılır. Doğrulama hataları (uzunluk, biçim)
+                sınır ipucu taşımaz.'
     PageMeta:
       type: object
       properties:
@@ -24583,8 +24590,12 @@ components:
               description: 'protected plans: price per locked bucket per cycle (min 1, max 50)'
     LimitHint:
       type: object
-      description: Present in `error.details` of every refusal caused by a limit (and in dry-run quotes as `quote.limit_exceeded`).
-      x-description-tr: Sınır kaynaklı her retin `error.details` alanında (ve dry-run teklifinde `quote.limit_exceeded`) bulunur.
+      description: 'Present in `error.details` of every refusal caused by a limit (and in dry-run quotes as `quote.limit_exceeded`). Only refusals caused by a real
+        account or plan limit carry it (known error code such as `limit_exceeded`, `server_limit`, `quota_exceeded`, or a known module limit refusal tied to its `limit_key`).
+        Input validation (length, format, characters, "at most N characters") never carries it: fix the input instead.'
+      x-description-tr: 'Sınır kaynaklı her retin `error.details` alanında (ve dry-run teklifinde `quote.limit_exceeded`) bulunur. Yalnız gerçek hesap ya da paket
+        sınırından doğan retlerde bulunur (`limit_exceeded`, `server_limit`, `quota_exceeded` gibi bilinen hata kodu ya da `limit_key`''e bağlı bilinen bir modül
+        sınır reti). Girdi doğrulama hataları (uzunluk, biçim, karakter, "en fazla N karakter") bunu taşımaz: girdiyi düzeltin.'
       properties:
         limit_exceeded:
           type: boolean
