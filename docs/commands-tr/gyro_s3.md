@@ -36,12 +36,16 @@ gyro s3 [flags]
 * [gyro s3 call](gyro_s3_call.md)	 - Hizmetin modül metodunu çağır
 * [gyro s3 connect](gyro_s3_connect.md)	 - connect (GyroDepolama)
 * [gyro s3 cors](gyro_s3_cors.md)	 - Kovanın CORS kuralları
+* [gyro s3 create](gyro_s3_create.md)	 - Nesne depolama (S3) sipariş et
+* [gyro s3 delete](gyro_s3_delete.md)	 - Depolama hizmetini iptal et
 * [gyro s3 folder](gyro_s3_folder.md)	 - Klasördeki nesneleri say
+* [gyro s3 get](gyro_s3_get.md)	 - Depolama hizmeti ayrıntısı
 * [gyro s3 key](gyro_s3_key.md)	 - Erişim anahtarları (gizli anahtar bir kez gösterilir)
 * [gyro s3 lifecycle](gyro_s3_lifecycle.md)	 - Kovanın eski sürüm silme kuralı
 * [gyro s3 list](gyro_s3_list.md)	 - Bu ürün hattındaki hizmetlerinizi listele
 * [gyro s3 object](gyro_s3_object.md)	 - Kova klasöründeki nesneleri listele
 * [gyro s3 object-lock](gyro_s3_object-lock.md)	 - Kovanın varsayılan saklaması
+* [gyro s3 plans](gyro_s3_plans.md)	 - Nesne depolama paketlerini listele
 * [gyro s3 tool](gyro_s3_tool.md)	 - Bir aracın verisini oku ya da eylemini çalıştır ('tools' ile bakın)
 * [gyro s3 tools](gyro_s3_tools.md)	 - Hizmetin araçlarını, eylemlerini ve güvenlik politikasını göster
 * [gyro s3 usage](gyro_s3_usage.md)	 - usage (GyroDepolama)

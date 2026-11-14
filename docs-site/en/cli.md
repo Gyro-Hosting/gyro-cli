@@ -62,6 +62,7 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro api request GET /cloud/mail/{id}/dns` | GET dns-setup (GyroMail) | `GET /cloud/mail/{id}/dns` |
 | `gyro api request GET /cloud/mail/{id}/mailboxes` | GET mailboxes (GyroMail) | `GET /cloud/mail/{id}/mailboxes` |
 | `gyro api request GET /cloud/mail/{id}/migrations` | GET sync-jobs (GyroMail) | `GET /cloud/mail/{id}/migrations` |
+| `gyro api request GET /cloud/storage` | List storage services | `GET /cloud/storage` |
 | `gyro api request GET /cloud/storage/{id}/buckets` | GET buckets (GyroDepolama) | `GET /cloud/storage/{id}/buckets` |
 | `gyro api request GET /cloud/storage/{id}/keys` | GET access-keys (GyroDepolama) | `GET /cloud/storage/{id}/keys` |
 | `gyro api request PATCH /cloud/mail/{id}/aliases/{aid}` | PATCH aliases:edit (GyroMail) | `PATCH /cloud/mail/{id}/aliases/{aid}` |
@@ -409,9 +410,12 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro storage cors delete` | Remove every CORS rule of a bucket | `DELETE /cloud/storage/{id}/buckets/{bucket}/cors` |
 | `gyro storage cors get` | CORS rules of a bucket | `GET /cloud/storage/{id}/buckets/{bucket}/cors` |
 | `gyro storage cors set` | Replace the CORS rules of a bucket | `PUT /cloud/storage/{id}/buckets/{bucket}/cors` |
+| `gyro storage create` | Order Object Storage (S3) | `POST /cloud/storage` |
+| `gyro storage delete` | Cancel a storage service | `DELETE /cloud/storage/{id}` |
 | `gyro storage folder count` | Count objects in a folder | `GET /cloud/storage/{id}/buckets/{bucket}/folders/count` |
 | `gyro storage folder create` | Create a folder | `POST /cloud/storage/{id}/buckets/{bucket}/folders` |
 | `gyro storage folder delete` | Delete a folder with its contents | `DELETE /cloud/storage/{id}/buckets/{bucket}/folders` |
+| `gyro storage get` | Get a storage service | `GET /cloud/storage/{id}` |
 | `gyro storage key rotate` | POST access-keys:rotate (GyroDepolama) | `POST /cloud/storage/{id}/keys/{key}/rotate` |
 | `gyro storage lifecycle noncurrent get` | Old version expiry of a bucket | `GET /cloud/storage/{id}/buckets/{bucket}/lifecycle/noncurrent` |
 | `gyro storage lifecycle noncurrent set` | Set old version expiry | `PUT /cloud/storage/{id}/buckets/{bucket}/lifecycle/noncurrent` |
@@ -427,6 +431,7 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro storage object-lock scan` | Scan locked versions now | `POST /cloud/storage/{id}/object-lock/scan` |
 | `gyro storage object-lock set` | Set the default retention of a bucket | `PUT /cloud/storage/{id}/buckets/{bucket}/object-lock` |
 | `gyro storage object-lock status` | Protected Storage: object lock summary | `GET /cloud/storage/{id}/object-lock` |
+| `gyro storage plans` | List Object Storage plans | `GET /cloud/storage/plans` |
 | `gyro storage usage get` | GET usage (GyroDepolama) | `GET /cloud/storage/{id}/usage` |
 | `gyro storage versions delete` | Permanently delete a version | `DELETE /cloud/storage/{id}/buckets/{bucket}/versions` |
 | `gyro storage versions list` | List object versions | `GET /cloud/storage/{id}/buckets/{bucket}/versions` |

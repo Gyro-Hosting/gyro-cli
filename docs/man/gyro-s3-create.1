@@ -1,0 +1,133 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-s3-create - Order Object Storage (S3)
+
+
+.SH SYNOPSIS
+\fBgyro s3 create [flags]\fP
+
+
+.SH DESCRIPTION
+Order Object Storage (S3)
+
+.PP
+Orders 1..N storage services of a plan in ONE order (\fBquantity\fR, default 1, max 25) and pays from the account balance (never a stored card). Billed per \fBcycle\fR (monthly | quarterly | semiannually | annually; fixed EUR prices charged in the account currency) and renewed from the balance like other services. \fBextra_traffic\fR (\fB1tb\fR | \fB5tb\fR) adds a one-time traffic pack for this month; \fBobject_lock_buckets\fR (protected plans, 1-50) buys object lock rights (billed every cycle). \fBname\fR (with \fB{n}\fR), \fBtags\fR and \fBproject_id\fR label the services. Send \fB"dry_run": true\fR for a quote; a real order needs \fB"confirm": true\fR and an \fBIdempotency-Key\fR header. The first bucket and the first access key are created automatically within about a minute (status \fBinprocess\fR -> \fBactive\fR); then use \fB/cloud/storage/{id}/buckets\fR, \fB/cloud/storage/{id}/keys\fR and \fB/cloud/storage/{id}/connect\fR\&. Errors: 402 \fBinsufficient_balance\fR, 409 \fBcapacity_unavailable\fR, 422 \fBconfirm_required\fR (with \fBquote\fR), \fBproduct_not_orderable\fR, \fBcycle_invalid\fR, \fBinvalid_extra_traffic\fR, \fBinvalid_object_lock\fR, \fBinvalid_quantity\fR; 429 \fBdaily_limit\fR\&.
+
+.PP
+API: POST /cloud/storage (operationId createStorageServices, scope cloud_order)
+
+
+.SH OPTIONS
+\fB--cycle\fP=""
+	billing cycle (monthly|quarterly|semiannually|annually)
+
+.PP
+\fB--data\fP=""
+	request body as JSON, @file or @- (stdin)
+
+.PP
+\fB--dry-run\fP[=false]
+	show the price quote / request without changing anything
+
+.PP
+\fB--end-customer-id\fP=0
+	reseller main key: assign to this end-customer
+
+.PP
+\fB--extra-traffic\fP=""
+	one-time traffic pack for this calendar month (1tb|5tb)
+
+.PP
+\fB-h\fP, \fB--help\fP[=false]
+	help for create
+
+.PP
+\fB--idempotency-key\fP=""
+	idempotency key (automatic for money operations)
+
+.PP
+\fB--name\fP=""
+	name (nickname); {n} = number in a batch
+
+.PP
+\fB--object-lock-buckets\fP=0
+	protected plans: object lock bucket rights (billed every cycle)
+
+.PP
+\fB--plan\fP=""
+	plan from GET /cloud/storage/plans
+
+.PP
+\fB--product-id\fP=0
+	product id instead of plan
+
+.PP
+\fB--project-id\fP=0
+	project (0 = default project)
+
+.PP
+\fB--quantity\fP=0
+	services to create in one order (--count), max 25
+
+.PP
+\fB--set\fP=[]
+	extra body field key=value (repeatable)
+
+.PP
+\fB--tags\fP=[]
+	tags
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH SEE ALSO
+\fBgyro-s3(1)\fP

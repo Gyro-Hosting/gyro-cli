@@ -6,7 +6,7 @@ Hizmetin yükseltilebileceği ürünler ve fiyatları
 
 Hizmetin yükseltilebileceği ürünler ve fiyatları
 
-Prepaid services answer `billing: prepaid`; each option has `plan`, `current` and one `hourly` price with `monthly_cap`.
+**Veri güvencesi (Gyro Bulut İstanbul, tr-ist-1)**: plan değişikliği diski ve içindeki tüm veriyi, IP adreslerini, ek diskleri ve snapshot'ları korur. Kök disk yerinde büyütülür ve dosya sistemi kendiliğinden genişler; disk asla küçülmez, daha küçük diskli plan 409 `disk_shrink` ile reddedilir (`dry_run`'da da; resize-options bu planları `allowed: false` gösterir). Artan CPU/RAM hipervizör izin veriyorsa canlı uygulanır, yoksa sunucu düzgünce kapatılıp yeniden açılır (ölçüm: 1-2 -> 2-4 yeniden başladı, SSH yaklaşık 12 sn yok; 2-4 -> 4-8 canlı, yeniden başlatma yok). Sunucuda snapshot varken disk büyütülemez: 409 `resize_refused` (önce snapshot'ları silin). Yanıtta `data_preserved: true`, `disk: grows_only`, `restart: if_needed`. Veriyi yalnız yeniden kurulum siler (`POST /cloud/servers/{id}/actions/rebuild`, `confirm: true` ister): disk, ek diskler ve snapshot'lar silinir (IP adresleri kalır). **`recreate_required`** (422, yalnız faturalı ürünler): hedef plan hizmetin başka platformda yeniden kurulmasını gerektirir, bu da veriyi siler; API bunu asla yapmaz, hiçbir şey değişmez ve ücret alınmaz. resize-options'tan başka plan seçin ya da yeni sunucu açıp veriyi taşıyın.
 
 API: GET /cloud/services/{id}/resize-options (operationId getResizeOptions, scope services_read)
 

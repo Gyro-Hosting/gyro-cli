@@ -2,7 +2,7 @@
 openapi: 3.1.0
 info:
   title: Gyro Public API
-  version: 2.24.4
+  version: 2.25.0
   summary: Manage Gyro cloud servers, SSH keys and billing programmatically.
   x-summary-tr: Gyro bulut sunucularınızı, SSH anahtarlarınızı ve faturalarınızı programla yönetin.
   description: "The Gyro Public API lets you automate everything you do in the Gyro client area:\norder and manage cloud servers, keep SSH keys, read invoices and\
@@ -60,7 +60,10 @@ info:
     \ removes its group attachments, so the group can be deleted. Group changes are written to each attached server's change log.\n\n**2.24.4**: Container services:\
     \ a replica count (scale, create, update, autoscaling max) outside the plan limit is refused with 422 `invalid_replicas` and the message names the limit (`details.max`).\
     \ GET /cloud/servers/{id}: Gyro Compute servers in tr-ist-1 show the SSH keys given at creation (`ssh_keys.fingerprints`, `ssh_keys.key_ids`, `method: cloud-init`;\
-    \ `state: none` when no key was given) instead of null.\n"
+    \ `state: none` when no key was given) instead of null.\n\n**2.25.0**: Object Storage and Protected Storage can be ordered through the API: `GET /cloud/storage/plans`,\
+    \ `POST /cloud/storage` (plan, cycle, quantity, extra_traffic, object_lock_buckets, name/tags/project_id; paid from the balance), `GET /cloud/storage`, `GET|DELETE\
+    \ /cloud/storage/{id}`. Plan change: documented data safety, `data_preserved`/`disk`/`restart` in the answer, resize-options marks smaller-disk plans `allowed:\
+    \ false` and a smaller disk is refused with 409 `disk_shrink` already in `dry_run`; clearer `recreate_required` message. Additive.\n"
   x-description-tr: "Gyro Public API, müşteri panelinde yaptığınız her işi otomatikleştirmenizi sağlar:\nbulut sunucu siparişi ve yönetimi, SSH anahtarları, fatura\
     \ ve bakiye okuma.\nResmi Terraform sağlayıcısı (`gyro-hosting/gyro`) ve `gyroctl` bu API'yi kullanır.\n\n* **Taban adres** `https://www.gyrohosting.com/api/v1/client`\n\
     * **Kimlik** `Authorization: Bearer wck_...` (anahtarı *Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri* bölümünden oluşturun)\n* **Biçim** JSON\
@@ -115,7 +118,11 @@ info:
     \ `trial` ve `trial_seconds_left` `applying` sırasında da dolu. Sunucu silinince grup bağları kalkar, grup silinebilir. Grup değişiklikleri bağlı her sunucunun\
     \ değişiklik kaydına yazılır.\n\n**2.24.4**: Kapsayıcı servisleri: plan sınırı dışındaki kopya sayısı (ölçek, oluşturma, güncelleme, otomatik ölçek max) 422 `invalid_replicas`\
     \ ile reddedilir, mesaj sınırı söyler (`details.max`). GET /cloud/servers/{id}: tr-ist-1 Gyro Compute sunucularında oluşturmada verilen SSH anahtarları görünür\
-    \ (`ssh_keys.fingerprints`, `ssh_keys.key_ids`, `method: cloud-init`; anahtar verilmediyse `state: none`), önceden null idi.\n"
+    \ (`ssh_keys.fingerprints`, `ssh_keys.key_ids`, `method: cloud-init`; anahtar verilmediyse `state: none`), önceden null idi.\n\n**2.25.0**: Nesne Depolama ve\
+    \ Korumalı Depolama API'den sipariş edilebilir: `GET /cloud/storage/plans`, `POST /cloud/storage` (plan, cycle, quantity, extra_traffic, object_lock_buckets,\
+    \ name/tags/project_id; bakiyeden ödenir), `GET /cloud/storage`, `GET|DELETE /cloud/storage/{id}`. Plan değişikliği: veri güvencesi belgelendi, yanıtta `data_preserved`/`disk`/`restart`,\
+    \ resize-options daha küçük diskli planları `allowed: false` gösterir ve küçük disk `dry_run`'da da 409 `disk_shrink` ile reddedilir; `recreate_required` mesajı\
+    \ netleşti. Geriye uyumlu.\n"
   contact:
     name: Gyro Hosting
     url: https://www.gyrohosting.com
@@ -872,7 +879,11 @@ paths:
         is set up on it (progress in GET /cloud/servers/{id}/app, `/app/log`; login details once in the app status). A rebuild **without** `app` closes the server''s
         previous app record (its automatic address is removed). What a rebuild keeps: IP addresses (incl. additional IPv4), server name, plan, SSH keys, firewall
         rules; tr-ist-1 deletes additional disks and snapshots, EU/US/SG keeps volumes, snapshots and backups. Errors: `app_with_user_data`, `invalid_app`, `invalid_app_domain`,
-        `app_not_supported` (legacy VDS), `tool_action_failed` with the reason (app not available for the image, hourly limit).'
+        `app_not_supported` (legacy VDS), `tool_action_failed` with the reason (app not available for the image, hourly limit).
+
+
+        **rebuild erases data** (needs `"confirm": true`): the disk is re-created from the image; on tr-ist-1 additional disks and snapshots are deleted too, IP addresses,
+        SSH keys of the order and the plan stay. A plan change (`/cloud/services/{id}/resize`) never erases data.'
       x-description-tr: 'Ağır işlemler (yeniden kurulum, reset, kurtarma, snapshot''tan dönüş, parola sıfırlama) sunucu başına günlük sınırlıdır.
 
         Tek seferlik `root_password` yalnız istekte `Idempotency-Key` **yoksa** döner (tekrar için saklanan yanıtlara sır yazılmaz;
@@ -891,7 +902,11 @@ paths:
         **2.19.1 (yeniden kurulum + uygulama)**: bulut sunucularda `rebuild` `app` (+ isteğe bağlı `app_domain`) alır: disk silinir, yeni sistem kurulur ve uygulama
         üstüne kurulur (ilerleme GET /cloud/servers/{id}/app ve `/app/log`; giriş bilgileri uygulama durumunda bir kez). `app` **olmadan** yeniden kurulum sunucunun
         önceki uygulama kaydını kapatır (otomatik adresi silinir). Korunanlar: IP adresleri (ek IPv4 dahil), sunucu adı, paket, SSH anahtarları, güvenlik duvarı kuralları;
-        tr-ist-1''de ek diskler ve snapshot''lar silinir, AB/ABD/SG''de volume, snapshot ve yedekler kalır.'
+        tr-ist-1''de ek diskler ve snapshot''lar silinir, AB/ABD/SG''de volume, snapshot ve yedekler kalır.
+
+
+        **rebuild veriyi siler** (`"confirm": true` ister): disk imajdan yeniden oluşur; tr-ist-1''de ek diskler ve snapshot''lar da silinir, IP adresleri, siparişteki
+        SSH anahtarları ve plan kalır. Plan değişikliği (`/cloud/services/{id}/resize`) veriyi asla silmez.'
       x-scope: cloud_write
       requestBody:
         content:
@@ -3108,7 +3123,29 @@ paths:
           $ref: '#/components/responses/NotFound'
         '422':
           $ref: '#/components/responses/Validation'
-      description: 'Prepaid services answer `billing: prepaid`; each option has `plan`, `current` and one `hourly` price with `monthly_cap`.'
+      description: 'Prepaid services answer `billing: prepaid`; each option has `plan`, `current` and one `hourly` price with `monthly_cap`.
+
+
+        **Data safety (Gyro Cloud Istanbul, tr-ist-1)**: a plan change keeps the disk and all its data, the IP addresses, additional disks and snapshots. The root
+        disk is enlarged in place and the file system is extended automatically; a disk never shrinks, so a plan with a smaller disk is refused with 409 `disk_shrink`
+        (also in `dry_run`; resize-options marks such plans `allowed: false`). Bigger CPU/RAM is applied live when the hypervisor allows it, otherwise the server
+        is shut down cleanly and started again (measured: 1-2 -> 2-4 restarted, about 12 seconds without SSH; 2-4 -> 4-8 live, no restart). While the server has snapshots
+        the disk cannot grow: 409 `resize_refused` (delete the snapshots first). The answer carries `data_preserved: true`, `disk: grows_only`, `restart: if_needed`.
+        Only a rebuild (`POST /cloud/servers/{id}/actions/rebuild`, needs `confirm: true`) erases data: the disk, additional disks and snapshots are deleted (IP addresses
+        stay). **`recreate_required`** (422, invoiced products only): the target plan would need the service to be re-created on another platform, which deletes its
+        data; the API never does that and nothing is changed or charged. Pick another plan from resize-options, or create a new server, move the data and delete the
+        old one.'
+      x-description-tr: '
+
+
+        **Veri güvencesi (Gyro Bulut İstanbul, tr-ist-1)**: plan değişikliği diski ve içindeki tüm veriyi, IP adreslerini, ek diskleri ve snapshot''ları korur. Kök
+        disk yerinde büyütülür ve dosya sistemi kendiliğinden genişler; disk asla küçülmez, daha küçük diskli plan 409 `disk_shrink` ile reddedilir (`dry_run`''da
+        da; resize-options bu planları `allowed: false` gösterir). Artan CPU/RAM hipervizör izin veriyorsa canlı uygulanır, yoksa sunucu düzgünce kapatılıp yeniden
+        açılır (ölçüm: 1-2 -> 2-4 yeniden başladı, SSH yaklaşık 12 sn yok; 2-4 -> 4-8 canlı, yeniden başlatma yok). Sunucuda snapshot varken disk büyütülemez: 409
+        `resize_refused` (önce snapshot''ları silin). Yanıtta `data_preserved: true`, `disk: grows_only`, `restart: if_needed`. Veriyi yalnız yeniden kurulum siler
+        (`POST /cloud/servers/{id}/actions/rebuild`, `confirm: true` ister): disk, ek diskler ve snapshot''lar silinir (IP adresleri kalır). **`recreate_required`**
+        (422, yalnız faturalı ürünler): hedef plan hizmetin başka platformda yeniden kurulmasını gerektirir, bu da veriyi siler; API bunu asla yapmaz, hiçbir şey
+        değişmez ve ücret alınmaz. resize-options''tan başka plan seçin ya da yeni sunucu açıp veriyi taşıyın.'
   /cloud/services/{id}/resize:
     parameters: *id001
     post:
@@ -3124,12 +3161,33 @@ paths:
         **Prepaid services** (`billing: prepaid`: Gyro Containers, Gyro Cloud Istanbul): no invoice and no confirm/Idempotency-Key; pick `product_id` (or `plan`,
         e.g. `standart-4-8`, `ecs-pro`) from resize-options (same product family). The module resizes the server / node pool (Istanbul servers: disks never shrink;
         containers: nodes of another size are replaced one by one, running services must fit a smaller plan). The new hourly price applies from the next hour; answer
-        `status: completed`, `effective: next_hour`, `invoice: null`. A bigger plan needs 24 hours of the price difference in the balance.'
+        `status: completed`, `effective: next_hour`, `invoice: null`. A bigger plan needs 24 hours of the price difference in the balance.
+
+
+        **Data safety (Gyro Cloud Istanbul, tr-ist-1)**: a plan change keeps the disk and all its data, the IP addresses, additional disks and snapshots. The root
+        disk is enlarged in place and the file system is extended automatically; a disk never shrinks, so a plan with a smaller disk is refused with 409 `disk_shrink`
+        (also in `dry_run`; resize-options marks such plans `allowed: false`). Bigger CPU/RAM is applied live when the hypervisor allows it, otherwise the server
+        is shut down cleanly and started again (measured: 1-2 -> 2-4 restarted, about 12 seconds without SSH; 2-4 -> 4-8 live, no restart). While the server has snapshots
+        the disk cannot grow: 409 `resize_refused` (delete the snapshots first). The answer carries `data_preserved: true`, `disk: grows_only`, `restart: if_needed`.
+        Only a rebuild (`POST /cloud/servers/{id}/actions/rebuild`, needs `confirm: true`) erases data: the disk, additional disks and snapshots are deleted (IP addresses
+        stay). **`recreate_required`** (422, invoiced products only): the target plan would need the service to be re-created on another platform, which deletes its
+        data; the API never does that and nothing is changed or charged. Pick another plan from resize-options, or create a new server, move the data and delete the
+        old one.'
       x-description-tr: 'dry_run fiyatı döndürür; gerçek değişiklik `"confirm": true` + Idempotency-Key ister. Yükseltme faturası oluşturulur ve bakiyeden ödenir;
         bakiye yetmezse `awaiting_payment` ve pay_url döner. Sunucuyu yeniden kuracak değişiklikler reddedilir (`recreate_required`).
 
         **Ön ödemeli hizmetler** (Gyro Kapsayıcı, Gyro Bulut İstanbul): fatura yok, confirm/Idempotency-Key gerekmez; resize-options''tan `product_id` ya da `plan`
-        seçin. Yeni saatlik ücret bir sonraki saatten; disk küçülmez; daha büyük plan için bakiye 24 saatlik farkı karşılamalı.'
+        seçin. Yeni saatlik ücret bir sonraki saatten; disk küçülmez; daha büyük plan için bakiye 24 saatlik farkı karşılamalı.
+
+
+        **Veri güvencesi (Gyro Bulut İstanbul, tr-ist-1)**: plan değişikliği diski ve içindeki tüm veriyi, IP adreslerini, ek diskleri ve snapshot''ları korur. Kök
+        disk yerinde büyütülür ve dosya sistemi kendiliğinden genişler; disk asla küçülmez, daha küçük diskli plan 409 `disk_shrink` ile reddedilir (`dry_run`''da
+        da; resize-options bu planları `allowed: false` gösterir). Artan CPU/RAM hipervizör izin veriyorsa canlı uygulanır, yoksa sunucu düzgünce kapatılıp yeniden
+        açılır (ölçüm: 1-2 -> 2-4 yeniden başladı, SSH yaklaşık 12 sn yok; 2-4 -> 4-8 canlı, yeniden başlatma yok). Sunucuda snapshot varken disk büyütülemez: 409
+        `resize_refused` (önce snapshot''ları silin). Yanıtta `data_preserved: true`, `disk: grows_only`, `restart: if_needed`. Veriyi yalnız yeniden kurulum siler
+        (`POST /cloud/servers/{id}/actions/rebuild`, `confirm: true` ister): disk, ek diskler ve snapshot''lar silinir (IP adresleri kalır). **`recreate_required`**
+        (422, yalnız faturalı ürünler): hedef plan hizmetin başka platformda yeniden kurulmasını gerektirir, bu da veriyi siler; API bunu asla yapmaz, hiçbir şey
+        değişmez ve ücret alınmaz. resize-options''tan başka plan seçin ya da yeni sunucu açıp veriyi taşıyın.'
       parameters:
       - $ref: '#/components/parameters/IdempotencyKey'
       requestBody:
@@ -3163,7 +3221,9 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
         '422':
-          $ref: '#/components/responses/Validation'
+          description: 'recreate_required (invoiced products: would re-create the service - refused, nothing changed) | invalid_product | confirm_required'
+        '409':
+          description: disk_shrink | resize_refused (has snapshots / busy) | not_actionable
   /cloud/services/{id}/addons/available:
     parameters: *id001
     get:
@@ -11783,7 +11843,7 @@ paths:
                   data:
                     type: object
                     properties:
-                      deploy_key: &id091
+                      deploy_key: &id092
                         type: object
                         nullable: true
                         properties:
@@ -20926,6 +20986,256 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '422':
           $ref: '#/components/responses/Validation'
+  /cloud/storage/plans:
+    get:
+      tags:
+      - Object storage
+      operationId: listStoragePlans
+      summary: List Object Storage plans
+      x-summary-tr: Nesne depolama paketlerini listele
+      x-scope: cloud_read
+      x-cli:
+        command: storage plans
+      description: 'Orderable Object Storage (`standard-*`) and Protected Storage (`protected-*`) plans with limits, prices per billing cycle (fixed EUR, VAT excluded)
+        and add-ons: extra traffic packs (`1tb`, `5tb`, one-time, this calendar month) and object lock buckets (protected plans). `available: false` = no capacity
+        right now.'
+      x-description-tr: 'Sipariş edilebilir Nesne Depolama (`standard-*`) ve Korumalı Depolama (`protected-*`) paketleri: sınırlar, dönem başına fiyat (sabit EUR,
+        KDV hariç) ve ek hizmetler: ek trafik paketi (`1tb`, `5tb`, tek seferlik, bu takvim ayı) ve nesne kilitli kova hakkı (korumalı paketler). `available: false`
+        = şu an kapasite yok.'
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/StoragePlan'
+  /cloud/storage:
+    get:
+      tags:
+      - Object storage
+      operationId: listStorageServices
+      summary: List storage services
+      x-summary-tr: Depolama hizmetlerini listele
+      x-scope: services_read
+      x-cli:
+        command: storage list
+      description: Object Storage and Protected Storage services of the account (same filters and paging as GET /cloud/services).
+      x-description-tr: Hesabın Nesne Depolama ve Korumalı Depolama hizmetleri (GET /cloud/services ile aynı süzgeç ve sayfalama).
+      parameters: []
+      responses:
+        '200':
+          description: OK
+    post:
+      tags:
+      - Object storage
+      operationId: createStorageServices
+      summary: Order Object Storage (S3)
+      x-summary-tr: Nesne depolama (S3) sipariş et
+      x-scope: cloud_order
+      x-cli:
+        command: storage create
+        money: true
+      description: 'Orders 1..N storage services of a plan in ONE order (`quantity`, default 1, max 25) and pays from the account balance (never a stored card). Billed
+        per `cycle` (monthly | quarterly | semiannually | annually; fixed EUR prices charged in the account currency) and renewed from the balance like other services.
+        `extra_traffic` (`1tb` | `5tb`) adds a one-time traffic pack for this month; `object_lock_buckets` (protected plans, 1-50) buys object lock rights (billed
+        every cycle). `name` (with `{n}`), `tags` and `project_id` label the services. Send `"dry_run": true` for a quote; a real order needs `"confirm": true` and
+        an `Idempotency-Key` header. The first bucket and the first access key are created automatically within about a minute (status `inprocess` -> `active`); then
+        use `/cloud/storage/{id}/buckets`, `/cloud/storage/{id}/keys` and `/cloud/storage/{id}/connect`. Errors: 402 `insufficient_balance`, 409 `capacity_unavailable`,
+        422 `confirm_required` (with `quote`), `product_not_orderable`, `cycle_invalid`, `invalid_extra_traffic`, `invalid_object_lock`, `invalid_quantity`; 429 `daily_limit`.'
+      x-description-tr: 'Bir paketten 1..N depolama hizmetini TEK siparişte açar (`quantity`, varsayılan 1, en çok 25) ve hesap bakiyesinden öder (kayıtlı kart asla).
+        `cycle` dönemine göre ücretlendirilir (monthly | quarterly | semiannually | annually; sabit EUR fiyat hesap para biriminde) ve diğer hizmetler gibi bakiyeden
+        yenilenir. `extra_traffic` (`1tb` | `5tb`) bu ay için tek seferlik trafik paketi ekler; `object_lock_buckets` (korumalı paketler, 1-50) nesne kilidi hakkı
+        alır (her dönem ücretlenir). `name` (`{n}` ile), `tags` ve `project_id` hizmetleri adlandırır. Teklif için `"dry_run": true`; gerçek sipariş `"confirm": true`
+        ve `Idempotency-Key` başlığı ister. İlk kova ve ilk erişim anahtarı yaklaşık bir dakikada kendiliğinden oluşur (durum `inprocess` -> `active`); sonra `/cloud/storage/{id}/buckets`,
+        `/keys`, `/connect`.'
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                plan:
+                  type: string
+                  example: standard-1tb
+                  description: plan from GET /cloud/storage/plans
+                  x-description-tr: GET /cloud/storage/plans paketi
+                product_id:
+                  type: integer
+                  description: product id instead of plan
+                  x-description-tr: plan yerine ürün kimliği
+                cycle:
+                  type: string
+                  enum:
+                  - monthly
+                  - quarterly
+                  - semiannually
+                  - annually
+                  default: monthly
+                  description: billing cycle
+                  x-description-tr: fatura dönemi
+                quantity:
+                  type: integer
+                  minimum: 1
+                  default: 1
+                  description: services to create in one order (--count), max 25
+                  x-description-tr: tek siparişte açılacak hizmet (--count), en çok 25
+                extra_traffic:
+                  type: string
+                  enum:
+                  - 1tb
+                  - 5tb
+                  description: one-time traffic pack for this calendar month
+                  x-description-tr: bu takvim ayı için tek seferlik trafik paketi
+                object_lock_buckets:
+                  type: integer
+                  minimum: 1
+                  maximum: 50
+                  description: 'protected plans: object lock bucket rights (billed every cycle)'
+                  x-description-tr: 'korumalı paketler: nesne kilitli kova hakkı (her dönem)'
+                name:
+                  type: string
+                  maxLength: 60
+                  example: gyro-yedek-{n}
+                  description: name (nickname); {n} = number in a batch
+                  x-description-tr: ad (takma ad); toplu siparişte {n} = sıra no
+                tags:
+                  type: array
+                  items:
+                    type: string
+                  maxItems: 10
+                project_id:
+                  type:
+                  - integer
+                  - 'null'
+                  description: project (0 = default project)
+                  x-description-tr: proje (0 = Genel)
+                end_customer_id:
+                  type: integer
+                  description: 'reseller main key: assign to this end-customer'
+                confirm:
+                  type: boolean
+                dry_run:
+                  type: boolean
+            example:
+              plan: standard-1tb
+              cycle: monthly
+              name: gyro-proje-s3
+              extra_traffic: 1tb
+              confirm: true
+      responses:
+        '200':
+          description: Dry-run quote
+        '201':
+          description: Ordered and paid; services are being set up
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      storage:
+                        type: object
+                        description: first service
+                      services:
+                        type: array
+                        items:
+                          type: object
+                      quantity:
+                        type: integer
+                      plan:
+                        type: string
+                      cycle:
+                        type: string
+                      order:
+                        type: object
+                      payment:
+                        type:
+                        - object
+                        - 'null'
+                      invoice:
+                        type:
+                        - object
+                        - 'null'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+  /cloud/storage/{id}:
+    get:
+      tags:
+      - Object storage
+      operationId: getStorageService
+      summary: Get a storage service
+      x-summary-tr: Depolama hizmeti ayrıntısı
+      x-scope: services_read
+      x-cli:
+        command: storage get
+      description: Service row plus `storage` (plan, kind, limits, S3 endpoint, region).
+      x-description-tr: Hizmet satırı ve `storage` (paket, tür, sınırlar, S3 uç noktası, bölge).
+      parameters:
+      - &id086
+        name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Storage service id
+      responses:
+        '200':
+          description: OK
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags:
+      - Object storage
+      operationId: deleteStorageService
+      summary: Cancel a storage service
+      x-summary-tr: Depolama hizmetini iptal et
+      x-scope: cloud_delete
+      x-cli:
+        command: storage delete
+        confirm: true
+      description: '`confirm=true` is required. `immediate=true` cancels now: access keys, website and custom domains stop within about a minute and every bucket
+        and object is deleted permanently within minutes (cannot be undone; Protected Storage versions under a COMPLIANCE lock or legal hold are kept until the lock
+        ends and stay billable). Without `immediate` a cancellation request is filed and the service keeps running until it is processed.'
+      x-description-tr: '`confirm=true` zorunlu. `immediate=true` hemen iptal eder: erişim anahtarları, web sitesi ve özel alan adları yaklaşık bir dakikada durur,
+        tüm kovalar ve nesneler dakikalar içinde kalıcı olarak silinir (geri alınamaz; Korumalı Depolama''da COMPLIANCE kilidi ya da legal hold altındaki sürümler
+        kilit bitene kadar kalır ve ücretlenir). `immediate` olmadan iptal talebi açılır, işlenene kadar hizmet çalışır.'
+      parameters:
+      - *id086
+      - name: confirm
+        in: query
+        required: true
+        schema:
+          type: boolean
+      - name: immediate
+        in: query
+        schema:
+          type: boolean
+      responses:
+        '202':
+          description: cancelling | cancellation_requested
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/Validation'
 components:
   securitySchemes:
     bearerAuth:
@@ -23324,7 +23634,7 @@ components:
           maxLength: 255
         color:
           type: string
-          enum: &id086
+          enum: &id087
           - gray
           - blue
           - green
@@ -23377,22 +23687,22 @@ components:
       required:
       - name
       properties:
-        name: &id087
+        name: &id088
           type: string
           minLength: 1
           maxLength: 40
           description: 'Letter or digit first; then letters, digits, space and . _ - / + # & ( ). Unique per account (case-insensitive). Reserved: Genel, General,
             Default.'
-        description: &id088
+        description: &id089
           type:
           - string
           - 'null'
           maxLength: 255
-        color: &id089
+        color: &id090
           type: string
-          enum: *id086
+          enum: *id087
           default: blue
-        icon: &id090
+        icon: &id091
           type: string
           enum:
           - folder
@@ -23427,10 +23737,10 @@ components:
     ProjectUpdate:
       type: object
       properties:
-        name: *id087
-        description: *id088
-        color: *id089
-        icon: *id090
+        name: *id088
+        description: *id089
+        color: *id090
+        icon: *id091
     ProjectRef:
       type:
       - object
@@ -23780,7 +24090,7 @@ components:
                   fingerprint:
                     type: string
                     example: SHA256:+DiY3wvvV6TuJJhbpZisF/zLDA0zPMSvHdkr4UvCOqU
-            deploy_key: *id091
+            deploy_key: *id092
         archive:
           type: object
           properties:
@@ -23919,3 +24229,94 @@ components:
         image_tag:
           type: string
           description: <sha7> for commits, arc-<upload> for archives
+    StoragePlan:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: product id
+        plan:
+          type: string
+          example: standard-1tb
+          description: 'plan name for POST /cloud/storage: standard-250gb | standard-1tb | standard-5tb | standard-10tb | protected-250gb | protected-1tb | protected-5tb
+            | protected-10tb'
+        name:
+          type: string
+        kind:
+          type: string
+          enum:
+          - standard
+          - protected
+          description: standard = Object Storage; protected = Protected Storage (versioning always on, object lock with the add-on)
+        region:
+          type: string
+          example: tr-ist-1
+        size_gb:
+          type: integer
+          description: storage quota
+        max_buckets:
+          type: integer
+        max_access_keys:
+          type: integer
+        max_objects:
+          type: integer
+        included_traffic_gb_month:
+          type: integer
+          description: outbound traffic included every calendar month
+        versioning:
+          type: boolean
+        object_lock:
+          description: false, or how to get it (add-on)
+        available:
+          type: boolean
+          description: false = not orderable right now (capacity)
+        prices:
+          type: array
+          items:
+            type: object
+            properties:
+              cycle:
+                type: string
+                enum:
+                - monthly
+                - quarterly
+                - semiannually
+                - annually
+              amount:
+                type: number
+              list_amount:
+                type:
+                - number
+                - 'null'
+                description: list price before the discount
+              currency:
+                type: string
+                example: EUR
+        tax_included:
+          type: boolean
+          const: false
+        addons:
+          type: object
+          properties:
+            extra_traffic:
+              type: array
+              items:
+                type: object
+                properties:
+                  size:
+                    type: string
+                    enum:
+                    - 1tb
+                    - 5tb
+                  extra_traffic_gb:
+                    type: integer
+                  price:
+                    type: object
+                  billing:
+                    type: string
+              description: one-time traffic packs, valid until the end of the calendar month of purchase
+            object_lock_buckets:
+              type:
+              - object
+              - 'null'
+              description: 'protected plans: price per locked bucket per cycle (min 1, max 50)'
