@@ -13,7 +13,7 @@ gyro-lb-delete - Delete (cancel) a load balancer
 Delete (cancel) a load balancer
 
 .PP
-\fBconfirm=true\fR required. \fBimmediate=true\fR cancels now: traffic and billing stop, the load balancer and its certificates are destroyed after the grace period (3 days). Without immediate a cancellation request is filed.
+\fBconfirm=true\fR required. \fBimmediate=true\fR cancels now: traffic and billing stop, the load balancer and its certificates are deleted permanently at once. Without immediate a cancellation request is filed.
 
 .PP
 API: DELETE /cloud/load-balancers/{id} (operationId deleteLoadBalancer, scope cloud_delete)

@@ -6,7 +6,7 @@ Scale a service
 
 Scale a service
 
-Sets the number of instances (0 = stop, settings kept). Does not create a revision. Refused with 409 `autoscaling_enabled` while autoscaling is on (change min/max instead).
+Sets the number of instances (0 = stop, settings kept). Does not create a revision. Refused with 409 `autoscaling_enabled` while autoscaling is on (change min/max instead). Refused with 422 `invalid_replicas` (`details.max` = your plan's limit) when the count is outside 0..max copies per service.
 
 API: POST /cloud/containers/{id}/services/{name}/scale (operationId typed_post_containers__id__services__name__scale, scope services_write)
 

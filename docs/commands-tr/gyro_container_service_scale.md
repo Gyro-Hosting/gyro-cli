@@ -6,7 +6,7 @@ Servisi ölçekle
 
 Servisi ölçekle
 
-Örnek sayısını ayarlar (0 = durdur). Sürüm oluşturmaz.
+Örnek sayısını ayarlar (0 = durdur). Sürüm oluşturmaz. Sayı servis başına 0..en fazla kopya aralığı dışındaysa 422 `invalid_replicas` (`details.max` = planınızın sınırı).
 
 API: POST /cloud/containers/{id}/services/{name}/scale (operationId typed_post_containers__id__services__name__scale, scope services_write)
 

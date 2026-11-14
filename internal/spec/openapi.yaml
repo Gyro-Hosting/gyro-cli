@@ -2,7 +2,7 @@
 openapi: 3.1.0
 info:
   title: Gyro Public API
-  version: 2.24.3
+  version: 2.24.4
   summary: Manage Gyro cloud servers, SSH keys and billing programmatically.
   x-summary-tr: Gyro bulut sunucularınızı, SSH anahtarlarınızı ve faturalarınızı programla yönetin.
   description: "The Gyro Public API lets you automate everything you do in the Gyro client area:\norder and manage cloud servers, keep SSH keys, read invoices and\
@@ -57,7 +57,10 @@ info:
     \ = `hours` x hourly; `billed_hours` kept (= `hours`). Replaces the 672-hour serverless ceiling announced in 2.24.1. Capped plans (servers, dedicated nodes) unchanged.\n\
     \n**2.24.3**: Security groups: a rule change that removes or narrows SSH/RDP access for a source on an attached server is a 5 minute trial on every path (API\
     \ included; before only when the caller's own address was cut); the group object has `trial` and `trial_seconds_left` also while `applying`. Deleting a server\
-    \ removes its group attachments, so the group can be deleted. Group changes are written to each attached server's change log.\n"
+    \ removes its group attachments, so the group can be deleted. Group changes are written to each attached server's change log.\n\n**2.24.4**: Container services:\
+    \ a replica count (scale, create, update, autoscaling max) outside the plan limit is refused with 422 `invalid_replicas` and the message names the limit (`details.max`).\
+    \ GET /cloud/servers/{id}: Gyro Compute servers in tr-ist-1 show the SSH keys given at creation (`ssh_keys.fingerprints`, `ssh_keys.key_ids`, `method: cloud-init`;\
+    \ `state: none` when no key was given) instead of null.\n"
   x-description-tr: "Gyro Public API, müşteri panelinde yaptığınız her işi otomatikleştirmenizi sağlar:\nbulut sunucu siparişi ve yönetimi, SSH anahtarları, fatura\
     \ ve bakiye okuma.\nResmi Terraform sağlayıcısı (`gyro-hosting/gyro`) ve `gyroctl` bu API'yi kullanır.\n\n* **Taban adres** `https://www.gyrohosting.com/api/v1/client`\n\
     * **Kimlik** `Authorization: Bearer wck_...` (anahtarı *Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri* bölümünden oluşturun)\n* **Biçim** JSON\
@@ -110,7 +113,9 @@ info:
     \ Sunucusuz tavanının yerine geçer. Tavanlı planlar (sunucu, ayrılmış düğüm) değişmedi.\n\n**2.24.3**: Güvenlik grupları: bağlı bir sunucuda bir kaynağın SSH/RDP\
     \ erişimini kaldıran ya da daraltan kural değişikliği her yoldan (API dahil; önceden yalnız çağıranın kendi adresi kesilince) 5 dakikalık denemedir; grup nesnesinde\
     \ `trial` ve `trial_seconds_left` `applying` sırasında da dolu. Sunucu silinince grup bağları kalkar, grup silinebilir. Grup değişiklikleri bağlı her sunucunun\
-    \ değişiklik kaydına yazılır.\n"
+    \ değişiklik kaydına yazılır.\n\n**2.24.4**: Kapsayıcı servisleri: plan sınırı dışındaki kopya sayısı (ölçek, oluşturma, güncelleme, otomatik ölçek max) 422 `invalid_replicas`\
+    \ ile reddedilir, mesaj sınırı söyler (`details.max`). GET /cloud/servers/{id}: tr-ist-1 Gyro Compute sunucularında oluşturmada verilen SSH anahtarları görünür\
+    \ (`ssh_keys.fingerprints`, `ssh_keys.key_ids`, `method: cloud-init`; anahtar verilmediyse `state: none`), önceden null idi.\n"
   contact:
     name: Gyro Hosting
     url: https://www.gyrohosting.com
@@ -3594,10 +3599,10 @@ paths:
       x-cli:
         command: lb delete
         confirm: true
-      description: '`confirm=true` required. `immediate=true` cancels now: traffic and billing stop, the load balancer and its certificates are destroyed after the
-        grace period (3 days). Without immediate a cancellation request is filed.'
-      x-description-tr: '`confirm=true` gerekir. `immediate=true` hemen iptal eder: trafik ve faturalama durur, yük dengeleyici ve sertifikaları bekleme süresinden
-        (3 gün) sonra silinir. immediate yoksa iptal talebi açılır.'
+      description: '`confirm=true` required. `immediate=true` cancels now: traffic and billing stop, the load balancer and its certificates are deleted permanently
+        at once. Without immediate a cancellation request is filed.'
+      x-description-tr: '`confirm=true` gerekir. `immediate=true` hemen iptal eder: trafik ve faturalama durur, yük dengeleyici ve sertifikaları hemen kalıcı olarak
+        silinir. immediate yoksa iptal talebi açılır.'
       parameters:
       - name: id
         in: path
@@ -8679,10 +8684,12 @@ paths:
       x-scope: services_write
       description: 'Starts a new service on your dedicated node pool. Name: lowercase letters, digits and ''-'', max 40. Fails with 409 `quota_exceeded` when the
         pool has no room. Secret values are set separately (PUT .../secrets). **Serverless environments:** `cpu_m` / `memory_mi` must be one of the pairs from `GET
-        /cloud/billing/container-sizes` (0.25-4 vCPU); billing is per running copy per hour (`POST /cloud/billing/estimate` with `type: serverless`).'
+        /cloud/billing/container-sizes` (0.25-4 vCPU); billing is per running copy per hour (`POST /cloud/billing/estimate` with `type: serverless`). Refused with
+        422 `invalid_replicas` (`details.max` = your plan''s limit) when the count is outside 0..max copies per service.'
       x-description-tr: 'Size ayrılmış düğüm havuzunda yeni servis başlatır. Ad: küçük harf, rakam, ''-'', en çok 40. Havuzda yer yoksa 409 `quota_exceeded`. Gizli
         değerler ayrıca (PUT .../secrets). **Sunucusuz ortam:** `cpu_m` / `memory_mi` `GET /cloud/billing/container-sizes` çiftlerinden biri olmalı (0,25-4 vCPU);
-        ücret çalışan kopya başına saatliktir (`POST /cloud/billing/estimate`, `type: serverless`).'
+        ücret çalışan kopya başına saatliktir (`POST /cloud/billing/estimate`, `type: serverless`). Sayı servis başına 0..en fazla kopya aralığı dışındaysa 422 `invalid_replicas`
+        (`details.max` = planınızın sınırı).'
       parameters:
       - name: id
         in: path
@@ -8868,10 +8875,10 @@ paths:
       description: 'Send only the fields to change (e.g. `image`). Every change except `replicas` creates a new revision and rolls out instance by instance without
         downtime. With autoscaling on, `replicas` is ignored (the autoscaler owns it). `autoscaling` / `alerts` are settings, not revisions. **Serverless environments:**
         `cpu_m` / `memory_mi` must be one of the pairs from `GET /cloud/billing/container-sizes` (0.25-4 vCPU); billing is per running copy per hour (`POST /cloud/billing/estimate`
-        with `type: serverless`).'
+        with `type: serverless`). Refused with 422 `invalid_replicas` (`details.max` = your plan''s limit) when the count is outside 0..max copies per service.'
       x-description-tr: 'Yalnız değişecek alanları gönderin (ör. `image`). `replicas` dışındaki her değişiklik yeni sürüm oluşturur ve kesintisiz dağıtılır. **Sunucusuz
         ortam:** `cpu_m` / `memory_mi` `GET /cloud/billing/container-sizes` çiftlerinden biri olmalı (0,25-4 vCPU); ücret çalışan kopya başına saatliktir (`POST /cloud/billing/estimate`,
-        `type: serverless`).'
+        `type: serverless`). Sayı servis başına 0..en fazla kopya aralığı dışındaysa 422 `invalid_replicas` (`details.max` = planınızın sınırı).'
       parameters:
       - name: id
         in: path
@@ -8992,8 +8999,9 @@ paths:
       x-summary-tr: Servisi ölçekle
       x-scope: services_write
       description: Sets the number of instances (0 = stop, settings kept). Does not create a revision. Refused with 409 `autoscaling_enabled` while autoscaling is
-        on (change min/max instead).
-      x-description-tr: Örnek sayısını ayarlar (0 = durdur). Sürüm oluşturmaz.
+        on (change min/max instead). Refused with 422 `invalid_replicas` (`details.max` = your plan's limit) when the count is outside 0..max copies per service.
+      x-description-tr: Örnek sayısını ayarlar (0 = durdur). Sürüm oluşturmaz. Sayı servis başına 0..en fazla kopya aralığı dışındaysa 422 `invalid_replicas` (`details.max`
+        = planınızın sınırı).
       parameters:
       - name: id
         in: path
@@ -9717,10 +9725,10 @@ paths:
       description: 'Body `{"autoscaling": {"enabled": true, "min": 1, "max": 5, "cpu_percent": 70, "memory_percent": 0}, "alerts": {"min_ready": 2}}`. Replicas are
         added when the average use exceeds the target (at most double per 30 s) and removed one per minute after 3 calm minutes. Max cannot exceed the plan replica
         limit; replicas that do not fit in the node pool wait (`warnings: max_exceeds_capacity`, alert `capacity`). Not a revision. Switching off keeps the current
-        replica count (or `replicas`).'
+        replica count (or `replicas`). Refused with 422 `invalid_replicas` (`details.max` = your plan''s limit) when the count is outside 0..max copies per service.'
       x-description-tr: 'Gövde `{"autoscaling": {...}, "alerts": {"min_ready": 2}}`. Ortalama kullanım hedefi aşınca kopya eklenir (30 sn''de en çok iki katı), 3
         dakika sakin kalınca dakikada bir azaltılır. En çok kopya paket sınırını aşamaz; havuza sığmayan kopyalar bekler. Sürüm oluşturmaz. Kapatınca mevcut kopya
-        sayısı (ya da `replicas`) kalır.'
+        sayısı (ya da `replicas`) kalır. Sayı servis başına 0..en fazla kopya aralığı dışındaysa 422 `invalid_replicas` (`details.max` = planınızın sınırı).'
       parameters:
       - name: id
         in: path
@@ -21415,7 +21423,7 @@ components:
             type: integer
           maxItems: 10
           description: 'Ids from /cloud/ssh-keys. Global regions: one key, installed at creation. tr-ist-1: up to 10 keys, installed for root at creation through
-            cloud-init (2.14.0; `ssh_keys` on GET /cloud/servers/{id} stays null for these servers).'
+            cloud-init (`ssh_keys` on GET /cloud/servers/{id} lists their fingerprints and key ids).'
         hostname:
           type: string
           example: web-1.example.com
@@ -22690,7 +22698,8 @@ components:
       type:
       - object
       - 'null'
-      description: 'tr-ist-1 only: install state of the SSH keys given at creation (null = none requested).'
+      description: 'tr-ist-1: SSH keys given at creation. Gyro Compute servers (installed with cloud-init at creation): `state` installed | none, `method: cloud-init`,
+        `fingerprints`, `key_ids` (matching keys of your account). Older tr-ist-1 servers: install state of the guest job.'
       properties:
         state:
           type: string
@@ -22700,6 +22709,7 @@ components:
           - installed
           - failed
           - cancelled
+          - none
         fingerprints:
           type: array
           items:
@@ -22711,8 +22721,18 @@ components:
           - string
           - 'null'
         updated_at:
-          type: string
+          type:
+          - string
+          - 'null'
           format: date-time
+        method:
+          type: string
+          description: cloud-init (installed at creation) or guest-job
+        key_ids:
+          type: array
+          items:
+            type: integer
+          description: Ids of your account keys (/cloud/ssh-keys) with these fingerprints
     MoneyEur:
       allOf:
       - $ref: '#/components/schemas/Money'

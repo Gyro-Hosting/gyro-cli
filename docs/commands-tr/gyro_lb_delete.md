@@ -6,7 +6,7 @@ Yük dengeleyiciyi sil (iptal)
 
 Yük dengeleyiciyi sil (iptal)
 
-`confirm=true` gerekir. `immediate=true` hemen iptal eder: trafik ve faturalama durur, yük dengeleyici ve sertifikaları bekleme süresinden (3 gün) sonra silinir. immediate yoksa iptal talebi açılır.
+`confirm=true` gerekir. `immediate=true` hemen iptal eder: trafik ve faturalama durur, yük dengeleyici ve sertifikaları hemen kalıcı olarak silinir. immediate yoksa iptal talebi açılır.
 
 API: DELETE /cloud/load-balancers/{id} (operationId deleteLoadBalancer, scope cloud_delete)
 

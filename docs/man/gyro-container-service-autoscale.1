@@ -13,7 +13,7 @@ gyro-container-service-autoscale - Autoscaling / alert threshold of a service
 Autoscaling / alert threshold of a service
 
 .PP
-Body \fB{"autoscaling": {"enabled": true, "min": 1, "max": 5, "cpu_percent": 70, "memory_percent": 0}, "alerts": {"min_ready": 2}}\fR\&. Replicas are added when the average use exceeds the target (at most double per 30 s) and removed one per minute after 3 calm minutes. Max cannot exceed the plan replica limit; replicas that do not fit in the node pool wait (\fBwarnings: max_exceeds_capacity\fR, alert \fBcapacity\fR). Not a revision. Switching off keeps the current replica count (or \fBreplicas\fR).
+Body \fB{"autoscaling": {"enabled": true, "min": 1, "max": 5, "cpu_percent": 70, "memory_percent": 0}, "alerts": {"min_ready": 2}}\fR\&. Replicas are added when the average use exceeds the target (at most double per 30 s) and removed one per minute after 3 calm minutes. Max cannot exceed the plan replica limit; replicas that do not fit in the node pool wait (\fBwarnings: max_exceeds_capacity\fR, alert \fBcapacity\fR). Not a revision. Switching off keeps the current replica count (or \fBreplicas\fR). Refused with 422 \fBinvalid_replicas\fR (\fBdetails.max\fR = your plan's limit) when the count is outside 0..max copies per service.
 
 .PP
 API: PUT /cloud/containers/{id}/services/{name}/autoscaling (operationId typed_put_containers\fBid\fPservices\fBname\fPautoscaling, scope services_write)

@@ -6,7 +6,7 @@ Delete (cancel) a load balancer
 
 Delete (cancel) a load balancer
 
-`confirm=true` required. `immediate=true` cancels now: traffic and billing stop, the load balancer and its certificates are destroyed after the grace period (3 days). Without immediate a cancellation request is filed.
+`confirm=true` required. `immediate=true` cancels now: traffic and billing stop, the load balancer and its certificates are deleted permanently at once. Without immediate a cancellation request is filed.
 
 API: DELETE /cloud/load-balancers/{id} (operationId deleteLoadBalancer, scope cloud_delete)
 

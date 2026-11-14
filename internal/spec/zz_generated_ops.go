@@ -3,7 +3,7 @@
 package spec
 
 // APIVersion is info.version of the spec this table was generated from.
-const APIVersion = "2.24.3"
+const APIVersion = "2.24.4"
 
 // Ops lists every API operation.
 var Ops = []Op{
@@ -684,7 +684,7 @@ var Ops = []Op{
 	},
 	{ID: "typed_post_containers__id__services", Method: "POST", Path: "/cloud/containers/{id}/services", Tag: "Containers",
 		Summary: "Create a container service", SummaryTR: "Kapsayıcı servisi oluştur",
-		Desc: "Starts a new service on your dedicated node pool. Name: lowercase letters, digits and '-', max 40. Fails with 409 `quota_exceeded` when the pool has no room. Secret values are set separately (PUT .../secrets). **Serverless environments:** `cpu_m` / `memory_mi` must be one of the pairs from `GET /cloud/billing/container-sizes` (0.25-4 vCPU); billing is per running copy per hour (`POST /cloud/billing/estimate` with `type: serverless`).", DescTR: "Size ayrılmış düğüm havuzunda yeni servis başlatır. Ad: küçük harf, rakam, '-', en çok 40. Havuzda yer yoksa 409 `quota_exceeded`. Gizli değerler ayrıca (PUT .../secrets). **Sunucusuz ortam:** `cpu_m` / `memory_mi` `GET /cloud/billing/container-sizes` çiftlerinden biri olmalı (0,25-4 vCPU); ücret çalışan kopya başına saatliktir (`POST /cloud/billing/estimate`, `type: serverless`).",
+		Desc: "Starts a new service on your dedicated node pool. Name: lowercase letters, digits and '-', max 40. Fails with 409 `quota_exceeded` when the pool has no room. Secret values are set separately (PUT .../secrets). **Serverless environments:** `cpu_m` / `memory_mi` must be one of the pairs from `GET /cloud/billing/container-sizes` (0.25-4 vCPU); billing is per running copy per hour (`POST /cloud/billing/estimate` with `type: serverless`). Refused with 422 `invalid_replicas` (`details.max` = your plan's limit) when the count is outside 0..max copies per service.", DescTR: "Size ayrılmış düğüm havuzunda yeni servis başlatır. Ad: küçük harf, rakam, '-', en çok 40. Havuzda yer yoksa 409 `quota_exceeded`. Gizli değerler ayrıca (PUT .../secrets). **Sunucusuz ortam:** `cpu_m` / `memory_mi` `GET /cloud/billing/container-sizes` çiftlerinden biri olmalı (0,25-4 vCPU); ücret çalışan kopya başına saatliktir (`POST /cloud/billing/estimate`, `type: serverless`). Sayı servis başına 0..en fazla kopya aralığı dışındaysa 422 `invalid_replicas` (`details.max` = planınızın sınırı).",
 		Scope: "services_write", Command: []string{"container", "service", "create"},
 		HasBody: true, BodyRequired: true, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
 		Params: []Param{
@@ -720,7 +720,7 @@ var Ops = []Op{
 	},
 	{ID: "typed_patch_containers__id__services__name", Method: "PATCH", Path: "/cloud/containers/{id}/services/{name}", Tag: "Containers",
 		Summary: "Deploy a new version / change settings", SummaryTR: "Yeni sürüm dağıt / ayar değiştir",
-		Desc: "Send only the fields to change (e.g. `image`). Every change except `replicas` creates a new revision and rolls out instance by instance without downtime. With autoscaling on, `replicas` is ignored (the autoscaler owns it). `autoscaling` / `alerts` are settings, not revisions. **Serverless environments:** `cpu_m` / `memory_mi` must be one of the pairs from `GET /cloud/billing/container-sizes` (0.25-4 vCPU); billing is per running copy per hour (`POST /cloud/billing/estimate` with `type: serverless`).", DescTR: "Yalnız değişecek alanları gönderin (ör. `image`). `replicas` dışındaki her değişiklik yeni sürüm oluşturur ve kesintisiz dağıtılır. **Sunucusuz ortam:** `cpu_m` / `memory_mi` `GET /cloud/billing/container-sizes` çiftlerinden biri olmalı (0,25-4 vCPU); ücret çalışan kopya başına saatliktir (`POST /cloud/billing/estimate`, `type: serverless`).",
+		Desc: "Send only the fields to change (e.g. `image`). Every change except `replicas` creates a new revision and rolls out instance by instance without downtime. With autoscaling on, `replicas` is ignored (the autoscaler owns it). `autoscaling` / `alerts` are settings, not revisions. **Serverless environments:** `cpu_m` / `memory_mi` must be one of the pairs from `GET /cloud/billing/container-sizes` (0.25-4 vCPU); billing is per running copy per hour (`POST /cloud/billing/estimate` with `type: serverless`). Refused with 422 `invalid_replicas` (`details.max` = your plan's limit) when the count is outside 0..max copies per service.", DescTR: "Yalnız değişecek alanları gönderin (ör. `image`). `replicas` dışındaki her değişiklik yeni sürüm oluşturur ve kesintisiz dağıtılır. **Sunucusuz ortam:** `cpu_m` / `memory_mi` `GET /cloud/billing/container-sizes` çiftlerinden biri olmalı (0,25-4 vCPU); ücret çalışan kopya başına saatliktir (`POST /cloud/billing/estimate`, `type: serverless`). Sayı servis başına 0..en fazla kopya aralığı dışındaysa 422 `invalid_replicas` (`details.max` = planınızın sınırı).",
 		Scope: "services_write", Command: []string{"container", "service", "update"},
 		HasBody: true, BodyRequired: true, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
 		Params: []Param{
@@ -760,7 +760,7 @@ var Ops = []Op{
 	},
 	{ID: "typed_put_containers__id__services__name__autoscaling", Method: "PUT", Path: "/cloud/containers/{id}/services/{name}/autoscaling", Tag: "Containers",
 		Summary: "Autoscaling / alert threshold of a service", SummaryTR: "Servisin otomatik ölçekleme / uyarı eşiği",
-		Desc: "Body `{\"autoscaling\": {\"enabled\": true, \"min\": 1, \"max\": 5, \"cpu_percent\": 70, \"memory_percent\": 0}, \"alerts\": {\"min_ready\": 2}}`. Replicas are added when the average use exceeds the target (at most double per 30 s) and removed one per minute after 3 calm minutes. Max cannot exceed the plan replica limit; replicas that do not fit in the node pool wait (`warnings: max_exceeds_capacity`, alert `capacity`). Not a revision. Switching off keeps the current replica count (or `replicas`).", DescTR: "Gövde `{\"autoscaling\": {...}, \"alerts\": {\"min_ready\": 2}}`. Ortalama kullanım hedefi aşınca kopya eklenir (30 sn'de en çok iki katı), 3 dakika sakin kalınca dakikada bir azaltılır. En çok kopya paket sınırını aşamaz; havuza sığmayan kopyalar bekler. Sürüm oluşturmaz. Kapatınca mevcut kopya sayısı (ya da `replicas`) kalır.",
+		Desc: "Body `{\"autoscaling\": {\"enabled\": true, \"min\": 1, \"max\": 5, \"cpu_percent\": 70, \"memory_percent\": 0}, \"alerts\": {\"min_ready\": 2}}`. Replicas are added when the average use exceeds the target (at most double per 30 s) and removed one per minute after 3 calm minutes. Max cannot exceed the plan replica limit; replicas that do not fit in the node pool wait (`warnings: max_exceeds_capacity`, alert `capacity`). Not a revision. Switching off keeps the current replica count (or `replicas`). Refused with 422 `invalid_replicas` (`details.max` = your plan's limit) when the count is outside 0..max copies per service.", DescTR: "Gövde `{\"autoscaling\": {...}, \"alerts\": {\"min_ready\": 2}}`. Ortalama kullanım hedefi aşınca kopya eklenir (30 sn'de en çok iki katı), 3 dakika sakin kalınca dakikada bir azaltılır. En çok kopya paket sınırını aşamaz; havuza sığmayan kopyalar bekler. Sürüm oluşturmaz. Kapatınca mevcut kopya sayısı (ya da `replicas`) kalır. Sayı servis başına 0..en fazla kopya aralığı dışındaysa 422 `invalid_replicas` (`details.max` = planınızın sınırı).",
 		Scope: "services_write", Command: []string{"container", "service", "autoscale"},
 		HasBody: true, BodyRequired: true, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
 		Params: []Param{
@@ -905,7 +905,7 @@ var Ops = []Op{
 	},
 	{ID: "typed_post_containers__id__services__name__scale", Method: "POST", Path: "/cloud/containers/{id}/services/{name}/scale", Tag: "Containers",
 		Summary: "Scale a service", SummaryTR: "Servisi ölçekle",
-		Desc: "Sets the number of instances (0 = stop, settings kept). Does not create a revision. Refused with 409 `autoscaling_enabled` while autoscaling is on (change min/max instead).", DescTR: "Örnek sayısını ayarlar (0 = durdur). Sürüm oluşturmaz.",
+		Desc: "Sets the number of instances (0 = stop, settings kept). Does not create a revision. Refused with 409 `autoscaling_enabled` while autoscaling is on (change min/max instead). Refused with 422 `invalid_replicas` (`details.max` = your plan's limit) when the count is outside 0..max copies per service.", DescTR: "Örnek sayısını ayarlar (0 = durdur). Sürüm oluşturmaz. Sayı servis başına 0..en fazla kopya aralığı dışındaysa 422 `invalid_replicas` (`details.max` = planınızın sınırı).",
 		Scope: "services_write", Command: []string{"container", "service", "scale"},
 		HasBody: true, BodyRequired: true, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
 		Params: []Param{
@@ -1387,7 +1387,7 @@ var Ops = []Op{
 	},
 	{ID: "deleteLoadBalancer", Method: "DELETE", Path: "/cloud/load-balancers/{id}", Tag: "Load balancers",
 		Summary: "Delete (cancel) a load balancer", SummaryTR: "Yük dengeleyiciyi sil (iptal)",
-		Desc: "`confirm=true` required. `immediate=true` cancels now: traffic and billing stop, the load balancer and its certificates are destroyed after the grace period (3 days). Without immediate a cancellation request is filed.", DescTR: "`confirm=true` gerekir. `immediate=true` hemen iptal eder: trafik ve faturalama durur, yük dengeleyici ve sertifikaları bekleme süresinden (3 gün) sonra silinir. immediate yoksa iptal talebi açılır.",
+		Desc: "`confirm=true` required. `immediate=true` cancels now: traffic and billing stop, the load balancer and its certificates are deleted permanently at once. Without immediate a cancellation request is filed.", DescTR: "`confirm=true` gerekir. `immediate=true` hemen iptal eder: trafik ve faturalama durur, yük dengeleyici ve sertifikaları hemen kalıcı olarak silinir. immediate yoksa iptal talebi açılır.",
 		Scope: "cloud_delete", Command: []string{"lb", "delete"},
 		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: true, Money: false, Hidden: false,
 		Params: []Param{
@@ -2421,7 +2421,7 @@ var Ops = []Op{
 			{Name: "location", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "Deprecated alias of region", DescTR: ""},
 			{Name: "cycle", Type: "string", Items: "", Enum: []string{"monthly", "quarterly", "semiannually", "annually"}, Default: "monthly", Required: false, Desc: "", DescTR: ""},
 			{Name: "image", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
-			{Name: "ssh_keys", Type: "array", Items: "integer", Enum: nil, Default: "", Required: false, Desc: "Ids from /cloud/ssh-keys. Global regions: one key, installed at creation. tr-ist-1: up to 10 keys, installed for root at creation through cloud-init (2.14.0; `ssh_keys` on GET /cloud/servers/{id} stays null for these servers).", DescTR: ""},
+			{Name: "ssh_keys", Type: "array", Items: "integer", Enum: nil, Default: "", Required: false, Desc: "Ids from /cloud/ssh-keys. Global regions: one key, installed at creation. tr-ist-1: up to 10 keys, installed for root at creation through cloud-init (`ssh_keys` on GET /cloud/servers/{id} lists their fingerprints and key ids).", DescTR: ""},
 			{Name: "hostname", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "In a batch `{n}` is replaced with 1..N (e.g. `web-{n}.example.com`); without `{n}` `-1`, `-2`... is appended.", DescTR: ""},
 			{Name: "user_data", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "cloud-init user data: `#cloud-config` or a `#!` script, max 32 KiB. Accepted in every region (tr-ist-1 since 2.14.0). Ignored when a one-click application is chosen on the product.", DescTR: "cloud-init kullanıcı verisi: `#cloud-config` ya da `#!` betiği, en çok 32 KiB. Tüm bölgelerde (tr-ist-1'de 2.14.0'dan beri) kabul edilir. Üründe tek tıkla uygulama seçilirse kullanılmaz."},
 			{Name: "dry_run", Type: "boolean", Items: "", Enum: nil, Default: "false", Required: false, Desc: "", DescTR: ""},

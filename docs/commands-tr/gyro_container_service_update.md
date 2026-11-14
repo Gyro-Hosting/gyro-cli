@@ -6,7 +6,7 @@ Yeni sürüm dağıt / ayar değiştir
 
 Yeni sürüm dağıt / ayar değiştir
 
-Yalnız değişecek alanları gönderin (ör. `image`). `replicas` dışındaki her değişiklik yeni sürüm oluşturur ve kesintisiz dağıtılır. **Sunucusuz ortam:** `cpu_m` / `memory_mi` `GET /cloud/billing/container-sizes` çiftlerinden biri olmalı (0,25-4 vCPU); ücret çalışan kopya başına saatliktir (`POST /cloud/billing/estimate`, `type: serverless`).
+Yalnız değişecek alanları gönderin (ör. `image`). `replicas` dışındaki her değişiklik yeni sürüm oluşturur ve kesintisiz dağıtılır. **Sunucusuz ortam:** `cpu_m` / `memory_mi` `GET /cloud/billing/container-sizes` çiftlerinden biri olmalı (0,25-4 vCPU); ücret çalışan kopya başına saatliktir (`POST /cloud/billing/estimate`, `type: serverless`). Sayı servis başına 0..en fazla kopya aralığı dışındaysa 422 `invalid_replicas` (`details.max` = planınızın sınırı).
 
 API: PATCH /cloud/containers/{id}/services/{name} (operationId typed_patch_containers__id__services__name, scope services_write)
 

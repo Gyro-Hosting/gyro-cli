@@ -6,7 +6,7 @@ Kapsayıcı servisi oluştur
 
 Kapsayıcı servisi oluştur
 
-Size ayrılmış düğüm havuzunda yeni servis başlatır. Ad: küçük harf, rakam, '-', en çok 40. Havuzda yer yoksa 409 `quota_exceeded`. Gizli değerler ayrıca (PUT .../secrets). **Sunucusuz ortam:** `cpu_m` / `memory_mi` `GET /cloud/billing/container-sizes` çiftlerinden biri olmalı (0,25-4 vCPU); ücret çalışan kopya başına saatliktir (`POST /cloud/billing/estimate`, `type: serverless`).
+Size ayrılmış düğüm havuzunda yeni servis başlatır. Ad: küçük harf, rakam, '-', en çok 40. Havuzda yer yoksa 409 `quota_exceeded`. Gizli değerler ayrıca (PUT .../secrets). **Sunucusuz ortam:** `cpu_m` / `memory_mi` `GET /cloud/billing/container-sizes` çiftlerinden biri olmalı (0,25-4 vCPU); ücret çalışan kopya başına saatliktir (`POST /cloud/billing/estimate`, `type: serverless`). Sayı servis başına 0..en fazla kopya aralığı dışındaysa 422 `invalid_replicas` (`details.max` = planınızın sınırı).
 
 API: POST /cloud/containers/{id}/services (operationId typed_post_containers__id__services, scope services_write)
 
