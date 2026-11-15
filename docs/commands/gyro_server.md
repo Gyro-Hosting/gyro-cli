@@ -33,6 +33,7 @@ gyro server [flags]
 
 * [gyro](gyro.md)	 - Gyro Hosting command-line interface
 * [gyro server activity](gyro_server_activity.md)	 - Recent platform actions on the server
+* [gyro server agent](gyro_server_agent.md)	 - Guest agent version
 * [gyro server app](gyro_server_app.md)	 - App install status (credentials shown once when ready)
 * [gyro server backup](gyro_server_backup.md)	 - List automatic backups
 * [gyro server console](gyro_server_console.md)	 - Open a one-time VNC console ticket

@@ -360,6 +360,8 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro security-group server set` | Set the exact list of attached groups | `PUT /cloud/servers/{id}/security-groups` |
 | `gyro security-group update` | Rename / describe a security group | `PATCH /cloud/security-groups/{sg}` |
 | `gyro server activity list` | Recent platform actions on the server | `GET /cloud/servers/{id}/activity` |
+| `gyro server agent get` | Guest agent version | `GET /cloud/servers/{id}/agent` |
+| `gyro server agent update` | Update the guest agent | `POST /cloud/servers/{id}/agent/update` |
 | `gyro server app create` | Install an app (rebuilds the disk; confirm required; 3 per server per day) | `POST /cloud/servers/{id}/app` |
 | `gyro server app get` | App install status (credentials shown once when ready) | `GET /cloud/servers/{id}/app` |
 | `gyro server app log get` | Live progress log of the latest app install (step changes, server log tail) | `GET /cloud/servers/{id}/app/log` |

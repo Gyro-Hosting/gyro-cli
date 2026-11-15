@@ -2,7 +2,7 @@
 openapi: 3.1.0
 info:
   title: Gyro Public API
-  version: 2.34.0
+  version: 2.35.0
   summary: Manage Gyro cloud servers, SSH keys and billing programmatically.
   x-summary-tr: Gyro bulut sunucularınızı, SSH anahtarlarınızı ve faturalarınızı programla yönetin.
   description: "The Gyro Public API lets you automate everything you do in the Gyro client area:\norder and manage cloud servers, keep SSH keys, read invoices and\
@@ -95,7 +95,9 @@ info:
     \ alert events `log_rule`, `log_quota`). The service log route accepts the same filters. Additive.\n\n**2.34.0**: container environments in private networks:\
     \ `GET|PUT|PATCH|DELETE /cloud/containers/{id}/vpc` attaches a node environment to a VPC subnet (fixed /28 VPC source range, VPC endpoint for published services,\
     \ free; Serverless 501). Port forwards take a source allow list `source_cidrs` (POST) and `PATCH /cloud/vpcs/{vpc_id}/port-forwards/{pf_id}` changes it. `Vpc.containers`\
-    \ lists attached environments. Additive.\n"
+    \ lists attached environments. Additive.\n\n**2.35.0**: guest agent for tr-ist-1 servers: `GET /cloud/servers/{id}/agent` (version, `update_available`, one-line\
+    \ `update_command`) and `POST /cloud/servers/{id}/agent/update` (automatic update for agent 3). Servers installed before private networking need it for `applied`\
+    \ cards and public IP off. Additive.\n"
   x-description-tr: "Gyro Public API, müşteri panelinde yaptığınız her işi otomatikleştirmenizi sağlar:\nbulut sunucu siparişi ve yönetimi, SSH anahtarları, fatura\
     \ ve bakiye okuma.\nResmi Terraform sağlayıcısı (`gyro-hosting/gyro`) ve `gyroctl` bu API'yi kullanır.\n\n* **Taban adres** `https://www.gyrohosting.com/api/v1/client`\n\
     * **Kimlik** `Authorization: Bearer wck_...` (anahtarı *Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri* bölümünden oluşturun)\n* **Biçim** JSON\
@@ -185,7 +187,9 @@ info:
     \ `POST .../log-rules/test`, uyarı olayları `log_rule`, `log_quota`). Servis log rotası aynı filtreleri kabul eder. Geriye uyumlu.\n\n**2.34.0**: kapsayıcı ortamları\
     \ özel ağda: `GET|PUT|PATCH|DELETE /cloud/containers/{id}/vpc` düğümlü ortamı bir VPC subnetine bağlar (sabit /28 VPC kaynak aralığı, yayınlanan servisler için\
     \ VPC uç noktası, ücretsiz; Sunucusuz 501). Port yönlendirme kaynak izin listesi `source_cidrs` alır (POST), `PATCH /cloud/vpcs/{vpc_id}/port-forwards/{pf_id}`\
-    \ değiştirir. `Vpc.containers` bağlı ortamları listeler. Geriye uyumlu.\n"
+    \ değiştirir. `Vpc.containers` bağlı ortamları listeler. Geriye uyumlu.\n\n**2.35.0**: tr-ist-1 sunucularında misafir ajanı: `GET /cloud/servers/{id}/agent` (sürüm,\
+    \ `update_available`, tek satır `update_command`) ve `POST /cloud/servers/{id}/agent/update` (ajan 3 için otomatik güncelleme). Özel ağ öncesi kurulan sunucularda\
+    \ kartın `applied` olması ve public IP kapatma için gerekir. Geriye uyumlu.\n"
   contact:
     name: Gyro Hosting
     url: https://www.gyrohosting.com
@@ -24139,10 +24143,11 @@ paths:
       description: 'Turning the public IPv4 off makes the server reachable only from its VPC, through a gateway port forward or with the web console (which always
         works). Confirm with the server''s current IP (`confirm_ip`). Needs a ready private card (409 `no_private_network`) and no additional IPv4 (409 `extra_ips`).
         If the VPC gateway (NAT) is off the server loses internet access: refused with 409 `no_egress` unless `allow_no_egress: true`. The address stays reserved
-        for the server; turning it on brings the same IP. '
+        for the server; turning it on brings the same IP. An old guest agent answers 409 `agent_update_required` (see GET /cloud/servers/{id}/agent). '
       x-description-tr: 'Public IPv4 kapanınca sunucuya yalnız VPC''den, kapı port yönlendirmesinden ya da web konsoldan (her zaman çalışır) erişilir. Onay için sunucunun
         mevcut IP''si (`confirm_ip`) yazılır. Hazır bir özel kart (409 `no_private_network`) gerekir ve ek IPv4 olmamalı (409 `extra_ips`). VPC kapısı (NAT) kapalıysa
-        sunucu internete çıkamaz: `allow_no_egress: true` verilmezse 409 `no_egress`. Adres sunucuya ayrılmış kalır; açınca aynı IP gelir. '
+        sunucu internete çıkamaz: `allow_no_egress: true` verilmezse 409 `no_egress`. Adres sunucuya ayrılmış kalır; açınca aynı IP gelir. Eski misafir ajanı 409
+        `agent_update_required` döner (bkz. GET /cloud/servers/{id}/agent). '
       parameters:
       - *id083
       responses:
@@ -24388,6 +24393,108 @@ paths:
                       id:
                         type: integer
         '401': *id101
+  /cloud/servers/{id}/agent:
+    get:
+      tags:
+      - Private networks
+      operationId: getServerAgent
+      summary: Guest agent version
+      x-summary-tr: Misafir ajanı sürümü
+      x-scope: cloud_read
+      x-cli:
+        command: server agent get
+      description: 'The Gyro guest agent configures private network cards and the public-IP-off route inside the server. Servers installed before 14 November 2026
+        run an older agent: a card attaches but `applied` stays false and turning the public IP off answers 409 `agent_update_required`. `update_command` is a one-line
+        command to run on the server as root (downloads Gyro''s versioned updater and checks its SHA-256); it only replaces the agent, needs no restart and does not
+        touch your data. If you gave the card an address yourself (netplan), delete that file and run `netplan apply` afterwards. The version is read from the server
+        when it is running.'
+      x-description-tr: 'Gyro misafir ajanı özel ağ kartlarını ve public IP kapalıyken rotayı sunucu içinde yapılandırır. 14 Kasım 2026 öncesi kurulan sunucularda
+        eski ajan vardır: kart takılır ama `applied` false kalır ve public IP kapatma 409 `agent_update_required` döner. `update_command`, sunucuda root olarak çalıştırılacak
+        tek satır komuttur (Gyro''nun sürümlü güncelleyicisini indirir ve SHA-256 özetini doğrular); yalnız ajanı değiştirir, yeniden başlatma gerekmez, verilere
+        dokunmaz. Karta adresi kendiniz verdiyseniz (netplan) sonra o dosyayı silip `netplan apply` çalıştırın. Sürüm, sunucu açıksa sunucudan okunur.'
+      parameters:
+      - *id083
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ServerAgent'
+        '403':
+          description: not_available (private networks are not enabled for this account yet) / forbidden (key limited to some servers)
+          content: *id045
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'conflict: limit_exceeded, vpc_in_use, subnet_in_use, last_subnet, gateway_disabled, gateway_in_use, port_in_use, already_attached, other_vpc,
+            extra_ips, no_private_network, no_egress, already_off, already_on, last_network, no_billing_server, suspended, busy'
+          content: *id045
+        '422':
+          $ref: '#/components/responses/Validation'
+        '503':
+          description: capacity / pool_exhausted (try again later)
+          content: *id045
+  /cloud/servers/{id}/agent/update:
+    post:
+      tags: *id093
+      operationId: updateServerAgent
+      summary: Update the guest agent
+      x-summary-tr: Misafir ajanını güncelle
+      x-scope: cloud_write
+      x-cli:
+        command: server agent update
+      description: 'Starts the automatic update through the old agent''s fixed Gyro download channel (agent 3, or unknown version which is checked first); the server
+        keeps running, about 30 s, then the private network settings are applied again. Refusals (409): `manual_update_required` (agent 1-2: run `update_command`),
+        `already_latest`, `not_running`, `not_supported`, `busy`. The task fails when the server cannot reach the internet; then run `update_command` from the web
+        console. The Gyro guest agent configures private network cards and the public-IP-off route inside the server. Servers installed before 14 November 2026 run
+        an older agent: a card attaches but `applied` stays false and turning the public IP off answers 409 `agent_update_required`. `update_command` is a one-line
+        command to run on the server as root (downloads Gyro''s versioned updater and checks its SHA-256); it only replaces the agent, needs no restart and does not
+        touch your data. If you gave the card an address yourself (netplan), delete that file and run `netplan apply` afterwards. '
+      x-description-tr: 'Eski ajanın sabit Gyro indirme kanalıyla otomatik güncellemeyi başlatır (ajan 3 ya da önce sorgulanan bilinmeyen sürüm); sunucu çalışmaya
+        devam eder, yaklaşık 30 sn, ardından özel ağ ayarı yeniden uygulanır. Ret (409): `manual_update_required` (ajan 1-2: `update_command` çalıştırın), `already_latest`,
+        `not_running`, `not_supported`, `busy`. Sunucu internete çıkamıyorsa görev başarısız olur; o zaman `update_command`''ı web konsoldan çalıştırın. Gyro misafir
+        ajanı özel ağ kartlarını ve public IP kapalıyken rotayı sunucu içinde yapılandırır. 14 Kasım 2026 öncesi kurulan sunucularda eski ajan vardır: kart takılır
+        ama `applied` false kalır ve public IP kapatma 409 `agent_update_required` döner. `update_command`, sunucuda root olarak çalıştırılacak tek satır komuttur
+        (Gyro''nun sürümlü güncelleyicisini indirir ve SHA-256 özetini doğrular); yalnız ajanı değiştirir, yeniden başlatma gerekmez, verilere dokunmaz. Karta adresi
+        kendiniz verdiyseniz (netplan) sonra o dosyayı silip `netplan apply` çalıştırın. '
+      parameters:
+      - *id083
+      responses:
+        '202':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      server_id:
+                        type: integer
+                      state:
+                        type: string
+                        example: updating
+                      task_id:
+                        type: integer
+        '403':
+          description: not_available (private networks are not enabled for this account yet) / forbidden (key limited to some servers)
+          content: *id045
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'conflict: limit_exceeded, vpc_in_use, subnet_in_use, last_subnet, gateway_disabled, gateway_in_use, port_in_use, already_attached, other_vpc,
+            extra_ips, no_private_network, no_egress, already_off, already_on, last_network, no_billing_server, suspended, busy'
+          content: *id045
+        '422':
+          $ref: '#/components/responses/Validation'
+        '503':
+          description: capacity / pool_exhausted (try again later)
+          content: *id045
 components:
   securitySchemes:
     bearerAuth:
@@ -28322,4 +28429,35 @@ components:
           type: string
           format: date-time
         error:
+          type: string
+    ServerAgent:
+      type: object
+      properties:
+        server_id:
+          type: integer
+        version:
+          type: string
+          description: agent version on the server; empty = not known yet
+          example: '3'
+        latest:
+          type: string
+          example: '4.2'
+        update_available:
+          type: boolean
+        auto_update:
+          type: boolean
+          description: POST .../agent/update can update it (agent 3 or unknown version)
+        private_network_supported:
+          type: boolean
+          description: agent 4+
+        network_applied:
+          type: boolean
+        supported:
+          type: boolean
+          description: false for operating systems without the updater (FreeBSD, Windows)
+        update_command:
+          type: string
+        update_url:
+          type: string
+        update_sha256:
           type: string

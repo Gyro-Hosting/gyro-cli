@@ -6,7 +6,7 @@ Public IPv4'ü kapat
 
 Public IPv4'ü kapat
 
-Public IPv4 kapanınca sunucuya yalnız VPC'den, kapı port yönlendirmesinden ya da web konsoldan (her zaman çalışır) erişilir. Onay için sunucunun mevcut IP'si (`confirm_ip`) yazılır. Hazır bir özel kart (409 `no_private_network`) gerekir ve ek IPv4 olmamalı (409 `extra_ips`). VPC kapısı (NAT) kapalıysa sunucu internete çıkamaz: `allow_no_egress: true` verilmezse 409 `no_egress`. Adres sunucuya ayrılmış kalır; açınca aynı IP gelir.
+Public IPv4 kapanınca sunucuya yalnız VPC'den, kapı port yönlendirmesinden ya da web konsoldan (her zaman çalışır) erişilir. Onay için sunucunun mevcut IP'si (`confirm_ip`) yazılır. Hazır bir özel kart (409 `no_private_network`) gerekir ve ek IPv4 olmamalı (409 `extra_ips`). VPC kapısı (NAT) kapalıysa sunucu internete çıkamaz: `allow_no_egress: true` verilmezse 409 `no_egress`. Adres sunucuya ayrılmış kalır; açınca aynı IP gelir. Eski misafir ajanı 409 `agent_update_required` döner (bkz. GET /cloud/servers/{id}/agent).
 
 API: DELETE /cloud/servers/{id}/public-ip (operationId disableServerPublicIp, scope cloud_write)
 

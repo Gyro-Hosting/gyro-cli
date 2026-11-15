@@ -33,6 +33,7 @@ gyro server [flags]
 
 * [gyro](gyro.md)	 - Gyro Hosting komut satırı aracı
 * [gyro server activity](gyro_server_activity.md)	 - Sunucudaki son platform işlemleri
+* [gyro server agent](gyro_server_agent.md)	 - Misafir ajanı sürümü
 * [gyro server app](gyro_server_app.md)	 - Uygulama kurulum durumu (hazır olunca kimlik bir kez)
 * [gyro server backup](gyro_server_backup.md)	 - Otomatik yedekleri listele
 * [gyro server console](gyro_server_console.md)	 - Tek seferlik VNC konsol bileti al

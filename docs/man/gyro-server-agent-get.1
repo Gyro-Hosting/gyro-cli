@@ -1,0 +1,77 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-server-agent-get - Guest agent version
+
+
+.SH SYNOPSIS
+\fBgyro server agent get  [flags]\fP
+
+
+.SH DESCRIPTION
+Guest agent version
+
+.PP
+The Gyro guest agent configures private network cards and the public-IP-off route inside the server. Servers installed before 14 November 2026 run an older agent: a card attaches but \fBapplied\fR stays false and turning the public IP off answers 409 \fBagent_update_required\fR\&. \fBupdate_command\fR is a one-line command to run on the server as root (downloads Gyro's versioned updater and checks its SHA-256); it only replaces the agent, needs no restart and does not touch your data. If you gave the card an address yourself (netplan), delete that file and run \fBnetplan apply\fR afterwards. The version is read from the server when it is running.
+
+.PP
+API: GET /cloud/servers/{id}/agent (operationId getServerAgent, scope cloud_read)
+
+
+.SH OPTIONS
+\fB-h\fP, \fB--help\fP[=false]
+	help for get
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH SEE ALSO
+\fBgyro-server-agent(1)\fP

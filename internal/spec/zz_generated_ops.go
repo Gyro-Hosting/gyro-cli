@@ -3,7 +3,7 @@
 package spec
 
 // APIVersion is info.version of the spec this table was generated from.
-const APIVersion = "2.34.0"
+const APIVersion = "2.35.0"
 
 // Ops lists every API operation.
 var Ops = []Op{
@@ -2985,6 +2985,26 @@ var Ops = []Op{
 			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Server id (= service id in the client area)", DescTR: ""},
 		},
 	},
+	{ID: "getServerAgent", Method: "GET", Path: "/cloud/servers/{id}/agent", Tag: "Private networks",
+		Summary: "Guest agent version", SummaryTR: "Misafir ajanı sürümü",
+		Desc: "The Gyro guest agent configures private network cards and the public-IP-off route inside the server. Servers installed before 14 November 2026 run an older agent: a card attaches but `applied` stays false and turning the public IP off answers 409 `agent_update_required`. `update_command` is a one-line command to run on the server as root (downloads Gyro's versioned updater and checks its SHA-256); it only replaces the agent, needs no restart and does not touch your data. If you gave the card an address yourself (netplan), delete that file and run `netplan apply` afterwards. The version is read from the server when it is running.", DescTR: "Gyro misafir ajanı özel ağ kartlarını ve public IP kapalıyken rotayı sunucu içinde yapılandırır. 14 Kasım 2026 öncesi kurulan sunucularda eski ajan vardır: kart takılır ama `applied` false kalır ve public IP kapatma 409 `agent_update_required` döner. `update_command`, sunucuda root olarak çalıştırılacak tek satır komuttur (Gyro'nun sürümlü güncelleyicisini indirir ve SHA-256 özetini doğrular); yalnız ajanı değiştirir, yeniden başlatma gerekmez, verilere dokunmaz. Karta adresi kendiniz verdiyseniz (netplan) sonra o dosyayı silip `netplan apply` çalıştırın. Sürüm, sunucu açıksa sunucudan okunur.",
+		Scope: "cloud_read", Command: []string{"server", "agent", "get"},
+		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
+		Columns: []string{"server_id", "version", "latest", "update_available", "auto_update", "private_network_supported", "network_applied", "supported", "update_command", "update_url", "update_sha256"},
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Server id (tr-ist-1)", DescTR: ""},
+		},
+	},
+	{ID: "updateServerAgent", Method: "POST", Path: "/cloud/servers/{id}/agent/update", Tag: "Private networks",
+		Summary: "Update the guest agent", SummaryTR: "Misafir ajanını güncelle",
+		Desc: "Starts the automatic update through the old agent's fixed Gyro download channel (agent 3, or unknown version which is checked first); the server keeps running, about 30 s, then the private network settings are applied again. Refusals (409): `manual_update_required` (agent 1-2: run `update_command`), `already_latest`, `not_running`, `not_supported`, `busy`. The task fails when the server cannot reach the internet; then run `update_command` from the web console. The Gyro guest agent configures private network cards and the public-IP-off route inside the server. Servers installed before 14 November 2026 run an older agent: a card attaches but `applied` stays false and turning the public IP off answers 409 `agent_update_required`. `update_command` is a one-line command to run on the server as root (downloads Gyro's versioned updater and checks its SHA-256); it only replaces the agent, needs no restart and does not touch your data. If you gave the card an address yourself (netplan), delete that file and run `netplan apply` afterwards.", DescTR: "Eski ajanın sabit Gyro indirme kanalıyla otomatik güncellemeyi başlatır (ajan 3 ya da önce sorgulanan bilinmeyen sürüm); sunucu çalışmaya devam eder, yaklaşık 30 sn, ardından özel ağ ayarı yeniden uygulanır. Ret (409): `manual_update_required` (ajan 1-2: `update_command` çalıştırın), `already_latest`, `not_running`, `not_supported`, `busy`. Sunucu internete çıkamıyorsa görev başarısız olur; o zaman `update_command`'ı web konsoldan çalıştırın. Gyro misafir ajanı özel ağ kartlarını ve public IP kapalıyken rotayı sunucu içinde yapılandırır. 14 Kasım 2026 öncesi kurulan sunucularda eski ajan vardır: kart takılır ama `applied` false kalır ve public IP kapatma 409 `agent_update_required` döner. `update_command`, sunucuda root olarak çalıştırılacak tek satır komuttur (Gyro'nun sürümlü güncelleyicisini indirir ve SHA-256 özetini doğrular); yalnız ajanı değiştirir, yeniden başlatma gerekmez, verilere dokunmaz. Karta adresi kendiniz verdiyseniz (netplan) sonra o dosyayı silip `netplan apply` çalıştırın.",
+		Scope: "cloud_write", Command: []string{"server", "agent", "update"},
+		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
+		Columns: []string{"server_id", "state", "task_id"},
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Server id (tr-ist-1)", DescTR: ""},
+		},
+	},
 	{ID: "getAppInstall", Method: "GET", Path: "/cloud/servers/{id}/app", Tag: "One-click apps",
 		Summary: "App install status (credentials shown once when ready)", SummaryTR: "Uygulama kurulum durumu (hazır olunca kimlik bir kez)",
 		Desc: "Since 2.7.0 also `stuck` (open but silent for too long), `stuck_reason` (`no_callback` = the server never reported back), `last_update_at`, `attempt`, `can_retry`, `error_code`, `step_text`. Live log: GET /cloud/servers/{id}/app/log.", DescTR: "2.7.0 ile ayrıca `stuck` (açık ama uzun süredir haber yok), `stuck_reason` (`no_callback` = sunucu hiç haber vermedi), `last_update_at`, `attempt`, `can_retry`, `error_code`, `step_text`. Canlı günlük: GET /cloud/servers/{id}/app/log.",
@@ -3306,7 +3326,7 @@ var Ops = []Op{
 	},
 	{ID: "disableServerPublicIp", Method: "DELETE", Path: "/cloud/servers/{id}/public-ip", Tag: "Private networks",
 		Summary: "Turn the public IPv4 off", SummaryTR: "Public IPv4'ü kapat",
-		Desc: "Turning the public IPv4 off makes the server reachable only from its VPC, through a gateway port forward or with the web console (which always works). Confirm with the server's current IP (`confirm_ip`). Needs a ready private card (409 `no_private_network`) and no additional IPv4 (409 `extra_ips`). If the VPC gateway (NAT) is off the server loses internet access: refused with 409 `no_egress` unless `allow_no_egress: true`. The address stays reserved for the server; turning it on brings the same IP.", DescTR: "Public IPv4 kapanınca sunucuya yalnız VPC'den, kapı port yönlendirmesinden ya da web konsoldan (her zaman çalışır) erişilir. Onay için sunucunun mevcut IP'si (`confirm_ip`) yazılır. Hazır bir özel kart (409 `no_private_network`) gerekir ve ek IPv4 olmamalı (409 `extra_ips`). VPC kapısı (NAT) kapalıysa sunucu internete çıkamaz: `allow_no_egress: true` verilmezse 409 `no_egress`. Adres sunucuya ayrılmış kalır; açınca aynı IP gelir.",
+		Desc: "Turning the public IPv4 off makes the server reachable only from its VPC, through a gateway port forward or with the web console (which always works). Confirm with the server's current IP (`confirm_ip`). Needs a ready private card (409 `no_private_network`) and no additional IPv4 (409 `extra_ips`). If the VPC gateway (NAT) is off the server loses internet access: refused with 409 `no_egress` unless `allow_no_egress: true`. The address stays reserved for the server; turning it on brings the same IP. An old guest agent answers 409 `agent_update_required` (see GET /cloud/servers/{id}/agent).", DescTR: "Public IPv4 kapanınca sunucuya yalnız VPC'den, kapı port yönlendirmesinden ya da web konsoldan (her zaman çalışır) erişilir. Onay için sunucunun mevcut IP'si (`confirm_ip`) yazılır. Hazır bir özel kart (409 `no_private_network`) gerekir ve ek IPv4 olmamalı (409 `extra_ips`). VPC kapısı (NAT) kapalıysa sunucu internete çıkamaz: `allow_no_egress: true` verilmezse 409 `no_egress`. Adres sunucuya ayrılmış kalır; açınca aynı IP gelir. Eski misafir ajanı 409 `agent_update_required` döner (bkz. GET /cloud/servers/{id}/agent).",
 		Scope: "cloud_write", Command: []string{"server", "public-ip", "off"},
 		HasBody: true, BodyRequired: true, ListResponse: false, Paginated: false, Confirm: true, Money: false, Hidden: false,
 		Columns: []string{"server_id", "ip", "enabled", "extra_ips", "private_ready", "task_id"},

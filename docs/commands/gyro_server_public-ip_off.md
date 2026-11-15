@@ -6,7 +6,7 @@ Turn the public IPv4 off
 
 Turn the public IPv4 off
 
-Turning the public IPv4 off makes the server reachable only from its VPC, through a gateway port forward or with the web console (which always works). Confirm with the server's current IP (`confirm_ip`). Needs a ready private card (409 `no_private_network`) and no additional IPv4 (409 `extra_ips`). If the VPC gateway (NAT) is off the server loses internet access: refused with 409 `no_egress` unless `allow_no_egress: true`. The address stays reserved for the server; turning it on brings the same IP.
+Turning the public IPv4 off makes the server reachable only from its VPC, through a gateway port forward or with the web console (which always works). Confirm with the server's current IP (`confirm_ip`). Needs a ready private card (409 `no_private_network`) and no additional IPv4 (409 `extra_ips`). If the VPC gateway (NAT) is off the server loses internet access: refused with 409 `no_egress` unless `allow_no_egress: true`. The address stays reserved for the server; turning it on brings the same IP. An old guest agent answers 409 `agent_update_required` (see GET /cloud/servers/{id}/agent).
 
 API: DELETE /cloud/servers/{id}/public-ip (operationId disableServerPublicIp, scope cloud_write)
 

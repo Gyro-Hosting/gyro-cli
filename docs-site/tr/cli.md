@@ -360,6 +360,8 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro security-group server set` | Bağlı grupları tam liste olarak ayarla | `PUT /cloud/servers/{id}/security-groups` |
 | `gyro security-group update` | Güvenlik grubunun adını / açıklamasını değiştir | `PATCH /cloud/security-groups/{sg}` |
 | `gyro server activity list` | Sunucudaki son platform işlemleri | `GET /cloud/servers/{id}/activity` |
+| `gyro server agent get` | Misafir ajanı sürümü | `GET /cloud/servers/{id}/agent` |
+| `gyro server agent update` | Misafir ajanını güncelle | `POST /cloud/servers/{id}/agent/update` |
 | `gyro server app create` | Uygulama kur (diski yeniden kurar; confirm zorunlu; sunucu başına günde 3) | `POST /cloud/servers/{id}/app` |
 | `gyro server app get` | Uygulama kurulum durumu (hazır olunca kimlik bir kez) | `GET /cloud/servers/{id}/app` |
 | `gyro server app log get` | Son uygulama kurulumunun canlı ilerleme günlüğü (adımlar, sunucu günlüğü) | `GET /cloud/servers/{id}/app/log` |
