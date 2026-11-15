@@ -414,6 +414,9 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro server snapshot delete` | Delete a snapshot | `DELETE /cloud/servers/{id}/snapshots/{sid}` |
 | `gyro server snapshot list` | List snapshots and the snapshot quota | `GET /cloud/servers/{id}/snapshots` |
 | `gyro server snapshot restore` | Restore a snapshot onto the server (overwrites the disk) | `POST /cloud/servers/{id}/snapshots/{sid}/restore` |
+| `gyro server snapshot-schedule delete` | Remove the snapshot schedule | `DELETE /cloud/servers/{id}/snapshot-schedule` |
+| `gyro server snapshot-schedule get` | Scheduled snapshots of a server | `GET /cloud/servers/{id}/snapshot-schedule` |
+| `gyro server snapshot-schedule set` | Create or change the snapshot schedule | `PUT /cloud/servers/{id}/snapshot-schedule` |
 | `gyro server storage-mount command` | New install command (rotates the mount key) | `POST /cloud/servers/{id}/storage-mounts/{mid}/command` |
 | `gyro server storage-mount create` | Mount a bucket on the server | `POST /cloud/servers/{id}/storage-mounts` |
 | `gyro server storage-mount get` | Get one storage mount | `GET /cloud/servers/{id}/storage-mounts/{mid}` |

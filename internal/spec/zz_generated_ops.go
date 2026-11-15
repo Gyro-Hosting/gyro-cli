@@ -3,7 +3,7 @@
 package spec
 
 // APIVersion is info.version of the spec this table was generated from.
-const APIVersion = "2.39.0"
+const APIVersion = "2.40.0"
 
 // Ops lists every API operation.
 var Ops = []Op{
@@ -3548,6 +3548,44 @@ var Ops = []Op{
 		Params: []Param{
 			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Server id (= service id in the client area)", DescTR: ""},
 			{Name: "sg", In: "path", Type: "string", Items: "", Enum: nil, Default: "", Required: true, Desc: "", DescTR: ""},
+		},
+	},
+	{ID: "getSnapshotSchedule", Method: "GET", Path: "/cloud/servers/{id}/snapshot-schedule", Tag: "Snapshots and backups",
+		Summary: "Scheduled snapshots of a server", SummaryTR: "Sunucunun zamanlanmış snapshot planı",
+		Desc: "Gyro Cloud Istanbul (tr-ist-1) servers only (other servers: 422 `not_supported`). A snapshot named `auto-YYYYMMDD-HHMM` is taken every day or every week at `hour`:`minute` Türkiye time (Europe/Istanbul); before it the oldest automatic snapshots are deleted so at most `keep` of them stay. Snapshots you take yourself are never deleted, but they count toward the server's snapshot limit (`snapshot_limit`, manual + automatic): when the limit is full the run is skipped (`last_status` skipped, `last_error` snapshot_limit). Snapshots above the free allowance of a prepaid server are billed hourly like manual ones. While the server has snapshots an extra disk cannot be grown (409 `has_snapshots`): turn the schedule off and delete the snapshots first.", DescTR: "Yalnız Gyro Bulut İstanbul (tr-ist-1) sunucuları (diğerleri: 422 `not_supported`). Her gün ya da her hafta `hour`:`minute` Türkiye saatinde `auto-YYYYMMDD-HHMM` adlı snapshot alınır; öncesinde en eski otomatik snapshot'lar silinerek en çok `keep` tanesi kalır. Elle aldığınız snapshot'lar asla silinmez ama sunucunun snapshot sınırına (`snapshot_limit`, elle + otomatik) sayılır: sınır doluysa çalışma atlanır (`last_status` skipped, `last_error` snapshot_limit). Ön ödemeli sunucuda ücretsiz hakkın üstündeki snapshot'lar elle alınanlar gibi saatlik ücretlenir. Sunucuda snapshot varken ek disk büyütülemez (409 `has_snapshots`): önce planı kapatıp snapshot'ları silin.",
+		Scope: "cloud_read", Command: []string{"server", "snapshot-schedule", "get"},
+		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
+		Columns: []string{"server_id", "configured", "enabled", "frequency", "weekday", "hour", "minute", "keep", "time_zone", "snapshot_limit", "next_run_at", "last_run_at", "last_status", "last_error"},
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Server (service) id", DescTR: ""},
+		},
+	},
+	{ID: "setSnapshotSchedule", Method: "PUT", Path: "/cloud/servers/{id}/snapshot-schedule", Tag: "Snapshots and backups",
+		Summary: "Create or change the snapshot schedule", SummaryTR: "Zamanlanmış snapshot planını oluştur ya da değiştir",
+		Desc: "Fields left out keep their value (a new schedule starts from daily 03:00, keep 7, enabled). `keep` is 1 to the server's snapshot limit; `weekday` only for weekly. Gyro Cloud Istanbul (tr-ist-1) servers only (other servers: 422 `not_supported`). A snapshot named `auto-YYYYMMDD-HHMM` is taken every day or every week at `hour`:`minute` Türkiye time (Europe/Istanbul); before it the oldest automatic snapshots are deleted so at most `keep` of them stay. Snapshots you take yourself are never deleted, but they count toward the server's snapshot limit (`snapshot_limit`, manual + automatic): when the limit is full the run is skipped (`last_status` skipped, `last_error` snapshot_limit). Snapshots above the free allowance of a prepaid server are billed hourly like manual ones. While the server has snapshots an extra disk cannot be grown (409 `has_snapshots`): turn the schedule off and delete the snapshots first.", DescTR: "Gönderilmeyen alan değişmez (yeni plan her gün 03:00, keep 7, açık ile başlar). `keep` 1 ile sunucunun snapshot sınırı arası; `weekday` yalnız haftalıkta. Yalnız Gyro Bulut İstanbul (tr-ist-1) sunucuları (diğerleri: 422 `not_supported`). Her gün ya da her hafta `hour`:`minute` Türkiye saatinde `auto-YYYYMMDD-HHMM` adlı snapshot alınır; öncesinde en eski otomatik snapshot'lar silinerek en çok `keep` tanesi kalır. Elle aldığınız snapshot'lar asla silinmez ama sunucunun snapshot sınırına (`snapshot_limit`, elle + otomatik) sayılır: sınır doluysa çalışma atlanır (`last_status` skipped, `last_error` snapshot_limit). Ön ödemeli sunucuda ücretsiz hakkın üstündeki snapshot'lar elle alınanlar gibi saatlik ücretlenir. Sunucuda snapshot varken ek disk büyütülemez (409 `has_snapshots`): önce planı kapatıp snapshot'ları silin.",
+		Scope: "cloud_write", Command: []string{"server", "snapshot-schedule", "set"},
+		HasBody: true, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
+		Columns: []string{"server_id", "configured", "enabled", "frequency", "weekday", "hour", "minute", "keep", "time_zone", "snapshot_limit", "next_run_at", "last_run_at", "last_status", "last_error"},
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Server (service) id", DescTR: ""},
+		},
+		Body: []Field{
+			{Name: "enabled", Type: "boolean", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
+			{Name: "frequency", Type: "string", Items: "", Enum: []string{"daily", "weekly"}, Default: "", Required: false, Desc: "", DescTR: ""},
+			{Name: "weekday", Type: "string", Items: "", Enum: []string{"sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"}, Default: "", Required: false, Desc: "weekly only (0-6 also accepted, 0 = Sunday)", DescTR: ""},
+			{Name: "hour", Type: "integer", Items: "", Enum: nil, Default: "", Required: false, Desc: "Türkiye time", DescTR: ""},
+			{Name: "minute", Type: "integer", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
+			{Name: "keep", Type: "integer", Items: "", Enum: nil, Default: "", Required: false, Desc: "<= snapshot_limit", DescTR: ""},
+		},
+	},
+	{ID: "deleteSnapshotSchedule", Method: "DELETE", Path: "/cloud/servers/{id}/snapshot-schedule", Tag: "Snapshots and backups",
+		Summary: "Remove the snapshot schedule", SummaryTR: "Zamanlanmış snapshot planını kaldır",
+		Desc: "The schedule is removed; existing snapshots (automatic ones too) stay. Gyro Cloud Istanbul (tr-ist-1) servers only (other servers: 422 `not_supported`). A snapshot named `auto-YYYYMMDD-HHMM` is taken every day or every week at `hour`:`minute` Türkiye time (Europe/Istanbul); before it the oldest automatic snapshots are deleted so at most `keep` of them stay. Snapshots you take yourself are never deleted, but they count toward the server's snapshot limit (`snapshot_limit`, manual + automatic): when the limit is full the run is skipped (`last_status` skipped, `last_error` snapshot_limit). Snapshots above the free allowance of a prepaid server are billed hourly like manual ones. While the server has snapshots an extra disk cannot be grown (409 `has_snapshots`): turn the schedule off and delete the snapshots first.", DescTR: "Plan kaldırılır; mevcut snapshot'lar (otomatikler dahil) durur. Yalnız Gyro Bulut İstanbul (tr-ist-1) sunucuları (diğerleri: 422 `not_supported`). Her gün ya da her hafta `hour`:`minute` Türkiye saatinde `auto-YYYYMMDD-HHMM` adlı snapshot alınır; öncesinde en eski otomatik snapshot'lar silinerek en çok `keep` tanesi kalır. Elle aldığınız snapshot'lar asla silinmez ama sunucunun snapshot sınırına (`snapshot_limit`, elle + otomatik) sayılır: sınır doluysa çalışma atlanır (`last_status` skipped, `last_error` snapshot_limit). Ön ödemeli sunucuda ücretsiz hakkın üstündeki snapshot'lar elle alınanlar gibi saatlik ücretlenir. Sunucuda snapshot varken ek disk büyütülemez (409 `has_snapshots`): önce planı kapatıp snapshot'ları silin.",
+		Scope: "cloud_write", Command: []string{"server", "snapshot-schedule", "delete"},
+		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: true, Money: false, Hidden: false,
+		Columns: []string{"server_id", "configured", "deleted"},
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Server (service) id", DescTR: ""},
 		},
 	},
 	{ID: "listSnapshots", Method: "GET", Path: "/cloud/servers/{id}/snapshots", Tag: "Snapshots and backups",

@@ -54,6 +54,7 @@ gyro server [flags]
 * [gyro server rescue](gyro_server_rescue.md)	 - Rescue system (boot into a recovery Linux)
 * [gyro server reset-password](gyro_server_reset-password.md)	 - Set a new random root password (shown once)
 * [gyro server snapshot](gyro_server_snapshot.md)	 - List snapshots and the snapshot quota
+* [gyro server snapshot-schedule](gyro_server_snapshot-schedule.md)	 - Scheduled snapshots of a server
 * [gyro server ssh](gyro_server_ssh.md)	 - Open an SSH session to a server
 * [gyro server storage-mount](gyro_server_storage-mount.md)	 - List object storage mounts of a server
 * [gyro server update](gyro_server_update.md)	 - Change host name or auto-renew

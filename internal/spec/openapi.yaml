@@ -2,7 +2,7 @@
 openapi: 3.1.0
 info:
   title: Gyro Public API
-  version: 2.39.0
+  version: 2.40.0
   summary: Manage Gyro cloud servers, SSH keys and billing programmatically.
   x-summary-tr: Gyro bulut sunucularınızı, SSH anahtarlarınızı ve faturalarınızı programla yönetin.
   description: "The Gyro Public API lets you automate everything you do in the Gyro client area:\norder and manage cloud servers, keep SSH keys, read invoices and\
@@ -106,7 +106,9 @@ info:
     \ overage invoice. Additive.\n\n**2.38.0**: serverless container environments can join a VPC too (`PUT /cloud/containers/{id}/vpc`). Their connection is charged\
     \ (2.99 EUR/month, hourly from the prepaid balance while attached): `GET .../vpc` returns `pricing`, attaching needs `\"confirm\": true` (422 `confirm_required`\
     \ with `details.pricing` otherwise). Node environments stay free. Additive.\n\n**2.39.0**: port forwards take an optional `name` (POST, and `PATCH /cloud/vpcs/{vpc_id}/port-forwards/{pf_id}`\
-    \ with `source_cidrs` and/or `name`). `GET /cloud/containers/{id}/services/{name}` always returns `spec.alerts` (`min_ready` 0 when off). Additive.\n"
+    \ with `source_cidrs` and/or `name`). `GET /cloud/containers/{id}/services/{name}` always returns `spec.alerts` (`min_ready` 0 when off). Additive.\n\n**2.40.0**:\
+    \ scheduled snapshots of Gyro Cloud Istanbul servers: `GET|PUT|DELETE /cloud/servers/{id}/snapshot-schedule` (daily or weekly at a Türkiye time, keep the last\
+    \ N automatic snapshots). Additive.\n"
   x-description-tr: "Gyro Public API, müşteri panelinde yaptığınız her işi otomatikleştirmenizi sağlar:\nbulut sunucu siparişi ve yönetimi, SSH anahtarları, fatura\
     \ ve bakiye okuma.\nResmi Terraform sağlayıcısı (`gyro-hosting/gyro`) ve `gyroctl` bu API'yi kullanır.\n\n* **Taban adres** `https://www.gyrohosting.com/api/v1/client`\n\
     * **Kimlik** `Authorization: Bearer wck_...` (anahtarı *Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri* bölümünden oluşturun)\n* **Biçim** JSON\
@@ -208,7 +210,8 @@ info:
     \ /cloud/containers/{id}/vpc`). Bağlantıları ücretlidir (2,99 €/ay, bağlıyken saatlik, ön ödemeli bakiyeden): `GET .../vpc` `pricing` döner, bağlama `\"confirm\"\
     : true` ister (yoksa 422 `confirm_required` + `details.pricing`). Düğümlü ortamlar ücretsiz kalır. Geriye uyumlu.\n\n**2.39.0**: port yönlendirmelere isteğe bağlı\
     \ `name` (POST; `PATCH /cloud/vpcs/{vpc_id}/port-forwards/{pf_id}` `source_cidrs` ve/veya `name`). `GET /cloud/containers/{id}/services/{name}` `spec.alerts`'ı\
-    \ her zaman döner (kapalıyken `min_ready` 0). Geriye uyumlu.\n"
+    \ her zaman döner (kapalıyken `min_ready` 0). Geriye uyumlu.\n\n**2.40.0**: Gyro Bulut İstanbul sunucularında zamanlanmış snapshot: `GET|PUT|DELETE /cloud/servers/{id}/snapshot-schedule`\
+    \ (her gün ya da her hafta, Türkiye saatiyle; son N otomatik snapshot tutulur). Geriye uyumlu.\n"
   contact:
     name: Gyro Hosting
     url: https://www.gyrohosting.com
@@ -6560,7 +6563,7 @@ paths:
                   type: array
                   items:
                     type: string
-                    enum: &id139
+                    enum: &id141
                     - storage.object.created
                     - storage.object.deleted
                     - storage.objects.deleted_bulk
@@ -14790,7 +14793,7 @@ paths:
                   data:
                     type: object
                     properties:
-                      deploy_key: &id134
+                      deploy_key: &id136
                         type: object
                         nullable: true
                         properties:
@@ -24948,10 +24951,10 @@ paths:
                 source_cidrs: &id123
                   type: array
                   maxItems: 20
-                  items: &id137
+                  items: &id139
                     type: string
                   description: allowed source networks (public IPv4 CIDR); empty = everyone
-                  example: &id138
+                  example: &id140
                   - 203.0.113.10/32
                   - 198.51.100.0/24
                 name: &id124
@@ -25638,6 +25641,193 @@ paths:
                         example: updating
                       task_id:
                         type: integer
+        '403':
+          description: not_available (private networks are not enabled for this account yet) / forbidden (key limited to some servers)
+          content: *id071
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'conflict: limit_exceeded, vpc_in_use, subnet_in_use, last_subnet, gateway_disabled, gateway_in_use, port_in_use, already_attached, other_vpc,
+            extra_ips, no_private_network, no_egress, already_off, already_on, last_network, no_billing_server, suspended, busy'
+          content: *id071
+        '422':
+          $ref: '#/components/responses/Validation'
+        '503':
+          description: capacity / pool_exhausted (try again later)
+          content: *id071
+  /cloud/servers/{id}/snapshot-schedule:
+    get:
+      tags: &id129
+      - Snapshots and backups
+      operationId: getSnapshotSchedule
+      summary: Scheduled snapshots of a server
+      x-summary-tr: Sunucunun zamanlanmış snapshot planı
+      x-scope: cloud_read
+      x-cli:
+        command: server snapshot-schedule get
+      description: 'Gyro Cloud Istanbul (tr-ist-1) servers only (other servers: 422 `not_supported`). A snapshot named `auto-YYYYMMDD-HHMM` is taken every day or
+        every week at `hour`:`minute` Türkiye time (Europe/Istanbul); before it the oldest automatic snapshots are deleted so at most `keep` of them stay. Snapshots
+        you take yourself are never deleted, but they count toward the server''s snapshot limit (`snapshot_limit`, manual + automatic): when the limit is full the
+        run is skipped (`last_status` skipped, `last_error` snapshot_limit). Snapshots above the free allowance of a prepaid server are billed hourly like manual
+        ones. While the server has snapshots an extra disk cannot be grown (409 `has_snapshots`): turn the schedule off and delete the snapshots first.'
+      x-description-tr: 'Yalnız Gyro Bulut İstanbul (tr-ist-1) sunucuları (diğerleri: 422 `not_supported`). Her gün ya da her hafta `hour`:`minute` Türkiye saatinde
+        `auto-YYYYMMDD-HHMM` adlı snapshot alınır; öncesinde en eski otomatik snapshot''lar silinerek en çok `keep` tanesi kalır. Elle aldığınız snapshot''lar asla
+        silinmez ama sunucunun snapshot sınırına (`snapshot_limit`, elle + otomatik) sayılır: sınır doluysa çalışma atlanır (`last_status` skipped, `last_error` snapshot_limit).
+        Ön ödemeli sunucuda ücretsiz hakkın üstündeki snapshot''lar elle alınanlar gibi saatlik ücretlenir. Sunucuda snapshot varken ek disk büyütülemez (409 `has_snapshots`):
+        önce planı kapatıp snapshot''ları silin.'
+      parameters: &id130
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Server (service) id
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/SnapshotSchedule'
+        '403':
+          description: not_available (private networks are not enabled for this account yet) / forbidden (key limited to some servers)
+          content: *id071
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'conflict: limit_exceeded, vpc_in_use, subnet_in_use, last_subnet, gateway_disabled, gateway_in_use, port_in_use, already_attached, other_vpc,
+            extra_ips, no_private_network, no_egress, already_off, already_on, last_network, no_billing_server, suspended, busy'
+          content: *id071
+        '422':
+          $ref: '#/components/responses/Validation'
+        '503':
+          description: capacity / pool_exhausted (try again later)
+          content: *id071
+    put:
+      tags: *id129
+      operationId: setSnapshotSchedule
+      summary: Create or change the snapshot schedule
+      x-summary-tr: Zamanlanmış snapshot planını oluştur ya da değiştir
+      x-scope: cloud_write
+      x-cli:
+        command: server snapshot-schedule set
+      description: 'Fields left out keep their value (a new schedule starts from daily 03:00, keep 7, enabled). `keep` is 1 to the server''s snapshot limit; `weekday`
+        only for weekly. Gyro Cloud Istanbul (tr-ist-1) servers only (other servers: 422 `not_supported`). A snapshot named `auto-YYYYMMDD-HHMM` is taken every day
+        or every week at `hour`:`minute` Türkiye time (Europe/Istanbul); before it the oldest automatic snapshots are deleted so at most `keep` of them stay. Snapshots
+        you take yourself are never deleted, but they count toward the server''s snapshot limit (`snapshot_limit`, manual + automatic): when the limit is full the
+        run is skipped (`last_status` skipped, `last_error` snapshot_limit). Snapshots above the free allowance of a prepaid server are billed hourly like manual
+        ones. While the server has snapshots an extra disk cannot be grown (409 `has_snapshots`): turn the schedule off and delete the snapshots first.'
+      x-description-tr: 'Gönderilmeyen alan değişmez (yeni plan her gün 03:00, keep 7, açık ile başlar). `keep` 1 ile sunucunun snapshot sınırı arası; `weekday` yalnız
+        haftalıkta. Yalnız Gyro Bulut İstanbul (tr-ist-1) sunucuları (diğerleri: 422 `not_supported`). Her gün ya da her hafta `hour`:`minute` Türkiye saatinde `auto-YYYYMMDD-HHMM`
+        adlı snapshot alınır; öncesinde en eski otomatik snapshot''lar silinerek en çok `keep` tanesi kalır. Elle aldığınız snapshot''lar asla silinmez ama sunucunun
+        snapshot sınırına (`snapshot_limit`, elle + otomatik) sayılır: sınır doluysa çalışma atlanır (`last_status` skipped, `last_error` snapshot_limit). Ön ödemeli
+        sunucuda ücretsiz hakkın üstündeki snapshot''lar elle alınanlar gibi saatlik ücretlenir. Sunucuda snapshot varken ek disk büyütülemez (409 `has_snapshots`):
+        önce planı kapatıp snapshot''ları silin.'
+      parameters: *id130
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/SnapshotSchedule'
+        '403':
+          description: not_available (private networks are not enabled for this account yet) / forbidden (key limited to some servers)
+          content: *id071
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: 'conflict: limit_exceeded, vpc_in_use, subnet_in_use, last_subnet, gateway_disabled, gateway_in_use, port_in_use, already_attached, other_vpc,
+            extra_ips, no_private_network, no_egress, already_off, already_on, last_network, no_billing_server, suspended, busy'
+          content: *id071
+        '422':
+          $ref: '#/components/responses/Validation'
+        '503':
+          description: capacity / pool_exhausted (try again later)
+          content: *id071
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                enabled:
+                  type: boolean
+                frequency:
+                  type: string
+                  enum:
+                  - daily
+                  - weekly
+                weekday:
+                  type: string
+                  enum:
+                  - sunday
+                  - monday
+                  - tuesday
+                  - wednesday
+                  - thursday
+                  - friday
+                  - saturday
+                  description: weekly only (0-6 also accepted, 0 = Sunday)
+                hour:
+                  type: integer
+                  minimum: 0
+                  maximum: 23
+                  description: Türkiye time
+                minute:
+                  type: integer
+                  minimum: 0
+                  maximum: 59
+                keep:
+                  type: integer
+                  minimum: 1
+                  maximum: 20
+                  description: <= snapshot_limit
+              required: []
+    delete:
+      tags: *id129
+      operationId: deleteSnapshotSchedule
+      summary: Remove the snapshot schedule
+      x-summary-tr: Zamanlanmış snapshot planını kaldır
+      x-scope: cloud_write
+      x-cli:
+        command: server snapshot-schedule delete
+      description: 'The schedule is removed; existing snapshots (automatic ones too) stay. Gyro Cloud Istanbul (tr-ist-1) servers only (other servers: 422 `not_supported`).
+        A snapshot named `auto-YYYYMMDD-HHMM` is taken every day or every week at `hour`:`minute` Türkiye time (Europe/Istanbul); before it the oldest automatic snapshots
+        are deleted so at most `keep` of them stay. Snapshots you take yourself are never deleted, but they count toward the server''s snapshot limit (`snapshot_limit`,
+        manual + automatic): when the limit is full the run is skipped (`last_status` skipped, `last_error` snapshot_limit). Snapshots above the free allowance of
+        a prepaid server are billed hourly like manual ones. While the server has snapshots an extra disk cannot be grown (409 `has_snapshots`): turn the schedule
+        off and delete the snapshots first.'
+      x-description-tr: 'Plan kaldırılır; mevcut snapshot''lar (otomatikler dahil) durur. Yalnız Gyro Bulut İstanbul (tr-ist-1) sunucuları (diğerleri: 422 `not_supported`).
+        Her gün ya da her hafta `hour`:`minute` Türkiye saatinde `auto-YYYYMMDD-HHMM` adlı snapshot alınır; öncesinde en eski otomatik snapshot''lar silinerek en
+        çok `keep` tanesi kalır. Elle aldığınız snapshot''lar asla silinmez ama sunucunun snapshot sınırına (`snapshot_limit`, elle + otomatik) sayılır: sınır doluysa
+        çalışma atlanır (`last_status` skipped, `last_error` snapshot_limit). Ön ödemeli sunucuda ücretsiz hakkın üstündeki snapshot''lar elle alınanlar gibi saatlik
+        ücretlenir. Sunucuda snapshot varken ek disk büyütülemez (409 `has_snapshots`): önce planı kapatıp snapshot''ları silin.'
+      parameters: *id130
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      server_id:
+                        type: integer
+                      configured:
+                        type: boolean
+                      deleted:
+                        type: boolean
         '403':
           description: not_available (private networks are not enabled for this account yet) / forbidden (key limited to some servers)
           content: *id071
@@ -28080,7 +28270,7 @@ components:
           maxLength: 255
         color:
           type: string
-          enum: &id129
+          enum: &id131
           - gray
           - blue
           - green
@@ -28133,22 +28323,22 @@ components:
       required:
       - name
       properties:
-        name: &id130
+        name: &id132
           type: string
           minLength: 1
           maxLength: 40
           description: 'Letter or digit first; then letters, digits, space and . _ - / + # & ( ). Unique per account (case-insensitive). Reserved: Genel, General,
             Default.'
-        description: &id131
+        description: &id133
           type:
           - string
           - 'null'
           maxLength: 255
-        color: &id132
+        color: &id134
           type: string
-          enum: *id129
+          enum: *id131
           default: blue
-        icon: &id133
+        icon: &id135
           type: string
           enum:
           - folder
@@ -28183,10 +28373,10 @@ components:
     ProjectUpdate:
       type: object
       properties:
-        name: *id130
-        description: *id131
-        color: *id132
-        icon: *id133
+        name: *id132
+        description: *id133
+        color: *id134
+        icon: *id135
     ProjectRef:
       type:
       - object
@@ -28536,7 +28726,7 @@ components:
                   fingerprint:
                     type: string
                     example: SHA256:+DiY3wvvV6TuJJhbpZisF/zLDA0zPMSvHdkr4UvCOqU
-            deploy_key: *id134
+            deploy_key: *id136
         archive:
           type: object
           properties:
@@ -28972,12 +29162,12 @@ components:
           type: string
         egress_change:
           $ref: '#/components/schemas/ContainerEgressChange'
-        pending_egress_ips: &id136
+        pending_egress_ips: &id138
           type: array
           items:
             type: string
           description: new egress IPs announced but not in use for sure yet; add them to your allow lists now
-        egress_hold_hours: &id135
+        egress_hold_hours: &id137
           type: integer
           description: approval window (0 = off)
     ContainerEnvironment:
@@ -29060,10 +29250,10 @@ components:
         node_monthly_eur:
           type: number
           description: price of one node per month (an extra node costs the same)
-        egress_hold_hours: *id135
+        egress_hold_hours: *id137
         egress_change:
           $ref: '#/components/schemas/ContainerEgressChange'
-        pending_egress_ips: *id136
+        pending_egress_ips: *id138
     VpcPortForward:
       type: object
       properties:
@@ -29086,9 +29276,9 @@ components:
         source_cidrs:
           type: array
           maxItems: 20
-          items: *id137
+          items: *id139
           description: allowed source networks; empty = everyone
-          example: *id138
+          example: *id140
         name:
           type: string
           description: label of the forward (empty when not set)
@@ -29798,7 +29988,7 @@ components:
           type: array
           items:
             type: string
-            enum: *id139
+            enum: *id141
         prefix:
           type: string
           example: resimler/
@@ -29955,3 +30145,68 @@ components:
           type: string
         list_monthly_text:
           type: string
+    SnapshotSchedule:
+      type: object
+      properties:
+        server_id:
+          type: integer
+        configured:
+          type: boolean
+          description: false = no schedule (the other fields are null)
+        enabled:
+          type: boolean
+        frequency:
+          type: string
+          enum:
+          - daily
+          - weekly
+          nullable: true
+        weekday:
+          type: string
+          nullable: true
+          enum:
+          - sunday
+          - monday
+          - tuesday
+          - wednesday
+          - thursday
+          - friday
+          - saturday
+          description: weekly only
+        hour:
+          type: integer
+          nullable: true
+          example: 3
+        minute:
+          type: integer
+          nullable: true
+          example: 0
+        keep:
+          type: integer
+          nullable: true
+          example: 7
+          description: the last N automatic snapshots are kept
+        time_zone:
+          type: string
+          example: Europe/Istanbul
+        snapshot_limit:
+          type: integer
+          description: the server's snapshot limit (manual + automatic)
+        next_run_at:
+          type: string
+          format: date-time
+          nullable: true
+        last_run_at:
+          type: string
+          format: date-time
+          nullable: true
+        last_status:
+          type: string
+          nullable: true
+          enum:
+          - queued
+          - skipped
+          description: queued = the snapshot was started; skipped = see last_error
+        last_error:
+          type: string
+          nullable: true

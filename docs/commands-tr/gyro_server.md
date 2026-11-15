@@ -54,6 +54,7 @@ gyro server [flags]
 * [gyro server rescue](gyro_server_rescue.md)	 - Kurtarma sistemi (kurtarma Linux'u ile açılış)
 * [gyro server reset-password](gyro_server_reset-password.md)	 - Yeni rastgele root parolası (bir kez gösterilir)
 * [gyro server snapshot](gyro_server_snapshot.md)	 - Snapshot'ları ve kotayı listele
+* [gyro server snapshot-schedule](gyro_server_snapshot-schedule.md)	 - Sunucunun zamanlanmış snapshot planı
 * [gyro server ssh](gyro_server_ssh.md)	 - Sunucuya SSH bağlantısı aç
 * [gyro server storage-mount](gyro_server_storage-mount.md)	 - Sunucuya bağlı kovalar
 * [gyro server update](gyro_server_update.md)	 - Ad ya da otomatik yenilemeyi değiştir

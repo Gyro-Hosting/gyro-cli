@@ -414,6 +414,9 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro server snapshot delete` | Snapshot sil | `DELETE /cloud/servers/{id}/snapshots/{sid}` |
 | `gyro server snapshot list` | Snapshot'ları ve kotayı listele | `GET /cloud/servers/{id}/snapshots` |
 | `gyro server snapshot restore` | Snapshot'ı sunucuya geri yükle (diski ezer) | `POST /cloud/servers/{id}/snapshots/{sid}/restore` |
+| `gyro server snapshot-schedule delete` | Zamanlanmış snapshot planını kaldır | `DELETE /cloud/servers/{id}/snapshot-schedule` |
+| `gyro server snapshot-schedule get` | Sunucunun zamanlanmış snapshot planı | `GET /cloud/servers/{id}/snapshot-schedule` |
+| `gyro server snapshot-schedule set` | Zamanlanmış snapshot planını oluştur ya da değiştir | `PUT /cloud/servers/{id}/snapshot-schedule` |
 | `gyro server storage-mount command` | Yeni kurulum komutu (bağlantı anahtarı yenilenir) | `POST /cloud/servers/{id}/storage-mounts/{mid}/command` |
 | `gyro server storage-mount create` | Kovayı sunucuya bağla | `POST /cloud/servers/{id}/storage-mounts` |
 | `gyro server storage-mount get` | Bağlantı ayrıntısı | `GET /cloud/servers/{id}/storage-mounts/{mid}` |

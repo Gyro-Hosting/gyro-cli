@@ -1,0 +1,77 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-server-snapshot-schedule-get - Scheduled snapshots of a server
+
+
+.SH SYNOPSIS
+\fBgyro server snapshot-schedule get  [flags]\fP
+
+
+.SH DESCRIPTION
+Scheduled snapshots of a server
+
+.PP
+Gyro Cloud Istanbul (tr-ist-1) servers only (other servers: 422 \fBnot_supported\fR). A snapshot named \fBauto-YYYYMMDD-HHMM\fR is taken every day or every week at \fBhour\fR:\fBminute\fR Türkiye time (Europe/Istanbul); before it the oldest automatic snapshots are deleted so at most \fBkeep\fR of them stay. Snapshots you take yourself are never deleted, but they count toward the server's snapshot limit (\fBsnapshot_limit\fR, manual + automatic): when the limit is full the run is skipped (\fBlast_status\fR skipped, \fBlast_error\fR snapshot_limit). Snapshots above the free allowance of a prepaid server are billed hourly like manual ones. While the server has snapshots an extra disk cannot be grown (409 \fBhas_snapshots\fR): turn the schedule off and delete the snapshots first.
+
+.PP
+API: GET /cloud/servers/{id}/snapshot-schedule (operationId getSnapshotSchedule, scope cloud_read)
+
+
+.SH OPTIONS
+\fB-h\fP, \fB--help\fP[=false]
+	help for get
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH SEE ALSO
+\fBgyro-server-snapshot-schedule(1)\fP
