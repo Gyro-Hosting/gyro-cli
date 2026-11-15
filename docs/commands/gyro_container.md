@@ -42,6 +42,8 @@ gyro container [flags]
 * [gyro container events](gyro_container_events.md)	 - Recent warnings
 * [gyro container external-registry](gyro_container_external-registry.md)	 - Remove external registry credentials
 * [gyro container get](gyro_container_get.md)	 - Container environment detail (namespace, internal addressing, egress IPs)
+* [gyro container job](gyro_container_job.md)	 - List one-off jobs
+* [gyro container jobs](gyro_container_jobs.md)	 - List one-off jobs (last 50)
 * [gyro container logs](gyro_container_logs.md)	 - Service logs
 * [gyro container metrics](gyro_container_metrics.md)	 - Service CPU / memory
 * [gyro container nodes](gyro_container_nodes.md)	 - Node pool
@@ -49,6 +51,7 @@ gyro container [flags]
 * [gyro container pipeline](gyro_container_pipeline.md)	 - List pipelines
 * [gyro container plans](gyro_container_plans.md)	 - List container environment plans
 * [gyro container registry](gyro_container_registry.md)	 - Gyro image registry of the environment
+* [gyro container run](gyro_container_run.md)	 - Run a one-off job (migration, seed) with a service's image, variables and secrets
 * [gyro container secret](gyro_container_secret.md)	 - Delete secret values
 * [gyro container service](gyro_container_service.md)	 - List container services
 * [gyro container sizes](gyro_container_sizes.md)	 - Serverless container sizes (vCPU / memory pairs) and prices

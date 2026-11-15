@@ -2,7 +2,7 @@
 openapi: 3.1.0
 info:
   title: Gyro Public API
-  version: 2.31.0
+  version: 2.32.0
   summary: Manage Gyro cloud servers, SSH keys and billing programmatically.
   x-summary-tr: Gyro bulut sunucularınızı, SSH anahtarlarınızı ve faturalarınızı programla yönetin.
   description: "The Gyro Public API lets you automate everything you do in the Gyro client area:\norder and manage cloud servers, keep SSH keys, read invoices and\
@@ -86,7 +86,10 @@ info:
     \ `pending_egress_ips`) with an optional approval step (`PUT .../egress-approval`, `POST .../egress-change/approve`), and `DELETE /cloud/containers/{id}` (prepaid\
     \ environment delete, same as the panel). Additive.\n\n**2.31.0**: browser sign-in for command-line tools: `POST /auth/device/code`, `POST /auth/device/token`\
     \ (device authorization), `GET` / `DELETE /auth/session`; key expiry (`expires` on `POST /cloud/keys`, `expires_at` in answers, 401 `key_expired`) and permission\
-    \ templates (`template`). Additive.\n"
+    \ templates (`template`). Additive.\n\n**2.32.0**: one-off jobs for containers: `POST /cloud/containers/{id}/services/{name}/run` runs a command once with the\
+    \ service's image (pinned digest), variables and secrets (migration, seed); `GET /cloud/containers/{id}/jobs[/{job}[/logs]]`, `DELETE /cloud/containers/{id}/jobs/{job}`\
+    \ stops one. Gyro Pipeline: `release` (pipeline field or `release:` in gyro-pipeline.yml) runs such a job with the new image before the deploy (run state `releasing`,\
+    \ error `release_failed`). Alert event `job_failed`. Additive.\n"
   x-description-tr: "Gyro Public API, müşteri panelinde yaptığınız her işi otomatikleştirmenizi sağlar:\nbulut sunucu siparişi ve yönetimi, SSH anahtarları, fatura\
     \ ve bakiye okuma.\nResmi Terraform sağlayıcısı (`gyro-hosting/gyro`) ve `gyroctl` bu API'yi kullanır.\n\n* **Taban adres** `https://www.gyrohosting.com/api/v1/client`\n\
     * **Kimlik** `Authorization: Bearer wck_...` (anahtarı *Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri* bölümünden oluşturun)\n* **Biçim** JSON\
@@ -167,7 +170,10 @@ info:
     \ duyurusu (`egress_change`, `pending_egress_ips`) ve isteğe bağlı onay adımı (`PUT .../egress-approval`, `POST .../egress-change/approve`), `DELETE /cloud/containers/{id}`\
     \ (ön ödemeli ortamı silme, panelle aynı). Geriye uyumlu.\n\n**2.31.0**: komut satırı araçları için tarayıcıyla giriş: `POST /auth/device/code`, `POST /auth/device/token`\
     \ (cihaz yetkilendirmesi), `GET` / `DELETE /auth/session`; anahtar son kullanma tarihi (`POST /cloud/keys` için `expires`, yanıtlarda `expires_at`, 401 `key_expired`)\
-    \ ve izin şablonları (`template`). Geriye uyumlu.\n"
+    \ ve izin şablonları (`template`). Geriye uyumlu.\n\n**2.32.0**: kapsayıcılar için tek seferlik görev: `POST /cloud/containers/{id}/services/{name}/run` bir komutu\
+    \ servisin imajı (sabit digest), değişkenleri ve gizli değerleriyle bir kez çalıştırır (migration, seed); `GET /cloud/containers/{id}/jobs[/{job}[/logs]]`, `DELETE\
+    \ /cloud/containers/{id}/jobs/{job}` durdurur. Gyro Pipeline: `release` (pipeline alanı ya da gyro-pipeline.yml'de `release:`) bu görevi yeni imajla dağıtımdan\
+    \ önce çalıştırır (çalıştırma durumu `releasing`, hata `release_failed`). Uyarı olayı `job_failed`. Geriye uyumlu.\n"
   contact:
     name: Gyro Hosting
     url: https://www.gyrohosting.com
@@ -9942,10 +9948,11 @@ paths:
       description: '`settings` (channels, events, cooldown; the webhook secret is never returned), `conditions` = what is wrong right now, `history` = last 30 alerts.
         Events: down (no ready replica for >3 min), crashloop (keeps restarting / image pull fails / out of memory), replicas_low (below alerts.min_ready), scale_max
         (autoscaling wants more than max), capacity (replicas wait for room in the node pool), egress (the egress IPs of the environment changed; one message, no
-        resolved). An event is announced after ~2 minutes, at most once per cooldown per service + event (flapping included), with a ''resolved'' message.'
+        resolved), job_failed (a one-off job failed or timed out; one message per job). An event is announced after ~2 minutes, at most once per cooldown per service
+        + event (flapping included), with a ''resolved'' message.'
       x-description-tr: '`settings` (kanallar, olaylar, tekrar aralığı; webhook anahtarı dönmez), `conditions` = şu an süren sorunlar, `history` = son 30 uyarı. Olaylar:
-        down, crashloop, replicas_low, scale_max, capacity, egress (çıkış IP''leri değişti). Olay ~2 dakika sürünce bildirilir; aynı servis + olay tekrar aralığında
-        bir kez (gidip gelenler dahil), düzelince ''düzeldi'' mesajı.'
+        down, crashloop, replicas_low, scale_max, capacity, egress (çıkış IP''leri değişti), job_failed (tek seferlik görev başarısız / süresi doldu). Olay ~2 dakika
+        sürünce bildirilir; aynı servis + olay tekrar aralığında bir kez (gidip gelenler dahil), düzelince ''düzeldi'' mesajı.'
       parameters:
       - name: id
         in: path
@@ -10028,7 +10035,7 @@ paths:
                   description: 'https URL of a public server; JSON POST signed with X-Gyro-Signature: sha256=HMAC(secret, X-Gyro-Timestamp + ''.'' + body)'
                 events:
                   type: string
-                  description: 'Comma separated: down, crashloop, replicas_low, scale_max, capacity, egress'
+                  description: 'Comma separated: down, crashloop, replicas_low, scale_max, capacity, egress, job_failed'
                 cooldown:
                   type: integer
                   description: Minutes between two announcements of the same service + event (5-1440, default 30)
@@ -11085,6 +11092,302 @@ paths:
           $ref: '#/components/responses/Conflict'
         '422':
           $ref: '#/components/responses/Validation'
+  /cloud/containers/{id}/services/{name}/run:
+    post:
+      tags:
+      - Containers
+      operationId: runContainerJob
+      summary: Run a one-off job
+      x-summary-tr: Tek seferlik görev çalıştır
+      x-scope: services_write
+      description: 'A **one-off job** runs a command once with the image, variables and secrets of an existing service and stops: database migration, seed, maintenance
+        script. The image is pinned to the digest of the service''s running version. The command replaces the image ENTRYPOINT and is a list (no shell; `["sh","-c","a
+        && b"]` for shell features). No ports, no health checks, never restarted (a failed job is not retried). Default size = the service''s, time limit 30 minutes
+        (10 s - 6 h). Jobs run inside the environment''s capacity: on node plans free (your nodes), on Serverless billed per vCPU-second / GB-second like a task (billing
+        line `<service>-job`). Parallel jobs per environment: Serverless and plans up to 2 vCPU 2, others 3 (raised with a support ticket; `GET /cloud/account/limits`).
+        The last 50 jobs are kept with their output (last 2,000 lines, secret values of the service masked as ****). A failed / timed out job triggers the `job_failed`
+        notification (Alerts channels). A refusal is 422 `tool_action_failed` with a message in the account language: parallel jobs reached (`details.limit_key` =
+        `ecs.job_concurrent`, `details.limit`, how to raise it), no free capacity next to the running services, unknown service, invalid time limit / command / size,
+        environment suspended. Send `Idempotency-Key` to retry safely.'
+      x-description-tr: '**Tek seferlik görev**, mevcut bir servisin imajı, değişkenleri ve gizli değerleriyle bir komutu bir kez çalıştırır ve durur: veritabanı
+        migration, seed, bakım betiği. İmaj servisin çalışan sürümünün digest''ine sabitlenir. Komut imajın ENTRYPOINT''inin yerine geçer ve listedir (kabuk yok;
+        kabuk özellikleri için `["sh","-c","a && b"]`). Port, sağlık kontrolü yok; yeniden başlatılmaz (başarısız görev tekrar denenmez). Varsayılan boyut servisinki,
+        zaman sınırı 30 dakika (10 sn - 6 saat). Görevler ortam kapasitesi içinde çalışır: düğümlü paketlerde ücretsiz (düğümleriniz), Sunucusuz''da görev (task)
+        gibi vCPU-saniye / GB-saniye ile ücretlenir (fatura satırı `<servis>-job`). Ortam başına eşzamanlı görev: Sunucusuz ve 2 vCPU''ya kadar paketlerde 2, diğerlerinde
+        3 (destek talebiyle artırılır). Son 50 görev çıktısıyla saklanır (son 2.000 satır, servisin gizli değerleri **** olarak). Başarısız / süresi dolan görev `job_failed`
+        bildirimini tetikler (Uyarılar kanalları). Ret, hesap dilinde mesajla 422 `tool_action_failed` döner: eşzamanlı görev sınırı (`details.limit_key` = `ecs.job_concurrent`,
+        `details.limit`, nasıl artırılır), çalışan servislerin yanında boş kapasite yok, servis yok, geçersiz zaman sınırı / komut / boyut, ortam askıda. Güvenli
+        tekrar için `Idempotency-Key` gönderin.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: name
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Service whose image, variables and secrets the job uses
+      - name: Idempotency-Key
+        in: header
+        required: false
+        schema:
+          type: string
+      responses:
+        '202':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      job:
+                        $ref: '#/components/schemas/ContainerJob'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                command:
+                  type: array
+                  items:
+                    type: string
+                  description: command and arguments (replaces ENTRYPOINT); a text is split like a shell line; omit = image command
+                  example:
+                  - npm
+                  - run
+                  - migrate
+                timeout_seconds:
+                  type: integer
+                  minimum: 10
+                  maximum: 21600
+                  default: 1800
+                cpu_m:
+                  type: integer
+                  description: 'default: the service''s'
+                memory_mi:
+                  type: integer
+                  description: 'default: the service''s'
+      x-cli:
+        command: container run
+        confirm: false
+  /cloud/containers/{id}/jobs:
+    get:
+      tags:
+      - Containers
+      operationId: listContainerJobs
+      summary: List one-off jobs
+      x-summary-tr: Tek seferlik görevleri listele
+      x-scope: services_read
+      description: Last 50 jobs, newest first, with `active` (running now) and `limit` (parallel jobs). `?service=<name>` filters.
+      x-description-tr: Son 50 görev (yeniden eskiye), `active` (şu an çalışan) ve `limit` (eşzamanlı görev sınırı). `?service=<ad>` süzer.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: service
+        in: query
+        required: false
+        schema:
+          type: string
+        description: only the jobs of this service
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      jobs:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ContainerJob'
+                      active:
+                        type: integer
+                      limit:
+                        type: integer
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      x-cli:
+        command: container job list
+        confirm: false
+  /cloud/containers/{id}/jobs/{job}:
+    get:
+      tags:
+      - Containers
+      operationId: getContainerJob
+      summary: Get a one-off job
+      x-summary-tr: Tek seferlik görevi getir
+      x-scope: services_read
+      description: State, exit code, duration.
+      x-description-tr: Durum, çıkış kodu, süre.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: job
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Job id (j + 10-16 characters)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ContainerJob'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      x-cli:
+        command: container job get
+        confirm: false
+    delete:
+      tags:
+      - Containers
+      operationId: cancelContainerJob
+      summary: Stop a one-off job
+      x-summary-tr: Tek seferlik görevi durdur
+      x-scope: services_write
+      description: Stops a running job (its output so far is kept; the record stays in the list as `cancelled`). 409 `job_finished` when it already ended. Nothing
+        else is deleted.
+      x-description-tr: Çalışan görevi durdurur (o ana kadarki çıktı saklanır; kayıt listede `cancelled` olarak kalır). Zaten bittiyse 409 `job_finished`. Başka hiçbir
+        şey silinmez.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: job
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Job id (j + 10-16 characters)
+      responses:
+        '202':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      state:
+                        type: string
+                      cancel_requested:
+                        type: boolean
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      x-cli:
+        command: container job cancel
+        confirm: true
+  /cloud/containers/{id}/jobs/{job}/logs:
+    get:
+      tags:
+      - Containers
+      operationId: getContainerJobLogs
+      summary: Output of a one-off job
+      x-summary-tr: Tek seferlik görevin çıktısı
+      x-scope: services_read
+      description: 'Live while the job runs (`live: true`), saved afterwards (last 2,000 lines, max 512 KB; secret values of the service masked). `?tail=N` last N
+        lines. Poll every few seconds to follow.'
+      x-description-tr: 'Görev çalışırken canlı (`live: true`), sonra kayıtlı (son 2.000 satır, en çok 512 KB; servisin gizli değerleri maskeli). `?tail=N` son N
+        satır. İzlemek için birkaç saniyede bir okuyun.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: job
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Job id (j + 10-16 characters)
+      - name: tail
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 2000
+        description: last N lines (default 2000)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      state:
+                        type: string
+                      live:
+                        type: boolean
+                      log:
+                        type: string
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      x-cli:
+        command: container job logs
+        confirm: false
   /cloud/containers/{id}/pipelines:
     get:
       tags:
@@ -25895,6 +26198,16 @@ components:
           type: string
           description: Dockerfile stage that is built (empty = last stage)
           x-description-tr: Derlenen Dockerfile aşaması (boş = son aşama)
+        release:
+          type: array
+          items:
+            type: string
+          description: one-off job run with the new image (settings of the first target service) BEFORE the deploy, e.g. ["npm","run","migrate"]; when it fails nothing
+            is deployed (run error `release_failed`). Also `release:` in gyro-pipeline.yml (top level or under deploy:)
+          example:
+          - npm
+          - run
+          - migrate
     ContainerPipelineRun:
       type: object
       properties:
@@ -25933,6 +26246,7 @@ components:
           - preparing
           - building
           - awaiting_approval
+          - releasing
           - deploying
           - verifying
           - succeeded
@@ -25953,13 +26267,14 @@ components:
           - approval
           - deploy
           - verify
+          - release
         error:
           type: string
           description: 'repo_auth, repo_not_found, repo_unreachable, repo_blocked, ref_not_found, target_missing, clone_failed, commands_failed, build_failed, build_target_not_found
             (detail = the stage name), invalid_build_target, push_failed, timeout, out_of_memory, no_capacity, build_image_pull, deploy_unhealthy, deploy_timeout,
             deploy_failed, minutes_exhausted, pipeline_file_invalid, cancelled, rejected, approval_expired, internal, archive_invalid (detail says why: links, ../
             paths, device files, > 20 000 files, > 2 GB unpacked, damaged), archive_download, upload_not_found, archive_format, archive_too_large, host_key_unconfirmed,
-            host_key_mismatch, deploy_key_missing'
+            host_key_mismatch, deploy_key_missing, release_failed'
         image:
           type: string
           example: registry.ist.gyrohosting.com/ab12cd/web:1a2b3c4
@@ -26023,6 +26338,9 @@ components:
         image_tag:
           type: string
           description: <sha7> for commits, arc-<upload> for archives
+        release_job:
+          type: string
+          description: id of the release job (GET /cloud/containers/{id}/jobs/{job})
     StoragePlan:
       type: object
       properties:
@@ -26697,3 +27015,72 @@ components:
           $ref: '#/components/schemas/AuthKey'
         account:
           $ref: '#/components/schemas/AuthAccount'
+    ContainerJob:
+      type: object
+      description: One-off job (batch run of a command with a service's settings).
+      x-description-tr: Tek seferlik görev (bir komutun servis ayarlarıyla bir kez çalıştırılması).
+      properties:
+        id:
+          type: string
+          example: jt0abc12def3
+        service:
+          type: string
+          example: api
+        image:
+          type: string
+          description: image reference the job ran; `<repo>@sha256:...` when pinned
+          example: registry.ist.gyrohosting.com/ab12cd/api@sha256:...
+        pinned:
+          type: boolean
+          description: true = digest of the service's running version (a moving tag cannot change what runs); false = by tag (the service had no running copy)
+        command:
+          type: array
+          items:
+            type: string
+          description: command run (replaces the image ENTRYPOINT); empty = the image's own command
+          example:
+          - npm
+          - run
+          - migrate
+        cpu_m:
+          type: integer
+        memory_mi:
+          type: integer
+        timeout_seconds:
+          type: integer
+        state:
+          type: string
+          enum:
+          - starting
+          - running
+          - succeeded
+          - failed
+          - timeout
+          - cancelled
+        exit_code:
+          type: integer
+          description: exit code of the command (when it ran to the end)
+        error:
+          type: string
+          description: exit_nonzero, timeout, cancelled, image_pull_failed, config_error, no_capacity, quota_exceeded, evicted, lost, internal
+        detail:
+          type: string
+        by:
+          type: string
+          description: 'api, client (panel), staff, pipeline #N'
+        pipeline_run:
+          type: string
+          description: Gyro Pipeline run that started it (release step)
+        created:
+          type: string
+          format: date-time
+        started:
+          type: string
+          format: date-time
+        finished:
+          type: string
+          format: date-time
+        duration_seconds:
+          type: integer
+        cancel_requested:
+          type: boolean

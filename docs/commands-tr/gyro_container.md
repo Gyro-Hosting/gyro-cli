@@ -42,6 +42,8 @@ gyro container [flags]
 * [gyro container events](gyro_container_events.md)	 - Son uyarılar
 * [gyro container external-registry](gyro_container_external-registry.md)	 - Özel depo bilgisini sil
 * [gyro container get](gyro_container_get.md)	 - Kapsayıcı ortamı ayrıntısı (namespace, iç adresleme, çıkış IP'leri)
+* [gyro container job](gyro_container_job.md)	 - Tek seferlik görevleri listele
+* [gyro container jobs](gyro_container_jobs.md)	 - Tek seferlik görevleri listele (son 50)
 * [gyro container logs](gyro_container_logs.md)	 - Servis logları
 * [gyro container metrics](gyro_container_metrics.md)	 - Servis işlemci / bellek
 * [gyro container nodes](gyro_container_nodes.md)	 - Düğüm havuzu
@@ -49,6 +51,7 @@ gyro container [flags]
 * [gyro container pipeline](gyro_container_pipeline.md)	 - Pipeline'ları listele
 * [gyro container plans](gyro_container_plans.md)	 - Kapsayıcı ortam paketlerini listele
 * [gyro container registry](gyro_container_registry.md)	 - Ortamın Gyro imaj deposu
+* [gyro container run](gyro_container_run.md)	 - Servisin imajı, değişkenleri ve gizli değerleriyle tek seferlik görev çalıştır (migration, seed)
 * [gyro container secret](gyro_container_secret.md)	 - Gizli değer sil
 * [gyro container service](gyro_container_service.md)	 - Kapsayıcı servislerini listele
 * [gyro container sizes](gyro_container_sizes.md)	 - Sunucusuz kapsayıcı boyutları (vCPU / bellek) ve fiyatları

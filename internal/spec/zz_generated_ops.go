@@ -3,7 +3,7 @@
 package spec
 
 // APIVersion is info.version of the spec this table was generated from.
-const APIVersion = "2.31.0"
+const APIVersion = "2.32.0"
 
 // Ops lists every API operation.
 var Ops = []Op{
@@ -243,6 +243,51 @@ var Ops = []Op{
 			{Name: "confirm", Type: "boolean", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
 		},
 	},
+	{ID: "listContainerJobs", Method: "GET", Path: "/cloud/containers/{id}/jobs", Tag: "Containers",
+		Summary: "List one-off jobs", SummaryTR: "Tek seferlik görevleri listele",
+		Desc: "Last 50 jobs, newest first, with `active` (running now) and `limit` (parallel jobs). `?service=<name>` filters.", DescTR: "Son 50 görev (yeniden eskiye), `active` (şu an çalışan) ve `limit` (eşzamanlı görev sınırı). `?service=<ad>` süzer.",
+		Scope: "services_read", Command: []string{"container", "job", "list"},
+		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
+		Columns: []string{"active", "limit"},
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Service id", DescTR: ""},
+			{Name: "service", In: "query", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "only the jobs of this service", DescTR: ""},
+		},
+	},
+	{ID: "getContainerJob", Method: "GET", Path: "/cloud/containers/{id}/jobs/{job}", Tag: "Containers",
+		Summary: "Get a one-off job", SummaryTR: "Tek seferlik görevi getir",
+		Desc: "State, exit code, duration.", DescTR: "Durum, çıkış kodu, süre.",
+		Scope: "services_read", Command: []string{"container", "job", "get"},
+		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
+		Columns: []string{"id", "service", "image", "pinned", "cpu_m", "memory_mi", "timeout_seconds", "state", "exit_code", "error", "detail", "by", "pipeline_run", "created", "started", "finished", "duration_seconds", "cancel_requested"},
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Service id", DescTR: ""},
+			{Name: "job", In: "path", Type: "string", Items: "", Enum: nil, Default: "", Required: true, Desc: "Job id (j + 10-16 characters)", DescTR: ""},
+		},
+	},
+	{ID: "cancelContainerJob", Method: "DELETE", Path: "/cloud/containers/{id}/jobs/{job}", Tag: "Containers",
+		Summary: "Stop a one-off job", SummaryTR: "Tek seferlik görevi durdur",
+		Desc: "Stops a running job (its output so far is kept; the record stays in the list as `cancelled`). 409 `job_finished` when it already ended. Nothing else is deleted.", DescTR: "Çalışan görevi durdurur (o ana kadarki çıktı saklanır; kayıt listede `cancelled` olarak kalır). Zaten bittiyse 409 `job_finished`. Başka hiçbir şey silinmez.",
+		Scope: "services_write", Command: []string{"container", "job", "cancel"},
+		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: true, Money: false, Hidden: false,
+		Columns: []string{"id", "state", "cancel_requested"},
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Service id", DescTR: ""},
+			{Name: "job", In: "path", Type: "string", Items: "", Enum: nil, Default: "", Required: true, Desc: "Job id (j + 10-16 characters)", DescTR: ""},
+		},
+	},
+	{ID: "getContainerJobLogs", Method: "GET", Path: "/cloud/containers/{id}/jobs/{job}/logs", Tag: "Containers",
+		Summary: "Output of a one-off job", SummaryTR: "Tek seferlik görevin çıktısı",
+		Desc: "Live while the job runs (`live: true`), saved afterwards (last 2,000 lines, max 512 KB; secret values of the service masked). `?tail=N` last N lines. Poll every few seconds to follow.", DescTR: "Görev çalışırken canlı (`live: true`), sonra kayıtlı (son 2.000 satır, en çok 512 KB; servisin gizli değerleri maskeli). `?tail=N` son N satır. İzlemek için birkaç saniyede bir okuyun.",
+		Scope: "services_read", Command: []string{"container", "job", "logs"},
+		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
+		Columns: []string{"id", "state", "live", "log"},
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Service id", DescTR: ""},
+			{Name: "job", In: "path", Type: "string", Items: "", Enum: nil, Default: "", Required: true, Desc: "Job id (j + 10-16 characters)", DescTR: ""},
+			{Name: "tail", In: "query", Type: "integer", Items: "", Enum: nil, Default: "", Required: false, Desc: "last N lines (default 2000)", DescTR: ""},
+		},
+	},
 	{ID: "typed_get_containers__id__nodes", Method: "GET", Path: "/cloud/containers/{id}/nodes", Tag: "Containers",
 		Summary: "Node pool", SummaryTR: "Düğüm havuzu",
 		Desc: "Your dedicated nodes (aliases node-1..n), pool capacity and usage, ingress IPs for apex A records, private registry (user only). Also `namespace`, `cluster_dns` and `egress` (schema ContainerEgress).", DescTR: "Size ayrılmış düğümler, havuz kapasitesi/kullanımı, kök alan adı A kaydı için IP'ler, özel depo (yalnız kullanıcı). Ayrıca `namespace`, `cluster_dns` ve `egress` (ContainerEgress şeması).",
@@ -267,7 +312,7 @@ var Ops = []Op{
 	},
 	{ID: "typed_get_containers__id__notifications", Method: "GET", Path: "/cloud/containers/{id}/notifications", Tag: "Containers",
 		Summary: "Notification settings and current alerts", SummaryTR: "Bildirim ayarları ve süren uyarılar",
-		Desc: "`settings` (channels, events, cooldown; the webhook secret is never returned), `conditions` = what is wrong right now, `history` = last 30 alerts. Events: down (no ready replica for >3 min), crashloop (keeps restarting / image pull fails / out of memory), replicas_low (below alerts.min_ready), scale_max (autoscaling wants more than max), capacity (replicas wait for room in the node pool), egress (the egress IPs of the environment changed; one message, no resolved). An event is announced after ~2 minutes, at most once per cooldown per service + event (flapping included), with a 'resolved' message.", DescTR: "`settings` (kanallar, olaylar, tekrar aralığı; webhook anahtarı dönmez), `conditions` = şu an süren sorunlar, `history` = son 30 uyarı. Olaylar: down, crashloop, replicas_low, scale_max, capacity, egress (çıkış IP'leri değişti). Olay ~2 dakika sürünce bildirilir; aynı servis + olay tekrar aralığında bir kez (gidip gelenler dahil), düzelince 'düzeldi' mesajı.",
+		Desc: "`settings` (channels, events, cooldown; the webhook secret is never returned), `conditions` = what is wrong right now, `history` = last 30 alerts. Events: down (no ready replica for >3 min), crashloop (keeps restarting / image pull fails / out of memory), replicas_low (below alerts.min_ready), scale_max (autoscaling wants more than max), capacity (replicas wait for room in the node pool), egress (the egress IPs of the environment changed; one message, no resolved), job_failed (a one-off job failed or timed out; one message per job). An event is announced after ~2 minutes, at most once per cooldown per service + event (flapping included), with a 'resolved' message.", DescTR: "`settings` (kanallar, olaylar, tekrar aralığı; webhook anahtarı dönmez), `conditions` = şu an süren sorunlar, `history` = son 30 uyarı. Olaylar: down, crashloop, replicas_low, scale_max, capacity, egress (çıkış IP'leri değişti), job_failed (tek seferlik görev başarısız / süresi doldu). Olay ~2 dakika sürünce bildirilir; aynı servis + olay tekrar aralığında bir kez (gidip gelenler dahil), düzelince 'düzeldi' mesajı.",
 		Scope: "services_read", Command: []string{"container", "notifications", "get"},
 		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
 		Params: []Param{
@@ -287,7 +332,7 @@ var Ops = []Op{
 			{Name: "sms", Type: "boolean", Items: "", Enum: nil, Default: "", Required: false, Desc: "Account phone", DescTR: ""},
 			{Name: "telegram", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "Telegram chat id (send /start to the platform bot, e.g. @gyrouptime_bot); empty = off", DescTR: ""},
 			{Name: "webhook_url", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "https URL of a public server; JSON POST signed with X-Gyro-Signature: sha256=HMAC(secret, X-Gyro-Timestamp + '.' + body)", DescTR: ""},
-			{Name: "events", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "Comma separated: down, crashloop, replicas_low, scale_max, capacity, egress", DescTR: ""},
+			{Name: "events", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "Comma separated: down, crashloop, replicas_low, scale_max, capacity, egress, job_failed", DescTR: ""},
 			{Name: "cooldown", Type: "integer", Items: "", Enum: nil, Default: "", Required: false, Desc: "Minutes between two announcements of the same service + event (5-1440, default 30)", DescTR: ""},
 			{Name: "resolved", Type: "boolean", Items: "", Enum: nil, Default: "", Required: false, Desc: "Send a 'resolved' message (default on)", DescTR: ""},
 			{Name: "confirm", Type: "boolean", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
@@ -322,7 +367,7 @@ var Ops = []Op{
 		Summary: "Get a run", SummaryTR: "Çalıştırmayı getir",
 		Scope: "services_read", Command: []string{"container", "pipeline", "run-get"},
 		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
-		Columns: []string{"id", "pipeline", "n", "trigger", "ref", "sha", "short_sha", "message", "author", "state", "step", "error", "image", "digest", "build_seconds", "billed_minutes", "duration_seconds", "created", "started", "finished", "deadline", "from_run", "archive", "archive_name", "archive_size", "archive_format", "image_tag"},
+		Columns: []string{"id", "pipeline", "n", "trigger", "ref", "sha", "short_sha", "message", "author", "state", "step", "error", "image", "digest", "build_seconds", "billed_minutes", "duration_seconds", "created", "started", "finished", "deadline", "from_run", "archive", "archive_name", "archive_size", "archive_format", "image_tag", "release_job"},
 		Params: []Param{
 			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Service id", DescTR: ""},
 			{Name: "run", In: "path", Type: "string", Items: "", Enum: nil, Default: "", Required: true, Desc: "Run id", DescTR: ""},
@@ -988,6 +1033,23 @@ var Ops = []Op{
 		Body: []Field{
 			{Name: "revision", Type: "integer", Items: "", Enum: nil, Default: "", Required: false, Desc: "Revision number (empty = previous)", DescTR: ""},
 			{Name: "confirm", Type: "boolean", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
+		},
+	},
+	{ID: "runContainerJob", Method: "POST", Path: "/cloud/containers/{id}/services/{name}/run", Tag: "Containers",
+		Summary: "Run a one-off job", SummaryTR: "Tek seferlik görev çalıştır",
+		Desc: "A **one-off job** runs a command once with the image, variables and secrets of an existing service and stops: database migration, seed, maintenance script. The image is pinned to the digest of the service's running version. The command replaces the image ENTRYPOINT and is a list (no shell; `[\"sh\",\"-c\",\"a && b\"]` for shell features). No ports, no health checks, never restarted (a failed job is not retried). Default size = the service's, time limit 30 minutes (10 s - 6 h). Jobs run inside the environment's capacity: on node plans free (your nodes), on Serverless billed per vCPU-second / GB-second like a task (billing line `<service>-job`). Parallel jobs per environment: Serverless and plans up to 2 vCPU 2, others 3 (raised with a support ticket; `GET /cloud/account/limits`). The last 50 jobs are kept with their output (last 2,000 lines, secret values of the service masked as ****). A failed / timed out job triggers the `job_failed` notification (Alerts channels). A refusal is 422 `tool_action_failed` with a message in the account language: parallel jobs reached (`details.limit_key` = `ecs.job_concurrent`, `details.limit`, how to raise it), no free capacity next to the running services, unknown service, invalid time limit / command / size, environment suspended. Send `Idempotency-Key` to retry safely.", DescTR: "**Tek seferlik görev**, mevcut bir servisin imajı, değişkenleri ve gizli değerleriyle bir komutu bir kez çalıştırır ve durur: veritabanı migration, seed, bakım betiği. İmaj servisin çalışan sürümünün digest'ine sabitlenir. Komut imajın ENTRYPOINT'inin yerine geçer ve listedir (kabuk yok; kabuk özellikleri için `[\"sh\",\"-c\",\"a && b\"]`). Port, sağlık kontrolü yok; yeniden başlatılmaz (başarısız görev tekrar denenmez). Varsayılan boyut servisinki, zaman sınırı 30 dakika (10 sn - 6 saat). Görevler ortam kapasitesi içinde çalışır: düğümlü paketlerde ücretsiz (düğümleriniz), Sunucusuz'da görev (task) gibi vCPU-saniye / GB-saniye ile ücretlenir (fatura satırı `<servis>-job`). Ortam başına eşzamanlı görev: Sunucusuz ve 2 vCPU'ya kadar paketlerde 2, diğerlerinde 3 (destek talebiyle artırılır). Son 50 görev çıktısıyla saklanır (son 2.000 satır, servisin gizli değerleri **** olarak). Başarısız / süresi dolan görev `job_failed` bildirimini tetikler (Uyarılar kanalları). Ret, hesap dilinde mesajla 422 `tool_action_failed` döner: eşzamanlı görev sınırı (`details.limit_key` = `ecs.job_concurrent`, `details.limit`, nasıl artırılır), çalışan servislerin yanında boş kapasite yok, servis yok, geçersiz zaman sınırı / komut / boyut, ortam askıda. Güvenli tekrar için `Idempotency-Key` gönderin.",
+		Scope: "services_write", Command: []string{"container", "run"},
+		HasBody: true, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Service id", DescTR: ""},
+			{Name: "name", In: "path", Type: "string", Items: "", Enum: nil, Default: "", Required: true, Desc: "Service whose image, variables and secrets the job uses", DescTR: ""},
+			{Name: "Idempotency-Key", In: "header", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
+		},
+		Body: []Field{
+			{Name: "command", Type: "array", Items: "string", Enum: nil, Default: "", Required: false, Desc: "command and arguments (replaces ENTRYPOINT); a text is split like a shell line; omit = image command", DescTR: ""},
+			{Name: "timeout_seconds", Type: "integer", Items: "", Enum: nil, Default: "1800", Required: false, Desc: "", DescTR: ""},
+			{Name: "cpu_m", Type: "integer", Items: "", Enum: nil, Default: "", Required: false, Desc: "default: the service's", DescTR: ""},
+			{Name: "memory_mi", Type: "integer", Items: "", Enum: nil, Default: "", Required: false, Desc: "default: the service's", DescTR: ""},
 		},
 	},
 	{ID: "typed_post_containers__id__services__name__scale", Method: "POST", Path: "/cloud/containers/{id}/services/{name}/scale", Tag: "Containers",

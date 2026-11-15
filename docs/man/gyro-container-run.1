@@ -1,0 +1,109 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-container-run - Run a one-off job (migration, seed) with a service's image, variables and secrets
+
+
+.SH SYNOPSIS
+\fBgyro container run  --service  [flags] [-- COMMAND [ARG...]]\fP
+
+
+.SH DESCRIPTION
+Runs a command once with the image (pinned to the digest of the running version), variables and secrets of an
+existing service, then stops. Everything after "--" is the command; it replaces the image ENTRYPOINT and is passed as
+a list (no shell: write sh -c "a && b" for shell features). Without a command the image's own command runs.
+--follow streams the output; --wait waits silently. With either, the CLI exits with the job's exit code
+(124 = time limit reached, 130 = stopped). Free on node plans (uses your nodes); on Serverless the job is billed per
+vCPU-second / GB-second like a task (billing line "-job"). Parallel jobs per environment are limited
+(2-3 by plan); see "gyro limits".
+
+
+.SH OPTIONS
+\fB--cpu\fP=""
+	vCPU for the job (default: same as the service)
+
+.PP
+\fB--follow\fP[=false]
+	stream the output until the job ends (implies --wait)
+
+.PP
+\fB-h\fP, \fB--help\fP[=false]
+	help for run
+
+.PP
+\fB--memory\fP=0
+	memory in MB for the job (default: same as the service)
+
+.PP
+\fB--service\fP=""
+	service whose image, variables and secrets are used (required)
+
+.PP
+\fB--time-limit\fP=0s
+	stop the job after this time (10s-6h, default 30m)
+
+.PP
+\fB--wait\fP[=false]
+	wait until the job ends; exit with its exit code
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH EXAMPLE
+.EX
+  gyro container run 17000 --service api --follow -- npm run migrate
+  gyro container run 17000 --service web --wait --time-limit 10m -- sh -c "php artisan migrate --force && php artisan db:seed --force"
+  gyro container run 17000 --service api --cpu 1 --memory 1024 -- python manage.py migrate
+.EE
+
+
+.SH SEE ALSO
+\fBgyro-container(1)\fP
