@@ -273,9 +273,11 @@ fiyatı TL ve € olarak gösterir ve onay ister (--yes onaylar).`)
 			// API 2.38.0: a serverless environment's VPC connection is charged -> show the price, ask, send "confirm": true
 			if pre, err := c.Do(ctx, api.Request{Method: "GET", Path: "/cloud/containers/" + env + "/vpc"}); err == nil {
 				if p, attached := vpcPricing(pre.Data); p != nil && p.Charged && !attached {
-					if err := a.Confirm(i18n.F("Environment %s is serverless: its VPC connection costs %s per month (%s per hour while attached, from your prepaid balance; at least %d hour per attachment). Attach?",
-						"%s ortamı sunucusuz: VPC bağlantısı aylık %s (bağlıyken saatlik %s, ön ödemeli bakiyeden; her bağlamada en az %d saat). Bağlansın mı?",
-						env, p.MonthlyText, p.HourlyText, max(1, p.MinimumHours))); err != nil {
+					// the price is printed even without a terminal (--yes / CI logs show what was accepted)
+					fmt.Fprintln(a.Err, i18n.F("Environment %s is serverless: its VPC connection costs %s per month (%s per hour while attached, from your prepaid balance; at least %d hour per attachment).",
+						"%s ortamı sunucusuz: VPC bağlantısı aylık %s (bağlıyken saatlik %s, ön ödemeli bakiyeden; her bağlamada en az %d saat).",
+						env, p.MonthlyText, p.HourlyText, max(1, p.MinimumHours)))
+					if err := a.Confirm(i18n.S("Attach and accept the charge?", "Bağlansın ve ücret onaylansın mı?")); err != nil {
 						return err
 					}
 					body["confirm"] = true
