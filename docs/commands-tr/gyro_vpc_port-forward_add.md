@@ -6,7 +6,7 @@ Kapının dış portunu yönlendir
 
 Kapının dış portunu yönlendir
 
-Kapının public_ip:public_port adresi -> VPC içinde target_ip:target_port. Kapı açık olmalı (409 `gateway_disabled`); protokol + dış port başına bir yönlendirme; en çok 20. `source_cidrs`: yönlendirmeyi yalnız bu public IPv4 ağları kullanabilir (tek IP /32; ağ adresi yazılır, ör. 198.51.100.0/24); en çok 20; boş liste ya da verilmezse herkes. Özel, ayrılmış ve platform aralıkları reddedilir (422 `invalid_source`).
+Kapının public_ip:public_port adresi -> VPC içinde target_ip:target_port. Kapı açık olmalı (409 `gateway_disabled`); protokol + dış port başına bir yönlendirme; en çok 20. `source_cidrs`: yönlendirmeyi yalnız bu public IPv4 ağları kullanabilir (tek IP /32; ağ adresi yazılır, ör. 198.51.100.0/24); en çok 20; boş liste ya da verilmezse herkes. Özel, ayrılmış ve platform aralıkları reddedilir (422 `invalid_source`). `name` (isteğe bağlı): en çok 64 karakterlik ad.
 
 API: POST /cloud/vpcs/{vpc_id}/port-forwards (operationId createVpcPortForward, scope cloud_write)
 
@@ -21,6 +21,7 @@ gyro vpc port-forward add <VPC-ID> [flags]
       --dry-run                  hiçbir şeyi değiştirmeden teklifi / isteği göster
   -h, --help                     help for add
       --idempotency-key string   tekrar güvenliği anahtarı (para işlemlerinde otomatik)
+      --name string              label of the forward (at most 64 characters; empty = no name). Only a label: the gateway is not touched when it changes.
       --protocol string          protocol (tcp|udp)
       --public-port int          public_port
       --set stringArray          ek gövde alanı anahtar=değer (tekrarlanabilir)

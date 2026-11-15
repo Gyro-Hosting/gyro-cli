@@ -21,7 +21,7 @@ API: PUT /cloud/containers/{id}/services/{name}/autoscaling (operationId typed_p
 
 .SH OPTIONS
 \fB--alerts\fP=""
-	Alert threshold: notify when fewer replicas are ready (0 = off). Channels: PUT /cloud/containers/{id}/notifications. (JSON)
+	Alert threshold: notify when fewer replicas are ready (0 = off). Channels: PUT /cloud/containers/{id}/notifications. Always returned in \fBspec\fR (min_ready 0 when off). (JSON)
 
 .PP
 \fB--autoscaling\fP=""

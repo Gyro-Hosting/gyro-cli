@@ -17,7 +17,7 @@ gyro container service create <ID> [flags]
 ### Options
 
 ```
-      --alerts string                         Alert threshold: notify when fewer replicas are ready (0 = off). Channels: PUT /cloud/containers/{id}/notifications. (JSON)
+      --alerts spec                           Alert threshold: notify when fewer replicas are ready (0 = off). Channels: PUT /cloud/containers/{id}/notifications. Always returned in spec (min_ready 0 when off). (JSON)
       --args sh -c "echo a && npm start"      Arguments for the image's default command. A JSON array of strings, e.g. ["sh","-c","echo a && npm start"]. A plain string is accepted too and split like a shell: whitespace separates, quotes keep text together ("..." with \" escapes, '...' literal): sh -c "echo a && npm start" -> ["sh","-c","echo a && npm start"]. A string starting with [ must be a valid JSON array; an unclosed quote is an error.
       --autoscaling enabled:false             Autoscaling (horizontal): replicas follow the average CPU (and optionally memory) use of the reserved size. enabled:false = off (fixed replicas). (JSON)
       --command sh -c "echo a && npm start"   Override the image entrypoint. A JSON array of strings, e.g. ["sh","-c","echo a && npm start"]. A plain string is accepted too and split like a shell: whitespace separates, quotes keep text together ("..." with \" escapes, '...' literal): sh -c "echo a && npm start" -> ["sh","-c","echo a && npm start"]. A string starting with [ must be a valid JSON array; an unclosed quote is an error.

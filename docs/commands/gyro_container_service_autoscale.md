@@ -17,7 +17,7 @@ gyro container service autoscale <ID> <NAME> [flags]
 ### Options
 
 ```
-      --alerts string               Alert threshold: notify when fewer replicas are ready (0 = off). Channels: PUT /cloud/containers/{id}/notifications. (JSON)
+      --alerts spec                 Alert threshold: notify when fewer replicas are ready (0 = off). Channels: PUT /cloud/containers/{id}/notifications. Always returned in spec (min_ready 0 when off). (JSON)
       --autoscaling enabled:false   Autoscaling (horizontal): replicas follow the average CPU (and optionally memory) use of the reserved size. enabled:false = off (fixed replicas). (JSON)
       --data string                 request body as JSON, @file or @- (stdin)
       --dry-run                     show the price quote / request without changing anything

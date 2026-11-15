@@ -81,7 +81,7 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro api request PATCH /cloud/containers/{id}/vpc` | Yayınlanan servisleri değiştir | `PATCH /cloud/containers/{id}/vpc` |
 | `gyro api request PATCH /cloud/mail/{id}/aliases/{aid}` | aliases:edit (GyroMail) | `PATCH /cloud/mail/{id}/aliases/{aid}` |
 | `gyro api request PATCH /cloud/mail/{id}/mailboxes/{local}` | mailboxes:edit (GyroMail) | `PATCH /cloud/mail/{id}/mailboxes/{local}` |
-| `gyro api request PATCH /cloud/vpcs/{vpc_id}/port-forwards/{pf_id}` | Port yönlendirmeyi kimin kullanabileceğini değiştir | `PATCH /cloud/vpcs/{vpc_id}/port-forwards/{pf_id}` |
+| `gyro api request PATCH /cloud/vpcs/{vpc_id}/port-forwards/{pf_id}` | Port yönlendirmeyi değiştir (izinli kaynaklar, ad) | `PATCH /cloud/vpcs/{vpc_id}/port-forwards/{pf_id}` |
 | `gyro api request POST /auth/device/code` | Tarayıcıyla girişi başlat (cihaz kodu) | `POST /auth/device/code` |
 | `gyro api request POST /auth/device/token` | Anahtarı sorgula (cihaz kodu) | `POST /auth/device/token` |
 | `gyro api request POST /cloud/billing/estimate` | Hourly / daily / monthly cost of prepaid plans and serverless containers, and how long the balance lasts | `POST /cloud/billing/estimate` |

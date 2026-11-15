@@ -3,7 +3,7 @@
 package spec
 
 // APIVersion is info.version of the spec this table was generated from.
-const APIVersion = "2.38.0"
+const APIVersion = "2.39.0"
 
 // Ops lists every API operation.
 var Ops = []Op{
@@ -1121,7 +1121,7 @@ var Ops = []Op{
 			{Name: "env", Type: "object", Items: "", Enum: nil, Default: "", Required: false, Desc: "Plain environment variables (replaces the whole set on update)", DescTR: "Ortam değişkenleri (güncellemede tamamı değişir)"},
 			{Name: "run_as_user", Type: "integer", Items: "", Enum: nil, Default: "", Required: false, Desc: "User id inside the container (default 10001)", DescTR: "Kapsayıcı içi kullanıcı kimliği (varsayılan 10001)"},
 			{Name: "autoscaling", Type: "object", Items: "", Enum: nil, Default: "", Required: false, Desc: "Autoscaling (horizontal): replicas follow the average CPU (and optionally memory) use of the reserved size. `enabled:false` = off (fixed replicas).", DescTR: "Otomatik ölçekleme: kopya sayısı ayrılan boyutun ortalama CPU (isteğe bağlı bellek) kullanımına göre değişir. `enabled:false` = kapalı."},
-			{Name: "alerts", Type: "object", Items: "", Enum: nil, Default: "", Required: false, Desc: "Alert threshold: notify when fewer replicas are ready (0 = off). Channels: PUT /cloud/containers/{id}/notifications.", DescTR: "Uyarı eşiği: hazır kopya bu sayının altına düşerse bildirim (0 = kapalı)."},
+			{Name: "alerts", Type: "object", Items: "", Enum: nil, Default: "", Required: false, Desc: "Alert threshold: notify when fewer replicas are ready (0 = off). Channels: PUT /cloud/containers/{id}/notifications. Always returned in `spec` (min_ready 0 when off).", DescTR: "Uyarı eşiği: hazır kopya bu sayının altına düşerse bildirim (0 = kapalı)."},
 			{Name: "confirm", Type: "boolean", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
 		},
 	},
@@ -1158,7 +1158,7 @@ var Ops = []Op{
 			{Name: "run_as_user", Type: "integer", Items: "", Enum: nil, Default: "", Required: false, Desc: "User id inside the container (default 10001)", DescTR: "Kapsayıcı içi kullanıcı kimliği (varsayılan 10001)"},
 			{Name: "reason", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "Free text shown in the revision history (e.g. a git sha)", DescTR: ""},
 			{Name: "autoscaling", Type: "object", Items: "", Enum: nil, Default: "", Required: false, Desc: "Autoscaling (horizontal): replicas follow the average CPU (and optionally memory) use of the reserved size. `enabled:false` = off (fixed replicas).", DescTR: "Otomatik ölçekleme: kopya sayısı ayrılan boyutun ortalama CPU (isteğe bağlı bellek) kullanımına göre değişir. `enabled:false` = kapalı."},
-			{Name: "alerts", Type: "object", Items: "", Enum: nil, Default: "", Required: false, Desc: "Alert threshold: notify when fewer replicas are ready (0 = off). Channels: PUT /cloud/containers/{id}/notifications.", DescTR: "Uyarı eşiği: hazır kopya bu sayının altına düşerse bildirim (0 = kapalı)."},
+			{Name: "alerts", Type: "object", Items: "", Enum: nil, Default: "", Required: false, Desc: "Alert threshold: notify when fewer replicas are ready (0 = off). Channels: PUT /cloud/containers/{id}/notifications. Always returned in `spec` (min_ready 0 when off).", DescTR: "Uyarı eşiği: hazır kopya bu sayının altına düşerse bildirim (0 = kapalı)."},
 			{Name: "confirm", Type: "boolean", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
 		},
 	},
@@ -1186,7 +1186,7 @@ var Ops = []Op{
 		},
 		Body: []Field{
 			{Name: "autoscaling", Type: "object", Items: "", Enum: nil, Default: "", Required: false, Desc: "Autoscaling (horizontal): replicas follow the average CPU (and optionally memory) use of the reserved size. `enabled:false` = off (fixed replicas).", DescTR: "Otomatik ölçekleme: kopya sayısı ayrılan boyutun ortalama CPU (isteğe bağlı bellek) kullanımına göre değişir. `enabled:false` = kapalı."},
-			{Name: "alerts", Type: "object", Items: "", Enum: nil, Default: "", Required: false, Desc: "Alert threshold: notify when fewer replicas are ready (0 = off). Channels: PUT /cloud/containers/{id}/notifications.", DescTR: "Uyarı eşiği: hazır kopya bu sayının altına düşerse bildirim (0 = kapalı)."},
+			{Name: "alerts", Type: "object", Items: "", Enum: nil, Default: "", Required: false, Desc: "Alert threshold: notify when fewer replicas are ready (0 = off). Channels: PUT /cloud/containers/{id}/notifications. Always returned in `spec` (min_ready 0 when off).", DescTR: "Uyarı eşiği: hazır kopya bu sayının altına düşerse bildirim (0 = kapalı)."},
 			{Name: "replicas", Type: "integer", Items: "", Enum: nil, Default: "", Required: false, Desc: "Fixed replicas when switching autoscaling off", DescTR: ""},
 			{Name: "confirm", Type: "boolean", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
 		},
@@ -4762,10 +4762,10 @@ var Ops = []Op{
 	},
 	{ID: "createVpcPortForward", Method: "POST", Path: "/cloud/vpcs/{vpc_id}/port-forwards", Tag: "Private networks",
 		Summary: "Forward a public port of the gateway", SummaryTR: "Kapının dış portunu yönlendir",
-		Desc: "public_ip:public_port of the gateway -> target_ip:target_port inside the VPC. The gateway must be on (409 `gateway_disabled`); one forward per protocol + public port; at most 20. `source_cidrs`: only these public IPv4 networks may use the forward (a single IP is /32; write the network address, e.g. 198.51.100.0/24); at most 20; empty list or left out = everyone. Private, reserved and our own platform ranges are refused (422 `invalid_source`).", DescTR: "Kapının public_ip:public_port adresi -> VPC içinde target_ip:target_port. Kapı açık olmalı (409 `gateway_disabled`); protokol + dış port başına bir yönlendirme; en çok 20. `source_cidrs`: yönlendirmeyi yalnız bu public IPv4 ağları kullanabilir (tek IP /32; ağ adresi yazılır, ör. 198.51.100.0/24); en çok 20; boş liste ya da verilmezse herkes. Özel, ayrılmış ve platform aralıkları reddedilir (422 `invalid_source`).",
+		Desc: "public_ip:public_port of the gateway -> target_ip:target_port inside the VPC. The gateway must be on (409 `gateway_disabled`); one forward per protocol + public port; at most 20. `source_cidrs`: only these public IPv4 networks may use the forward (a single IP is /32; write the network address, e.g. 198.51.100.0/24); at most 20; empty list or left out = everyone. Private, reserved and our own platform ranges are refused (422 `invalid_source`). `name` (optional): a label of at most 64 characters.", DescTR: "Kapının public_ip:public_port adresi -> VPC içinde target_ip:target_port. Kapı açık olmalı (409 `gateway_disabled`); protokol + dış port başına bir yönlendirme; en çok 20. `source_cidrs`: yönlendirmeyi yalnız bu public IPv4 ağları kullanabilir (tek IP /32; ağ adresi yazılır, ör. 198.51.100.0/24); en çok 20; boş liste ya da verilmezse herkes. Özel, ayrılmış ve platform aralıkları reddedilir (422 `invalid_source`). `name` (isteğe bağlı): en çok 64 karakterlik ad.",
 		Scope: "cloud_write", Command: []string{"vpc", "port-forward", "add"},
 		HasBody: true, BodyRequired: true, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
-		Columns: []string{"id", "protocol", "public_port", "target_ip", "target_port", "created_at"},
+		Columns: []string{"id", "protocol", "public_port", "target_ip", "target_port", "created_at", "name"},
 		Params: []Param{
 			{Name: "vpc_id", In: "path", Type: "string", Items: "", Enum: nil, Default: "", Required: true, Desc: "VPC id (from GET /cloud/vpcs)", DescTR: ""},
 		},
@@ -4775,20 +4775,22 @@ var Ops = []Op{
 			{Name: "target_ip", Type: "string", Items: "", Enum: nil, Default: "", Required: true, Desc: "", DescTR: ""},
 			{Name: "target_port", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "", DescTR: ""},
 			{Name: "source_cidrs", Type: "array", Items: "string", Enum: nil, Default: "", Required: false, Desc: "allowed source networks (public IPv4 CIDR); empty = everyone", DescTR: ""},
+			{Name: "name", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "label of the forward (at most 64 characters; empty = no name). Only a label: the gateway is not touched when it changes.", DescTR: ""},
 		},
 	},
 	{ID: "updateVpcPortForward", Method: "PATCH", Path: "/cloud/vpcs/{vpc_id}/port-forwards/{pf_id}", Tag: "Private networks",
-		Summary: "Change who may use a port forward", SummaryTR: "Port yönlendirmeyi kimin kullanabileceğini değiştir",
-		Desc: "`source_cidrs`: only these public IPv4 networks may use the forward (a single IP is /32; write the network address, e.g. 198.51.100.0/24); at most 20; empty list or left out = everyone. Private, reserved and our own platform ranges are refused (422 `invalid_source`). The list replaces the old one; `[]` opens it to everyone. Takes effect on the gateway within seconds.", DescTR: "`source_cidrs`: yönlendirmeyi yalnız bu public IPv4 ağları kullanabilir (tek IP /32; ağ adresi yazılır, ör. 198.51.100.0/24); en çok 20; boş liste ya da verilmezse herkes. Özel, ayrılmış ve platform aralıkları reddedilir (422 `invalid_source`). Liste eskisinin yerine geçer; `[]` herkese açar. Kapıda saniyeler içinde uygulanır.",
+		Summary: "Change a port forward (allowed sources, name)", SummaryTR: "Port yönlendirmeyi değiştir (izinli kaynaklar, ad)",
+		Desc: "Send `source_cidrs` and/or `name`; fields left out do not change. `source_cidrs`: only these public IPv4 networks may use the forward (a single IP is /32; write the network address, e.g. 198.51.100.0/24); at most 20; empty list or left out = everyone. Private, reserved and our own platform ranges are refused (422 `invalid_source`). The list replaces the old one; `[]` opens it to everyone. Takes effect on the gateway within seconds. Changing only `name` does not touch the gateway.", DescTR: "`source_cidrs` ve/veya `name` gönderin; gönderilmeyen alan değişmez. `source_cidrs`: yönlendirmeyi yalnız bu public IPv4 ağları kullanabilir (tek IP /32; ağ adresi yazılır, ör. 198.51.100.0/24); en çok 20; boş liste ya da verilmezse herkes. Özel, ayrılmış ve platform aralıkları reddedilir (422 `invalid_source`). Liste eskisinin yerine geçer; `[]` herkese açar. Kapıda saniyeler içinde uygulanır. Yalnız `name` değişirse kapıya dokunulmaz.",
 		Scope: "cloud_write", Command: []string{"vpc", "port-forward", "update"},
 		HasBody: true, BodyRequired: true, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
-		Columns: []string{"id", "protocol", "public_port", "target_ip", "target_port", "created_at"},
+		Columns: []string{"id", "protocol", "public_port", "target_ip", "target_port", "created_at", "name"},
 		Params: []Param{
 			{Name: "vpc_id", In: "path", Type: "string", Items: "", Enum: nil, Default: "", Required: true, Desc: "VPC id (from GET /cloud/vpcs)", DescTR: ""},
 			{Name: "pf_id", In: "path", Type: "string", Items: "", Enum: nil, Default: "", Required: true, Desc: "Port forward id", DescTR: ""},
 		},
 		Body: []Field{
-			{Name: "source_cidrs", Type: "array", Items: "string", Enum: nil, Default: "", Required: true, Desc: "allowed source networks (public IPv4 CIDR); empty = everyone", DescTR: ""},
+			{Name: "source_cidrs", Type: "array", Items: "string", Enum: nil, Default: "", Required: false, Desc: "allowed source networks (public IPv4 CIDR); empty = everyone", DescTR: ""},
+			{Name: "name", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "label of the forward (at most 64 characters; empty = no name). Only a label: the gateway is not touched when it changes.", DescTR: ""},
 		},
 	},
 	{ID: "deleteVpcPortForward", Method: "DELETE", Path: "/cloud/vpcs/{vpc_id}/port-forwards/{pf_id}", Tag: "Private networks",

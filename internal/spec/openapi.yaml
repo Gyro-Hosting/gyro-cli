@@ -2,7 +2,7 @@
 openapi: 3.1.0
 info:
   title: Gyro Public API
-  version: 2.38.0
+  version: 2.39.0
   summary: Manage Gyro cloud servers, SSH keys and billing programmatically.
   x-summary-tr: Gyro bulut sunucularınızı, SSH anahtarlarınızı ve faturalarınızı programla yönetin.
   description: "The Gyro Public API lets you automate everything you do in the Gyro client area:\norder and manage cloud servers, keep SSH keys, read invoices and\
@@ -105,7 +105,8 @@ info:
     \ `GET .../events/{event}/deliveries`. Signed HTTPS webhooks (same signature as account webhooks), prefix / suffix filters, monthly allowance + event packs, no\
     \ overage invoice. Additive.\n\n**2.38.0**: serverless container environments can join a VPC too (`PUT /cloud/containers/{id}/vpc`). Their connection is charged\
     \ (2.99 EUR/month, hourly from the prepaid balance while attached): `GET .../vpc` returns `pricing`, attaching needs `\"confirm\": true` (422 `confirm_required`\
-    \ with `details.pricing` otherwise). Node environments stay free. Additive.\n"
+    \ with `details.pricing` otherwise). Node environments stay free. Additive.\n\n**2.39.0**: port forwards take an optional `name` (POST, and `PATCH /cloud/vpcs/{vpc_id}/port-forwards/{pf_id}`\
+    \ with `source_cidrs` and/or `name`). `GET /cloud/containers/{id}/services/{name}` always returns `spec.alerts` (`min_ready` 0 when off). Additive.\n"
   x-description-tr: "Gyro Public API, müşteri panelinde yaptığınız her işi otomatikleştirmenizi sağlar:\nbulut sunucu siparişi ve yönetimi, SSH anahtarları, fatura\
     \ ve bakiye okuma.\nResmi Terraform sağlayıcısı (`gyro-hosting/gyro`) ve `gyroctl` bu API'yi kullanır.\n\n* **Taban adres** `https://www.gyrohosting.com/api/v1/client`\n\
     * **Kimlik** `Authorization: Bearer wck_...` (anahtarı *Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri* bölümünden oluşturun)\n* **Biçim** JSON\
@@ -205,7 +206,9 @@ info:
     \ .../events/{event}`, `POST .../events/{event}/test|rotate-secret`, `GET .../events/{event}/deliveries`. İmzalı HTTPS webhook (hesap webhook'larıyla aynı imza),\
     \ önek / uzantı süzgeci, aylık hak + olay paketi, aşım faturası yok. Geriye uyumlu.\n\n**2.38.0**: sunucusuz kapsayıcı ortamları da VPC'ye bağlanabilir (`PUT\
     \ /cloud/containers/{id}/vpc`). Bağlantıları ücretlidir (2,99 €/ay, bağlıyken saatlik, ön ödemeli bakiyeden): `GET .../vpc` `pricing` döner, bağlama `\"confirm\"\
-    : true` ister (yoksa 422 `confirm_required` + `details.pricing`). Düğümlü ortamlar ücretsiz kalır. Geriye uyumlu.\n"
+    : true` ister (yoksa 422 `confirm_required` + `details.pricing`). Düğümlü ortamlar ücretsiz kalır. Geriye uyumlu.\n\n**2.39.0**: port yönlendirmelere isteğe bağlı\
+    \ `name` (POST; `PATCH /cloud/vpcs/{vpc_id}/port-forwards/{pf_id}` `source_cidrs` ve/veya `name`). `GET /cloud/containers/{id}/services/{name}` `spec.alerts`'ı\
+    \ her zaman döner (kapalıyken `min_ready` 0). Geriye uyumlu.\n"
   contact:
     name: Gyro Hosting
     url: https://www.gyrohosting.com
@@ -6557,7 +6560,7 @@ paths:
                   type: array
                   items:
                     type: string
-                    enum: &id138
+                    enum: &id139
                     - storage.object.created
                     - storage.object.deleted
                     - storage.objects.deleted_bulk
@@ -9528,7 +9531,8 @@ paths:
                       description: 0 = off, else 10-95
                 alerts: &id048
                   type: object
-                  description: 'Alert threshold: notify when fewer replicas are ready (0 = off). Channels: PUT /cloud/containers/{id}/notifications.'
+                  description: 'Alert threshold: notify when fewer replicas are ready (0 = off). Channels: PUT /cloud/containers/{id}/notifications. Always returned
+                    in `spec` (min_ready 0 when off).'
                   x-description-tr: 'Uyarı eşiği: hazır kopya bu sayının altına düşerse bildirim (0 = kapalı).'
                   properties:
                     min_ready:
@@ -14786,7 +14790,7 @@ paths:
                   data:
                     type: object
                     properties:
-                      deploy_key: &id133
+                      deploy_key: &id134
                         type: object
                         nullable: true
                         properties:
@@ -24887,10 +24891,12 @@ paths:
         command: vpc port-forward add
       description: 'public_ip:public_port of the gateway -> target_ip:target_port inside the VPC. The gateway must be on (409 `gateway_disabled`); one forward per
         protocol + public port; at most 20. `source_cidrs`: only these public IPv4 networks may use the forward (a single IP is /32; write the network address, e.g.
-        198.51.100.0/24); at most 20; empty list or left out = everyone. Private, reserved and our own platform ranges are refused (422 `invalid_source`).'
+        198.51.100.0/24); at most 20; empty list or left out = everyone. Private, reserved and our own platform ranges are refused (422 `invalid_source`). `name`
+        (optional): a label of at most 64 characters.'
       x-description-tr: 'Kapının public_ip:public_port adresi -> VPC içinde target_ip:target_port. Kapı açık olmalı (409 `gateway_disabled`); protokol + dış port
         başına bir yönlendirme; en çok 20. `source_cidrs`: yönlendirmeyi yalnız bu public IPv4 ağları kullanabilir (tek IP /32; ağ adresi yazılır, ör. 198.51.100.0/24);
-        en çok 20; boş liste ya da verilmezse herkes. Özel, ayrılmış ve platform aralıkları reddedilir (422 `invalid_source`).'
+        en çok 20; boş liste ya da verilmezse herkes. Özel, ayrılmış ve platform aralıkları reddedilir (422 `invalid_source`). `name` (isteğe bağlı): en çok 64 karakterlik
+        ad.'
       parameters:
       - *id121
       responses:
@@ -24942,12 +24948,17 @@ paths:
                 source_cidrs: &id123
                   type: array
                   maxItems: 20
-                  items: &id136
+                  items: &id137
                     type: string
                   description: allowed source networks (public IPv4 CIDR); empty = everyone
-                  example: &id137
+                  example: &id138
                   - 203.0.113.10/32
                   - 198.51.100.0/24
+                name: &id124
+                  type: string
+                  maxLength: 64
+                  description: 'label of the forward (at most 64 characters; empty = no name). Only a label: the gateway is not touched when it changes.'
+                  example: ssh-admin
               required:
               - protocol
               - public_port
@@ -25005,17 +25016,18 @@ paths:
     patch:
       tags: *id119
       operationId: updateVpcPortForward
-      summary: Change who may use a port forward
-      x-summary-tr: Port yönlendirmeyi kimin kullanabileceğini değiştir
+      summary: Change a port forward (allowed sources, name)
+      x-summary-tr: Port yönlendirmeyi değiştir (izinli kaynaklar, ad)
       x-scope: cloud_write
       x-cli:
         command: vpc port-forward update
-      description: '`source_cidrs`: only these public IPv4 networks may use the forward (a single IP is /32; write the network address, e.g. 198.51.100.0/24); at
-        most 20; empty list or left out = everyone. Private, reserved and our own platform ranges are refused (422 `invalid_source`). The list replaces the old one;
-        `[]` opens it to everyone. Takes effect on the gateway within seconds.'
-      x-description-tr: '`source_cidrs`: yönlendirmeyi yalnız bu public IPv4 ağları kullanabilir (tek IP /32; ağ adresi yazılır, ör. 198.51.100.0/24); en çok 20;
-        boş liste ya da verilmezse herkes. Özel, ayrılmış ve platform aralıkları reddedilir (422 `invalid_source`). Liste eskisinin yerine geçer; `[]` herkese açar.
-        Kapıda saniyeler içinde uygulanır.'
+      description: 'Send `source_cidrs` and/or `name`; fields left out do not change. `source_cidrs`: only these public IPv4 networks may use the forward (a single
+        IP is /32; write the network address, e.g. 198.51.100.0/24); at most 20; empty list or left out = everyone. Private, reserved and our own platform ranges
+        are refused (422 `invalid_source`). The list replaces the old one; `[]` opens it to everyone. Takes effect on the gateway within seconds. Changing only `name`
+        does not touch the gateway.'
+      x-description-tr: '`source_cidrs` ve/veya `name` gönderin; gönderilmeyen alan değişmez. `source_cidrs`: yönlendirmeyi yalnız bu public IPv4 ağları kullanabilir
+        (tek IP /32; ağ adresi yazılır, ör. 198.51.100.0/24); en çok 20; boş liste ya da verilmezse herkes. Özel, ayrılmış ve platform aralıkları reddedilir (422
+        `invalid_source`). Liste eskisinin yerine geçer; `[]` herkese açar. Kapıda saniyeler içinde uygulanır. Yalnız `name` değişirse kapıya dokunulmaz.'
       parameters:
       - *id121
       - *id122
@@ -25051,8 +25063,7 @@ paths:
               type: object
               properties:
                 source_cidrs: *id123
-              required:
-              - source_cidrs
+                name: *id124
   /cloud/servers/{id}/nics:
     get:
       tags:
@@ -25248,7 +25259,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  data: &id124
+                  data: &id125
                     type: object
                     properties:
                       server_id:
@@ -25304,7 +25315,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  data: *id124
+                  data: *id125
         '403':
           description: not_available (private networks are not enabled for this account yet) / forbidden (key limited to some servers)
           content: *id071
@@ -25352,7 +25363,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  data: *id124
+                  data: *id125
         '403':
           description: not_available (private networks are not enabled for this account yet) / forbidden (key limited to some servers)
           content: *id071
@@ -25369,7 +25380,7 @@ paths:
           content: *id071
   /auth/device/code:
     post:
-      tags: &id125
+      tags: &id126
       - Authentication
       operationId: createDeviceCode
       security: []
@@ -25439,11 +25450,11 @@ paths:
           description: rate_limited
           content:
             application/json:
-              schema: &id126
+              schema: &id127
                 $ref: '#/components/schemas/Error'
   /auth/device/token:
     post:
-      tags: *id125
+      tags: *id126
       operationId: pollDeviceToken
       security: []
       summary: Poll for the key (device code)
@@ -25481,15 +25492,15 @@ paths:
           description: authorization_pending | slow_down | access_denied | expired_token | invalid_grant
           content:
             application/json:
-              schema: *id126
+              schema: *id127
         '429':
           description: rate_limited
           content:
             application/json:
-              schema: *id126
+              schema: *id127
   /auth/session:
     get:
-      tags: *id125
+      tags: *id126
       operationId: getAuthSession
       summary: 'Key in use: account, permissions, expiry'
       x-summary-tr: 'Kullanılan anahtar: hesap, izinler, bitiş'
@@ -25512,10 +25523,10 @@ paths:
                         $ref: '#/components/schemas/AuthKey'
                       account:
                         $ref: '#/components/schemas/AuthAccount'
-        '401': &id127
+        '401': &id128
           $ref: '#/components/responses/Unauthorized'
     delete:
-      tags: *id125
+      tags: *id126
       operationId: deleteAuthSession
       summary: Revoke the key in use (sign out)
       x-summary-tr: Kullanılan anahtarı iptal et (çıkış)
@@ -25538,7 +25549,7 @@ paths:
                         type: boolean
                       id:
                         type: integer
-        '401': *id127
+        '401': *id128
   /cloud/servers/{id}/agent:
     get:
       tags:
@@ -28069,7 +28080,7 @@ components:
           maxLength: 255
         color:
           type: string
-          enum: &id128
+          enum: &id129
           - gray
           - blue
           - green
@@ -28122,22 +28133,22 @@ components:
       required:
       - name
       properties:
-        name: &id129
+        name: &id130
           type: string
           minLength: 1
           maxLength: 40
           description: 'Letter or digit first; then letters, digits, space and . _ - / + # & ( ). Unique per account (case-insensitive). Reserved: Genel, General,
             Default.'
-        description: &id130
+        description: &id131
           type:
           - string
           - 'null'
           maxLength: 255
-        color: &id131
+        color: &id132
           type: string
-          enum: *id128
+          enum: *id129
           default: blue
-        icon: &id132
+        icon: &id133
           type: string
           enum:
           - folder
@@ -28172,10 +28183,10 @@ components:
     ProjectUpdate:
       type: object
       properties:
-        name: *id129
-        description: *id130
-        color: *id131
-        icon: *id132
+        name: *id130
+        description: *id131
+        color: *id132
+        icon: *id133
     ProjectRef:
       type:
       - object
@@ -28525,7 +28536,7 @@ components:
                   fingerprint:
                     type: string
                     example: SHA256:+DiY3wvvV6TuJJhbpZisF/zLDA0zPMSvHdkr4UvCOqU
-            deploy_key: *id133
+            deploy_key: *id134
         archive:
           type: object
           properties:
@@ -28961,12 +28972,12 @@ components:
           type: string
         egress_change:
           $ref: '#/components/schemas/ContainerEgressChange'
-        pending_egress_ips: &id135
+        pending_egress_ips: &id136
           type: array
           items:
             type: string
           description: new egress IPs announced but not in use for sure yet; add them to your allow lists now
-        egress_hold_hours: &id134
+        egress_hold_hours: &id135
           type: integer
           description: approval window (0 = off)
     ContainerEnvironment:
@@ -29049,10 +29060,10 @@ components:
         node_monthly_eur:
           type: number
           description: price of one node per month (an extra node costs the same)
-        egress_hold_hours: *id134
+        egress_hold_hours: *id135
         egress_change:
           $ref: '#/components/schemas/ContainerEgressChange'
-        pending_egress_ips: *id135
+        pending_egress_ips: *id136
     VpcPortForward:
       type: object
       properties:
@@ -29075,9 +29086,12 @@ components:
         source_cidrs:
           type: array
           maxItems: 20
-          items: *id136
+          items: *id137
           description: allowed source networks; empty = everyone
-          example: *id137
+          example: *id138
+        name:
+          type: string
+          description: label of the forward (empty when not set)
     VpcGateway:
       type: object
       properties:
@@ -29784,7 +29798,7 @@ components:
           type: array
           items:
             type: string
-            enum: *id138
+            enum: *id139
         prefix:
           type: string
           example: resimler/
