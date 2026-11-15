@@ -6,6 +6,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"sync/atomic"
 	"testing"
@@ -75,7 +76,7 @@ func TestAuthLoginStoresKey(t *testing.T) {
 	if !strings.Contains(string(b), `token = "wck_new"`) || !strings.Contains(string(b), "[profiles.work]") {
 		t.Fatalf("config: %s", b)
 	}
-	if st, _ := os.Stat(cfg); st.Mode().Perm() != 0o600 {
+	if st, _ := os.Stat(cfg); runtime.GOOS != "windows" && st.Mode().Perm() != 0o600 {
 		t.Fatalf("mode %v", st.Mode().Perm())
 	}
 }
