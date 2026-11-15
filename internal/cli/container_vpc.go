@@ -401,25 +401,38 @@ fiyatı TL ve € olarak gösterir ve onay ister (--yes onaylar).`)
 	pfg := ensureGroup(root, []string{"vpc", "port-forward"})
 	var src []string
 	var anyone bool
+	var pfName string
 	upd := &cobra.Command{
-		Use:   "update <VPC_ID> <PORT_FORWARD_ID> --source <IP|CIDR> ... | --any",
-		Short: i18n.S("Change who may use a port forward (source allow list)", "Port yönlendirmeyi kimin kullanabileceğini değiştir (kaynak izin listesi)"),
+		Use:   "update <VPC_ID> <PORT_FORWARD_ID> [--source <IP|CIDR> ... | --any] [--name <label>]",
+		Short: i18n.S("Change a port forward (source allow list, name)", "Port yönlendirmeyi değiştir (kaynak izin listesi, ad)"),
 		Long: i18n.S(`Only the given public IPv4 networks may use the forward (a single IP becomes /32; write the network
-address, e.g. 198.51.100.0/24; at most 20). The list replaces the old one; --any opens it to everyone.`,
+address, e.g. 198.51.100.0/24; at most 20). The list replaces the old one; --any opens it to everyone.
+--name renames the forward (a label of at most 64 characters, "" removes it; the gateway is not touched).
+What you leave out does not change.`,
 			`Yönlendirmeyi yalnız verilen public IPv4 ağları kullanabilir (tek IP /32 olur; ağ adresi yazılır, ör.
-198.51.100.0/24; en çok 20). Liste eskisinin yerine geçer; --any herkese açar.`),
+198.51.100.0/24; en çok 20). Liste eskisinin yerine geçer; --any herkese açar.
+--name yönlendirmenin adını değiştirir (en çok 64 karakterlik etiket, "" kaldırır; kapıya dokunulmaz).
+Verilmeyen değişmez.`),
 		Example: "  gyro vpc port-forward update vpc-1a2b3c4d pf-9c8b7a6d --source 203.0.113.10 --source 198.51.100.0/24\n" +
-			"  gyro vpc port-forward update vpc-1a2b3c4d pf-9c8b7a6d --any",
+			"  gyro vpc port-forward update vpc-1a2b3c4d pf-9c8b7a6d --any\n" +
+			"  gyro vpc port-forward update vpc-1a2b3c4d pf-9c8b7a6d --name ssh-admin",
 		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			l := parseSources(src)
-			if anyone == (len(l) > 0) {
-				return &ExitErr{Code: ExitUsage, Err: errors.New(i18n.S("give --source <IP|CIDR> (repeatable) or --any", "--source <IP|CIDR> (tekrarlanabilir) ya da --any verin"))}
+			named := cmd.Flags().Changed("name")
+			if anyone && len(l) > 0 || !named && anyone == (len(l) > 0) {
+				return &ExitErr{Code: ExitUsage, Err: errors.New(i18n.S("give --source <IP|CIDR> (repeatable), --any and/or --name", "--source <IP|CIDR> (tekrarlanabilir), --any ve/veya --name verin"))}
 			}
 			if len(l) > 20 {
 				return &ExitErr{Code: ExitUsage, Err: errors.New(i18n.S("--source: at most 20 networks", "--source: en çok 20 ağ"))}
 			}
-			body := map[string]any{"source_cidrs": l}
+			body := map[string]any{}
+			if anyone || len(l) > 0 {
+				body["source_cidrs"] = l
+			}
+			if named {
+				body["name"] = strings.TrimSpace(pfName)
+			}
 			p := "/cloud/vpcs/" + url.PathEscape(args[0]) + "/port-forwards/" + url.PathEscape(args[1])
 			if dry4 {
 				return a.Printer().Print(map[string]any{"method": "PATCH", "path": p, "body": body}, nil, "")
@@ -440,5 +453,6 @@ address, e.g. 198.51.100.0/24; at most 20). The list replaces the old one; --any
 	upd.Flags().StringArrayVar(&src, "source", nil, i18n.S("allowed source IPv4 or CIDR (repeatable or comma separated)", "izin verilen kaynak IPv4 ya da CIDR (tekrarlanabilir ya da virgülle)"))
 	upd.Flags().BoolVar(&dry4, "dry-run", false, dryUse)
 	upd.Flags().BoolVar(&anyone, "any", false, i18n.S("allow everyone (empty list)", "herkese izin ver (boş liste)"))
+	upd.Flags().StringVar(&pfName, "name", "", i18n.S("new name (label, at most 64 characters; \"\" removes it)", "yeni ad (etiket, en çok 64 karakter; \"\" kaldırır)"))
 	pfg.AddCommand(upd)
 }

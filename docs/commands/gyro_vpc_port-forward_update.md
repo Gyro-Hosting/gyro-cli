@@ -1,14 +1,16 @@
 ## gyro vpc port-forward update
 
-Change who may use a port forward (source allow list)
+Change a port forward (source allow list, name)
 
 ### Synopsis
 
 Only the given public IPv4 networks may use the forward (a single IP becomes /32; write the network
 address, e.g. 198.51.100.0/24; at most 20). The list replaces the old one; --any opens it to everyone.
+--name renames the forward (a label of at most 64 characters, "" removes it; the gateway is not touched).
+What you leave out does not change.
 
 ```
-gyro vpc port-forward update <VPC_ID> <PORT_FORWARD_ID> --source <IP|CIDR> ... | --any [flags]
+gyro vpc port-forward update <VPC_ID> <PORT_FORWARD_ID> [--source <IP|CIDR> ... | --any] [--name <label>] [flags]
 ```
 
 ### Examples
@@ -16,6 +18,7 @@ gyro vpc port-forward update <VPC_ID> <PORT_FORWARD_ID> --source <IP|CIDR> ... |
 ```
   gyro vpc port-forward update vpc-1a2b3c4d pf-9c8b7a6d --source 203.0.113.10 --source 198.51.100.0/24
   gyro vpc port-forward update vpc-1a2b3c4d pf-9c8b7a6d --any
+  gyro vpc port-forward update vpc-1a2b3c4d pf-9c8b7a6d --name ssh-admin
 ```
 
 ### Options
@@ -24,6 +27,7 @@ gyro vpc port-forward update <VPC_ID> <PORT_FORWARD_ID> --source <IP|CIDR> ... |
       --any                  allow everyone (empty list)
       --dry-run              show the request without changing anything
   -h, --help                 help for update
+      --name string          new name (label, at most 64 characters; "" removes it)
       --source stringArray   allowed source IPv4 or CIDR (repeatable or comma separated)
 ```
 

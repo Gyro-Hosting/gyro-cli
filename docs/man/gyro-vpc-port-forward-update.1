@@ -2,16 +2,18 @@
 .TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
 
 .SH NAME
-gyro-vpc-port-forward-update - Change who may use a port forward (source allow list)
+gyro-vpc-port-forward-update - Change a port forward (source allow list, name)
 
 
 .SH SYNOPSIS
-\fBgyro vpc port-forward update   --source  ... | --any [flags]\fP
+\fBgyro vpc port-forward update   [--source  ... | --any] [--name ] [flags]\fP
 
 
 .SH DESCRIPTION
 Only the given public IPv4 networks may use the forward (a single IP becomes /32; write the network
 address, e.g. 198.51.100.0/24; at most 20). The list replaces the old one; --any opens it to everyone.
+--name renames the forward (a label of at most 64 characters, "" removes it; the gateway is not touched).
+What you leave out does not change.
 
 
 .SH OPTIONS
@@ -25,6 +27,10 @@ address, e.g. 198.51.100.0/24; at most 20). The list replaces the old one; --any
 .PP
 \fB-h\fP, \fB--help\fP[=false]
 	help for update
+
+.PP
+\fB--name\fP=""
+	new name (label, at most 64 characters; "" removes it)
 
 .PP
 \fB--source\fP=[]
@@ -84,6 +90,7 @@ address, e.g. 198.51.100.0/24; at most 20). The list replaces the old one; --any
 .EX
   gyro vpc port-forward update vpc-1a2b3c4d pf-9c8b7a6d --source 203.0.113.10 --source 198.51.100.0/24
   gyro vpc port-forward update vpc-1a2b3c4d pf-9c8b7a6d --any
+  gyro vpc port-forward update vpc-1a2b3c4d pf-9c8b7a6d --name ssh-admin
 .EE
 
 

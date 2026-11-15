@@ -101,9 +101,18 @@ func TestVpcPortForwardSources(t *testing.T) {
 	if r.code != ExitUsage {
 		t.Fatalf("update needs --source or --any: %d", r.code)
 	}
-	r = run(t, srv, nil, "", false, "vpc", "port-forward", "add", "vpc-1", "--protocol", "tcp", "--public-port", "2222", "--target-ip", "10.10.1.5", "--target-port", "22", "--source", "203.0.113.10/32", "--yes")
-	if l, _ := add["source_cidrs"].([]any); r.code != 0 || len(l) != 1 || l[0] != "203.0.113.10/32" {
-		t.Fatalf("add --source alias: %d %#v %q", r.code, add, r.err)
+	r = run(t, srv, nil, "", false, "vpc", "port-forward", "add", "vpc-1", "--protocol", "tcp", "--public-port", "2222", "--target-ip", "10.10.1.5", "--target-port", "22", "--source", "203.0.113.10/32", "--name", "ssh-admin", "--yes")
+	if l, _ := add["source_cidrs"].([]any); r.code != 0 || len(l) != 1 || l[0] != "203.0.113.10/32" || add["name"] != "ssh-admin" {
+		t.Fatalf("add --source alias / --name: %d %#v %q", r.code, add, r.err)
+	}
+	// #3462: --name alone renames, the source list is not sent (stays as it is)
+	r = run(t, srv, nil, "", false, "vpc", "port-forward", "update", "vpc-1", "pf-1", "--name", " Gyro Proje SSH ")
+	if _, has := upd["source_cidrs"]; r.code != 0 || has || upd["name"] != "Gyro Proje SSH" {
+		t.Fatalf("update --name only: %d %#v", r.code, upd)
+	}
+	r = run(t, srv, nil, "", false, "vpc", "port-forward", "update", "vpc-1", "pf-1", "--source", "203.0.113.10", "--any")
+	if r.code != ExitUsage {
+		t.Fatalf("--source with --any: %d", r.code)
 	}
 }
 

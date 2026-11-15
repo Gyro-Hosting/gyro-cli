@@ -1,14 +1,16 @@
 ## gyro vpc port-forward update
 
-Port yönlendirmeyi kimin kullanabileceğini değiştir (kaynak izin listesi)
+Port yönlendirmeyi değiştir (kaynak izin listesi, ad)
 
 ### Synopsis
 
 Yönlendirmeyi yalnız verilen public IPv4 ağları kullanabilir (tek IP /32 olur; ağ adresi yazılır, ör.
 198.51.100.0/24; en çok 20). Liste eskisinin yerine geçer; --any herkese açar.
+--name yönlendirmenin adını değiştirir (en çok 64 karakterlik etiket, "" kaldırır; kapıya dokunulmaz).
+Verilmeyen değişmez.
 
 ```
-gyro vpc port-forward update <VPC_ID> <PORT_FORWARD_ID> --source <IP|CIDR> ... | --any [flags]
+gyro vpc port-forward update <VPC_ID> <PORT_FORWARD_ID> [--source <IP|CIDR> ... | --any] [--name <label>] [flags]
 ```
 
 ### Examples
@@ -16,6 +18,7 @@ gyro vpc port-forward update <VPC_ID> <PORT_FORWARD_ID> --source <IP|CIDR> ... |
 ```
   gyro vpc port-forward update vpc-1a2b3c4d pf-9c8b7a6d --source 203.0.113.10 --source 198.51.100.0/24
   gyro vpc port-forward update vpc-1a2b3c4d pf-9c8b7a6d --any
+  gyro vpc port-forward update vpc-1a2b3c4d pf-9c8b7a6d --name ssh-admin
 ```
 
 ### Options
@@ -24,6 +27,7 @@ gyro vpc port-forward update <VPC_ID> <PORT_FORWARD_ID> --source <IP|CIDR> ... |
       --any                  herkese izin ver (boş liste)
       --dry-run              hiçbir şeyi değiştirmeden isteği göster
   -h, --help                 help for update
+      --name string          yeni ad (etiket, en çok 64 karakter; "" kaldırır)
       --source stringArray   izin verilen kaynak IPv4 ya da CIDR (tekrarlanabilir ya da virgülle)
 ```
 
