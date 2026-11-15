@@ -106,3 +106,32 @@ func TestVpcPortForwardSources(t *testing.T) {
 		t.Fatalf("add --source alias: %d %#v %q", r.code, add, r.err)
 	}
 }
+
+// API 2.38.0: serverless environment -> the attach shows the price and asks; --yes sends "confirm": true. Node environments do not ask.
+func TestContainerVpcAttachCharged(t *testing.T) {
+	setup(t)
+	m, srv := newMock(t)
+	var got map[string]any
+	charged := true
+	m.routes["GET /cloud/containers/78/vpc"] = func(w http.ResponseWriter, r *http.Request, b map[string]any) {
+		j(w, 200, map[string]any{"data": map[string]any{"attached": false, "state": "off", "mode": "serverless",
+			"pricing": map[string]any{"charged": charged, "monthly_eur": 2.99, "monthly_text": "166,45 TL (2,99 €)", "hourly_text": "0,2477 TL (0,0044 €)", "minimum_hours": 1}}})
+	}
+	m.routes["PUT /cloud/containers/78/vpc"] = func(w http.ResponseWriter, r *http.Request, b map[string]any) {
+		got = b
+		j(w, 200, map[string]any{"data": map[string]any{"status": "successful", "vpc": map[string]any{"attached": true, "state": "attaching", "source_range": "10.10.1.16/28"}}})
+	}
+	r := run(t, srv, nil, "", false, "container", "vpc", "attach", "78", "--subnet", "sn-1")
+	if r.code != ExitAborted || got != nil {
+		t.Fatalf("charged attach asks first (no terminal -> aborted): %d %#v", r.code, got)
+	}
+	r = run(t, srv, nil, "", false, "container", "vpc", "attach", "78", "--subnet", "sn-1", "--yes")
+	if r.code != 0 || got["confirm"] != true || got["subnet_id"] != "sn-1" {
+		t.Fatalf("charged attach --yes: %d %#v %q", r.code, got, r.err)
+	}
+	got, charged = nil, false
+	r = run(t, srv, nil, "", false, "container", "vpc", "attach", "78", "--subnet", "sn-1")
+	if r.code != 0 || got == nil || got["confirm"] != nil {
+		t.Fatalf("free attach does not ask: %d %#v %q", r.code, got, r.err)
+	}
+}

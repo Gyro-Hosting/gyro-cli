@@ -1,7 +1,8 @@
 package cli
 
-// VPC V2 (API 2.34.0): a node container environment in a private network (VPC) of tr-ist-1, and the source allow list of
-// VPC gateway port forwards.
+// VPC V2 (API 2.34.0): a container environment in a private network (VPC) of tr-ist-1, and the source allow list of
+// VPC gateway port forwards. API 2.38.0: serverless environments too; their connection is charged (GET .../vpc "pricing"),
+// attach shows the price and asks (--yes skips), then sends "confirm": true. Node environments stay free.
 //   gyro container vpc get <ENV>
 //   gyro container vpc attach <ENV> --vpc <VPC> --subnet <SUBNET> [--expose api:8080 ...] [--wait]
 //   gyro container vpc expose <ENV> --expose api:8080 ... | --clear
@@ -55,6 +56,29 @@ func vpcFrom(raw json.RawMessage) (*containerVpcDoc, json.RawMessage) {
 	var d containerVpcDoc
 	_ = json.Unmarshal(raw, &d)
 	return &d, raw
+}
+
+// vpcPricingDoc is the "pricing" block of GET .../vpc (API 2.38.0); nil on older APIs.
+type vpcPricingDoc struct {
+	Charged         bool    `json:"charged"`
+	MonthlyEUR      float64 `json:"monthly_eur"`
+	MonthlyText     string  `json:"monthly_text"`
+	HourlyText      string  `json:"hourly_text"`
+	ListMonthlyText string  `json:"list_monthly_text"`
+	MinimumHours    int     `json:"minimum_hours"`
+}
+
+func vpcPricing(raw json.RawMessage) (*vpcPricingDoc, bool) {
+	var g struct {
+		Attached bool           `json:"attached"`
+		Pricing  *vpcPricingDoc `json:"pricing"`
+	}
+	_, v := vpcFrom(raw)
+	_ = json.Unmarshal(v, &g)
+	if g.Pricing != nil && g.Pricing.MonthlyText == "" {
+		g.Pricing.MonthlyText = strconv.FormatFloat(g.Pricing.MonthlyEUR, 'f', 2, 64) + " EUR"
+	}
+	return g.Pricing, g.Attached
 }
 
 // parseExpose turns "api:8080" values into [{service, port}]. Spaces, invisible characters and a trailing comma are tolerated.
@@ -160,18 +184,23 @@ func (a *App) waitVpc(ctx context.Context, c *api.Client, env string, wantOff bo
 func addContainerVpc(a *App, root *cobra.Command) {
 	markHandled(opGetContainerVpc, opAttachContainerVpc, opSetContainerVpcExpose, opDetachContainerVpc, opUpdateVpcPortForward)
 	grp := ensureGroup(root, []string{"container", "vpc"})
-	grp.Short = i18n.S("Private network (VPC) of a node environment: fixed source range, VPC endpoint", "Düğümlü ortamın özel ağı (VPC): sabit kaynak aralığı, VPC uç noktası")
+	grp.Short = i18n.S("Private network (VPC) of a container environment: fixed source range, VPC endpoint", "Kapsayıcı ortamının özel ağı (VPC): sabit kaynak aralığı, VPC uç noktası")
 	delete(grp.Annotations, "autoShort")
-	long := i18n.S(`Connects a node container environment (Mini, Small, Starter, Standard, Pro) to one subnet of your private network
-(VPC) in tr-ist-1. The environment gets a fixed VPC source range (/28) inside the subnet: connections from your
-containers to the VPC servers come from it and it does not change when nodes are replaced, scaled or renewed.
-The first address is the VPC endpoint: VPC servers reach the services you publish (--expose service:port) at
-endpoint:port. Never reachable from the internet. Free. The subnet must be /26 or larger. Serverless: not yet.`,
-		`Düğümlü bir Kapsayıcı ortamını (Mini, Küçük, Başlangıç, Standart, Pro) tr-ist-1'deki özel ağınızın (VPC) bir
-subnetine bağlar. Ortama subnet içinde sabit bir VPC kaynak aralığı (/28) ayrılır: kapsayıcılarınızdan VPC
-sunucularına giden bağlantılar buradan gelir; düğüm değişimi, ölçekleme ya da yenilemede değişmez. İlk adres VPC
-uç noktasıdır: VPC sunucuları yayınladığınız servislere (--expose servis:port) uç_nokta:port ile ulaşır.
-İnternetten erişilemez. Ücretsizdir. Subnet en az /26 olmalı. Sunucusuz: yakında.`)
+	long := i18n.S(`Connects a container environment to one subnet of your private network (VPC) in tr-ist-1. The environment
+gets a fixed VPC source range (/28) inside the subnet: connections from your containers to the VPC servers come
+from it and it does not change when nodes are replaced, scaled or renewed. The first address is the VPC endpoint:
+VPC servers reach the services you publish (--expose service:port) at endpoint:port. Never reachable from the
+internet. The subnet must be /26 or larger.
+Price: node environments (Mini, Small, Starter, Standard, Pro) free. Serverless environments: a connector dedicated
+to the environment runs, so the connection is charged (2.99 EUR/month, billed hourly from the prepaid balance while
+attached); attach shows the price in your currency and asks for confirmation (--yes accepts it).`,
+		`Bir Kapsayıcı ortamını tr-ist-1'deki özel ağınızın (VPC) bir subnetine bağlar. Ortama subnet içinde sabit bir
+VPC kaynak aralığı (/28) ayrılır: kapsayıcılarınızdan VPC sunucularına giden bağlantılar buradan gelir; düğüm
+değişimi, ölçekleme ya da yenilemede değişmez. İlk adres VPC uç noktasıdır: VPC sunucuları yayınladığınız
+servislere (--expose servis:port) uç_nokta:port ile ulaşır. İnternetten erişilemez. Subnet en az /26 olmalı.
+Ücret: düğümlü ortamlarda (Mini, Küçük, Başlangıç, Standart, Pro) ücretsiz. Sunucusuz ortamlarda ortama ayrılmış
+bir bağlayıcı çalıştığı için bağlantı ücretlidir (2,99 €/ay, bağlıyken saatlik, ön ödemeli bakiyeden); attach
+fiyatı TL ve € olarak gösterir ve onay ister (--yes onaylar).`)
 	grp.Long = long
 
 	get := &cobra.Command{
@@ -240,6 +269,17 @@ uç noktasıdır: VPC sunucuları yayınladığınız servislere (--expose servi
 			c, err := a.Client()
 			if err != nil {
 				return err
+			}
+			// API 2.38.0: a serverless environment's VPC connection is charged -> show the price, ask, send "confirm": true
+			if pre, err := c.Do(ctx, api.Request{Method: "GET", Path: "/cloud/containers/" + env + "/vpc"}); err == nil {
+				if p, attached := vpcPricing(pre.Data); p != nil && p.Charged && !attached {
+					if err := a.Confirm(i18n.F("Environment %s is serverless: its VPC connection costs %s per month (%s per hour while attached, from your prepaid balance; at least %d hour per attachment). Attach?",
+						"%s ortamı sunucusuz: VPC bağlantısı aylık %s (bağlıyken saatlik %s, ön ödemeli bakiyeden; her bağlamada en az %d saat). Bağlansın mı?",
+						env, p.MonthlyText, p.HourlyText, max(1, p.MinimumHours))); err != nil {
+						return err
+					}
+					body["confirm"] = true
+				}
 			}
 			resp, err := c.Do(ctx, api.Request{Method: "PUT", Path: "/cloud/containers/" + env + "/vpc", Body: body})
 			if err != nil {
