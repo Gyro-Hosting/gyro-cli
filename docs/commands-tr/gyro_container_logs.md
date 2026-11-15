@@ -1,27 +1,45 @@
 ## gyro container logs
 
-Servis logları
+Ortamın ya da bir servisin loglarında ara, canlı izle
 
 ### Synopsis
 
-Servis logları
-
-Satırlar `{time, instance, text}` eskiden yeniye. `since_minutes` (varsayılan 60), `filter`, `limit` (en çok 2000), `previous=1` = son çöken örnek.
-
-API: GET /cloud/containers/{id}/services/{name}/logs (operationId typed_get_containers__id__services__name__logs, scope services_read)
+Kapsayıcılarınızın stdout / stderr'e yazdıklarını eskiden yeniye gösterir. Servis verilmezse ortamın tüm servisleri
+aranır. Filtreler: --filter (satır içerir, büyük/küçük harf duyarsız), --exclude, --level (error|warn|info|debug) ve
+JSON / logfmt satırlarda --where alan koşulları (status>=500, method=POST, path~/api; birden fazlası için bayrağı tekrarlayın).
+--follow yeni satırları basmayı sürdürür (2 sn'de bir, Ctrl-C durdurur). --all tüm aralığı geriye doğru sayfalar
+(en çok 100.000 satır). Ne kadar geriye gidebileceğiniz log paketinize bağlıdır (ücretsiz: 7 gün; gyro container log-usage).
 
 ```
-gyro container logs <ID> <NAME> [flags]
+gyro container logs <ENVIRONMENT_ID> [SERVICE] [flags]
+```
+
+### Examples
+
+```
+  gyro container logs 17000 api --since 30m
+  gyro container logs 17000 --level error --since 24h
+  gyro container logs 17000 api --where 'status>=500' --where 'path~/api' --since 2h
+  gyro container logs 17000 api -f
 ```
 
 ### Options
 
 ```
-      --filter string          Plain text filter
-  -h, --help                   help for logs
-      --param-limit string     Max lines
-      --previous string        1 = previous (crashed) instance
-      --since-minutes string   Time range in minutes
+      --all                 tüm aralığı geriye doğru sayfala (en çok 100.000 satır)
+      --end string          bitiş (RFC3339 ya da geçen süre)
+      --exclude string      satır bu metni içermez
+      --filter string       satır bu metni içerir (büyük/küçük harf duyarsız)
+  -f, --follow              yeni satırları basmayı sürdür (Ctrl-C durdurur)
+  -h, --help                help for logs
+      --level string        error | warn | info | debug
+      --limit int           sayfa başına satır (varsayılan 300, en çok 5000)
+      --parse string        json | logfmt
+      --previous            servisin son çöken kopyasının çıktısı
+      --service string      yalnız bu servis (ikinci argümanla aynı)
+      --since string        şimdi biten aralık: 30m, 6h, 7d (varsayılan 1h; --follow ile 15m)
+      --start string        başlangıç (RFC3339 ya da geçen süre, ör. 3d); bir sorgu en çok 31 gün
+      --where stringArray   JSON / logfmt satırlarda alan koşulu: status>=500, method=POST, path~/api (tekrarlanabilir)
 ```
 
 ### Options inherited from parent commands

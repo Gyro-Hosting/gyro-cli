@@ -63,6 +63,8 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro api request GET /cloud/billing/balance` | Balance, hourly cost of running prepaid services and estimated time left | `GET /cloud/billing/balance` |
 | `gyro api request GET /cloud/billing/statement/{month}` | Monthly usage statement (not an invoice); JSON, PDF or CSV | `GET /cloud/billing/statement/{month}` |
 | `gyro api request GET /cloud/billing/usage` | Hour-by-hour usage ledger (or daily/monthly totals). Times are Europe/Istanbul. | `GET /cloud/billing/usage` |
+| `gyro api request GET /cloud/containers/{id}/logs` | Search the environment's logs | `GET /cloud/containers/{id}/logs` |
+| `gyro api request GET /cloud/containers/{id}/services/{name}/logs` | Service logs | `GET /cloud/containers/{id}/services/{name}/logs` |
 | `gyro api request GET /cloud/mail/{id}/aliases` | GET aliases (GyroMail) | `GET /cloud/mail/{id}/aliases` |
 | `gyro api request GET /cloud/mail/{id}/autoresponders` | GET autoresponder (GyroMail) | `GET /cloud/mail/{id}/autoresponders` |
 | `gyro api request GET /cloud/mail/{id}/catch-all` | GET catch-all (GyroMail) | `GET /cloud/mail/{id}/catch-all` |
@@ -77,6 +79,7 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro api request POST /auth/device/code` | Start a browser sign-in (device code) | `POST /auth/device/code` |
 | `gyro api request POST /auth/device/token` | Poll for the key (device code) | `POST /auth/device/token` |
 | `gyro api request POST /cloud/billing/estimate` | Hourly / daily / monthly cost of prepaid plans and serverless containers, and how long the balance lasts | `POST /cloud/billing/estimate` |
+| `gyro api request POST /cloud/containers/{id}/services/{name}/run` | Run a one-off job | `POST /cloud/containers/{id}/services/{name}/run` |
 | `gyro api request POST /cloud/licenses/{id}/change-ip` | POST method change_ip (LisansAPP) | `POST /cloud/licenses/{id}/change-ip` |
 | `gyro api request POST /cloud/mail/{id}/aliases` | POST aliases:create (GyroMail) | `POST /cloud/mail/{id}/aliases` |
 | `gyro api request POST /cloud/mail/{id}/mailboxes` | POST mailboxes:create (GyroMail) | `POST /cloud/mail/{id}/mailboxes` |
@@ -103,7 +106,18 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro container external-registry delete` | Remove external registry credentials | `DELETE /cloud/containers/{id}/external-registry` |
 | `gyro container external-registry set` | External private registry credentials | `PUT /cloud/containers/{id}/external-registry` |
 | `gyro container get` | Container environment detail (namespace, internal addressing, egress IPs) | `GET /cloud/containers/{id}` |
-| `gyro container logs` | Service logs | `GET /cloud/containers/{id}/services/{name}/logs` |
+| `gyro container job cancel` | Stop a one-off job | `DELETE /cloud/containers/{id}/jobs/{job}` |
+| `gyro container job get` | Get a one-off job | `GET /cloud/containers/{id}/jobs/{job}` |
+| `gyro container job list` | List one-off jobs | `GET /cloud/containers/{id}/jobs` |
+| `gyro container job logs` | Output of a one-off job | `GET /cloud/containers/{id}/jobs/{job}/logs` |
+| `gyro container log-plans` | Log packages | `GET /cloud/containers/{id}/logs/plans` |
+| `gyro container log-query` | Search the logs (JSON body) | `POST /cloud/containers/{id}/logs/query` |
+| `gyro container log-retention set` | Change the log package | `PUT /cloud/containers/{id}/logs/retention` |
+| `gyro container log-rules list` | Log alert rules | `GET /cloud/containers/{id}/log-rules` |
+| `gyro container log-rules set` | Replace the log alert rules | `PUT /cloud/containers/{id}/log-rules` |
+| `gyro container log-rules test` | Try a log alert rule | `POST /cloud/containers/{id}/log-rules/test` |
+| `gyro container log-stats` | Log statistics | `GET /cloud/containers/{id}/logs/stats` |
+| `gyro container log-usage` | Log package and usage | `GET /cloud/containers/{id}/logs/usage` |
 | `gyro container metrics` | Service CPU / memory | `GET /cloud/containers/{id}/services/{name}/metrics` |
 | `gyro container nodes` | Node pool | `GET /cloud/containers/{id}/nodes` |
 | `gyro container nodes set` | Set the extra node count | `PUT /cloud/containers/{id}/nodes` |

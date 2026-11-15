@@ -2,42 +2,76 @@
 .TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
 
 .SH NAME
-gyro-container-logs - Service logs
+gyro-container-logs - Search and follow the logs of an environment or one service
 
 
 .SH SYNOPSIS
-\fBgyro container logs   [flags]\fP
+\fBgyro container logs  [SERVICE] [flags]\fP
 
 
 .SH DESCRIPTION
-Service logs
-
-.PP
-Lines \fB{time, instance, text}\fR oldest first. \fBsince_minutes\fR (default 60, max 10080), \fBfilter\fR (plain text), \fBlimit\fR (max 2000), \fBprevious=1\fR = last crashed instance.
-
-.PP
-API: GET /cloud/containers/{id}/services/{name}/logs (operationId typed_get_containers\fBid\fPservices\fBname\fPlogs, scope services_read)
+Shows what your containers wrote to stdout / stderr, oldest first. Without a service every service of the
+environment is searched. Filters: --filter (line contains, case-insensitive), --exclude, --level (error|warn|info|debug)
+and --where field conditions on JSON / logfmt lines (status>=500, method=POST, path~/api; repeat the flag for more).
+--follow keeps printing new lines (polls every 2 s, Ctrl-C stops). --all pages back through the whole window
+(up to 100,000 lines). How far back you can go depends on the log package (free: 7 days; gyro container log-usage).
 
 
 .SH OPTIONS
+\fB--all\fP[=false]
+	page back through the whole window (max 100,000 lines)
+
+.PP
+\fB--end\fP=""
+	end time (RFC3339 or a duration ago)
+
+.PP
+\fB--exclude\fP=""
+	line does not contain this text
+
+.PP
 \fB--filter\fP=""
-	Plain text filter
+	line contains this text (case-insensitive)
+
+.PP
+\fB-f\fP, \fB--follow\fP[=false]
+	keep printing new lines (Ctrl-C stops)
 
 .PP
 \fB-h\fP, \fB--help\fP[=false]
 	help for logs
 
 .PP
-\fB--param-limit\fP=""
-	Max lines
+\fB--level\fP=""
+	error | warn | info | debug
 
 .PP
-\fB--previous\fP=""
-	1 = previous (crashed) instance
+\fB--limit\fP=0
+	lines per page (default 300, max 5000)
 
 .PP
-\fB--since-minutes\fP=""
-	Time range in minutes
+\fB--parse\fP=""
+	json | logfmt
+
+.PP
+\fB--previous\fP[=false]
+	output of the last crashed replica of the service
+
+.PP
+\fB--service\fP=""
+	only this service (same as the second argument)
+
+.PP
+\fB--since\fP=""
+	window ending now: 30m, 6h, 7d (default 1h; 15m with --follow)
+
+.PP
+\fB--start\fP=""
+	start time (RFC3339 or a duration ago, e.g. 3d); one query spans at most 31 days
+
+.PP
+\fB--where\fP=[]
+	field condition on JSON / logfmt lines: status>=500, method=POST, path~/api (repeatable)
 
 
 .SH OPTIONS INHERITED FROM PARENT COMMANDS
@@ -87,6 +121,15 @@ API: GET /cloud/containers/{id}/services/{name}/logs (operationId typed_get_cont
 .PP
 \fB-y\fP, \fB--yes\fP[=false]
 	do not ask for confirmation
+
+
+.SH EXAMPLE
+.EX
+  gyro container logs 17000 api --since 30m
+  gyro container logs 17000 --level error --since 24h
+  gyro container logs 17000 api --where 'status>=500' --where 'path~/api' --since 2h
+  gyro container logs 17000 api -f
+.EE
 
 
 .SH SEE ALSO

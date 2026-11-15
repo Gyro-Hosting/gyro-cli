@@ -1,0 +1,105 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-container-log-retention-set - Change the log package
+
+
+.SH SYNOPSIS
+\fBgyro container log-retention set  [flags]\fP
+
+
+.SH DESCRIPTION
+Change the log package
+
+.PP
+\fBdays\fR 7 | 30 | 90 | 365 and \fBgb\fR (monthly size) from \fBGET .../logs/plans\fR; \fB{"free": true}\fR goes back to the free package (logs older than 7 days are deleted). A paid package is billed hourly from the prepaid balance (billing line "Log retention") and needs \fB"confirm": true\fR\&. 409/422 when the platform has no room for the package. Logs are what your containers write to stdout / stderr. Every query is built by the platform with your environment fixed; there is no raw query language. \fBFree package\fP: 7 days, 5 GB per month. Paid packages (30 / 90 / 365 days x 10 / 50 / 100 / 300 GB per month, prepaid hourly; \fBGET /cloud/containers/{id}/logs/plans\fR) keep logs longer. Over the monthly size there is no extra charge: the stored volume is capped at GB x days / 30, the oldest logs are deleted earlier and you get the \fBlog_quota\fR notification at 80 % and 100 %. When the environment is cancelled its logs are deleted at once. Best effort service, no compensation for lost log lines.
+
+.PP
+API: PUT /cloud/containers/{id}/logs/retention (operationId setContainerLogPackage, scope services_write)
+
+
+.SH OPTIONS
+\fB--data\fP=""
+	request body as JSON, @file or @- (stdin)
+
+.PP
+\fB--days\fP=0
+	days (7|30|90|365)
+
+.PP
+\fB--dry-run\fP[=false]
+	show the price quote / request without changing anything
+
+.PP
+\fB--free\fP[=false]
+	free
+
+.PP
+\fB--gb\fP=0
+	gb
+
+.PP
+\fB-h\fP, \fB--help\fP[=false]
+	help for set
+
+.PP
+\fB--idempotency-key\fP=""
+	idempotency key (automatic for money operations)
+
+.PP
+\fB--set\fP=[]
+	extra body field key=value (repeatable)
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH SEE ALSO
+\fBgyro-container-log-retention(1)\fP

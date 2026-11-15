@@ -1,0 +1,121 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-container-log-stats - Log statistics
+
+
+.SH SYNOPSIS
+\fBgyro container log-stats  [flags]\fP
+
+
+.SH DESCRIPTION
+Log statistics
+
+.PP
+Line counts over time (\fBseries\fR, at most 60 buckets) and the top values of one grouping: \fBby=service\fR (default), \fBlevel\fR, or a field of JSON / logfmt lines (\fBby=status\fR). Same filters as the search; window at most 7 days.
+
+.PP
+API: GET /cloud/containers/{id}/logs/stats (operationId containerLogStats, scope services_read)
+
+
+.SH OPTIONS
+\fB--by\fP=""
+	service | level | 
+
+.PP
+\fB--end\fP=""
+	RFC3339 end (default now)
+
+.PP
+\fB--exclude\fP=""
+	line does not contain this text
+
+.PP
+\fB--filter\fP=""
+	line contains this text (case-insensitive, max 200)
+
+.PP
+\fB-h\fP, \fB--help\fP[=false]
+	help for log-stats
+
+.PP
+\fB--level\fP=""
+	error | warn | info | debug (level word in the line)
+
+.PP
+\fB--parse\fP=""
+	json (default when \fBwhere\fR is given) | logfmt
+
+.PP
+\fB--service\fP=""
+	only this service (default: all services of the environment)
+
+.PP
+\fB--since-minutes\fP=0
+	window ending now (default 60); limited to the package retention
+
+.PP
+\fB--start\fP=""
+	RFC3339 start (instead of since_minutes); one query spans at most 31 days
+
+.PP
+\fB--top\fP=0
+	groups (default 10)
+
+.PP
+\fB--where\fP=""
+	field conditions on JSON / logfmt lines, separated by \fB;\fR: \fBstatus>=500; path~/api; method=POST\fR (ops = != > >= < <= =~ ~)
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH SEE ALSO
+\fBgyro-container(1)\fP

@@ -44,7 +44,13 @@ gyro container [flags]
 * [gyro container get](gyro_container_get.md)	 - Kapsayıcı ortamı ayrıntısı (namespace, iç adresleme, çıkış IP'leri)
 * [gyro container job](gyro_container_job.md)	 - Tek seferlik görevleri listele
 * [gyro container jobs](gyro_container_jobs.md)	 - Tek seferlik görevleri listele (son 50)
-* [gyro container logs](gyro_container_logs.md)	 - Servis logları
+* [gyro container log-plans](gyro_container_log-plans.md)	 - Log paketleri
+* [gyro container log-query](gyro_container_log-query.md)	 - Loglarda ara (JSON gövde)
+* [gyro container log-retention](gyro_container_log-retention.md)	 - Log paketini değiştir
+* [gyro container log-rules](gyro_container_log-rules.md)	 - Logdan alarm kuralları
+* [gyro container log-stats](gyro_container_log-stats.md)	 - Log özeti
+* [gyro container log-usage](gyro_container_log-usage.md)	 - Log paketi ve kullanım
+* [gyro container logs](gyro_container_logs.md)	 - Ortamın ya da bir servisin loglarında ara, canlı izle
 * [gyro container metrics](gyro_container_metrics.md)	 - Servis işlemci / bellek
 * [gyro container nodes](gyro_container_nodes.md)	 - Düğüm havuzu
 * [gyro container notifications](gyro_container_notifications.md)	 - Bildirim ayarları ve süren uyarılar

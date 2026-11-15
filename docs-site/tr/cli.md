@@ -63,6 +63,8 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro api request GET /cloud/billing/balance` | Balance, hourly cost of running prepaid services and estimated time left | `GET /cloud/billing/balance` |
 | `gyro api request GET /cloud/billing/statement/{month}` | Monthly usage statement (not an invoice); JSON, PDF or CSV | `GET /cloud/billing/statement/{month}` |
 | `gyro api request GET /cloud/billing/usage` | Hour-by-hour usage ledger (or daily/monthly totals). Times are Europe/Istanbul. | `GET /cloud/billing/usage` |
+| `gyro api request GET /cloud/containers/{id}/logs` | Ortamın loglarında ara | `GET /cloud/containers/{id}/logs` |
+| `gyro api request GET /cloud/containers/{id}/services/{name}/logs` | Servis logları | `GET /cloud/containers/{id}/services/{name}/logs` |
 | `gyro api request GET /cloud/mail/{id}/aliases` | aliases (GyroMail) | `GET /cloud/mail/{id}/aliases` |
 | `gyro api request GET /cloud/mail/{id}/autoresponders` | autoresponder (GyroMail) | `GET /cloud/mail/{id}/autoresponders` |
 | `gyro api request GET /cloud/mail/{id}/catch-all` | catch-all (GyroMail) | `GET /cloud/mail/{id}/catch-all` |
@@ -77,6 +79,7 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro api request POST /auth/device/code` | Tarayıcıyla girişi başlat (cihaz kodu) | `POST /auth/device/code` |
 | `gyro api request POST /auth/device/token` | Anahtarı sorgula (cihaz kodu) | `POST /auth/device/token` |
 | `gyro api request POST /cloud/billing/estimate` | Hourly / daily / monthly cost of prepaid plans and serverless containers, and how long the balance lasts | `POST /cloud/billing/estimate` |
+| `gyro api request POST /cloud/containers/{id}/services/{name}/run` | Tek seferlik görev çalıştır | `POST /cloud/containers/{id}/services/{name}/run` |
 | `gyro api request POST /cloud/licenses/{id}/change-ip` | method change_ip (LisansAPP) | `POST /cloud/licenses/{id}/change-ip` |
 | `gyro api request POST /cloud/mail/{id}/aliases` | aliases:create (GyroMail) | `POST /cloud/mail/{id}/aliases` |
 | `gyro api request POST /cloud/mail/{id}/mailboxes` | mailboxes:create (GyroMail) | `POST /cloud/mail/{id}/mailboxes` |
@@ -103,7 +106,18 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro container external-registry delete` | Özel depo bilgisini sil | `DELETE /cloud/containers/{id}/external-registry` |
 | `gyro container external-registry set` | Harici özel depo bilgisi | `PUT /cloud/containers/{id}/external-registry` |
 | `gyro container get` | Kapsayıcı ortamı ayrıntısı (namespace, iç adresleme, çıkış IP'leri) | `GET /cloud/containers/{id}` |
-| `gyro container logs` | Servis logları | `GET /cloud/containers/{id}/services/{name}/logs` |
+| `gyro container job cancel` | Tek seferlik görevi durdur | `DELETE /cloud/containers/{id}/jobs/{job}` |
+| `gyro container job get` | Tek seferlik görevi getir | `GET /cloud/containers/{id}/jobs/{job}` |
+| `gyro container job list` | Tek seferlik görevleri listele | `GET /cloud/containers/{id}/jobs` |
+| `gyro container job logs` | Tek seferlik görevin çıktısı | `GET /cloud/containers/{id}/jobs/{job}/logs` |
+| `gyro container log-plans` | Log paketleri | `GET /cloud/containers/{id}/logs/plans` |
+| `gyro container log-query` | Loglarda ara (JSON gövde) | `POST /cloud/containers/{id}/logs/query` |
+| `gyro container log-retention set` | Log paketini değiştir | `PUT /cloud/containers/{id}/logs/retention` |
+| `gyro container log-rules list` | Logdan alarm kuralları | `GET /cloud/containers/{id}/log-rules` |
+| `gyro container log-rules set` | Logdan alarm kurallarını değiştir | `PUT /cloud/containers/{id}/log-rules` |
+| `gyro container log-rules test` | Logdan alarm kuralını dene | `POST /cloud/containers/{id}/log-rules/test` |
+| `gyro container log-stats` | Log özeti | `GET /cloud/containers/{id}/logs/stats` |
+| `gyro container log-usage` | Log paketi ve kullanım | `GET /cloud/containers/{id}/logs/usage` |
 | `gyro container metrics` | Servis işlemci / bellek | `GET /cloud/containers/{id}/services/{name}/metrics` |
 | `gyro container nodes` | Düğüm havuzu | `GET /cloud/containers/{id}/nodes` |
 | `gyro container nodes set` | Ek düğüm sayısını ayarla | `PUT /cloud/containers/{id}/nodes` |

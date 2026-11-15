@@ -300,6 +300,7 @@ func NewRoot(a *App) *cobra.Command {
 	addProductLines(a, root)
 	addDNS(a, root)
 	addContainerJobs(a, root) // GYR-17: gyro container run / jobs
+	addContainerLogs(a, root) // GYR-19: gyro container logs (search, live tail)
 	addGenerated(a, root)
 	addCoreShortcuts(a, root)
 	fillGroupShorts(root)

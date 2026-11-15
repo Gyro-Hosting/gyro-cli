@@ -44,7 +44,13 @@ gyro container [flags]
 * [gyro container get](gyro_container_get.md)	 - Container environment detail (namespace, internal addressing, egress IPs)
 * [gyro container job](gyro_container_job.md)	 - List one-off jobs
 * [gyro container jobs](gyro_container_jobs.md)	 - List one-off jobs (last 50)
-* [gyro container logs](gyro_container_logs.md)	 - Service logs
+* [gyro container log-plans](gyro_container_log-plans.md)	 - Log packages
+* [gyro container log-query](gyro_container_log-query.md)	 - Search the logs (JSON body)
+* [gyro container log-retention](gyro_container_log-retention.md)	 - Change the log package
+* [gyro container log-rules](gyro_container_log-rules.md)	 - Log alert rules
+* [gyro container log-stats](gyro_container_log-stats.md)	 - Log statistics
+* [gyro container log-usage](gyro_container_log-usage.md)	 - Log package and usage
+* [gyro container logs](gyro_container_logs.md)	 - Search and follow the logs of an environment or one service
 * [gyro container metrics](gyro_container_metrics.md)	 - Service CPU / memory
 * [gyro container nodes](gyro_container_nodes.md)	 - Node pool
 * [gyro container notifications](gyro_container_notifications.md)	 - Notification settings and current alerts
