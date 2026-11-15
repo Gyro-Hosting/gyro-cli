@@ -1,0 +1,143 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-container-schedule-update - Change a scheduled job (only the given flags change)
+
+
+.SH SYNOPSIS
+\fBgyro container schedule update   [flags] [-- COMMAND...]\fP
+
+
+.SH DESCRIPTION
+Change a scheduled job (only the given flags change)
+
+
+.SH OPTIONS
+\fB--at\fP=""
+	run once at this time: 2026-12-01T03:00 (in --timezone) or RFC 3339
+
+.PP
+\fB--body\fP=""
+	HTTP body (text, or @file)
+
+.PP
+\fB--clear-headers\fP[=false]
+	remove the stored HTTP headers
+
+.PP
+\fB--cpu\fP=""
+	vCPU of a run (default: same as the service)
+
+.PP
+\fB--cron\fP=""
+	cron expression: minute hour day month weekday, e.g. "0 3 * * \fI" (daily 03:00), "\fP/15 * * * *", "0 9 * * 1-5"; @daily / @hourly work too
+
+.PP
+\fB--description\fP=""
+	description
+
+.PP
+\fB--every\fP=0s
+	run every N minutes instead of a cron expression, e.g. 15m, 2h (at least 1m; Serverless 5m)
+
+.PP
+\fB--header\fP=[]
+	HTTP header "Name: value" (repeatable; values are kept secret)
+
+.PP
+\fB-h\fP, \fB--help\fP[=false]
+	help for update
+
+.PP
+\fB--http-timeout\fP=0s
+	time limit of the HTTP call (1s-120s, default 30s)
+
+.PP
+\fB--memory\fP=0
+	memory in MB of a run (default: same as the service)
+
+.PP
+\fB--method\fP=""
+	HTTP method (default GET)
+
+.PP
+\fB--retries\fP=0
+	retries after a failed run, 0-3 (30 s × attempt apart)
+
+.PP
+\fB--service\fP=""
+	run the command after "--" with this service's image, variables and secrets
+
+.PP
+\fB--time-limit\fP=0s
+	stop a run after this time (10s-6h, default 30m)
+
+.PP
+\fB--timezone\fP=""
+	IANA time zone of the schedule (default Europe/Istanbul), e.g. UTC
+
+.PP
+\fB--url\fP=""
+	call this URL instead (http:// or https://)
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH EXAMPLE
+.EX
+  gyro container schedule update 17000 nightly-report --cron "30 2 * * *" --timezone UTC
+  gyro container schedule update 17000 nightly-report --service api -- npm run report:full
+  gyro container schedule update 17000 ping-app --header "Authorization: Bearer $NEW"
+.EE
+
+
+.SH SEE ALSO
+\fBgyro-container-schedule(1)\fP

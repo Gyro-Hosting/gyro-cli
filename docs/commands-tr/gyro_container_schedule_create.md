@@ -1,0 +1,69 @@
+## gyro container schedule create
+
+Zamanlanmış görev oluştur (cron, her N dakikada ya da tek sefer)
+
+### Synopsis
+
+Bir servisin komutunu (tek seferlik görev olarak: çalışan sürümün imajı, değişkenleri ve gizli değerleri) ya da bir
+adresi takvime göre çalıştırır. Saatler --timezone'a göre (varsayılan Europe/Istanbul). Aynı zamanlamanın önceki
+çalışması sürerken yenisi başlamaz. Başarısız çalışma tekrar denenebilir (--retries 0-3); son denemeden sonra
+schedule_failed bildirimi gelir (zamanında başlayamayan çalışma için schedule_missed). Düğümlü paketlerde ücretsiz;
+Sunucusuz'da her çalışma görev gibi ücretlenir. Sınırlar: en kısa aralık 1 dakika (Sunucusuz 5), ortam başına
+zamanlama pakete göre 5-10 (bkz. "gyro limits").
+
+```
+gyro container schedule create <ENVIRONMENT_ID> <NAME> (--cron EXPR | --every DURATION | --at TIME) (--service NAME [-- COMMAND...] | --url URL) [flags]
+```
+
+### Examples
+
+```
+  gyro container schedule create 17000 nightly-report --cron "0 3 * * *" --service api -- npm run report
+  gyro container schedule create 17000 queue-clean --every 15m --service worker --retries 2 -- php artisan queue:prune-failed
+  gyro container schedule create 17000 ping-app --every 5m --url https://example.com/cron --method POST --header "Authorization: Bearer $TOKEN"
+  gyro container schedule create 17000 campaign --at 2026-12-01T09:00 --service api -- node send.js
+```
+
+### Options
+
+```
+      --at string               bu zamanda bir kez çalıştır: 2026-12-01T03:00 (--timezone'a göre) ya da RFC 3339
+      --body string             HTTP gövdesi (metin ya da @dosya)
+      --cpu string              çalışmanın vCPU'su (varsayılan: servisle aynı)
+      --cron string             cron ifadesi: dakika saat gün ay haftanın-günü, ör. "0 3 * * *" (her gün 03:00), "*/15 * * * *", "0 9 * * 1-5"; @daily / @hourly da olur
+      --description string      açıklama
+      --every duration          cron yerine her N dakikada, ör. 15m, 2h (en az 1m; Sunucusuz 5m)
+      --header stringArray      HTTP başlığı "Ad: değer" (tekrarlanabilir; değerler gizli saklanır)
+  -h, --help                    help for create
+      --http-timeout duration   HTTP çağrısının zaman sınırı (1s-120s, varsayılan 30s)
+      --memory int              çalışmanın belleği MB (varsayılan: servisle aynı)
+      --method string           HTTP yöntemi (varsayılan GET)
+      --paused                  duraklatılmış olarak oluştur
+      --retries int             başarısız çalışmadan sonra tekrar deneme, 0-3 (30 sn × deneme arayla)
+      --service string          "--" sonrasındaki komutu bu servisin imajı, değişkenleri ve gizli değerleriyle çalıştır
+      --time-limit duration     bir çalışmayı bu süre sonunda durdur (10s-6h, varsayılan 30m)
+      --timezone string         zamanlamanın IANA saat dilimi (varsayılan Europe/Istanbul), ör. UTC
+      --url string              bunun yerine bu adresi çağır (http:// ya da https://)
+```
+
+### Options inherited from parent commands
+
+```
+      --api-url string     API taban adresi (ortam GYRO_API_URL)
+      --debug              HTTP isteklerini stderr'e yaz (sırlar maskeli)
+      --lang string        mesaj dili: tr ya da en (varsayılan yerel ayar)
+      --no-color           renkleri kapat (NO_COLOR da olur)
+      --no-header          tablo başlığını yazma
+  -o, --output string      çıktı biçimi: table, json, yaml, text
+  -p, --profile string     kullanılacak profil (ortam GYRO_PROFILE)
+      --query string       sonuca uygulanacak JMESPath sorgusu
+  -q, --quiet              yalnız kimlikleri yaz
+      --timeout duration   toplam zaman aşımı, ör. 30s, 10m
+      --wide               tüm tablo sütunlarını göster
+  -y, --yes                onay sorma
+```
+
+### SEE ALSO
+
+* [gyro container schedule](gyro_container_schedule.md)	 - Zamanlanmış görevleri sonraki ve son çalışmalarıyla listele
+

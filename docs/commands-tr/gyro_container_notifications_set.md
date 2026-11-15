@@ -21,7 +21,7 @@ gyro container notifications set <ID> [flags]
       --data string              istek gövdesi JSON, @dosya ya da @- (stdin)
       --dry-run                  hiçbir şeyi değiştirmeden teklifi / isteği göster
       --email                    Account e-mail (default on)
-      --events string            Comma separated: down, crashloop, replicas_low, scale_max, capacity, egress, job_failed
+      --events events            Comma separated list (or JSON list) of the events to enable: down, crashloop, replicas_low, scale_max, capacity, egress, job_failed, log_rule, log_quota, schedule_failed, schedule_missed. It is the FULL set: events not listed are turned off. Omit events to keep the current selection (e.g. when only changing `cooldown`). GET returns every event in `settings.events` (1 = on).
   -h, --help                     help for set
       --idempotency-key string   tekrar güvenliği anahtarı (para işlemlerinde otomatik)
       --resolved                 Send a 'resolved' message (default on)

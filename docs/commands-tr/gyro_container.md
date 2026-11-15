@@ -58,6 +58,7 @@ gyro container [flags]
 * [gyro container plans](gyro_container_plans.md)	 - Kapsayıcı ortam paketlerini listele
 * [gyro container registry](gyro_container_registry.md)	 - Ortamın Gyro imaj deposu
 * [gyro container run](gyro_container_run.md)	 - Servisin imajı, değişkenleri ve gizli değerleriyle tek seferlik görev çalıştır (migration, seed)
+* [gyro container schedule](gyro_container_schedule.md)	 - Zamanlanmış görevleri sonraki ve son çalışmalarıyla listele
 * [gyro container secret](gyro_container_secret.md)	 - Gizli değer sil
 * [gyro container service](gyro_container_service.md)	 - Kapsayıcı servislerini listele
 * [gyro container sizes](gyro_container_sizes.md)	 - Sunucusuz kapsayıcı boyutları (vCPU / bellek) ve fiyatları

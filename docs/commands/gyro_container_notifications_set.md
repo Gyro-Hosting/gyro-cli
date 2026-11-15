@@ -21,7 +21,7 @@ gyro container notifications set <ID> [flags]
       --data string              request body as JSON, @file or @- (stdin)
       --dry-run                  show the price quote / request without changing anything
       --email                    Account e-mail (default on)
-      --events string            Comma separated: down, crashloop, replicas_low, scale_max, capacity, egress, job_failed
+      --events events            Comma separated list (or JSON list) of the events to enable: down, crashloop, replicas_low, scale_max, capacity, egress, job_failed, log_rule, log_quota, schedule_failed, schedule_missed. It is the FULL set: events not listed are turned off. Omit events to keep the current selection (e.g. when only changing `cooldown`). GET returns every event in `settings.events` (1 = on).
   -h, --help                     help for set
       --idempotency-key string   idempotency key (automatic for money operations)
       --resolved                 Send a 'resolved' message (default on)

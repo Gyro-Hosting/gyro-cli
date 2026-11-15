@@ -2,7 +2,7 @@
 openapi: 3.1.0
 info:
   title: Gyro Public API
-  version: 2.35.0
+  version: 2.36.0
   summary: Manage Gyro cloud servers, SSH keys and billing programmatically.
   x-summary-tr: Gyro bulut sunucularınızı, SSH anahtarlarınızı ve faturalarınızı programla yönetin.
   description: "The Gyro Public API lets you automate everything you do in the Gyro client area:\norder and manage cloud servers, keep SSH keys, read invoices and\
@@ -97,7 +97,10 @@ info:
     \ free; Serverless 501). Port forwards take a source allow list `source_cidrs` (POST) and `PATCH /cloud/vpcs/{vpc_id}/port-forwards/{pf_id}` changes it. `Vpc.containers`\
     \ lists attached environments. Additive.\n\n**2.35.0**: guest agent for tr-ist-1 servers: `GET /cloud/servers/{id}/agent` (version, `update_available`, one-line\
     \ `update_command`) and `POST /cloud/servers/{id}/agent/update` (automatic update for agent 3). Servers installed before private networking need it for `applied`\
-    \ cards and public IP off. Additive.\n"
+    \ cards and public IP off. Additive.\n\n**2.36.0**: scheduled jobs for containers: `GET|POST /cloud/containers/{id}/schedules`, `GET|PATCH|DELETE .../schedules/{sched}`,\
+    \ `POST .../schedules/{sched}/pause|resume|run`, `POST .../schedules/preview`. cron (time zone aware) / every N minutes / once; target a service command (one-off\
+    \ job) or an HTTP call; overlap never, retries 0-3, history, alert events `schedule_failed` / `schedule_missed`. Notification `events` documented in full (omit\
+    \ to keep). Additive.\n"
   x-description-tr: "Gyro Public API, müşteri panelinde yaptığınız her işi otomatikleştirmenizi sağlar:\nbulut sunucu siparişi ve yönetimi, SSH anahtarları, fatura\
     \ ve bakiye okuma.\nResmi Terraform sağlayıcısı (`gyro-hosting/gyro`) ve `gyroctl` bu API'yi kullanır.\n\n* **Taban adres** `https://www.gyrohosting.com/api/v1/client`\n\
     * **Kimlik** `Authorization: Bearer wck_...` (anahtarı *Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri* bölümünden oluşturun)\n* **Biçim** JSON\
@@ -189,7 +192,10 @@ info:
     \ VPC uç noktası, ücretsiz; Sunucusuz 501). Port yönlendirme kaynak izin listesi `source_cidrs` alır (POST), `PATCH /cloud/vpcs/{vpc_id}/port-forwards/{pf_id}`\
     \ değiştirir. `Vpc.containers` bağlı ortamları listeler. Geriye uyumlu.\n\n**2.35.0**: tr-ist-1 sunucularında misafir ajanı: `GET /cloud/servers/{id}/agent` (sürüm,\
     \ `update_available`, tek satır `update_command`) ve `POST /cloud/servers/{id}/agent/update` (ajan 3 için otomatik güncelleme). Özel ağ öncesi kurulan sunucularda\
-    \ kartın `applied` olması ve public IP kapatma için gerekir. Geriye uyumlu.\n"
+    \ kartın `applied` olması ve public IP kapatma için gerekir. Geriye uyumlu.\n\n**2.36.0**: kapsayıcılar için zamanlanmış görev: `GET|POST /cloud/containers/{id}/schedules`,\
+    \ `GET|PATCH|DELETE .../schedules/{sched}`, `POST .../schedules/{sched}/pause|resume|run`, `POST .../schedules/preview`. cron (saat dilimli) / her N dakikada\
+    \ / tek sefer; hedef servis komutu (tek seferlik görev) ya da HTTP çağrısı; üst üste binme yok, 0-3 tekrar deneme, geçmiş, uyarı olayları `schedule_failed` /\
+    \ `schedule_missed`. Bildirim `events` alanı tam belgelendi (verilmezse korunur). Geriye uyumlu.\n"
   contact:
     name: Gyro Hosting
     url: https://www.gyrohosting.com
@@ -3683,7 +3689,7 @@ paths:
                   type: boolean
                 confirm:
                   type: boolean
-                project_id: &id076
+                project_id: &id095
                   type: integer
                   minimum: 0
                   description: 'Optional project for the new service(s) (0 = default project). Checked before the order: unknown id = 404 `project_not_found` (GyroAPI
@@ -10680,10 +10686,13 @@ paths:
         Events: down (no ready replica for >3 min), crashloop (keeps restarting / image pull fails / out of memory), replicas_low (below alerts.min_ready), scale_max
         (autoscaling wants more than max), capacity (replicas wait for room in the node pool), egress (the egress IPs of the environment changed; one message, no
         resolved), job_failed (a one-off job failed or timed out; one message per job). An event is announced after ~2 minutes, at most once per cooldown per service
-        + event (flapping included), with a ''resolved'' message.'
+        + event (flapping included), with a ''resolved'' message. log_rule / log_quota (log alert rules and log package use, GYR-19), schedule_failed (a scheduled
+        run failed after its retries), schedule_missed (a scheduled run could not start in time); one message per schedule per cooldown.'
       x-description-tr: '`settings` (kanallar, olaylar, tekrar aralığı; webhook anahtarı dönmez), `conditions` = şu an süren sorunlar, `history` = son 30 uyarı. Olaylar:
         down, crashloop, replicas_low, scale_max, capacity, egress (çıkış IP''leri değişti), job_failed (tek seferlik görev başarısız / süresi doldu). Olay ~2 dakika
-        sürünce bildirilir; aynı servis + olay tekrar aralığında bir kez (gidip gelenler dahil), düzelince ''düzeldi'' mesajı.'
+        sürünce bildirilir; aynı servis + olay tekrar aralığında bir kez (gidip gelenler dahil), düzelince ''düzeldi'' mesajı. log_rule / log_quota (log uyarı kuralları
+        ve log paketi kullanımı), schedule_failed (zamanlanmış çalışma denemelerden sonra başarısız), schedule_missed (zamanlanmış çalışma zamanında başlayamadı);
+        zamanlama başına tekrar aralığında bir mesaj.'
       parameters:
       - name: id
         in: path
@@ -10766,7 +10775,9 @@ paths:
                   description: 'https URL of a public server; JSON POST signed with X-Gyro-Signature: sha256=HMAC(secret, X-Gyro-Timestamp + ''.'' + body)'
                 events:
                   type: string
-                  description: 'Comma separated: down, crashloop, replicas_low, scale_max, capacity, egress, job_failed'
+                  description: 'Comma separated list (or JSON list) of the events to enable: down, crashloop, replicas_low, scale_max, capacity, egress, job_failed,
+                    log_rule, log_quota, schedule_failed, schedule_missed. It is the FULL set: events not listed are turned off. Omit `events` to keep the current
+                    selection (e.g. when only changing `cooldown`). GET returns every event in `settings.events` (1 = on).'
                 cooldown:
                   type: integer
                   description: Minutes between two announcements of the same service + event (5-1440, default 30)
@@ -12119,6 +12130,573 @@ paths:
       x-cli:
         command: container job logs
         confirm: false
+  /cloud/containers/{id}/schedules:
+    get:
+      tags:
+      - Containers
+      operationId: listContainerSchedules
+      summary: List scheduled jobs
+      x-summary-tr: Zamanlanmış görevleri listele
+      x-scope: services_read
+      description: All schedules with their last run, `count` and `limit`.
+      x-description-tr: Tüm zamanlamalar son çalışmalarıyla, `count` ve `limit`.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      schedules:
+                        type: array
+                        items: &id045
+                          $ref: '#/components/schemas/ContainerSchedule'
+                      count:
+                        type: integer
+                      limit:
+                        type: integer
+                      min_minutes:
+                        type: integer
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      x-cli:
+        command: container schedule list
+        confirm: false
+    post:
+      tags:
+      - Containers
+      operationId: createContainerSchedule
+      summary: Create a scheduled job
+      x-summary-tr: Zamanlanmış görev oluştur
+      x-scope: services_write
+      description: 'A **schedule** runs a job at set times: `cron` (5 fields `minute hour day month weekday`, names and `@daily` / `@hourly` accepted, day-of-month
+        OR day-of-week like Vixie cron), `rate_minutes` (every N minutes) or `at` (once). Times follow `timezone` (IANA name, default `Europe/Istanbul`). Target `service`:
+        a one-off job with the service''s image (pinned to the digest running at that moment), variables and secrets (see the one-off jobs); target `http`: a request
+        from your environment (curl, no redirects, HTTP 400+ fails, time limit 1-120 s, headers / body kept secret; private and platform addresses are not reachable,
+        the service''s internal address `http://<service>.<namespace>.svc.cluster.local` is). A run never starts while the previous run of the same schedule is still
+        going (`skipped`, error `previous_running`). A run that could not start within 5 minutes of its time is `missed`. `retries` 0-3: a failed attempt is tried
+        again after 30 s × attempt. Shortest interval 1 minute (Serverless 5). Schedules per environment: Serverless and plans up to 2 vCPU 5, others 10 (`ecs.schedules`,
+        raised with a support ticket). Free; on Serverless every run is billed like a task (billing line `<service>-job`, HTTP calls `cron-<name>-job`). Runs count
+        against the parallel job limit. Notifications: `schedule_failed` (after the last attempt), `schedule_missed`; at most one message per schedule per cooldown.
+        Nothing runs while the environment is suspended. Give exactly one of `cron`, `rate_minutes`, `at`. A refusal is 422 `tool_action_failed` with a message in
+        the account language (schedule limit with `details.limit_key` = `ecs.schedules`, invalid cron / time zone / URL, interval too short, name exists).'
+      x-description-tr: '**Zamanlama**, bir görevi belirli zamanlarda çalıştırır: `cron` (5 alan `dakika saat gün ay haftanın-günü`, ad ve `@daily` / `@hourly` olur;
+        ayın günü VEYA haftanın günü, Vixie cron gibi), `rate_minutes` (her N dakikada) ya da `at` (tek sefer). Saatler `timezone`''a göre (IANA adı, varsayılan `Europe/Istanbul`).
+        Hedef `service`: servisin imajı (o anda çalışan digest), değişkenleri ve gizli değerleriyle tek seferlik görev; hedef `http`: ortamınızdan bir istek (curl,
+        yönlendirme izlenmez, HTTP 400+ başarısız sayılır, zaman sınırı 1-120 sn, başlıklar / gövde gizli saklanır; özel ağ ve platform adreslerine ulaşılmaz, servisin
+        iç adresine `http://<servis>.<namespace>.svc.cluster.local` ulaşılır). Aynı zamanlamanın önceki çalışması sürerken yenisi başlamaz (`skipped`, hata `previous_running`).
+        Zamanından 5 dakika içinde başlayamayan çalışma `missed` olur. `retries` 0-3: başarısız deneme 30 sn × deneme sonra tekrarlanır. En kısa aralık 1 dakika (Sunucusuz
+        5). Ortam başına zamanlama: Sunucusuz ve 2 vCPU''ya kadar paketlerde 5, diğerlerinde 10 (`ecs.schedules`, destek talebiyle artırılır). Ücretsiz; Sunucusuz''da
+        her çalışma görev gibi ücretlenir (fatura satırı `<servis>-job`, HTTP çağrıları `cron-<ad>-job`). Çalışmalar eşzamanlı görev sınırına sayılır. Bildirim: `schedule_failed`
+        (son denemeden sonra), `schedule_missed`; zamanlama başına tekrar aralığında en çok bir mesaj. Ortam askıdayken hiçbir şey çalışmaz. `cron`, `rate_minutes`,
+        `at`''ten yalnız biri verilir. Ret, hesap dilinde mesajla 422 `tool_action_failed` döner (zamanlama sınırı `details.limit_key` = `ecs.schedules`, geçersiz
+        cron / saat dilimi / adres, aralık çok kısa, ad zaten var).'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: Idempotency-Key
+        in: header
+        required: false
+        schema:
+          type: string
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      schedule: *id045
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  pattern: ^[a-z][a-z0-9-]{0,38}[a-z0-9]$
+                  example: nightly-report
+                description: &id050
+                  type: string
+                  maxLength: 200
+                cron: &id046
+                  type: string
+                  example: 0 3 * * *
+                rate_minutes: &id047
+                  type: integer
+                  minimum: 1
+                  maximum: 10080
+                at: &id048
+                  type: string
+                  example: 2026-12-01T03:00
+                  description: RFC 3339, or local date-time in `timezone`
+                timezone: &id049
+                  type: string
+                  default: Europe/Istanbul
+                target: &id051
+                  type: string
+                  enum:
+                  - service
+                  - http
+                  description: 'default: http when `url` is given, otherwise service'
+                service: &id052
+                  type: string
+                  description: service whose image / variables / secrets are used (target service)
+                command: &id053
+                  type: array
+                  items:
+                    type: string
+                  description: replaces ENTRYPOINT; a text is split like a shell line; empty = image command
+                timeout_seconds: &id054
+                  type: integer
+                  minimum: 10
+                  maximum: 21600
+                  default: 1800
+                cpu_m: &id055
+                  type: integer
+                memory_mi: &id056
+                  type: integer
+                url: &id057
+                  type: string
+                  description: http:// or https:// (target http)
+                method: &id058
+                  type: string
+                  enum:
+                  - GET
+                  - POST
+                  - PUT
+                  - PATCH
+                  - DELETE
+                  - HEAD
+                  default: GET
+                headers: &id059
+                  type: object
+                  additionalProperties:
+                    type: string
+                  description: 'at most 20; values kept secret. On update: omit = keep, {} = remove'
+                body: &id060
+                  type: string
+                  description: 'at most 64 KB (not for GET / HEAD). On update: omit = keep, "" = remove'
+                http_timeout_seconds: &id061
+                  type: integer
+                  minimum: 1
+                  maximum: 120
+                  default: 30
+                retries: &id062
+                  type: integer
+                  minimum: 0
+                  maximum: 3
+                  default: 0
+                paused: &id063
+                  type: boolean
+                  default: false
+              required:
+              - name
+      x-cli:
+        command: container schedule create
+        confirm: false
+  /cloud/containers/{id}/schedules/preview:
+    post:
+      tags:
+      - Containers
+      operationId: previewContainerSchedule
+      summary: Next run times of a timing
+      x-summary-tr: Zamanlamanın sonraki çalışma saatleri
+      x-scope: services_write
+      description: Checks `cron` / `rate_minutes` / `at` + `timezone` and returns the next `count` (1-20, default 5) run times in that time zone. Nothing is stored.
+      x-description-tr: '`cron` / `rate_minutes` / `at` + `timezone`''u denetler, o saat diliminde sonraki `count` (1-20, varsayılan 5) çalışma saatini döner. Hiçbir
+        şey kaydedilmez.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      kind:
+                        type: string
+                      timezone:
+                        type: string
+                      next_runs:
+                        type: array
+                        items:
+                          type: string
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cron: *id046
+                rate_minutes: *id047
+                at: *id048
+                timezone: *id049
+                count:
+                  type: integer
+                  minimum: 1
+                  maximum: 20
+      x-cli:
+        command: container schedule preview
+        confirm: false
+  /cloud/containers/{id}/schedules/{sched}:
+    get:
+      tags:
+      - Containers
+      operationId: getContainerSchedule
+      summary: Get a scheduled job
+      x-summary-tr: Zamanlanmış görevi getir
+      x-scope: services_read
+      description: Settings, next run and the last 20 runs.
+      x-description-tr: Ayarlar, sonraki çalışma ve son 20 çalışma.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: sched
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Schedule id or name
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: *id045
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      x-cli:
+        command: container schedule get
+        confirm: false
+    patch:
+      tags:
+      - Containers
+      operationId: updateContainerSchedule
+      summary: Change a scheduled job
+      x-summary-tr: Zamanlanmış görevi değiştir
+      x-scope: services_write
+      description: 'Send only the fields to change (the name cannot change). Changing the timing recalculates the next run. Headers / body: omit = keep.'
+      x-description-tr: 'Yalnız değişecek alanları gönderin (ad değişmez). Zamanlama değişince sonraki çalışma yeniden hesaplanır. Başlık / gövde: verilmezse korunur.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: sched
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Schedule id or name
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      schedule: *id045
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                description: *id050
+                cron: *id046
+                rate_minutes: *id047
+                at: *id048
+                timezone: *id049
+                target: *id051
+                service: *id052
+                command: *id053
+                timeout_seconds: *id054
+                cpu_m: *id055
+                memory_mi: *id056
+                url: *id057
+                method: *id058
+                headers: *id059
+                body: *id060
+                http_timeout_seconds: *id061
+                retries: *id062
+                paused: *id063
+      x-cli:
+        command: container schedule update
+        confirm: false
+    delete:
+      tags:
+      - Containers
+      operationId: deleteContainerSchedule
+      summary: Delete a scheduled job
+      x-summary-tr: Zamanlanmış görevi sil
+      x-scope: services_write
+      description: 'Deletes the schedule and its stored HTTP headers / body. A run in progress finishes; outputs of past runs stay in the job list. Send `{"confirm":
+        true}`.'
+      x-description-tr: 'Zamanlamayı ve saklanan HTTP başlık / gövdesini siler. Süren çalışma biter; geçmiş çalışmaların çıktıları görev listesinde kalır. `{"confirm":
+        true}` gönderin.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: sched
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Schedule id or name
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      deleted:
+                        type: boolean
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                confirm:
+                  type: boolean
+      x-cli:
+        command: container schedule delete
+        confirm: true
+  /cloud/containers/{id}/schedules/{sched}/pause:
+    post:
+      tags:
+      - Containers
+      operationId: pauseContainerSchedule
+      summary: Pause a scheduled job
+      x-summary-tr: Zamanlanmış görevi duraklat
+      x-scope: services_write
+      description: No run starts until resumed (a run in progress finishes).
+      x-description-tr: Devam ettirilene kadar çalışma başlamaz (süren çalışma biter).
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: sched
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Schedule id or name
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      schedule: *id045
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      x-cli:
+        command: container schedule pause
+        confirm: false
+  /cloud/containers/{id}/schedules/{sched}/resume:
+    post:
+      tags:
+      - Containers
+      operationId: resumeContainerSchedule
+      summary: Resume a scheduled job
+      x-summary-tr: Zamanlanmış görevi devam ettir
+      x-scope: services_write
+      description: The next run is counted from now (runs missed while paused are not made up).
+      x-description-tr: Sonraki çalışma şimdiden hesaplanır (duraklatılmışken kaçanlar telafi edilmez).
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: sched
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Schedule id or name
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      schedule: *id045
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      x-cli:
+        command: container schedule resume
+        confirm: false
+  /cloud/containers/{id}/schedules/{sched}/run:
+    post:
+      tags:
+      - Containers
+      operationId: runContainerScheduleNow
+      summary: Run a scheduled job now
+      x-summary-tr: Zamanlanmış görevi şimdi çalıştır
+      x-scope: services_write
+      description: Starts one run now (trigger `manual`), whether paused or not; refused with `schedule_running` while a run of the schedule is going. Returns the
+        run and its job id.
+      x-description-tr: Duraklatılmış olsa da şimdi bir çalışma başlatır (tetik `manual`); zamanlamanın bir çalışması sürerken `schedule_running` ile reddedilir.
+        Çalışmayı ve görev kimliğini döner.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: sched
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Schedule id or name
+      - name: Idempotency-Key
+        in: header
+        required: false
+        schema:
+          type: string
+      responses:
+        '202':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      schedule:
+                        type: string
+                      run:
+                        $ref: '#/components/schemas/ContainerScheduleRun'
+                      job:
+                        type: string
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+      x-cli:
+        command: container schedule run-now
+        confirm: false
   /cloud/containers/{id}/vpc:
     get:
       tags:
@@ -12223,7 +12801,7 @@ paths:
                         $ref: '#/components/schemas/ContainerVPC'
         '403':
           description: not_available
-          content: &id045
+          content: &id064
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
@@ -12235,7 +12813,7 @@ paths:
           $ref: '#/components/responses/Validation'
         '501':
           description: not_supported (Serverless)
-          content: *id045
+          content: *id064
       requestBody:
         required: true
         content:
@@ -12248,7 +12826,7 @@ paths:
                   description: VPC id (GET /cloud/vpcs); optional, checked when given
                 subnet_id:
                   type: string
-                expose: &id046
+                expose: &id065
                   type: array
                   maxItems: 20
                   items:
@@ -12311,7 +12889,7 @@ paths:
                         $ref: '#/components/schemas/ContainerVPC'
         '403':
           description: not_available
-          content: *id045
+          content: *id064
         '404':
           $ref: '#/components/responses/NotFound'
         '409':
@@ -12320,7 +12898,7 @@ paths:
           $ref: '#/components/responses/Validation'
         '501':
           description: not_supported (Serverless)
-          content: *id045
+          content: *id064
       requestBody:
         required: true
         content:
@@ -12328,7 +12906,7 @@ paths:
             schema:
               type: object
               properties:
-                expose: *id046
+                expose: *id065
               required:
               - expose
       x-cli:
@@ -12387,7 +12965,7 @@ paths:
                         $ref: '#/components/schemas/ContainerVPC'
         '403':
           description: not_available
-          content: *id045
+          content: *id064
         '404':
           $ref: '#/components/responses/NotFound'
         '409':
@@ -12396,7 +12974,7 @@ paths:
           $ref: '#/components/responses/Validation'
         '501':
           description: not_supported (Serverless)
-          content: *id045
+          content: *id064
       requestBody:
         required: true
         content:
@@ -12506,11 +13084,11 @@ paths:
             schema:
               type: object
               properties:
-                name: &id047
+                name: &id066
                   type: string
                   description: Display name (1-48)
                   x-description-tr: Görünen ad (1-48)
-                provider: &id048
+                provider: &id067
                   type: string
                   enum:
                   - github
@@ -12519,7 +13097,7 @@ paths:
                   - git
                   - archive
                   default: github
-                repo: &id049
+                repo: &id068
                   type: string
                   description: 'Required for github / gitlab / gitea / git: https clone URL (no credentials) or SSH address git@host:org/repo.git / ssh://user@host[:port]/path
                     (needs a deploy key). Leave it out for provider `archive` (an archive pipeline has no repository; a value sent with `archive` is ignored and the
@@ -12528,42 +13106,42 @@ paths:
                     / ssh://kullanici@sunucu[:port]/yol (deploy key gerekir). provider `archive` için göndermeyin (arşiv pipeline deposuz çalışır; `archive` ile gönderilen
                     değer yok sayılır, yanıtta `repo` boş görünür).'
                   example: https://github.com/gyro-ornek/uygulama
-                token: &id050
+                token: &id069
                   type: string
                   format: password
                   description: Read-only access token for a private repository (stored encrypted, never returned; "-" on update removes it)
                   x-description-tr: Özel depo için yalnız okuma erişim belirteci (şifreli saklanır, geri dönmez; güncellemede "-" siler)
-                git_user: &id051
+                git_user: &id070
                   type: string
                   description: 'User name for the token (default: x-access-token / oauth2 / git)'
-                branch: &id052
+                branch: &id071
                   type: string
                   description: Branches whose pushes build (comma separated globs, empty = none)
                   x-description-tr: Push'u derlenen dallar (virgüllü glob, boş = yok)
                   default: main
-                tags: &id053
+                tags: &id072
                   type: string
                   description: Tags that build (globs, e.g. v*)
                   x-description-tr: Derlenen etiketler (glob, ör. v*)
-                auto: &id054
+                auto: &id073
                   type: boolean
                   default: true
                   description: Webhook pushes start runs
-                repo_file: &id055
+                repo_file: &id074
                   type: boolean
                   default: true
                   description: Read gyro-pipeline.yml from the repository (GitHub, GitLab, Gitea)
-                image: &id056
+                image: &id075
                   type: string
                   description: Image name in the environment registry (<registry>/<code>/<image>:<sha7> + :latest)
                   x-description-tr: Ortam deposundaki imaj adı
-                dockerfile: &id057
+                dockerfile: &id076
                   type: string
                   default: Dockerfile
-                context: &id058
+                context: &id077
                   type: string
                   description: Build folder (empty = repository root)
-                build_target: &id059
+                build_target: &id078
                   type: string
                   pattern: ^[A-Za-z0-9._-]{0,64}$
                   example: production
@@ -12573,51 +13151,51 @@ paths:
                   x-description-tr: 'Çok aşamalı Dockerfile''da derlenecek aşama (`FROM node:20 AS production` -> `production`, `docker build --target` ile aynı).
                     Boş = son aşama. Aşama adı büyük/küçük harf duyarsızdır (küçük harfle saklanır). Dockerfile''da olmayan aşama `build_target_not_found` hatasıyla
                     çalıştırmayı durdurur. gyro-pipeline.yml: `build_target:` çalıştırma için bunu ezer. CLI: `--target` (ya da `--build-target`).'
-                targets: &id060
+                targets: &id079
                   type: array
                   items:
                     type: string
                   description: Services that get the new image (empty = build only)
                   x-description-tr: Yeni imaja geçecek servisler (boş = yalnız derle)
-                approval: &id061
+                approval: &id080
                   type: boolean
                   default: false
                   description: Wait for approval before deploying (24 h)
-                auto_rollback: &id062
+                auto_rollback: &id081
                   type: boolean
                   default: true
                   description: Roll back when the new version is unhealthy
-                build_image: &id063
+                build_image: &id082
                   type: string
                   description: Image that runs `commands` (e.g. node:22-alpine)
-                commands: &id064
+                commands: &id083
                   type: array
                   items:
                     type: string
                   description: Shell commands run in the repository root before the Dockerfile (tests, npm ci ...); build secrets are environment variables here
-                build_env: &id065
+                build_env: &id084
                   type: object
                   additionalProperties:
                     type: string
                   description: Variables for `commands`
-                build_args: &id066
+                build_args: &id085
                   type: object
                   additionalProperties:
                     type: string
                   description: Dockerfile ARG values (visible in the image history)
-                cpu_m: &id067
+                cpu_m: &id086
                   type: integer
                   description: Build CPU (millicores, plan limit)
-                memory_mi: &id068
+                memory_mi: &id087
                   type: integer
                   description: Build memory (MiB, plan limit)
-                timeout_min: &id069
+                timeout_min: &id088
                   type: integer
                   description: Build time limit (minutes, plan limit)
-                verify_min: &id070
+                verify_min: &id089
                   type: integer
                   description: Health wait after deploy (1-30 minutes)
-                notify: &id071
+                notify: &id090
                   type: array
                   items:
                     type: string
@@ -12629,7 +13207,7 @@ paths:
                   description: 'Notifications (channels: the environment''s alert settings)'
                 confirm:
                   type: boolean
-                release: &id072
+                release: &id091
                   type: array
                   items:
                     type: string
@@ -12735,34 +13313,34 @@ paths:
             schema:
               type: object
               properties:
-                name: *id047
-                provider: *id048
-                repo: *id049
-                token: *id050
-                git_user: *id051
-                branch: *id052
-                tags: *id053
-                auto: *id054
-                repo_file: *id055
-                image: *id056
-                dockerfile: *id057
-                context: *id058
-                build_target: *id059
-                targets: *id060
-                approval: *id061
-                auto_rollback: *id062
-                build_image: *id063
-                commands: *id064
-                build_env: *id065
-                build_args: *id066
-                cpu_m: *id067
-                memory_mi: *id068
-                timeout_min: *id069
-                verify_min: *id070
-                notify: *id071
+                name: *id066
+                provider: *id067
+                repo: *id068
+                token: *id069
+                git_user: *id070
+                branch: *id071
+                tags: *id072
+                auto: *id073
+                repo_file: *id074
+                image: *id075
+                dockerfile: *id076
+                context: *id077
+                build_target: *id078
+                targets: *id079
+                approval: *id080
+                auto_rollback: *id081
+                build_image: *id082
+                commands: *id083
+                build_env: *id084
+                build_args: *id085
+                cpu_m: *id086
+                memory_mi: *id087
+                timeout_min: *id088
+                verify_min: *id089
+                notify: *id090
                 confirm:
                   type: boolean
-                release: *id072
+                release: *id091
       x-cli:
         command: container pipeline update
         confirm: false
@@ -13640,7 +14218,7 @@ paths:
                   data:
                     type: object
                     properties:
-                      deploy_key: &id107
+                      deploy_key: &id126
                         type: object
                         nullable: true
                         properties:
@@ -13926,7 +14504,7 @@ paths:
                   type: boolean
   /cloud/security-groups:
     get:
-      tags: &id073
+      tags: &id092
       - Security groups
       operationId: listSecurityGroups
       summary: List security groups
@@ -13948,7 +14526,7 @@ paths:
                       $ref: '#/components/schemas/SecurityGroup'
         '401': *id003
     post:
-      tags: *id073
+      tags: *id092
       operationId: createSecurityGroup
       summary: Create a security group
       x-summary-tr: Güvenlik grubu oluştur
@@ -13988,7 +14566,7 @@ paths:
         '422': *id005
   /cloud/security-groups/{sg}:
     parameters:
-    - &id074
+    - &id093
       name: sg
       in: path
       required: true
@@ -13996,7 +14574,7 @@ paths:
         type: string
         pattern: ^sg-[a-f0-9]{8}$
     get:
-      tags: *id073
+      tags: *id092
       operationId: getSecurityGroup
       summary: Get a security group
       x-summary-tr: Güvenlik grubunu getir
@@ -14016,7 +14594,7 @@ paths:
         '401': *id003
         '404': *id004
     patch:
-      tags: *id073
+      tags: *id092
       operationId: updateSecurityGroup
       summary: Rename / describe a security group
       x-summary-tr: Güvenlik grubunun adını / açıklamasını değiştir
@@ -14050,7 +14628,7 @@ paths:
         '404': *id004
         '422': *id005
     delete:
-      tags: *id073
+      tags: *id092
       operationId: deleteSecurityGroup
       summary: Delete a security group
       x-summary-tr: Güvenlik grubunu sil
@@ -14080,9 +14658,9 @@ paths:
         '422': *id005
   /cloud/security-groups/{sg}/rules:
     parameters:
-    - *id074
+    - *id093
     put:
-      tags: *id073
+      tags: *id092
       operationId: putSecurityGroupRules
       summary: Replace the rules of a security group
       x-summary-tr: Güvenlik grubunun kurallarını değiştir
@@ -14137,9 +14715,9 @@ paths:
         '422': *id005
   /cloud/security-groups/{sg}/confirm:
     parameters:
-    - *id074
+    - *id093
     post:
-      tags: *id073
+      tags: *id092
       operationId: confirmSecurityGroup
       summary: Make the running rule trial permanent
       x-summary-tr: Kural denemesini kalıcı yap
@@ -14161,10 +14739,10 @@ paths:
         '422': *id005
   /cloud/servers/{id}/security-groups:
     parameters:
-    - &id075
+    - &id094
       $ref: '#/components/parameters/ServerId'
     get:
-      tags: *id073
+      tags: *id092
       operationId: listServerSecurityGroups
       summary: Security groups attached to a server
       x-summary-tr: Sunucuya bağlı güvenlik grupları
@@ -14186,7 +14764,7 @@ paths:
         '409':
           description: firewall_not_enabled
     put:
-      tags: *id073
+      tags: *id092
       operationId: setServerSecurityGroups
       summary: Set the exact list of attached groups
       x-summary-tr: Bağlı grupları tam liste olarak ayarla
@@ -14228,10 +14806,10 @@ paths:
         '422': *id005
   /cloud/servers/{id}/security-groups/{sg}:
     parameters:
-    - *id075
-    - *id074
+    - *id094
+    - *id093
     post:
-      tags: *id073
+      tags: *id092
       operationId: attachSecurityGroup
       summary: Attach a security group to a server
       x-summary-tr: Güvenlik grubunu sunucuya bağla
@@ -14254,7 +14832,7 @@ paths:
           description: firewall_not_enabled
         '422': *id005
     delete:
-      tags: *id073
+      tags: *id092
       operationId: detachSecurityGroup
       summary: Detach a security group from a server
       x-summary-tr: Güvenlik grubunu sunucudan ayır
@@ -18863,7 +19441,7 @@ paths:
                 card_id:
                   type: integer
                   description: Çekilecek kartın numarası. Verilmezse hesabın varsayılan kartı çekilir.
-                project_id: *id076
+                project_id: *id095
               required:
               - cycle
               - items
@@ -20582,8 +21160,8 @@ paths:
         / legal hold versions and the latest end date). Protected Storage only: a standard Object Storage service answers 409 `feature_not_available`.'
       x-description-tr: 'Kilitli kova hakkı (Nesne Kilidi ek hizmeti) ve kullanımı, kovaların varsayılan saklaması ve son kilit taraması (COMPLIANCE / GOVERNANCE
         / legal hold sürüm sayısı, en geç bitiş). Yalnız Korumalı Depolama: standart Nesne Depolama hizmeti 409 `feature_not_available` döner.'
-      parameters: &id077
-      - &id078
+      parameters: &id096
+      - &id097
         name: id
         in: path
         required: true
@@ -20623,7 +21201,7 @@ paths:
         confirm: false
       description: 'Counts locked versions in every locked bucket (up to 25 s / 5000 versions; `complete: false` when cut short).'
       x-description-tr: 'Kilitli kovalardaki kilitli sürümleri sayar (en çok 25 sn / 5000 sürüm; yarım kalırsa `complete: false`).'
-      parameters: *id077
+      parameters: *id096
       responses:
         '202':
           description: OK
@@ -20665,8 +21243,8 @@ paths:
       x-description-tr: Bir klasördeki sürümler ve silme işaretleri (sayfa 50, ayraç `/`; alt klasörler `folders`). `truncated` true iken önceki sayfanın `key_marker`
         + `version_id_marker` değerleriyle devam edin. Kilitli kovalarda her sürümde `lock_mode`, `retain_until`, `legal_hold` bulunur.
       parameters:
-      - *id078
-      - &id079
+      - *id097
+      - &id098
         name: bucket
         in: path
         required: true
@@ -20726,8 +21304,8 @@ paths:
       x-description-tr: Bir sürümü ya da silme işaretini kalıcı siler (geri alınamaz). GOVERNANCE / COMPLIANCE saklamasında ya da legal hold'daki sürüm bitiş tarihiyle
         reddedilir. `confirm=true` gerekir.
       parameters:
-      - *id078
-      - *id079
+      - *id097
+      - *id098
       - name: key
         in: query
         required: true
@@ -20789,9 +21367,9 @@ paths:
         confirm: false
       description: Copies the version as the new current version (the old one stays). Max 5 GB; delete markers cannot be restored (use undelete).
       x-description-tr: Sürümü yeni güncel sürüm olarak kopyalar (eskisi durur). En çok 5 GB; silme işareti geri yüklenmez (undelete kullanın).
-      parameters: &id080
-      - *id078
-      - *id079
+      parameters: &id099
+      - *id097
+      - *id098
       responses:
         '202':
           description: OK
@@ -20830,7 +21408,7 @@ paths:
           application/json:
             schema:
               type: object
-              properties: &id081
+              properties: &id100
                 key:
                   type: string
                   description: Object key
@@ -20853,7 +21431,7 @@ paths:
         confirm: false
       description: Removes the latest delete marker of the key, so the previous version becomes current again. `version_id` must be that delete marker.
       x-description-tr: Anahtarın en güncel silme işaretini kaldırır; önceki sürüm yeniden güncel olur. `version_id` o silme işareti olmalıdır.
-      parameters: *id080
+      parameters: *id099
       responses:
         '202':
           description: OK
@@ -20889,7 +21467,7 @@ paths:
           application/json:
             schema:
               type: object
-              properties: *id081
+              properties: *id100
               required:
               - key
               - version_id
@@ -20906,7 +21484,7 @@ paths:
         confirm: false
       description: '`object_lock` (set at creation, cannot change) and `default_retention` (null = none): new objects get this retention automatically.'
       x-description-tr: '`object_lock` (açılışta seçilir, değişmez) ve `default_retention` (null = yok): yeni nesneler bu saklamayı kendiliğinden alır.'
-      parameters: *id080
+      parameters: *id099
       responses:
         '200':
           description: OK
@@ -20943,7 +21521,7 @@ paths:
       x-description-tr: 'Yalnız kilitli kovalar. `mode` GOVERNANCE ya da COMPLIANCE ve `days` 1-3650, ya da OFF (yeni nesnelere otomatik saklama yok; mevcut kilitler
         sürer). GOVERNANCE: yalnız Gyro personeli talep üzerine aşabilir. COMPLIANCE kilidi süresi dolana kadar kimse (Gyro dahil) kısaltamaz, GOVERNANCE''a çeviremez,
         kaldıramaz; veri saklanır ve iptalde bile süre sonuna kadar ücret sürer. `"confirm": true` ve `"acknowledge": "COMPLIANCE"` gönderin.'
-      parameters: *id080
+      parameters: *id099
       responses:
         '202':
           description: OK
@@ -21006,8 +21584,8 @@ paths:
       description: Lock mode, end date and legal hold of one version (`version_id` empty = current version).
       x-description-tr: Bir sürümün kilit kipi, bitiş tarihi ve legal hold durumu (`version_id` boş = güncel sürüm).
       parameters:
-      - *id078
-      - *id079
+      - *id097
+      - *id098
       - name: key
         in: query
         required: true
@@ -21056,7 +21634,7 @@ paths:
       x-description-tr: 'Bir sürümün saklamasını şimdiden itibaren `days` (1-3650) gün olarak koyar ya da uzatır (`version_id` boş = güncel). Saklama yalnız uzatılabilir;
         COMPLIANCE GOVERNANCE''a çevrilemez. COMPLIANCE kilidi süresi dolana kadar kimse (Gyro dahil) kısaltamaz, GOVERNANCE''a çeviremez, kaldıramaz; veri saklanır
         ve iptalde bile süre sonuna kadar ücret sürer. `"confirm": true` ve `"acknowledge": "COMPLIANCE"` gönderin.'
-      parameters: *id080
+      parameters: *id099
       responses:
         '202':
           description: OK
@@ -21124,8 +21702,8 @@ paths:
       description: '`legal_hold` true = the version cannot be deleted until the hold is removed (no end date).'
       x-description-tr: '`legal_hold` true = kaldırılana kadar sürüm silinemez (bitiş tarihi yok).'
       parameters:
-      - *id078
-      - *id079
+      - *id097
+      - *id098
       - name: key
         in: query
         required: true
@@ -21179,7 +21757,7 @@ paths:
         confirm: false
       description: '`status` on / off (locked buckets only). A legal hold blocks deletion with no end date, independent of retention; you can remove it yourself.'
       x-description-tr: '`status` on / off (yalnız kilitli kovalar). Legal hold, saklamadan bağımsız ve bitiş tarihsiz silmeyi engeller; kendiniz kaldırabilirsiniz.'
-      parameters: *id080
+      parameters: *id099
       responses:
         '202':
           description: OK
@@ -21242,7 +21820,7 @@ paths:
         confirm: false
       description: 'Days after which non-current versions are deleted (new buckets: 30). 0 / null = kept until you delete them (they count toward the quota).'
       x-description-tr: Eski (güncel olmayan) sürümlerin kaç gün sonra silineceği (yeni kovalarda 30). 0 / null = siz silene kadar durur (kotadan düşer).
-      parameters: *id080
+      parameters: *id099
       responses:
         '200':
           description: OK
@@ -21276,7 +21854,7 @@ paths:
       description: '`days` 1-3650, or 0 to keep old versions. Locked versions are deleted only after their retention ends. Other lifecycle rules of the bucket are
         kept.'
       x-description-tr: '`days` 1-3650 ya da 0 (eski sürümler durur). Kilitli sürümler saklaması bitince silinir. Kovanın diğer yaşam döngüsü kuralları korunur.'
-      parameters: *id080
+      parameters: *id099
       responses:
         '202':
           description: OK
@@ -21369,7 +21947,7 @@ paths:
       description: Another account's template answers 404.
       x-description-tr: Başka hesabın şablonu 404 döner.
       parameters:
-      - &id082
+      - &id101
         name: id
         in: path
         required: true
@@ -21408,7 +21986,7 @@ paths:
       description: Name 1-60 characters (letters, digits, space . _ -).
       x-description-tr: Ad 1-60 karakter (harf, rakam, boşluk . _ -).
       parameters:
-      - *id082
+      - *id101
       responses:
         '200':
           description: OK
@@ -21456,7 +22034,7 @@ paths:
       description: Permanent. Servers created from it are not affected; the charge stops from the next hour.
       x-description-tr: Kalıcıdır. Şablondan açılmış sunucular etkilenmez; ücret sonraki saatten durur.
       parameters:
-      - *id082
+      - *id101
       responses:
         '202':
           description: OK
@@ -21571,7 +22149,7 @@ paths:
       x-description-tr: 'Şablondan kurulan normal ön ödemeli tr-ist-1 siparişi (24 saat bakiye kuralı, hesap sınırları). `product_id` (ya da `plan`) GET /cloud/products?region=tr-ist-1''den;
         diski şablonun `min_disk_gb` değerinden küçük olamaz. `"confirm": true` ve `Idempotency-Key` başlığı gerekir (teklif için `dry_run`).'
       parameters:
-      - *id082
+      - *id101
       responses:
         '202':
           description: OK
@@ -21620,7 +22198,7 @@ paths:
                   type: boolean
                 dry_run:
                   type: boolean
-                project_id: *id076
+                project_id: *id095
               required: []
   /cloud/templates/{id}/rebuild:
     post:
@@ -21638,7 +22216,7 @@ paths:
       x-description-tr: 'tr-ist-1 sunucunuzun kök diskini şablonla değiştirir (disk en az `min_disk_gb` olmalı); sunucunun SSH anahtarları yeniden kurulur, yeni root
         parolası döner (Idempotency-Key gönderilirse dönmez). `"confirm": true` gerekir.'
       parameters:
-      - *id082
+      - *id101
       responses:
         '202':
           description: OK
@@ -21709,7 +22287,7 @@ paths:
         çıkarıldığı saate kadar. Sunucu başına en çok `max` (varsayılan 5). Adres sunucuya otomatik tanımlanır (birincil arayüze /32, yeniden başlatma ve yeniden
         kurulumda korunur); ters DNS: PUT /cloud/servers/{id}/rdns. '
       parameters:
-      - &id083
+      - &id102
         name: id
         in: path
         required: true
@@ -21763,7 +22341,7 @@ paths:
         çıkarıldığı saate kadar. Sunucu başına en çok `max` (varsayılan 5). Adres sunucuya otomatik tanımlanır (birincil arayüze /32, yeniden başlatma ve yeniden
         kurulumda korunur); ters DNS: PUT /cloud/servers/{id}/rdns. Yalnız ön ödemeli tr-ist-1 sunucuları; askıdayken eklenemez.'
       parameters:
-      - *id083
+      - *id102
       requestBody:
         required: false
         content:
@@ -21821,7 +22399,7 @@ paths:
         düşülür; aynı adresi yeniden almak yeni bir asgari süre başlatır. Bir sunucuya 60 dakikada en çok `adds_per_hour` (varsayılan 10) adres eklenebilir. Adres
         sunucudan kaldırılır ve havuza döner (aynı adresi geri alma garantisi yok); ücret bırakınca durur (asgari süre yine uygulanır). `confirm=true` gerekir.'
       parameters:
-      - *id083
+      - *id102
       - name: ip
         in: path
         required: true
@@ -21911,7 +22489,7 @@ paths:
         bağlantıyla birlikte silinir. Gyro Bulut İstanbul (tr-ist-1) sunucularında otomatik uygulanır (`automatic: true`); diğer sunucularda `install_command` bir
         kez çalıştırılır. Ücretsizdir; S3 trafiği depolama hizmetinden sayılır. Korumalı Depolama kovaları: varsayılan salt okuma (2.20.0).'
       parameters:
-      - &id084
+      - &id103
         name: id
         in: path
         required: true
@@ -21967,7 +22545,7 @@ paths:
         kez çalıştırılır. Ücretsizdir; S3 trafiği depolama hizmetinden sayılır.  Yanıtta `install_command` döner (tek kullanımlık, 60 dakika). **Korumalı Depolama
         (2.20.0):** desteklenir; `read_only: false` ve `accept_versioning: true` verilmedikçe salt okuma bağlanır.'
       parameters:
-      - *id084
+      - *id103
       requestBody:
         required: true
         content:
@@ -22035,8 +22613,8 @@ paths:
       x-cli:
         command: server storage-mount get
       parameters:
-      - *id084
-      - &id085
+      - *id103
+      - &id104
         name: mid
         in: path
         required: true
@@ -22085,8 +22663,8 @@ paths:
       x-description-tr: Bağlantı anahtarı hemen silinir (sunucu kovaya erişemez; kovadaki dosyalar silinmez). tr-ist-1 sunucularında birim otomatik kaldırılır; diğerlerinde
         `remove_command` çalıştırın.
       parameters:
-      - *id084
-      - *id085
+      - *id103
+      - *id104
       responses:
         '202':
           description: OK
@@ -22129,8 +22707,8 @@ paths:
       x-description-tr: Bağlantı için yeni erişim anahtarı ve yeni tek kullanımlık komut üretir (eski anahtar hemen durur). Sunucu yeniden kurulduğunda ya da komutun
         süresi dolduğunda kullanın.
       parameters:
-      - *id084
-      - *id085
+      - *id103
+      - *id104
       responses:
         '202':
           description: OK
@@ -22180,9 +22758,9 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Project'
-        '401': &id086
+        '401': &id105
           $ref: '#/components/responses/Unauthorized'
-        '403': &id087
+        '403': &id106
           $ref: '#/components/responses/Forbidden'
       x-cli:
         command: project list
@@ -22224,16 +22802,16 @@ paths:
           description: name_taken / project_limit
         '422':
           description: Validation error
-        '401': *id086
-        '403': *id087
-        '404': &id088
+        '401': *id105
+        '403': *id106
+        '404': &id107
           $ref: '#/components/responses/NotFound'
-        '429': &id089
+        '429': &id108
           $ref: '#/components/responses/RateLimited'
       x-cli:
         command: project create
   /cloud/projects/{id}:
-    parameters: &id090
+    parameters: &id109
     - name: id
       in: path
       required: true
@@ -22260,10 +22838,10 @@ paths:
                 properties:
                   data:
                     $ref: '#/components/schemas/Project'
-        '401': *id086
-        '403': *id087
-        '404': *id088
-        '429': *id089
+        '401': *id105
+        '403': *id106
+        '404': *id107
+        '429': *id108
       x-cli:
         command: project get
     patch:
@@ -22295,10 +22873,10 @@ paths:
                     $ref: '#/components/schemas/Project'
         '409':
           description: name_taken / default_project
-        '401': *id086
-        '403': *id087
-        '404': *id088
-        '429': *id089
+        '401': *id105
+        '403': *id106
+        '404': *id107
+        '429': *id108
       x-cli:
         command: project rename
     delete:
@@ -22331,15 +22909,15 @@ paths:
                         type: integer
         '409':
           description: default_project
-        '401': *id086
-        '403': *id087
-        '404': *id088
-        '429': *id089
+        '401': *id105
+        '403': *id106
+        '404': *id107
+        '429': *id108
       x-cli:
         command: project delete
         confirm: true
   /cloud/projects/{id}/services:
-    parameters: *id090
+    parameters: *id109
     post:
       tags:
       - Projects
@@ -22388,10 +22966,10 @@ paths:
                         type: array
                         items:
                           type: integer
-        '401': *id086
-        '403': *id087
-        '404': *id088
-        '429': *id089
+        '401': *id105
+        '403': *id106
+        '404': *id107
+        '429': *id108
       x-cli:
         command: project move
   /cloud/services/{id}/project:
@@ -22435,10 +23013,10 @@ paths:
                     $ref: '#/components/schemas/Service'
         '422':
           description: project_id_required / invalid_project_id
-        '401': *id086
-        '403': *id087
-        '404': *id088
-        '429': *id089
+        '401': *id105
+        '403': *id106
+        '404': *id107
+        '429': *id108
       x-cli:
         command: service project set
   /cloud/servers/{id}/disks:
@@ -22460,7 +23038,7 @@ paths:
         saat. Sunucu başına en çok 4 disk ve sınıf başına `classes.<sınıf>.max_gb` GB; boyutlar `step_gb` katları. Yeni disk boştur (sunucu içinde bölümlendirip biçimlendirin
         ve bağlayın). Yeniden kurulum ek diskleri siler. '
       parameters:
-      - *id083
+      - *id102
       responses:
         '200':
           description: OK
@@ -22506,7 +23084,7 @@ paths:
         saat. Sunucu başına en çok 4 disk ve sınıf başına `classes.<sınıf>.max_gb` GB; boyutlar `step_gb` katları. Yeni disk boştur (sunucu içinde bölümlendirip biçimlendirin
         ve bağlayın). Yeniden kurulum ek diskleri siler. Yalnız ön ödemeli tr-ist-1 sunucuları; askıdayken eklenemez.'
       parameters:
-      - *id083
+      - *id102
       requestBody:
         required: true
         content:
@@ -22568,8 +23146,8 @@ paths:
       description: Grows the disk to `size_gb` (never shrinks; not while snapshots exist). Extend the partition / file system inside the server afterwards.
       x-description-tr: Diski `size_gb` boyutuna büyütür (küçültmez; snapshot varken olmaz). Sonra sunucu içinde bölümü / dosya sistemini genişletin.
       parameters:
-      - *id083
-      - &id091
+      - *id102
+      - &id110
         name: disk
         in: path
         required: true
@@ -22629,8 +23207,8 @@ paths:
       description: Detaches and deletes the disk with all its data (cannot be undone); billing stops after the current hour (minimum hours apply). Needs `confirm=true`.
       x-description-tr: Diski tüm verisiyle siler (geri alınamaz); ücret içinde bulunulan saatten sonra durur (asgari süre geçerli). `confirm=true` gerekir.
       parameters:
-      - *id083
-      - *id091
+      - *id102
+      - *id110
       - name: confirm
         in: query
         required: true
@@ -23005,7 +23583,7 @@ paths:
       description: Service row plus `storage` (plan, kind, limits, S3 endpoint, region).
       x-description-tr: Hizmet satırı ve `storage` (paket, tür, sınırlar, S3 uç noktası, bölge).
       parameters:
-      - &id092
+      - &id111
         name: id
         in: path
         required: true
@@ -23034,7 +23612,7 @@ paths:
         tüm kovalar ve nesneler dakikalar içinde kalıcı olarak silinir (geri alınamaz; Korumalı Depolama''da COMPLIANCE kilidi ya da legal hold altındaki sürümler
         kilit bitene kadar kalır ve ücretlenir). `immediate` olmadan iptal talebi açılır, işlenene kadar hizmet çalışır.'
       parameters:
-      - *id092
+      - *id111
       - name: confirm
         in: query
         required: true
@@ -23150,7 +23728,7 @@ paths:
           $ref: '#/components/responses/Unauthorized'
   /cloud/vpcs:
     get:
-      tags: &id093
+      tags: &id112
       - Private networks
       operationId: listVpcs
       summary: List private networks
@@ -23178,7 +23756,7 @@ paths:
                     properties:
                       vpcs:
                         type: array
-                        items: &id094
+                        items: &id113
                           $ref: '#/components/schemas/Vpc'
                       count:
                         type: integer
@@ -23206,20 +23784,20 @@ paths:
                             type: integer
         '403':
           description: not_available (private networks are not enabled for this account yet) / forbidden (key limited to some servers)
-          content: *id045
+          content: *id064
         '404':
           $ref: '#/components/responses/NotFound'
         '409':
           description: 'conflict: limit_exceeded, vpc_in_use, subnet_in_use, last_subnet, gateway_disabled, gateway_in_use, port_in_use, already_attached, other_vpc,
             extra_ips, no_private_network, no_egress, already_off, already_on, last_network, no_billing_server, suspended, busy'
-          content: *id045
+          content: *id064
         '422':
           $ref: '#/components/responses/Validation'
         '503':
           description: capacity / pool_exhausted (try again later)
-          content: *id045
+          content: *id064
     post:
-      tags: *id093
+      tags: *id112
       operationId: createVpc
       summary: Create a private network
       x-summary-tr: Özel ağ oluştur
@@ -23245,21 +23823,21 @@ paths:
               schema:
                 type: object
                 properties:
-                  data: *id094
+                  data: *id113
         '403':
           description: not_available (private networks are not enabled for this account yet) / forbidden (key limited to some servers)
-          content: *id045
+          content: *id064
         '404':
           $ref: '#/components/responses/NotFound'
         '409':
           description: 'conflict: limit_exceeded, vpc_in_use, subnet_in_use, last_subnet, gateway_disabled, gateway_in_use, port_in_use, already_attached, other_vpc,
             extra_ips, no_private_network, no_egress, already_off, already_on, last_network, no_billing_server, suspended, busy'
-          content: *id045
+          content: *id064
         '422':
           $ref: '#/components/responses/Validation'
         '503':
           description: capacity / pool_exhausted (try again later)
-          content: *id045
+          content: *id064
       requestBody:
         required: true
         content:
@@ -23289,7 +23867,7 @@ paths:
               - cidr
   /cloud/vpcs/{vpc_id}:
     get:
-      tags: *id093
+      tags: *id112
       operationId: getVpc
       summary: Get a private network
       x-summary-tr: Özel ağı getir
@@ -23299,7 +23877,7 @@ paths:
       description: Subnets, attached servers and the gateway.
       x-description-tr: Subnetler, bağlı sunucular ve kapı.
       parameters:
-      - &id095
+      - &id114
         name: vpc_id
         in: path
         required: true
@@ -23314,23 +23892,23 @@ paths:
               schema:
                 type: object
                 properties:
-                  data: *id094
+                  data: *id113
         '403':
           description: not_available (private networks are not enabled for this account yet) / forbidden (key limited to some servers)
-          content: *id045
+          content: *id064
         '404':
           $ref: '#/components/responses/NotFound'
         '409':
           description: 'conflict: limit_exceeded, vpc_in_use, subnet_in_use, last_subnet, gateway_disabled, gateway_in_use, port_in_use, already_attached, other_vpc,
             extra_ips, no_private_network, no_egress, already_off, already_on, last_network, no_billing_server, suspended, busy'
-          content: *id045
+          content: *id064
         '422':
           $ref: '#/components/responses/Validation'
         '503':
           description: capacity / pool_exhausted (try again later)
-          content: *id045
+          content: *id064
     patch:
-      tags: *id093
+      tags: *id112
       operationId: updateVpc
       summary: Rename a private network
       x-summary-tr: Özel ağın adını değiştir
@@ -23340,7 +23918,7 @@ paths:
       description: Only the name changes (the range never changes).
       x-description-tr: Yalnız ad değişir (aralık değişmez).
       parameters:
-      - *id095
+      - *id114
       responses:
         '200':
           description: OK
@@ -23349,21 +23927,21 @@ paths:
               schema:
                 type: object
                 properties:
-                  data: *id094
+                  data: *id113
         '403':
           description: not_available (private networks are not enabled for this account yet) / forbidden (key limited to some servers)
-          content: *id045
+          content: *id064
         '404':
           $ref: '#/components/responses/NotFound'
         '409':
           description: 'conflict: limit_exceeded, vpc_in_use, subnet_in_use, last_subnet, gateway_disabled, gateway_in_use, port_in_use, already_attached, other_vpc,
             extra_ips, no_private_network, no_egress, already_off, already_on, last_network, no_billing_server, suspended, busy'
-          content: *id045
+          content: *id064
         '422':
           $ref: '#/components/responses/Validation'
         '503':
           description: capacity / pool_exhausted (try again later)
-          content: *id045
+          content: *id064
       requestBody:
         required: true
         content:
@@ -23377,7 +23955,7 @@ paths:
               required:
               - name
     delete:
-      tags: *id093
+      tags: *id112
       operationId: deleteVpc
       summary: Delete a private network
       x-summary-tr: Özel ağı sil
@@ -23390,7 +23968,7 @@ paths:
       x-description-tr: 'Kalıcıdır. Önce sunucu kartlarını çıkarın ve port yönlendirmelerini silin (409 `vpc_in_use`); açık kapı kapatılır. `"confirm": true` gerekir
         (gövde ya da sorgu).'
       parameters:
-      - *id095
+      - *id114
       - name: confirm
         in: query
         schema:
@@ -23412,18 +23990,18 @@ paths:
                         type: boolean
         '403':
           description: not_available (private networks are not enabled for this account yet) / forbidden (key limited to some servers)
-          content: *id045
+          content: *id064
         '404':
           $ref: '#/components/responses/NotFound'
         '409':
           description: 'conflict: limit_exceeded, vpc_in_use, subnet_in_use, last_subnet, gateway_disabled, gateway_in_use, port_in_use, already_attached, other_vpc,
             extra_ips, no_private_network, no_egress, already_off, already_on, last_network, no_billing_server, suspended, busy'
-          content: *id045
+          content: *id064
         '422':
           $ref: '#/components/responses/Validation'
         '503':
           description: capacity / pool_exhausted (try again later)
-          content: *id045
+          content: *id064
       requestBody:
         required: false
         content:
@@ -23436,7 +24014,7 @@ paths:
               required: []
   /cloud/vpcs/{vpc_id}/subnets:
     get:
-      tags: *id093
+      tags: *id112
       operationId: listVpcSubnets
       summary: List subnets
       x-summary-tr: Subnetleri listele
@@ -23446,7 +24024,7 @@ paths:
       description: ''
       x-description-tr: ''
       parameters:
-      - *id095
+      - *id114
       responses:
         '200':
           description: OK
@@ -23466,20 +24044,20 @@ paths:
                         type: integer
         '403':
           description: not_available (private networks are not enabled for this account yet) / forbidden (key limited to some servers)
-          content: *id045
+          content: *id064
         '404':
           $ref: '#/components/responses/NotFound'
         '409':
           description: 'conflict: limit_exceeded, vpc_in_use, subnet_in_use, last_subnet, gateway_disabled, gateway_in_use, port_in_use, already_attached, other_vpc,
             extra_ips, no_private_network, no_egress, already_off, already_on, last_network, no_billing_server, suspended, busy'
-          content: *id045
+          content: *id064
         '422':
           $ref: '#/components/responses/Validation'
         '503':
           description: capacity / pool_exhausted (try again later)
-          content: *id045
+          content: *id064
     post:
-      tags: *id093
+      tags: *id112
       operationId: createVpcSubnet
       summary: Add a subnet
       x-summary-tr: Subnet ekle
@@ -23491,7 +24069,7 @@ paths:
       x-description-tr: VPC aralığı içinde /20 - /28, başka subnetle çakışmadan. `cidr` verin ya da sıradaki boş aralık için `prefix` (varsayılan 24). Her subnette
         .1 kapıdır; .0-.4 ve son adres ayrılmıştır.
       parameters:
-      - *id095
+      - *id114
       responses:
         '201':
           description: OK
@@ -23504,18 +24082,18 @@ paths:
                     $ref: '#/components/schemas/VpcSubnet'
         '403':
           description: not_available (private networks are not enabled for this account yet) / forbidden (key limited to some servers)
-          content: *id045
+          content: *id064
         '404':
           $ref: '#/components/responses/NotFound'
         '409':
           description: 'conflict: limit_exceeded, vpc_in_use, subnet_in_use, last_subnet, gateway_disabled, gateway_in_use, port_in_use, already_attached, other_vpc,
             extra_ips, no_private_network, no_egress, already_off, already_on, last_network, no_billing_server, suspended, busy'
-          content: *id045
+          content: *id064
         '422':
           $ref: '#/components/responses/Validation'
         '503':
           description: capacity / pool_exhausted (try again later)
-          content: *id045
+          content: *id064
       requestBody:
         required: true
         content:
@@ -23536,7 +24114,7 @@ paths:
               - name
   /cloud/vpcs/{vpc_id}/subnets/{subnet_id}:
     delete:
-      tags: *id093
+      tags: *id112
       operationId: deleteVpcSubnet
       summary: Delete a subnet
       x-summary-tr: Subneti sil
@@ -23546,7 +24124,7 @@ paths:
       description: Refused while cards are attached or a port forward targets it (409 `subnet_in_use`); the last subnet cannot be deleted (delete the VPC).
       x-description-tr: Bağlı kart ya da ona yönlenen port yönlendirme varken reddedilir (409 `subnet_in_use`); son subnet silinmez (VPC'yi silin).
       parameters:
-      - *id095
+      - *id114
       - name: subnet_id
         in: path
         required: true
@@ -23570,21 +24148,21 @@ paths:
                         type: boolean
         '403':
           description: not_available (private networks are not enabled for this account yet) / forbidden (key limited to some servers)
-          content: *id045
+          content: *id064
         '404':
           $ref: '#/components/responses/NotFound'
         '409':
           description: 'conflict: limit_exceeded, vpc_in_use, subnet_in_use, last_subnet, gateway_disabled, gateway_in_use, port_in_use, already_attached, other_vpc,
             extra_ips, no_private_network, no_egress, already_off, already_on, last_network, no_billing_server, suspended, busy'
-          content: *id045
+          content: *id064
         '422':
           $ref: '#/components/responses/Validation'
         '503':
           description: capacity / pool_exhausted (try again later)
-          content: *id045
+          content: *id064
   /cloud/vpcs/{vpc_id}/gateway:
     get:
-      tags: *id093
+      tags: *id112
       operationId: getVpcGateway
       summary: Get the VPC gateway
       x-summary-tr: VPC kapısını getir
@@ -23600,7 +24178,7 @@ paths:
         `no_billing_server`). Kapatınca public IP bırakılır; port yönlendirme varken ya da public IP''si kapalı sunucular kullanırken reddedilir (409 `gateway_in_use`,
         `allow_no_egress: true` ile tekrarlayın). Dışarı çıkan bağlantılar 5651 sayılı Kanun gereği kaydedilir (2 yıl). '
       parameters:
-      - *id095
+      - *id114
       responses:
         '200':
           description: OK
@@ -23613,20 +24191,20 @@ paths:
                     $ref: '#/components/schemas/VpcGateway'
         '403':
           description: not_available (private networks are not enabled for this account yet) / forbidden (key limited to some servers)
-          content: *id045
+          content: *id064
         '404':
           $ref: '#/components/responses/NotFound'
         '409':
           description: 'conflict: limit_exceeded, vpc_in_use, subnet_in_use, last_subnet, gateway_disabled, gateway_in_use, port_in_use, already_attached, other_vpc,
             extra_ips, no_private_network, no_egress, already_off, already_on, last_network, no_billing_server, suspended, busy'
-          content: *id045
+          content: *id064
         '422':
           $ref: '#/components/responses/Validation'
         '503':
           description: capacity / pool_exhausted (try again later)
-          content: *id045
+          content: *id064
     put:
-      tags: *id093
+      tags: *id112
       operationId: setVpcGateway
       summary: Turn the VPC gateway on/off and change its settings
       x-summary-tr: VPC kapısını aç/kapat, ayarla
@@ -23643,7 +24221,7 @@ paths:
         `no_billing_server`). Kapatınca public IP bırakılır; port yönlendirme varken ya da public IP''si kapalı sunucular kullanırken reddedilir (409 `gateway_in_use`,
         `allow_no_egress: true` ile tekrarlayın). Dışarı çıkan bağlantılar 5651 sayılı Kanun gereği kaydedilir (2 yıl). Yalnız verilen alanlar değişir.'
       parameters:
-      - *id095
+      - *id114
       responses:
         '200':
           description: OK
@@ -23656,18 +24234,18 @@ paths:
                     $ref: '#/components/schemas/VpcGateway'
         '403':
           description: not_available (private networks are not enabled for this account yet) / forbidden (key limited to some servers)
-          content: *id045
+          content: *id064
         '404':
           $ref: '#/components/responses/NotFound'
         '409':
           description: 'conflict: limit_exceeded, vpc_in_use, subnet_in_use, last_subnet, gateway_disabled, gateway_in_use, port_in_use, already_attached, other_vpc,
             extra_ips, no_private_network, no_egress, already_off, already_on, last_network, no_billing_server, suspended, busy'
-          content: *id045
+          content: *id064
         '422':
           $ref: '#/components/responses/Validation'
         '503':
           description: capacity / pool_exhausted (try again later)
-          content: *id045
+          content: *id064
       requestBody:
         required: false
         content:
@@ -23689,7 +24267,7 @@ paths:
               required: []
   /cloud/vpcs/{vpc_id}/port-forwards:
     get:
-      tags: *id093
+      tags: *id112
       operationId: listVpcPortForwards
       summary: List port forwards
       x-summary-tr: Port yönlendirmeleri listele
@@ -23699,7 +24277,7 @@ paths:
       description: ''
       x-description-tr: ''
       parameters:
-      - *id095
+      - *id114
       responses:
         '200':
           description: OK
@@ -23719,20 +24297,20 @@ paths:
                         type: integer
         '403':
           description: not_available (private networks are not enabled for this account yet) / forbidden (key limited to some servers)
-          content: *id045
+          content: *id064
         '404':
           $ref: '#/components/responses/NotFound'
         '409':
           description: 'conflict: limit_exceeded, vpc_in_use, subnet_in_use, last_subnet, gateway_disabled, gateway_in_use, port_in_use, already_attached, other_vpc,
             extra_ips, no_private_network, no_egress, already_off, already_on, last_network, no_billing_server, suspended, busy'
-          content: *id045
+          content: *id064
         '422':
           $ref: '#/components/responses/Validation'
         '503':
           description: capacity / pool_exhausted (try again later)
-          content: *id045
+          content: *id064
     post:
-      tags: *id093
+      tags: *id112
       operationId: createVpcPortForward
       summary: Forward a public port of the gateway
       x-summary-tr: Kapının dış portunu yönlendir
@@ -23746,7 +24324,7 @@ paths:
         başına bir yönlendirme; en çok 20. `source_cidrs`: yönlendirmeyi yalnız bu public IPv4 ağları kullanabilir (tek IP /32; ağ adresi yazılır, ör. 198.51.100.0/24);
         en çok 20; boş liste ya da verilmezse herkes. Özel, ayrılmış ve platform aralıkları reddedilir (422 `invalid_source`).'
       parameters:
-      - *id095
+      - *id114
       responses:
         '201':
           description: OK
@@ -23759,18 +24337,18 @@ paths:
                     $ref: '#/components/schemas/VpcPortForward'
         '403':
           description: not_available (private networks are not enabled for this account yet) / forbidden (key limited to some servers)
-          content: *id045
+          content: *id064
         '404':
           $ref: '#/components/responses/NotFound'
         '409':
           description: 'conflict: limit_exceeded, vpc_in_use, subnet_in_use, last_subnet, gateway_disabled, gateway_in_use, port_in_use, already_attached, other_vpc,
             extra_ips, no_private_network, no_egress, already_off, already_on, last_network, no_billing_server, suspended, busy'
-          content: *id045
+          content: *id064
         '422':
           $ref: '#/components/responses/Validation'
         '503':
           description: capacity / pool_exhausted (try again later)
-          content: *id045
+          content: *id064
       requestBody:
         required: true
         content:
@@ -23793,13 +24371,13 @@ paths:
                   type: integer
                   minimum: 1
                   maximum: 65535
-                source_cidrs: &id097
+                source_cidrs: &id116
                   type: array
                   maxItems: 20
-                  items: &id110
+                  items: &id129
                     type: string
                   description: allowed source networks (public IPv4 CIDR); empty = everyone
-                  example: &id111
+                  example: &id130
                   - 203.0.113.10/32
                   - 198.51.100.0/24
               required:
@@ -23809,7 +24387,7 @@ paths:
               - target_port
   /cloud/vpcs/{vpc_id}/port-forwards/{pf_id}:
     delete:
-      tags: *id093
+      tags: *id112
       operationId: deleteVpcPortForward
       summary: Delete a port forward
       x-summary-tr: Port yönlendirmeyi sil
@@ -23819,8 +24397,8 @@ paths:
       description: ''
       x-description-tr: ''
       parameters:
-      - *id095
-      - &id096
+      - *id114
+      - &id115
         name: pf_id
         in: path
         required: true
@@ -23844,20 +24422,20 @@ paths:
                         type: boolean
         '403':
           description: not_available (private networks are not enabled for this account yet) / forbidden (key limited to some servers)
-          content: *id045
+          content: *id064
         '404':
           $ref: '#/components/responses/NotFound'
         '409':
           description: 'conflict: limit_exceeded, vpc_in_use, subnet_in_use, last_subnet, gateway_disabled, gateway_in_use, port_in_use, already_attached, other_vpc,
             extra_ips, no_private_network, no_egress, already_off, already_on, last_network, no_billing_server, suspended, busy'
-          content: *id045
+          content: *id064
         '422':
           $ref: '#/components/responses/Validation'
         '503':
           description: capacity / pool_exhausted (try again later)
-          content: *id045
+          content: *id064
     patch:
-      tags: *id093
+      tags: *id112
       operationId: updateVpcPortForward
       summary: Change who may use a port forward
       x-summary-tr: Port yönlendirmeyi kimin kullanabileceğini değiştir
@@ -23871,8 +24449,8 @@ paths:
         boş liste ya da verilmezse herkes. Özel, ayrılmış ve platform aralıkları reddedilir (422 `invalid_source`). Liste eskisinin yerine geçer; `[]` herkese açar.
         Kapıda saniyeler içinde uygulanır.'
       parameters:
-      - *id095
-      - *id096
+      - *id114
+      - *id115
       responses:
         '200':
           description: OK
@@ -23885,18 +24463,18 @@ paths:
                     $ref: '#/components/schemas/VpcPortForward'
         '403':
           description: not_available (private networks are not enabled for this account yet) / forbidden (key limited to some servers)
-          content: *id045
+          content: *id064
         '404':
           $ref: '#/components/responses/NotFound'
         '409':
           description: 'conflict: limit_exceeded, vpc_in_use, subnet_in_use, last_subnet, gateway_disabled, gateway_in_use, port_in_use, already_attached, other_vpc,
             extra_ips, no_private_network, no_egress, already_off, already_on, last_network, no_billing_server, suspended, busy'
-          content: *id045
+          content: *id064
         '422':
           $ref: '#/components/responses/Validation'
         '503':
           description: capacity / pool_exhausted (try again later)
-          content: *id045
+          content: *id064
       requestBody:
         required: true
         content:
@@ -23904,7 +24482,7 @@ paths:
             schema:
               type: object
               properties:
-                source_cidrs: *id097
+                source_cidrs: *id116
               required:
               - source_cidrs
   /cloud/servers/{id}/nics:
@@ -23922,7 +24500,7 @@ paths:
       x-description-tr: 'tr-ist-1 sunucusunun özel ağ kartları. Takma sıcak yapılır (yeniden başlatma yok): açık sunucuda yaklaşık 10-60 sn''de hazır (`state` attaching
         -> ready); kapalı sunucuda ayarlar açılışta uygulanır. Bir sunucu aynı anda tek VPC''ye bağlanır (409 `other_vpc`), en çok 3 kart. `ip` boş = otomatik. '
       parameters:
-      - *id083
+      - *id102
       responses:
         '200':
           description: OK
@@ -23953,20 +24531,20 @@ paths:
                         description: the server applied the latest network settings
         '403':
           description: not_available (private networks are not enabled for this account yet) / forbidden (key limited to some servers)
-          content: *id045
+          content: *id064
         '404':
           $ref: '#/components/responses/NotFound'
         '409':
           description: 'conflict: limit_exceeded, vpc_in_use, subnet_in_use, last_subnet, gateway_disabled, gateway_in_use, port_in_use, already_attached, other_vpc,
             extra_ips, no_private_network, no_egress, already_off, already_on, last_network, no_billing_server, suspended, busy'
-          content: *id045
+          content: *id064
         '422':
           $ref: '#/components/responses/Validation'
         '503':
           description: capacity / pool_exhausted (try again later)
-          content: *id045
+          content: *id064
     post:
-      tags: *id093
+      tags: *id112
       operationId: attachServerNic
       summary: Attach the server to a subnet
       x-summary-tr: Sunucuyu subnete bağla
@@ -23978,7 +24556,7 @@ paths:
       x-description-tr: 'tr-ist-1 sunucusunun özel ağ kartları. Takma sıcak yapılır (yeniden başlatma yok): açık sunucuda yaklaşık 10-60 sn''de hazır (`state` attaching
         -> ready); kapalı sunucuda ayarlar açılışta uygulanır. Bir sunucu aynı anda tek VPC''ye bağlanır (409 `other_vpc`), en çok 3 kart. `ip` boş = otomatik. '
       parameters:
-      - *id083
+      - *id102
       responses:
         '202':
           description: OK
@@ -23998,18 +24576,18 @@ paths:
                         type: integer
         '403':
           description: not_available (private networks are not enabled for this account yet) / forbidden (key limited to some servers)
-          content: *id045
+          content: *id064
         '404':
           $ref: '#/components/responses/NotFound'
         '409':
           description: 'conflict: limit_exceeded, vpc_in_use, subnet_in_use, last_subnet, gateway_disabled, gateway_in_use, port_in_use, already_attached, other_vpc,
             extra_ips, no_private_network, no_egress, already_off, already_on, last_network, no_billing_server, suspended, busy'
-          content: *id045
+          content: *id064
         '422':
           $ref: '#/components/responses/Validation'
         '503':
           description: capacity / pool_exhausted (try again later)
-          content: *id045
+          content: *id064
       requestBody:
         required: true
         content:
@@ -24025,7 +24603,7 @@ paths:
               - subnet_id
   /cloud/servers/{id}/nics/{nic_id}:
     delete:
-      tags: *id093
+      tags: *id112
       operationId: detachServerNic
       summary: Detach a private network card
       x-summary-tr: Özel ağ kartını çıkar
@@ -24035,7 +24613,7 @@ paths:
       description: The address is held for 10 minutes. While the public IP is off the last card cannot be detached (409 `last_network`).
       x-description-tr: Adres 10 dakika başka sunucuya verilmez. Public IP kapalıyken son kart çıkarılamaz (409 `last_network`).
       parameters:
-      - *id083
+      - *id102
       - name: nic_id
         in: path
         required: true
@@ -24063,18 +24641,18 @@ paths:
                         type: integer
         '403':
           description: not_available (private networks are not enabled for this account yet) / forbidden (key limited to some servers)
-          content: *id045
+          content: *id064
         '404':
           $ref: '#/components/responses/NotFound'
         '409':
           description: 'conflict: limit_exceeded, vpc_in_use, subnet_in_use, last_subnet, gateway_disabled, gateway_in_use, port_in_use, already_attached, other_vpc,
             extra_ips, no_private_network, no_egress, already_off, already_on, last_network, no_billing_server, suspended, busy'
-          content: *id045
+          content: *id064
         '422':
           $ref: '#/components/responses/Validation'
         '503':
           description: capacity / pool_exhausted (try again later)
-          content: *id045
+          content: *id064
   /cloud/servers/{id}/public-ip:
     get:
       tags:
@@ -24093,7 +24671,7 @@ paths:
         mevcut IP''si (`confirm_ip`) yazılır. Hazır bir özel kart (409 `no_private_network`) gerekir ve ek IPv4 olmamalı (409 `extra_ips`). VPC kapısı (NAT) kapalıysa
         sunucu internete çıkamaz: `allow_no_egress: true` verilmezse 409 `no_egress`. Adres sunucuya ayrılmış kalır; açınca aynı IP gelir. '
       parameters:
-      - *id083
+      - *id102
       responses:
         '200':
           description: OK
@@ -24102,7 +24680,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  data: &id098
+                  data: &id117
                     type: object
                     properties:
                       server_id:
@@ -24119,20 +24697,20 @@ paths:
                         type: integer
         '403':
           description: not_available (private networks are not enabled for this account yet) / forbidden (key limited to some servers)
-          content: *id045
+          content: *id064
         '404':
           $ref: '#/components/responses/NotFound'
         '409':
           description: 'conflict: limit_exceeded, vpc_in_use, subnet_in_use, last_subnet, gateway_disabled, gateway_in_use, port_in_use, already_attached, other_vpc,
             extra_ips, no_private_network, no_egress, already_off, already_on, last_network, no_billing_server, suspended, busy'
-          content: *id045
+          content: *id064
         '422':
           $ref: '#/components/responses/Validation'
         '503':
           description: capacity / pool_exhausted (try again later)
-          content: *id045
+          content: *id064
     delete:
-      tags: *id093
+      tags: *id112
       operationId: disableServerPublicIp
       summary: Turn the public IPv4 off
       x-summary-tr: Public IPv4'ü kapat
@@ -24149,7 +24727,7 @@ paths:
         sunucu internete çıkamaz: `allow_no_egress: true` verilmezse 409 `no_egress`. Adres sunucuya ayrılmış kalır; açınca aynı IP gelir. Eski misafir ajanı 409
         `agent_update_required` döner (bkz. GET /cloud/servers/{id}/agent). '
       parameters:
-      - *id083
+      - *id102
       responses:
         '202':
           description: OK
@@ -24158,21 +24736,21 @@ paths:
               schema:
                 type: object
                 properties:
-                  data: *id098
+                  data: *id117
         '403':
           description: not_available (private networks are not enabled for this account yet) / forbidden (key limited to some servers)
-          content: *id045
+          content: *id064
         '404':
           $ref: '#/components/responses/NotFound'
         '409':
           description: 'conflict: limit_exceeded, vpc_in_use, subnet_in_use, last_subnet, gateway_disabled, gateway_in_use, port_in_use, already_attached, other_vpc,
             extra_ips, no_private_network, no_egress, already_off, already_on, last_network, no_billing_server, suspended, busy'
-          content: *id045
+          content: *id064
         '422':
           $ref: '#/components/responses/Validation'
         '503':
           description: capacity / pool_exhausted (try again later)
-          content: *id045
+          content: *id064
       requestBody:
         required: true
         content:
@@ -24187,7 +24765,7 @@ paths:
               required:
               - confirm_ip
     post:
-      tags: *id093
+      tags: *id112
       operationId: enableServerPublicIp
       summary: Turn the public IPv4 on
       x-summary-tr: Public IPv4'ü aç
@@ -24197,7 +24775,7 @@ paths:
       description: Brings the same address back.
       x-description-tr: Aynı adres geri gelir.
       parameters:
-      - *id083
+      - *id102
       responses:
         '202':
           description: OK
@@ -24206,24 +24784,24 @@ paths:
               schema:
                 type: object
                 properties:
-                  data: *id098
+                  data: *id117
         '403':
           description: not_available (private networks are not enabled for this account yet) / forbidden (key limited to some servers)
-          content: *id045
+          content: *id064
         '404':
           $ref: '#/components/responses/NotFound'
         '409':
           description: 'conflict: limit_exceeded, vpc_in_use, subnet_in_use, last_subnet, gateway_disabled, gateway_in_use, port_in_use, already_attached, other_vpc,
             extra_ips, no_private_network, no_egress, already_off, already_on, last_network, no_billing_server, suspended, busy'
-          content: *id045
+          content: *id064
         '422':
           $ref: '#/components/responses/Validation'
         '503':
           description: capacity / pool_exhausted (try again later)
-          content: *id045
+          content: *id064
   /auth/device/code:
     post:
-      tags: &id099
+      tags: &id118
       - Authentication
       operationId: createDeviceCode
       security: []
@@ -24293,11 +24871,11 @@ paths:
           description: rate_limited
           content:
             application/json:
-              schema: &id100
+              schema: &id119
                 $ref: '#/components/schemas/Error'
   /auth/device/token:
     post:
-      tags: *id099
+      tags: *id118
       operationId: pollDeviceToken
       security: []
       summary: Poll for the key (device code)
@@ -24335,15 +24913,15 @@ paths:
           description: authorization_pending | slow_down | access_denied | expired_token | invalid_grant
           content:
             application/json:
-              schema: *id100
+              schema: *id119
         '429':
           description: rate_limited
           content:
             application/json:
-              schema: *id100
+              schema: *id119
   /auth/session:
     get:
-      tags: *id099
+      tags: *id118
       operationId: getAuthSession
       summary: 'Key in use: account, permissions, expiry'
       x-summary-tr: 'Kullanılan anahtar: hesap, izinler, bitiş'
@@ -24366,10 +24944,10 @@ paths:
                         $ref: '#/components/schemas/AuthKey'
                       account:
                         $ref: '#/components/schemas/AuthAccount'
-        '401': &id101
+        '401': &id120
           $ref: '#/components/responses/Unauthorized'
     delete:
-      tags: *id099
+      tags: *id118
       operationId: deleteAuthSession
       summary: Revoke the key in use (sign out)
       x-summary-tr: Kullanılan anahtarı iptal et (çıkış)
@@ -24392,7 +24970,7 @@ paths:
                         type: boolean
                       id:
                         type: integer
-        '401': *id101
+        '401': *id120
   /cloud/servers/{id}/agent:
     get:
       tags:
@@ -24403,17 +24981,17 @@ paths:
       x-scope: cloud_read
       x-cli:
         command: server agent get
-      description: 'The Gyro guest agent configures private network cards and the public-IP-off route inside the server. Servers installed before 14 November 2026
+      description: 'The Gyro guest agent configures private network cards and the public-IP-off route inside the server. Servers installed before 15 November 2026
         run an older agent: a card attaches but `applied` stays false and turning the public IP off answers 409 `agent_update_required`. `update_command` is a one-line
         command to run on the server as root (downloads Gyro''s versioned updater and checks its SHA-256); it only replaces the agent, needs no restart and does not
         touch your data. If you gave the card an address yourself (netplan), delete that file and run `netplan apply` afterwards. The version is read from the server
         when it is running.'
-      x-description-tr: 'Gyro misafir ajanı özel ağ kartlarını ve public IP kapalıyken rotayı sunucu içinde yapılandırır. 14 Kasım 2026 öncesi kurulan sunucularda
+      x-description-tr: 'Gyro misafir ajanı özel ağ kartlarını ve public IP kapalıyken rotayı sunucu içinde yapılandırır. 15 Kasım 2026 öncesi kurulan sunucularda
         eski ajan vardır: kart takılır ama `applied` false kalır ve public IP kapatma 409 `agent_update_required` döner. `update_command`, sunucuda root olarak çalıştırılacak
         tek satır komuttur (Gyro''nun sürümlü güncelleyicisini indirir ve SHA-256 özetini doğrular); yalnız ajanı değiştirir, yeniden başlatma gerekmez, verilere
         dokunmaz. Karta adresi kendiniz verdiyseniz (netplan) sonra o dosyayı silip `netplan apply` çalıştırın. Sürüm, sunucu açıksa sunucudan okunur.'
       parameters:
-      - *id083
+      - *id102
       responses:
         '200':
           description: OK
@@ -24426,21 +25004,21 @@ paths:
                     $ref: '#/components/schemas/ServerAgent'
         '403':
           description: not_available (private networks are not enabled for this account yet) / forbidden (key limited to some servers)
-          content: *id045
+          content: *id064
         '404':
           $ref: '#/components/responses/NotFound'
         '409':
           description: 'conflict: limit_exceeded, vpc_in_use, subnet_in_use, last_subnet, gateway_disabled, gateway_in_use, port_in_use, already_attached, other_vpc,
             extra_ips, no_private_network, no_egress, already_off, already_on, last_network, no_billing_server, suspended, busy'
-          content: *id045
+          content: *id064
         '422':
           $ref: '#/components/responses/Validation'
         '503':
           description: capacity / pool_exhausted (try again later)
-          content: *id045
+          content: *id064
   /cloud/servers/{id}/agent/update:
     post:
-      tags: *id093
+      tags: *id112
       operationId: updateServerAgent
       summary: Update the guest agent
       x-summary-tr: Misafir ajanını güncelle
@@ -24450,19 +25028,19 @@ paths:
       description: 'Starts the automatic update through the old agent''s fixed Gyro download channel (agent 3, or unknown version which is checked first); the server
         keeps running, about 30 s, then the private network settings are applied again. Refusals (409): `manual_update_required` (agent 1-2: run `update_command`),
         `already_latest`, `not_running`, `not_supported`, `busy`. The task fails when the server cannot reach the internet; then run `update_command` from the web
-        console. The Gyro guest agent configures private network cards and the public-IP-off route inside the server. Servers installed before 14 November 2026 run
+        console. The Gyro guest agent configures private network cards and the public-IP-off route inside the server. Servers installed before 15 November 2026 run
         an older agent: a card attaches but `applied` stays false and turning the public IP off answers 409 `agent_update_required`. `update_command` is a one-line
         command to run on the server as root (downloads Gyro''s versioned updater and checks its SHA-256); it only replaces the agent, needs no restart and does not
         touch your data. If you gave the card an address yourself (netplan), delete that file and run `netplan apply` afterwards. '
       x-description-tr: 'Eski ajanın sabit Gyro indirme kanalıyla otomatik güncellemeyi başlatır (ajan 3 ya da önce sorgulanan bilinmeyen sürüm); sunucu çalışmaya
         devam eder, yaklaşık 30 sn, ardından özel ağ ayarı yeniden uygulanır. Ret (409): `manual_update_required` (ajan 1-2: `update_command` çalıştırın), `already_latest`,
         `not_running`, `not_supported`, `busy`. Sunucu internete çıkamıyorsa görev başarısız olur; o zaman `update_command`''ı web konsoldan çalıştırın. Gyro misafir
-        ajanı özel ağ kartlarını ve public IP kapalıyken rotayı sunucu içinde yapılandırır. 14 Kasım 2026 öncesi kurulan sunucularda eski ajan vardır: kart takılır
+        ajanı özel ağ kartlarını ve public IP kapalıyken rotayı sunucu içinde yapılandırır. 15 Kasım 2026 öncesi kurulan sunucularda eski ajan vardır: kart takılır
         ama `applied` false kalır ve public IP kapatma 409 `agent_update_required` döner. `update_command`, sunucuda root olarak çalıştırılacak tek satır komuttur
         (Gyro''nun sürümlü güncelleyicisini indirir ve SHA-256 özetini doğrular); yalnız ajanı değiştirir, yeniden başlatma gerekmez, verilere dokunmaz. Karta adresi
         kendiniz verdiyseniz (netplan) sonra o dosyayı silip `netplan apply` çalıştırın. '
       parameters:
-      - *id083
+      - *id102
       responses:
         '202':
           description: OK
@@ -24483,18 +25061,18 @@ paths:
                         type: integer
         '403':
           description: not_available (private networks are not enabled for this account yet) / forbidden (key limited to some servers)
-          content: *id045
+          content: *id064
         '404':
           $ref: '#/components/responses/NotFound'
         '409':
           description: 'conflict: limit_exceeded, vpc_in_use, subnet_in_use, last_subnet, gateway_disabled, gateway_in_use, port_in_use, already_attached, other_vpc,
             extra_ips, no_private_network, no_egress, already_off, already_on, last_network, no_billing_server, suspended, busy'
-          content: *id045
+          content: *id064
         '422':
           $ref: '#/components/responses/Validation'
         '503':
           description: capacity / pool_exhausted (try again later)
-          content: *id045
+          content: *id064
 components:
   securitySchemes:
     bearerAuth:
@@ -25018,7 +25596,7 @@ components:
         end_customer_id:
           type: integer
           description: 'Reseller main key: assign the new server to this end-customer'
-        project_id: *id076
+        project_id: *id095
         quantity:
           type: integer
           minimum: 1
@@ -26923,7 +27501,7 @@ components:
           maxLength: 255
         color:
           type: string
-          enum: &id102
+          enum: &id121
           - gray
           - blue
           - green
@@ -26976,22 +27554,22 @@ components:
       required:
       - name
       properties:
-        name: &id103
+        name: &id122
           type: string
           minLength: 1
           maxLength: 40
           description: 'Letter or digit first; then letters, digits, space and . _ - / + # & ( ). Unique per account (case-insensitive). Reserved: Genel, General,
             Default.'
-        description: &id104
+        description: &id123
           type:
           - string
           - 'null'
           maxLength: 255
-        color: &id105
+        color: &id124
           type: string
-          enum: *id102
+          enum: *id121
           default: blue
-        icon: &id106
+        icon: &id125
           type: string
           enum:
           - folder
@@ -27026,10 +27604,10 @@ components:
     ProjectUpdate:
       type: object
       properties:
-        name: *id103
-        description: *id104
-        color: *id105
-        icon: *id106
+        name: *id122
+        description: *id123
+        color: *id124
+        icon: *id125
     ProjectRef:
       type:
       - object
@@ -27379,7 +27957,7 @@ components:
                   fingerprint:
                     type: string
                     example: SHA256:+DiY3wvvV6TuJJhbpZisF/zLDA0zPMSvHdkr4UvCOqU
-            deploy_key: *id107
+            deploy_key: *id126
         archive:
           type: object
           properties:
@@ -27395,7 +27973,7 @@ components:
           type: string
           description: Dockerfile stage that is built (empty = last stage)
           x-description-tr: Derlenen Dockerfile aşaması (boş = son aşama)
-        release: *id072
+        release: *id091
     ContainerPipelineRun:
       type: object
       properties:
@@ -27815,12 +28393,12 @@ components:
           type: string
         egress_change:
           $ref: '#/components/schemas/ContainerEgressChange'
-        pending_egress_ips: &id109
+        pending_egress_ips: &id128
           type: array
           items:
             type: string
           description: new egress IPs announced but not in use for sure yet; add them to your allow lists now
-        egress_hold_hours: &id108
+        egress_hold_hours: &id127
           type: integer
           description: approval window (0 = off)
     ContainerEnvironment:
@@ -27903,10 +28481,10 @@ components:
         node_monthly_eur:
           type: number
           description: price of one node per month (an extra node costs the same)
-        egress_hold_hours: *id108
+        egress_hold_hours: *id127
         egress_change:
           $ref: '#/components/schemas/ContainerEgressChange'
-        pending_egress_ips: *id109
+        pending_egress_ips: *id128
     VpcPortForward:
       type: object
       properties:
@@ -27929,9 +28507,9 @@ components:
         source_cidrs:
           type: array
           maxItems: 20
-          items: *id110
+          items: *id129
           description: allowed source networks; empty = everyone
-          example: *id111
+          example: *id130
     VpcGateway:
       type: object
       properties:
@@ -28460,4 +29038,161 @@ components:
         update_url:
           type: string
         update_sha256:
+          type: string
+    ContainerScheduleRun:
+      type: object
+      properties:
+        id:
+          type: string
+          example: rmwhbdqgkml3p
+        planned:
+          type: string
+          format: date-time
+          description: schedule time (empty for run now)
+        trigger:
+          type: string
+          enum:
+          - schedule
+          - manual
+        state:
+          type: string
+          enum:
+          - starting
+          - running
+          - retrying
+          - succeeded
+          - failed
+          - timeout
+          - cancelled
+          - missed
+          - skipped
+        error:
+          type: string
+          description: 'job error (exit_nonzero, timeout, ...), previous_running (skipped: the run before was still going), missed, limit_jobs, quota_exceeded, svc_not_found,
+            suspended, lost'
+        detail:
+          type: string
+        jobs:
+          type: array
+          items:
+            type: string
+          description: one-off job ids of the attempts (GET /cloud/containers/{id}/jobs/{job}/logs)
+        attempts:
+          type: integer
+        exit_code:
+          type: integer
+        started:
+          type: string
+          format: date-time
+        finished:
+          type: string
+          format: date-time
+        retry_at:
+          type: string
+          format: date-time
+    ContainerSchedule:
+      type: object
+      description: Scheduled job of a container environment.
+      x-description-tr: Kapsayıcı ortamının zamanlanmış görevi.
+      properties:
+        id:
+          type: string
+          example: stoizgqhpi9t
+        name:
+          type: string
+          example: nightly-report
+        description:
+          type: string
+        kind:
+          type: string
+          enum:
+          - cron
+          - rate
+          - once
+        cron:
+          type: string
+          example: 0 3 * * *
+        rate_minutes:
+          type: integer
+        at:
+          type: string
+          format: date-time
+        timezone:
+          type: string
+          example: Europe/Istanbul
+        target:
+          type: string
+          enum:
+          - service
+          - http
+        service:
+          type: string
+          example: api
+        command:
+          type: array
+          items:
+            type: string
+          example:
+          - npm
+          - run
+          - report
+        cpu_m:
+          type: integer
+        memory_mi:
+          type: integer
+        timeout_seconds:
+          type: integer
+        url:
+          type: string
+        method:
+          type: string
+        header_names:
+          type: array
+          items:
+            type: string
+        headers:
+          type: object
+          additionalProperties:
+            type: string
+          description: header names with **** (values are never returned)
+        body_bytes:
+          type: integer
+        http_timeout_seconds:
+          type: integer
+        retries:
+          type: integer
+        paused:
+          type: boolean
+        completed:
+          type: boolean
+          description: a one-time schedule that ran
+        state:
+          type: string
+          enum:
+          - active
+          - paused
+          - completed
+        running:
+          type: boolean
+        next_run:
+          type: string
+          format: date-time
+          nullable: true
+        next_run_local:
+          type: string
+          description: next run in the schedule's time zone (RFC 3339 with offset)
+        last_run:
+          $ref: '#/components/schemas/ContainerScheduleRun'
+        runs:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContainerScheduleRun'
+          description: last 20 runs, newest first (GET one)
+        created:
+          type: string
+          format: date-time
+        updated:
+          type: string
+          format: date-time
+        by:
           type: string

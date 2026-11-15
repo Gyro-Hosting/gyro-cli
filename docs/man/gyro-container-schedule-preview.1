@@ -1,0 +1,113 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-container-schedule-preview - Next run times of a timing
+
+
+.SH SYNOPSIS
+\fBgyro container schedule preview  [flags]\fP
+
+
+.SH DESCRIPTION
+Next run times of a timing
+
+.PP
+Checks \fBcron\fR / \fBrate_minutes\fR / \fBat\fR + \fBtimezone\fR and returns the next \fBcount\fR (1-20, default 5) run times in that time zone. Nothing is stored.
+
+.PP
+API: POST /cloud/containers/{id}/schedules/preview (operationId previewContainerSchedule, scope services_write)
+
+
+.SH OPTIONS
+\fB--at\fP=""
+	RFC 3339, or local date-time in \fBtimezone\fR
+
+.PP
+\fB--count\fP=0
+	count
+
+.PP
+\fB--cron\fP=""
+	cron
+
+.PP
+\fB--data\fP=""
+	request body as JSON, @file or @- (stdin)
+
+.PP
+\fB--dry-run\fP[=false]
+	show the price quote / request without changing anything
+
+.PP
+\fB-h\fP, \fB--help\fP[=false]
+	help for preview
+
+.PP
+\fB--idempotency-key\fP=""
+	idempotency key (automatic for money operations)
+
+.PP
+\fB--rate-minutes\fP=0
+	rate_minutes
+
+.PP
+\fB--set\fP=[]
+	extra body field key=value (repeatable)
+
+.PP
+\fB--timezone\fP=""
+	timezone
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH SEE ALSO
+\fBgyro-container-schedule(1)\fP

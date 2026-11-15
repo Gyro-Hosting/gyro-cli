@@ -6,7 +6,7 @@ Misafir ajanı sürümü
 
 Misafir ajanı sürümü
 
-Gyro misafir ajanı özel ağ kartlarını ve public IP kapalıyken rotayı sunucu içinde yapılandırır. 14 Kasım 2026 öncesi kurulan sunucularda eski ajan vardır: kart takılır ama `applied` false kalır ve public IP kapatma 409 `agent_update_required` döner. `update_command`, sunucuda root olarak çalıştırılacak tek satır komuttur (Gyro'nun sürümlü güncelleyicisini indirir ve SHA-256 özetini doğrular); yalnız ajanı değiştirir, yeniden başlatma gerekmez, verilere dokunmaz. Karta adresi kendiniz verdiyseniz (netplan) sonra o dosyayı silip `netplan apply` çalıştırın. Sürüm, sunucu açıksa sunucudan okunur.
+Gyro misafir ajanı özel ağ kartlarını ve public IP kapalıyken rotayı sunucu içinde yapılandırır. 15 Kasım 2026 öncesi kurulan sunucularda eski ajan vardır: kart takılır ama `applied` false kalır ve public IP kapatma 409 `agent_update_required` döner. `update_command`, sunucuda root olarak çalıştırılacak tek satır komuttur (Gyro'nun sürümlü güncelleyicisini indirir ve SHA-256 özetini doğrular); yalnız ajanı değiştirir, yeniden başlatma gerekmez, verilere dokunmaz. Karta adresi kendiniz verdiyseniz (netplan) sonra o dosyayı silip `netplan apply` çalıştırın. Sürüm, sunucu açıksa sunucudan okunur.
 
 API: GET /cloud/servers/{id}/agent (operationId getServerAgent, scope cloud_read)
 

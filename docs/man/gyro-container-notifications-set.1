@@ -37,7 +37,7 @@ API: PUT /cloud/containers/{id}/notifications (operationId typed_put_containers\
 
 .PP
 \fB--events\fP=""
-	Comma separated: down, crashloop, replicas_low, scale_max, capacity, egress, job_failed
+	Comma separated list (or JSON list) of the events to enable: down, crashloop, replicas_low, scale_max, capacity, egress, job_failed, log_rule, log_quota, schedule_failed, schedule_missed. It is the FULL set: events not listed are turned off. Omit \fBevents\fR to keep the current selection (e.g. when only changing \fBcooldown\fR). GET returns every event in \fBsettings.events\fR (1 = on).
 
 .PP
 \fB-h\fP, \fB--help\fP[=false]
