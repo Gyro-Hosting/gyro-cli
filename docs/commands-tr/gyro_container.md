@@ -62,5 +62,5 @@ gyro container [flags]
 * [gyro container secret](gyro_container_secret.md)	 - Gizli değer sil
 * [gyro container service](gyro_container_service.md)	 - Kapsayıcı servislerini listele
 * [gyro container sizes](gyro_container_sizes.md)	 - Sunucusuz kapsayıcı boyutları (vCPU / bellek) ve fiyatları
-* [gyro container vpc](gyro_container_vpc.md)	 - Düğümlü ortamın özel ağı (VPC): sabit kaynak aralığı, VPC uç noktası
+* [gyro container vpc](gyro_container_vpc.md)	 - Kapsayıcı ortamının özel ağı (VPC): sabit kaynak aralığı, VPC uç noktası
 

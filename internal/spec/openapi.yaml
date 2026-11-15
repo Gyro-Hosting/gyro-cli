@@ -2,7 +2,7 @@
 openapi: 3.1.0
 info:
   title: Gyro Public API
-  version: 2.37.0
+  version: 2.38.0
   summary: Manage Gyro cloud servers, SSH keys and billing programmatically.
   x-summary-tr: Gyro bulut sunucularınızı, SSH anahtarlarınızı ve faturalarınızı programla yönetin.
   description: "The Gyro Public API lets you automate everything you do in the Gyro client area:\norder and manage cloud servers, keep SSH keys, read invoices and\
@@ -103,7 +103,9 @@ info:
     \ to keep). Additive.\n\n**2.37.0**: bucket event notifications (Object Storage and Protected Storage): `GET|POST /cloud/storage/{id}/buckets/{bucket}/events`,\
     \ `GET /cloud/storage/{id}/events`, `GET /cloud/storage/{id}/events/usage`, `GET|PATCH|DELETE .../events/{event}`, `POST .../events/{event}/test|rotate-secret`,\
     \ `GET .../events/{event}/deliveries`. Signed HTTPS webhooks (same signature as account webhooks), prefix / suffix filters, monthly allowance + event packs, no\
-    \ overage invoice. Additive.\n"
+    \ overage invoice. Additive.\n\n**2.38.0**: serverless container environments can join a VPC too (`PUT /cloud/containers/{id}/vpc`). Their connection is charged\
+    \ (2.99 EUR/month, hourly from the prepaid balance while attached): `GET .../vpc` returns `pricing`, attaching needs `\"confirm\": true` (422 `confirm_required`\
+    \ with `details.pricing` otherwise). Node environments stay free. Additive.\n"
   x-description-tr: "Gyro Public API, müşteri panelinde yaptığınız her işi otomatikleştirmenizi sağlar:\nbulut sunucu siparişi ve yönetimi, SSH anahtarları, fatura\
     \ ve bakiye okuma.\nResmi Terraform sağlayıcısı (`gyro-hosting/gyro`) ve `gyroctl` bu API'yi kullanır.\n\n* **Taban adres** `https://www.gyrohosting.com/api/v1/client`\n\
     * **Kimlik** `Authorization: Bearer wck_...` (anahtarı *Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri* bölümünden oluşturun)\n* **Biçim** JSON\
@@ -201,7 +203,9 @@ info:
     \ `schedule_missed`. Bildirim `events` alanı tam belgelendi (verilmezse korunur). Geriye uyumlu.\n\n**2.37.0**: kova olay bildirimleri (Nesne Depolama ve Korumalı\
     \ Depolama): `GET|POST /cloud/storage/{id}/buckets/{bucket}/events`, `GET /cloud/storage/{id}/events`, `GET /cloud/storage/{id}/events/usage`, `GET|PATCH|DELETE\
     \ .../events/{event}`, `POST .../events/{event}/test|rotate-secret`, `GET .../events/{event}/deliveries`. İmzalı HTTPS webhook (hesap webhook'larıyla aynı imza),\
-    \ önek / uzantı süzgeci, aylık hak + olay paketi, aşım faturası yok. Geriye uyumlu.\n"
+    \ önek / uzantı süzgeci, aylık hak + olay paketi, aşım faturası yok. Geriye uyumlu.\n\n**2.38.0**: sunucusuz kapsayıcı ortamları da VPC'ye bağlanabilir (`PUT\
+    \ /cloud/containers/{id}/vpc`). Bağlantıları ücretlidir (2,99 €/ay, bağlıyken saatlik, ön ödemeli bakiyeden): `GET .../vpc` `pricing` döner, bağlama `\"confirm\"\
+    : true` ister (yoksa 422 `confirm_required` + `details.pricing`). Düğümlü ortamlar ücretsiz kalır. Geriye uyumlu.\n"
   contact:
     name: Gyro Hosting
     url: https://www.gyrohosting.com
@@ -13255,23 +13259,27 @@ paths:
       summary: Get the environment's VPC attachment
       x-summary-tr: Ortamın VPC bağını getir
       x-scope: services_read
-      description: 'Connects a **node** container environment (Mini / Small / Starter / Standard / Pro) to one subnet of your private network (VPC) in tr-ist-1. The
-        environment gets a fixed **VPC source range** (/28, 16 addresses) inside the subnet: connections from your containers to servers in the VPC come from this
-        range, and it does not change when nodes are replaced, scaled, the plan changes or a node is renewed automatically, so allow it once in your server firewalls.
-        The first address of the range is the **VPC endpoint**: servers in the VPC reach the services you publish (`expose`, at most 20) at `endpoint:port` (TCP to
-        the service''s internal address `<service>.<namespace>.svc.cluster.local:80`); it is never reachable from the internet. Free (no gateway needed, VPC traffic
-        is free). The subnet must be /26 or larger; an environment joins one VPC subnet at a time. Serverless environments answer 501 `not_supported` (coming later).
-        A refusal answers 422 `tool_action_failed` with a message in the account language: already attached to another subnet (detach first), subnet smaller than
-        /26, no free /28 block in the subnet, invalid publish list or unknown service, the previous attachment is still being removed. Published ports: 1-65535 except
-        22, 2200, 6443, 9100, 9750, 10250-10256, 30000-32767, 51820-51821; each port once.'
-      x-description-tr: '**Düğümlü** bir Kapsayıcı ortamını (Mini / Küçük / Başlangıç / Standart / Pro) tr-ist-1''deki özel ağınızın (VPC) bir subnetine bağlar. Ortama
-        subnet içinde sabit bir **VPC kaynak aralığı** (/28, 16 adres) ayrılır: kapsayıcılarınızdan VPC''deki sunuculara giden bağlantılar bu aralıktan gelir ve düğüm
-        değişimi, ölçekleme, paket değişikliği ya da otomatik düğüm yenilemede DEĞİŞMEZ; sunucu güvenlik duvarınızda bir kez izin vermeniz yeter. Aralığın ilk adresi
-        **VPC uç noktasıdır**: VPC''deki sunucular yayınladığınız servislere (`expose`, en çok 20) `uç_nokta:port` ile ulaşır (servisin iç adresine `<servis>.<ns>.svc.cluster.local:80`
-        TCP); internetten erişilemez. Ücretsizdir (kapı gerekmez, VPC trafiği ücretsiz). Subnet en az /26 olmalı; bir ortam aynı anda tek VPC subnetine bağlanır.
-        Sunucusuz ortamlar 501 `not_supported` döner (yakında). Ret, hesap dilinde mesajla 422 `tool_action_failed` döner: başka subnete zaten bağlı (önce kaldırın),
-        subnet /26''dan küçük, subnette boş /28 blok yok, yayın listesi geçersiz ya da servis yok, önceki bağ hâlâ kaldırılıyor. Yayın portları: 1-65535; 22, 2200,
-        6443, 9100, 9750, 10250-10256, 30000-32767, 51820-51821 hariç; her port bir kez.'
+      description: 'Connects a container environment to one subnet of your private network (VPC) in tr-ist-1. The environment gets a fixed **VPC source range** (/28,
+        16 addresses) inside the subnet: connections from your containers to servers in the VPC come from this range, and it does not change when nodes are replaced,
+        scaled, the plan changes or a node is renewed automatically, so allow it once in your server firewalls. The first address of the range is the **VPC endpoint**:
+        servers in the VPC reach the services you publish (`expose`, at most 20) at `endpoint:port` (TCP to the service''s internal address `<service>.<namespace>.svc.cluster.local:80`);
+        it is never reachable from the internet. **Price:** node environments (Mini / Small / Starter / Standard / Pro) free. **Serverless** environments: a connector
+        dedicated to the environment runs, so the connection is charged (`pricing`: 2.99 EUR/month, list 3.49, billed hourly from the prepaid balance while attached,
+        at least 1 hour per attachment; the charge stops on detach). Attaching a serverless environment needs `"confirm": true`; without it the answer is 422 `confirm_required`
+        with `details.pricing`. VPC traffic is free, no gateway needed. The subnet must be /26 or larger; an environment joins one VPC subnet at a time. A refusal
+        answers 422 `tool_action_failed` with a message in the account language: already attached to another subnet (detach first), subnet smaller than /26, no free
+        /28 block in the subnet, invalid publish list or unknown service, the previous attachment is still being removed. Published ports: 1-65535 except 22, 2200,
+        6443, 9100, 9750, 10250-10256, 30000-32767, 51820-51821; each port once.'
+      x-description-tr: 'Bir Kapsayıcı ortamını tr-ist-1''deki özel ağınızın (VPC) bir subnetine bağlar. Ortama subnet içinde sabit bir **VPC kaynak aralığı** (/28,
+        16 adres) ayrılır: kapsayıcılarınızdan VPC''deki sunuculara giden bağlantılar bu aralıktan gelir ve düğüm değişimi, ölçekleme, paket değişikliği ya da otomatik
+        düğüm yenilemede DEĞİŞMEZ; sunucu güvenlik duvarınızda bir kez izin vermeniz yeter. Aralığın ilk adresi **VPC uç noktasıdır**: VPC''deki sunucular yayınladığınız
+        servislere (`expose`, en çok 20) `uç_nokta:port` ile ulaşır (servisin iç adresine `<servis>.<ns>.svc.cluster.local:80` TCP); internetten erişilemez. **Ücret:**
+        düğümlü ortamlarda (Mini / Küçük / Başlangıç / Standart / Pro) ücretsiz. **Sunucusuz** ortamlarda ortama ayrılmış bir bağlayıcı çalıştığı için bağlantı ücretlidir
+        (`pricing`: 2,99 €/ay, liste 3,49; bağlıyken saatlik, ön ödemeli bakiyeden, her bağlamada en az 1 saat; bağ kaldırılınca durur). Sunucusuz ortamı bağlamak
+        `"confirm": true` ister; verilmezse 422 `confirm_required` + `details.pricing` döner. VPC trafiği ücretsiz, kapı gerekmez. Subnet en az /26 olmalı; bir ortam
+        aynı anda tek VPC subnetine bağlanır. Ret, hesap dilinde mesajla 422 `tool_action_failed` döner: başka subnete zaten bağlı (önce kaldırın), subnet /26''dan
+        küçük, subnette boş /28 blok yok, yayın listesi geçersiz ya da servis yok, önceki bağ hâlâ kaldırılıyor. Yayın portları: 1-65535; 22, 2200, 6443, 9100, 9750,
+        10250-10256, 30000-32767, 51820-51821 hariç; her port bir kez.'
       parameters:
       - name: id
         in: path
@@ -13305,25 +13313,31 @@ paths:
       summary: Attach the environment to a VPC subnet
       x-summary-tr: Ortamı bir VPC subnetine bağla
       x-scope: services_write
-      description: 'Answers at once with `state: attaching`; the nodes join the subnet in about a minute (`ready`). Repeating with the same subnet only replaces `expose`
-        when given. Connects a **node** container environment (Mini / Small / Starter / Standard / Pro) to one subnet of your private network (VPC) in tr-ist-1. The
-        environment gets a fixed **VPC source range** (/28, 16 addresses) inside the subnet: connections from your containers to servers in the VPC come from this
-        range, and it does not change when nodes are replaced, scaled, the plan changes or a node is renewed automatically, so allow it once in your server firewalls.
-        The first address of the range is the **VPC endpoint**: servers in the VPC reach the services you publish (`expose`, at most 20) at `endpoint:port` (TCP to
-        the service''s internal address `<service>.<namespace>.svc.cluster.local:80`); it is never reachable from the internet. Free (no gateway needed, VPC traffic
-        is free). The subnet must be /26 or larger; an environment joins one VPC subnet at a time. Serverless environments answer 501 `not_supported` (coming later).
-        A refusal answers 422 `tool_action_failed` with a message in the account language: already attached to another subnet (detach first), subnet smaller than
-        /26, no free /28 block in the subnet, invalid publish list or unknown service, the previous attachment is still being removed. Published ports: 1-65535 except
-        22, 2200, 6443, 9100, 9750, 10250-10256, 30000-32767, 51820-51821; each port once.'
-      x-description-tr: 'Hemen `state: attaching` ile döner; düğümler yaklaşık bir dakikada subnete katılır (`ready`). Aynı subnetle tekrar çağrı yalnız verilen `expose`''u
-        değiştirir. **Düğümlü** bir Kapsayıcı ortamını (Mini / Küçük / Başlangıç / Standart / Pro) tr-ist-1''deki özel ağınızın (VPC) bir subnetine bağlar. Ortama
-        subnet içinde sabit bir **VPC kaynak aralığı** (/28, 16 adres) ayrılır: kapsayıcılarınızdan VPC''deki sunuculara giden bağlantılar bu aralıktan gelir ve düğüm
-        değişimi, ölçekleme, paket değişikliği ya da otomatik düğüm yenilemede DEĞİŞMEZ; sunucu güvenlik duvarınızda bir kez izin vermeniz yeter. Aralığın ilk adresi
-        **VPC uç noktasıdır**: VPC''deki sunucular yayınladığınız servislere (`expose`, en çok 20) `uç_nokta:port` ile ulaşır (servisin iç adresine `<servis>.<ns>.svc.cluster.local:80`
-        TCP); internetten erişilemez. Ücretsizdir (kapı gerekmez, VPC trafiği ücretsiz). Subnet en az /26 olmalı; bir ortam aynı anda tek VPC subnetine bağlanır.
-        Sunucusuz ortamlar 501 `not_supported` döner (yakında). Ret, hesap dilinde mesajla 422 `tool_action_failed` döner: başka subnete zaten bağlı (önce kaldırın),
-        subnet /26''dan küçük, subnette boş /28 blok yok, yayın listesi geçersiz ya da servis yok, önceki bağ hâlâ kaldırılıyor. Yayın portları: 1-65535; 22, 2200,
-        6443, 9100, 9750, 10250-10256, 30000-32767, 51820-51821 hariç; her port bir kez.'
+      description: 'Serverless environments: send `"confirm": true` (the connection is charged, see `pricing`). Answers at once with `state: attaching`; the nodes
+        join the subnet in about a minute (serverless: about 3 minutes) (`ready`). Repeating with the same subnet only replaces `expose` when given. Connects a container
+        environment to one subnet of your private network (VPC) in tr-ist-1. The environment gets a fixed **VPC source range** (/28, 16 addresses) inside the subnet:
+        connections from your containers to servers in the VPC come from this range, and it does not change when nodes are replaced, scaled, the plan changes or a
+        node is renewed automatically, so allow it once in your server firewalls. The first address of the range is the **VPC endpoint**: servers in the VPC reach
+        the services you publish (`expose`, at most 20) at `endpoint:port` (TCP to the service''s internal address `<service>.<namespace>.svc.cluster.local:80`);
+        it is never reachable from the internet. **Price:** node environments (Mini / Small / Starter / Standard / Pro) free. **Serverless** environments: a connector
+        dedicated to the environment runs, so the connection is charged (`pricing`: 2.99 EUR/month, list 3.49, billed hourly from the prepaid balance while attached,
+        at least 1 hour per attachment; the charge stops on detach). Attaching a serverless environment needs `"confirm": true`; without it the answer is 422 `confirm_required`
+        with `details.pricing`. VPC traffic is free, no gateway needed. The subnet must be /26 or larger; an environment joins one VPC subnet at a time. A refusal
+        answers 422 `tool_action_failed` with a message in the account language: already attached to another subnet (detach first), subnet smaller than /26, no free
+        /28 block in the subnet, invalid publish list or unknown service, the previous attachment is still being removed. Published ports: 1-65535 except 22, 2200,
+        6443, 9100, 9750, 10250-10256, 30000-32767, 51820-51821; each port once.'
+      x-description-tr: 'Sunucusuz ortamlarda `"confirm": true` gönderin (bağlantı ücretli, bkz. `pricing`). Hemen `state: attaching` ile döner; düğümler yaklaşık
+        bir dakikada subnete katılır (sunucusuz: yaklaşık 3 dakika) (`ready`). Aynı subnetle tekrar çağrı yalnız verilen `expose`''u değiştirir. Bir Kapsayıcı ortamını
+        tr-ist-1''deki özel ağınızın (VPC) bir subnetine bağlar. Ortama subnet içinde sabit bir **VPC kaynak aralığı** (/28, 16 adres) ayrılır: kapsayıcılarınızdan
+        VPC''deki sunuculara giden bağlantılar bu aralıktan gelir ve düğüm değişimi, ölçekleme, paket değişikliği ya da otomatik düğüm yenilemede DEĞİŞMEZ; sunucu
+        güvenlik duvarınızda bir kez izin vermeniz yeter. Aralığın ilk adresi **VPC uç noktasıdır**: VPC''deki sunucular yayınladığınız servislere (`expose`, en çok
+        20) `uç_nokta:port` ile ulaşır (servisin iç adresine `<servis>.<ns>.svc.cluster.local:80` TCP); internetten erişilemez. **Ücret:** düğümlü ortamlarda (Mini
+        / Küçük / Başlangıç / Standart / Pro) ücretsiz. **Sunucusuz** ortamlarda ortama ayrılmış bir bağlayıcı çalıştığı için bağlantı ücretlidir (`pricing`: 2,99
+        €/ay, liste 3,49; bağlıyken saatlik, ön ödemeli bakiyeden, her bağlamada en az 1 saat; bağ kaldırılınca durur). Sunucusuz ortamı bağlamak `"confirm": true`
+        ister; verilmezse 422 `confirm_required` + `details.pricing` döner. VPC trafiği ücretsiz, kapı gerekmez. Subnet en az /26 olmalı; bir ortam aynı anda tek
+        VPC subnetine bağlanır. Ret, hesap dilinde mesajla 422 `tool_action_failed` döner: başka subnete zaten bağlı (önce kaldırın), subnet /26''dan küçük, subnette
+        boş /28 blok yok, yayın listesi geçersiz ya da servis yok, önceki bağ hâlâ kaldırılıyor. Yayın portları: 1-65535; 22, 2200, 6443, 9100, 9750, 10250-10256,
+        30000-32767, 51820-51821 hariç; her port bir kez.'
       parameters:
       - name: id
         in: path
@@ -13360,9 +13374,7 @@ paths:
         '409':
           $ref: '#/components/responses/Conflict'
         '422':
-          $ref: '#/components/responses/Validation'
-        '501':
-          description: not_supported (Serverless)
+          description: 'confirm_required (serverless: details.pricing) / tool_action_failed'
           content: *id071
       requestBody:
         required: true
@@ -13382,6 +13394,9 @@ paths:
                   items:
                     $ref: '#/components/schemas/ContainerVPCExpose'
                   description: services published at the VPC endpoint
+                confirm:
+                  type: boolean
+                  description: accept the charge (required for serverless environments; ignored for node environments)
               required:
               - subnet_id
       x-cli:
@@ -13394,24 +13409,29 @@ paths:
       summary: Change the published services
       x-summary-tr: Yayınlanan servisleri değiştir
       x-scope: services_write
-      description: 'Replaces the whole list; `[]` removes all. The source range and endpoint stay the same. Connects a **node** container environment (Mini / Small
-        / Starter / Standard / Pro) to one subnet of your private network (VPC) in tr-ist-1. The environment gets a fixed **VPC source range** (/28, 16 addresses)
-        inside the subnet: connections from your containers to servers in the VPC come from this range, and it does not change when nodes are replaced, scaled, the
-        plan changes or a node is renewed automatically, so allow it once in your server firewalls. The first address of the range is the **VPC endpoint**: servers
-        in the VPC reach the services you publish (`expose`, at most 20) at `endpoint:port` (TCP to the service''s internal address `<service>.<namespace>.svc.cluster.local:80`);
-        it is never reachable from the internet. Free (no gateway needed, VPC traffic is free). The subnet must be /26 or larger; an environment joins one VPC subnet
-        at a time. Serverless environments answer 501 `not_supported` (coming later). A refusal answers 422 `tool_action_failed` with a message in the account language:
-        already attached to another subnet (detach first), subnet smaller than /26, no free /28 block in the subnet, invalid publish list or unknown service, the
-        previous attachment is still being removed. Published ports: 1-65535 except 22, 2200, 6443, 9100, 9750, 10250-10256, 30000-32767, 51820-51821; each port once.'
-      x-description-tr: 'Listenin tamamını değiştirir; `[]` hepsini kaldırır. Kaynak aralığı ve uç nokta değişmez. **Düğümlü** bir Kapsayıcı ortamını (Mini / Küçük
-        / Başlangıç / Standart / Pro) tr-ist-1''deki özel ağınızın (VPC) bir subnetine bağlar. Ortama subnet içinde sabit bir **VPC kaynak aralığı** (/28, 16 adres)
-        ayrılır: kapsayıcılarınızdan VPC''deki sunuculara giden bağlantılar bu aralıktan gelir ve düğüm değişimi, ölçekleme, paket değişikliği ya da otomatik düğüm
-        yenilemede DEĞİŞMEZ; sunucu güvenlik duvarınızda bir kez izin vermeniz yeter. Aralığın ilk adresi **VPC uç noktasıdır**: VPC''deki sunucular yayınladığınız
-        servislere (`expose`, en çok 20) `uç_nokta:port` ile ulaşır (servisin iç adresine `<servis>.<ns>.svc.cluster.local:80` TCP); internetten erişilemez. Ücretsizdir
-        (kapı gerekmez, VPC trafiği ücretsiz). Subnet en az /26 olmalı; bir ortam aynı anda tek VPC subnetine bağlanır. Sunucusuz ortamlar 501 `not_supported` döner
-        (yakında). Ret, hesap dilinde mesajla 422 `tool_action_failed` döner: başka subnete zaten bağlı (önce kaldırın), subnet /26''dan küçük, subnette boş /28 blok
-        yok, yayın listesi geçersiz ya da servis yok, önceki bağ hâlâ kaldırılıyor. Yayın portları: 1-65535; 22, 2200, 6443, 9100, 9750, 10250-10256, 30000-32767,
-        51820-51821 hariç; her port bir kez.'
+      description: 'Replaces the whole list; `[]` removes all. The source range and endpoint stay the same. Connects a container environment to one subnet of your
+        private network (VPC) in tr-ist-1. The environment gets a fixed **VPC source range** (/28, 16 addresses) inside the subnet: connections from your containers
+        to servers in the VPC come from this range, and it does not change when nodes are replaced, scaled, the plan changes or a node is renewed automatically, so
+        allow it once in your server firewalls. The first address of the range is the **VPC endpoint**: servers in the VPC reach the services you publish (`expose`,
+        at most 20) at `endpoint:port` (TCP to the service''s internal address `<service>.<namespace>.svc.cluster.local:80`); it is never reachable from the internet.
+        **Price:** node environments (Mini / Small / Starter / Standard / Pro) free. **Serverless** environments: a connector dedicated to the environment runs, so
+        the connection is charged (`pricing`: 2.99 EUR/month, list 3.49, billed hourly from the prepaid balance while attached, at least 1 hour per attachment; the
+        charge stops on detach). Attaching a serverless environment needs `"confirm": true`; without it the answer is 422 `confirm_required` with `details.pricing`.
+        VPC traffic is free, no gateway needed. The subnet must be /26 or larger; an environment joins one VPC subnet at a time. A refusal answers 422 `tool_action_failed`
+        with a message in the account language: already attached to another subnet (detach first), subnet smaller than /26, no free /28 block in the subnet, invalid
+        publish list or unknown service, the previous attachment is still being removed. Published ports: 1-65535 except 22, 2200, 6443, 9100, 9750, 10250-10256,
+        30000-32767, 51820-51821; each port once.'
+      x-description-tr: 'Listenin tamamını değiştirir; `[]` hepsini kaldırır. Kaynak aralığı ve uç nokta değişmez. Bir Kapsayıcı ortamını tr-ist-1''deki özel ağınızın
+        (VPC) bir subnetine bağlar. Ortama subnet içinde sabit bir **VPC kaynak aralığı** (/28, 16 adres) ayrılır: kapsayıcılarınızdan VPC''deki sunuculara giden
+        bağlantılar bu aralıktan gelir ve düğüm değişimi, ölçekleme, paket değişikliği ya da otomatik düğüm yenilemede DEĞİŞMEZ; sunucu güvenlik duvarınızda bir kez
+        izin vermeniz yeter. Aralığın ilk adresi **VPC uç noktasıdır**: VPC''deki sunucular yayınladığınız servislere (`expose`, en çok 20) `uç_nokta:port` ile ulaşır
+        (servisin iç adresine `<servis>.<ns>.svc.cluster.local:80` TCP); internetten erişilemez. **Ücret:** düğümlü ortamlarda (Mini / Küçük / Başlangıç / Standart
+        / Pro) ücretsiz. **Sunucusuz** ortamlarda ortama ayrılmış bir bağlayıcı çalıştığı için bağlantı ücretlidir (`pricing`: 2,99 €/ay, liste 3,49; bağlıyken saatlik,
+        ön ödemeli bakiyeden, her bağlamada en az 1 saat; bağ kaldırılınca durur). Sunucusuz ortamı bağlamak `"confirm": true` ister; verilmezse 422 `confirm_required`
+        + `details.pricing` döner. VPC trafiği ücretsiz, kapı gerekmez. Subnet en az /26 olmalı; bir ortam aynı anda tek VPC subnetine bağlanır. Ret, hesap dilinde
+        mesajla 422 `tool_action_failed` döner: başka subnete zaten bağlı (önce kaldırın), subnet /26''dan küçük, subnette boş /28 blok yok, yayın listesi geçersiz
+        ya da servis yok, önceki bağ hâlâ kaldırılıyor. Yayın portları: 1-65535; 22, 2200, 6443, 9100, 9750, 10250-10256, 30000-32767, 51820-51821 hariç; her port
+        bir kez.'
       parameters:
       - name: id
         in: path
@@ -13446,9 +13466,6 @@ paths:
           $ref: '#/components/responses/Conflict'
         '422':
           $ref: '#/components/responses/Validation'
-        '501':
-          description: not_supported (Serverless)
-          content: *id071
       requestBody:
         required: true
         content:
@@ -13470,24 +13487,28 @@ paths:
       x-summary-tr: Ortamın VPC bağını kaldır
       x-scope: services_write
       description: 'Needs `"confirm": true`. Answers `state: detaching`; GET returns `attached: false` / `off` when done (about a minute). The /28 block is released.
-        Connects a **node** container environment (Mini / Small / Starter / Standard / Pro) to one subnet of your private network (VPC) in tr-ist-1. The environment
-        gets a fixed **VPC source range** (/28, 16 addresses) inside the subnet: connections from your containers to servers in the VPC come from this range, and
-        it does not change when nodes are replaced, scaled, the plan changes or a node is renewed automatically, so allow it once in your server firewalls. The first
-        address of the range is the **VPC endpoint**: servers in the VPC reach the services you publish (`expose`, at most 20) at `endpoint:port` (TCP to the service''s
-        internal address `<service>.<namespace>.svc.cluster.local:80`); it is never reachable from the internet. Free (no gateway needed, VPC traffic is free). The
-        subnet must be /26 or larger; an environment joins one VPC subnet at a time. Serverless environments answer 501 `not_supported` (coming later). A refusal
+        Connects a container environment to one subnet of your private network (VPC) in tr-ist-1. The environment gets a fixed **VPC source range** (/28, 16 addresses)
+        inside the subnet: connections from your containers to servers in the VPC come from this range, and it does not change when nodes are replaced, scaled, the
+        plan changes or a node is renewed automatically, so allow it once in your server firewalls. The first address of the range is the **VPC endpoint**: servers
+        in the VPC reach the services you publish (`expose`, at most 20) at `endpoint:port` (TCP to the service''s internal address `<service>.<namespace>.svc.cluster.local:80`);
+        it is never reachable from the internet. **Price:** node environments (Mini / Small / Starter / Standard / Pro) free. **Serverless** environments: a connector
+        dedicated to the environment runs, so the connection is charged (`pricing`: 2.99 EUR/month, list 3.49, billed hourly from the prepaid balance while attached,
+        at least 1 hour per attachment; the charge stops on detach). Attaching a serverless environment needs `"confirm": true`; without it the answer is 422 `confirm_required`
+        with `details.pricing`. VPC traffic is free, no gateway needed. The subnet must be /26 or larger; an environment joins one VPC subnet at a time. A refusal
         answers 422 `tool_action_failed` with a message in the account language: already attached to another subnet (detach first), subnet smaller than /26, no free
         /28 block in the subnet, invalid publish list or unknown service, the previous attachment is still being removed. Published ports: 1-65535 except 22, 2200,
         6443, 9100, 9750, 10250-10256, 30000-32767, 51820-51821; each port once.'
       x-description-tr: '`"confirm": true` gerekir. `state: detaching` döner; bitince GET `attached: false` / `off` gösterir (yaklaşık bir dakika). /28 blok serbest
-        kalır. **Düğümlü** bir Kapsayıcı ortamını (Mini / Küçük / Başlangıç / Standart / Pro) tr-ist-1''deki özel ağınızın (VPC) bir subnetine bağlar. Ortama subnet
-        içinde sabit bir **VPC kaynak aralığı** (/28, 16 adres) ayrılır: kapsayıcılarınızdan VPC''deki sunuculara giden bağlantılar bu aralıktan gelir ve düğüm değişimi,
-        ölçekleme, paket değişikliği ya da otomatik düğüm yenilemede DEĞİŞMEZ; sunucu güvenlik duvarınızda bir kez izin vermeniz yeter. Aralığın ilk adresi **VPC
-        uç noktasıdır**: VPC''deki sunucular yayınladığınız servislere (`expose`, en çok 20) `uç_nokta:port` ile ulaşır (servisin iç adresine `<servis>.<ns>.svc.cluster.local:80`
-        TCP); internetten erişilemez. Ücretsizdir (kapı gerekmez, VPC trafiği ücretsiz). Subnet en az /26 olmalı; bir ortam aynı anda tek VPC subnetine bağlanır.
-        Sunucusuz ortamlar 501 `not_supported` döner (yakında). Ret, hesap dilinde mesajla 422 `tool_action_failed` döner: başka subnete zaten bağlı (önce kaldırın),
-        subnet /26''dan küçük, subnette boş /28 blok yok, yayın listesi geçersiz ya da servis yok, önceki bağ hâlâ kaldırılıyor. Yayın portları: 1-65535; 22, 2200,
-        6443, 9100, 9750, 10250-10256, 30000-32767, 51820-51821 hariç; her port bir kez.'
+        kalır. Bir Kapsayıcı ortamını tr-ist-1''deki özel ağınızın (VPC) bir subnetine bağlar. Ortama subnet içinde sabit bir **VPC kaynak aralığı** (/28, 16 adres)
+        ayrılır: kapsayıcılarınızdan VPC''deki sunuculara giden bağlantılar bu aralıktan gelir ve düğüm değişimi, ölçekleme, paket değişikliği ya da otomatik düğüm
+        yenilemede DEĞİŞMEZ; sunucu güvenlik duvarınızda bir kez izin vermeniz yeter. Aralığın ilk adresi **VPC uç noktasıdır**: VPC''deki sunucular yayınladığınız
+        servislere (`expose`, en çok 20) `uç_nokta:port` ile ulaşır (servisin iç adresine `<servis>.<ns>.svc.cluster.local:80` TCP); internetten erişilemez. **Ücret:**
+        düğümlü ortamlarda (Mini / Küçük / Başlangıç / Standart / Pro) ücretsiz. **Sunucusuz** ortamlarda ortama ayrılmış bir bağlayıcı çalıştığı için bağlantı ücretlidir
+        (`pricing`: 2,99 €/ay, liste 3,49; bağlıyken saatlik, ön ödemeli bakiyeden, her bağlamada en az 1 saat; bağ kaldırılınca durur). Sunucusuz ortamı bağlamak
+        `"confirm": true` ister; verilmezse 422 `confirm_required` + `details.pricing` döner. VPC trafiği ücretsiz, kapı gerekmez. Subnet en az /26 olmalı; bir ortam
+        aynı anda tek VPC subnetine bağlanır. Ret, hesap dilinde mesajla 422 `tool_action_failed` döner: başka subnete zaten bağlı (önce kaldırın), subnet /26''dan
+        küçük, subnette boş /28 blok yok, yayın listesi geçersiz ya da servis yok, önceki bağ hâlâ kaldırılıyor. Yayın portları: 1-65535; 22, 2200, 6443, 9100, 9750,
+        10250-10256, 30000-32767, 51820-51821 hariç; her port bir kez.'
       parameters:
       - name: id
         in: path
@@ -13522,9 +13543,6 @@ paths:
           $ref: '#/components/responses/Conflict'
         '422':
           $ref: '#/components/responses/Validation'
-        '501':
-          description: not_supported (Serverless)
-          content: *id071
       requestBody:
         required: true
         content:
@@ -29498,7 +29516,7 @@ components:
           type: boolean
         supported:
           type: boolean
-          description: false on Serverless
+          description: false only when the feature is not open for the account
         mode:
           type: string
           enum:
@@ -29558,6 +29576,8 @@ components:
           format: date-time
         error:
           type: string
+        pricing:
+          $ref: '#/components/schemas/ContainerVPCPricing'
     ServerAgent:
       type: object
       properties:
@@ -29886,3 +29906,38 @@ components:
           type: string
           format: date-time
           nullable: true
+    ContainerVPCPricing:
+      type: object
+      description: Price of the VPC connection of this environment.
+      x-description-tr: Bu ortamın VPC bağlantısının ücreti.
+      properties:
+        charged:
+          type: boolean
+          description: true on serverless environments; node environments are free (false)
+        billing:
+          type: string
+          enum:
+          - free
+          - prepaid_hourly
+        monthly_eur:
+          type: number
+          example: 2.99
+        list_monthly_eur:
+          type: number
+          example: 3.49
+          description: list price (shown struck through)
+        hourly_eur:
+          type: number
+          example: 0.0044494
+        minimum_hours:
+          type: integer
+          example: 1
+          description: every attachment is billed at least this many hours
+        monthly_text:
+          type: string
+          example: 166,45 TL (2,99 €)
+          description: in the account currency with EUR in brackets
+        hourly_text:
+          type: string
+        list_monthly_text:
+          type: string

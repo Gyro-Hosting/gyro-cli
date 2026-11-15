@@ -4,11 +4,13 @@ Ortamı bir VPC subnetine bağla
 
 ### Synopsis
 
-Düğümlü bir Kapsayıcı ortamını (Mini, Küçük, Başlangıç, Standart, Pro) tr-ist-1'deki özel ağınızın (VPC) bir
-subnetine bağlar. Ortama subnet içinde sabit bir VPC kaynak aralığı (/28) ayrılır: kapsayıcılarınızdan VPC
-sunucularına giden bağlantılar buradan gelir; düğüm değişimi, ölçekleme ya da yenilemede değişmez. İlk adres VPC
-uç noktasıdır: VPC sunucuları yayınladığınız servislere (--expose servis:port) uç_nokta:port ile ulaşır.
-İnternetten erişilemez. Ücretsizdir. Subnet en az /26 olmalı. Sunucusuz: yakında.
+Bir Kapsayıcı ortamını tr-ist-1'deki özel ağınızın (VPC) bir subnetine bağlar. Ortama subnet içinde sabit bir
+VPC kaynak aralığı (/28) ayrılır: kapsayıcılarınızdan VPC sunucularına giden bağlantılar buradan gelir; düğüm
+değişimi, ölçekleme ya da yenilemede değişmez. İlk adres VPC uç noktasıdır: VPC sunucuları yayınladığınız
+servislere (--expose servis:port) uç_nokta:port ile ulaşır. İnternetten erişilemez. Subnet en az /26 olmalı.
+Ücret: düğümlü ortamlarda (Mini, Küçük, Başlangıç, Standart, Pro) ücretsiz. Sunucusuz ortamlarda ortama ayrılmış
+bir bağlayıcı çalıştığı için bağlantı ücretlidir (2,99 €/ay, bağlıyken saatlik, ön ödemeli bakiyeden); attach
+fiyatı TL ve € olarak gösterir ve onay ister (--yes onaylar).
 
 ```
 gyro container vpc attach <ENVIRONMENT_ID> --subnet <SUBNET_ID> [--vpc <VPC_ID>] [--expose service:port ...] [flags]
@@ -52,5 +54,5 @@ gyro container vpc attach <ENVIRONMENT_ID> --subnet <SUBNET_ID> [--vpc <VPC_ID>]
 
 ### SEE ALSO
 
-* [gyro container vpc](gyro_container_vpc.md)	 - Düğümlü ortamın özel ağı (VPC): sabit kaynak aralığı, VPC uç noktası
+* [gyro container vpc](gyro_container_vpc.md)	 - Kapsayıcı ortamının özel ağı (VPC): sabit kaynak aralığı, VPC uç noktası
 

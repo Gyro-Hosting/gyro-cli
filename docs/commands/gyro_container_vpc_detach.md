@@ -4,11 +4,14 @@ Detach the environment from its VPC (the /28 source range is released)
 
 ### Synopsis
 
-Connects a node container environment (Mini, Small, Starter, Standard, Pro) to one subnet of your private network
-(VPC) in tr-ist-1. The environment gets a fixed VPC source range (/28) inside the subnet: connections from your
-containers to the VPC servers come from it and it does not change when nodes are replaced, scaled or renewed.
-The first address is the VPC endpoint: VPC servers reach the services you publish (--expose service:port) at
-endpoint:port. Never reachable from the internet. Free. The subnet must be /26 or larger. Serverless: not yet.
+Connects a container environment to one subnet of your private network (VPC) in tr-ist-1. The environment
+gets a fixed VPC source range (/28) inside the subnet: connections from your containers to the VPC servers come
+from it and it does not change when nodes are replaced, scaled or renewed. The first address is the VPC endpoint:
+VPC servers reach the services you publish (--expose service:port) at endpoint:port. Never reachable from the
+internet. The subnet must be /26 or larger.
+Price: node environments (Mini, Small, Starter, Standard, Pro) free. Serverless environments: a connector dedicated
+to the environment runs, so the connection is charged (2.99 EUR/month, billed hourly from the prepaid balance while
+attached); attach shows the price in your currency and asks for confirmation (--yes accepts it).
 
 ```
 gyro container vpc detach <ENVIRONMENT_ID> [flags]
@@ -49,5 +52,5 @@ gyro container vpc detach <ENVIRONMENT_ID> [flags]
 
 ### SEE ALSO
 
-* [gyro container vpc](gyro_container_vpc.md)	 - Private network (VPC) of a node environment: fixed source range, VPC endpoint
+* [gyro container vpc](gyro_container_vpc.md)	 - Private network (VPC) of a container environment: fixed source range, VPC endpoint
 
