@@ -345,9 +345,10 @@ func genCommand(a *App, op *spec.Op) *cobra.Command {
 			_ = cmd.RegisterFlagCompletionFunc(fn, fixedCompletion(f.Enum...))
 		}
 	}
-	// friendlier flag names: --count = batch size (2.21.0), --target = Dockerfile stage of a pipeline (2.28.0, body build_target)
+	// friendlier flag names: --count = batch size (2.21.0), --target = Dockerfile stage of a pipeline (2.28.0, body build_target),
+	// --source = port forward source allow list (2.34.0, body source_cidrs)
 	alias := map[string]string{}
-	for short, field := range map[string]string{"count": "b:quantity", "target": "b:build_target"} {
+	for short, field := range map[string]string{"count": "b:quantity", "target": "b:build_target", "source": "b:source_cidrs"} {
 		if fn, ok := o.flagName[field]; ok && !used[short] {
 			alias[short] = fn
 		}

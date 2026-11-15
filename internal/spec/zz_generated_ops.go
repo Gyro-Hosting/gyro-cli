@@ -3,7 +3,7 @@
 package spec
 
 // APIVersion is info.version of the spec this table was generated from.
-const APIVersion = "2.33.0"
+const APIVersion = "2.34.0"
 
 // Ops lists every API operation.
 var Ops = []Op{
@@ -1232,6 +1232,57 @@ var Ops = []Op{
 		},
 		Body: []Field{
 			{Name: "confirm", Type: "boolean", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
+		},
+	},
+	{ID: "getContainerVpc", Method: "GET", Path: "/cloud/containers/{id}/vpc", Tag: "Containers",
+		Summary: "Get the environment's VPC attachment", SummaryTR: "Ortamın VPC bağını getir",
+		Desc: "Connects a **node** container environment (Mini / Small / Starter / Standard / Pro) to one subnet of your private network (VPC) in tr-ist-1. The environment gets a fixed **VPC source range** (/28, 16 addresses) inside the subnet: connections from your containers to servers in the VPC come from this range, and it does not change when nodes are replaced, scaled, the plan changes or a node is renewed automatically, so allow it once in your server firewalls. The first address of the range is the **VPC endpoint**: servers in the VPC reach the services you publish (`expose`, at most 20) at `endpoint:port` (TCP to the service's internal address `<service>.<namespace>.svc.cluster.local:80`); it is never reachable from the internet. Free (no gateway needed, VPC traffic is free). The subnet must be /26 or larger; an environment joins one VPC subnet at a time. Serverless environments answer 501 `not_supported` (coming later). Errors: `already_attached` 409 (another subnet: detach first), `subnet_too_small` 422, `subnet_full` 409 (no free /28 block), `invalid_expose` 422, `busy` 409 (the previous attachment is still being removed), `not_available` 403. Published ports: 1-65535 except 22, 2200, 6443, 9100, 9750, 10250-10256, 30000-32767, 51820-51821; each port once.", DescTR: "**Düğümlü** bir Kapsayıcı ortamını (Mini / Küçük / Başlangıç / Standart / Pro) tr-ist-1'deki özel ağınızın (VPC) bir subnetine bağlar. Ortama subnet içinde sabit bir **VPC kaynak aralığı** (/28, 16 adres) ayrılır: kapsayıcılarınızdan VPC'deki sunuculara giden bağlantılar bu aralıktan gelir ve düğüm değişimi, ölçekleme, paket değişikliği ya da otomatik düğüm yenilemede DEĞİŞMEZ; sunucu güvenlik duvarınızda bir kez izin vermeniz yeter. Aralığın ilk adresi **VPC uç noktasıdır**: VPC'deki sunucular yayınladığınız servislere (`expose`, en çok 20) `uç_nokta:port` ile ulaşır (servisin iç adresine `<servis>.<ns>.svc.cluster.local:80` TCP); internetten erişilemez. Ücretsizdir (kapı gerekmez, VPC trafiği ücretsiz). Subnet en az /26 olmalı; bir ortam aynı anda tek VPC subnetine bağlanır. Sunucusuz ortamlar 501 `not_supported` döner (yakında). Hatalar: `already_attached` 409 (başka subnet: önce kaldırın), `subnet_too_small` 422, `subnet_full` 409 (boş /28 blok yok), `invalid_expose` 422, `busy` 409 (önceki bağ kaldırılıyor), `not_available` 403. Yayın portları: 1-65535; 22, 2200, 6443, 9100, 9750, 10250-10256, 30000-32767, 51820-51821 hariç; her port bir kez.",
+		Scope: "services_read", Command: []string{"container", "vpc", "get"},
+		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
+		Columns: []string{"attached", "supported", "mode", "state", "vpc_id", "subnet_id", "subnet_name", "vpc_cidr", "subnet_cidr", "subnet_gateway", "source_range", "endpoint_ip", "attached_at", "error"},
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Container environment (service) id", DescTR: ""},
+		},
+	},
+	{ID: "attachContainerVpc", Method: "PUT", Path: "/cloud/containers/{id}/vpc", Tag: "Containers",
+		Summary: "Attach the environment to a VPC subnet", SummaryTR: "Ortamı bir VPC subnetine bağla",
+		Desc: "Answers at once with `state: attaching`; the nodes join the subnet in about a minute (`ready`). Repeating with the same subnet only replaces `expose` when given. Connects a **node** container environment (Mini / Small / Starter / Standard / Pro) to one subnet of your private network (VPC) in tr-ist-1. The environment gets a fixed **VPC source range** (/28, 16 addresses) inside the subnet: connections from your containers to servers in the VPC come from this range, and it does not change when nodes are replaced, scaled, the plan changes or a node is renewed automatically, so allow it once in your server firewalls. The first address of the range is the **VPC endpoint**: servers in the VPC reach the services you publish (`expose`, at most 20) at `endpoint:port` (TCP to the service's internal address `<service>.<namespace>.svc.cluster.local:80`); it is never reachable from the internet. Free (no gateway needed, VPC traffic is free). The subnet must be /26 or larger; an environment joins one VPC subnet at a time. Serverless environments answer 501 `not_supported` (coming later). Errors: `already_attached` 409 (another subnet: detach first), `subnet_too_small` 422, `subnet_full` 409 (no free /28 block), `invalid_expose` 422, `busy` 409 (the previous attachment is still being removed), `not_available` 403. Published ports: 1-65535 except 22, 2200, 6443, 9100, 9750, 10250-10256, 30000-32767, 51820-51821; each port once.", DescTR: "Hemen `state: attaching` ile döner; düğümler yaklaşık bir dakikada subnete katılır (`ready`). Aynı subnetle tekrar çağrı yalnız verilen `expose`'u değiştirir. **Düğümlü** bir Kapsayıcı ortamını (Mini / Küçük / Başlangıç / Standart / Pro) tr-ist-1'deki özel ağınızın (VPC) bir subnetine bağlar. Ortama subnet içinde sabit bir **VPC kaynak aralığı** (/28, 16 adres) ayrılır: kapsayıcılarınızdan VPC'deki sunuculara giden bağlantılar bu aralıktan gelir ve düğüm değişimi, ölçekleme, paket değişikliği ya da otomatik düğüm yenilemede DEĞİŞMEZ; sunucu güvenlik duvarınızda bir kez izin vermeniz yeter. Aralığın ilk adresi **VPC uç noktasıdır**: VPC'deki sunucular yayınladığınız servislere (`expose`, en çok 20) `uç_nokta:port` ile ulaşır (servisin iç adresine `<servis>.<ns>.svc.cluster.local:80` TCP); internetten erişilemez. Ücretsizdir (kapı gerekmez, VPC trafiği ücretsiz). Subnet en az /26 olmalı; bir ortam aynı anda tek VPC subnetine bağlanır. Sunucusuz ortamlar 501 `not_supported` döner (yakında). Hatalar: `already_attached` 409 (başka subnet: önce kaldırın), `subnet_too_small` 422, `subnet_full` 409 (boş /28 blok yok), `invalid_expose` 422, `busy` 409 (önceki bağ kaldırılıyor), `not_available` 403. Yayın portları: 1-65535; 22, 2200, 6443, 9100, 9750, 10250-10256, 30000-32767, 51820-51821 hariç; her port bir kez.",
+		Scope: "services_write", Command: []string{"container", "vpc", "attach"},
+		HasBody: true, BodyRequired: true, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
+		Columns: []string{"status", "message"},
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Container environment (service) id", DescTR: ""},
+		},
+		Body: []Field{
+			{Name: "vpc_id", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "VPC id (GET /cloud/vpcs); optional, checked when given", DescTR: ""},
+			{Name: "subnet_id", Type: "string", Items: "", Enum: nil, Default: "", Required: true, Desc: "", DescTR: ""},
+			{Name: "expose", Type: "array", Items: "object", Enum: nil, Default: "", Required: false, Desc: "services published at the VPC endpoint", DescTR: ""},
+		},
+	},
+	{ID: "setContainerVpcExpose", Method: "PATCH", Path: "/cloud/containers/{id}/vpc", Tag: "Containers",
+		Summary: "Change the published services", SummaryTR: "Yayınlanan servisleri değiştir",
+		Desc: "Replaces the whole list; `[]` removes all. The source range and endpoint stay the same. Connects a **node** container environment (Mini / Small / Starter / Standard / Pro) to one subnet of your private network (VPC) in tr-ist-1. The environment gets a fixed **VPC source range** (/28, 16 addresses) inside the subnet: connections from your containers to servers in the VPC come from this range, and it does not change when nodes are replaced, scaled, the plan changes or a node is renewed automatically, so allow it once in your server firewalls. The first address of the range is the **VPC endpoint**: servers in the VPC reach the services you publish (`expose`, at most 20) at `endpoint:port` (TCP to the service's internal address `<service>.<namespace>.svc.cluster.local:80`); it is never reachable from the internet. Free (no gateway needed, VPC traffic is free). The subnet must be /26 or larger; an environment joins one VPC subnet at a time. Serverless environments answer 501 `not_supported` (coming later). Errors: `already_attached` 409 (another subnet: detach first), `subnet_too_small` 422, `subnet_full` 409 (no free /28 block), `invalid_expose` 422, `busy` 409 (the previous attachment is still being removed), `not_available` 403. Published ports: 1-65535 except 22, 2200, 6443, 9100, 9750, 10250-10256, 30000-32767, 51820-51821; each port once.", DescTR: "Listenin tamamını değiştirir; `[]` hepsini kaldırır. Kaynak aralığı ve uç nokta değişmez. **Düğümlü** bir Kapsayıcı ortamını (Mini / Küçük / Başlangıç / Standart / Pro) tr-ist-1'deki özel ağınızın (VPC) bir subnetine bağlar. Ortama subnet içinde sabit bir **VPC kaynak aralığı** (/28, 16 adres) ayrılır: kapsayıcılarınızdan VPC'deki sunuculara giden bağlantılar bu aralıktan gelir ve düğüm değişimi, ölçekleme, paket değişikliği ya da otomatik düğüm yenilemede DEĞİŞMEZ; sunucu güvenlik duvarınızda bir kez izin vermeniz yeter. Aralığın ilk adresi **VPC uç noktasıdır**: VPC'deki sunucular yayınladığınız servislere (`expose`, en çok 20) `uç_nokta:port` ile ulaşır (servisin iç adresine `<servis>.<ns>.svc.cluster.local:80` TCP); internetten erişilemez. Ücretsizdir (kapı gerekmez, VPC trafiği ücretsiz). Subnet en az /26 olmalı; bir ortam aynı anda tek VPC subnetine bağlanır. Sunucusuz ortamlar 501 `not_supported` döner (yakında). Hatalar: `already_attached` 409 (başka subnet: önce kaldırın), `subnet_too_small` 422, `subnet_full` 409 (boş /28 blok yok), `invalid_expose` 422, `busy` 409 (önceki bağ kaldırılıyor), `not_available` 403. Yayın portları: 1-65535; 22, 2200, 6443, 9100, 9750, 10250-10256, 30000-32767, 51820-51821 hariç; her port bir kez.",
+		Scope: "services_write", Command: []string{"container", "vpc", "expose"},
+		HasBody: true, BodyRequired: true, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
+		Columns: []string{"status", "message"},
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Container environment (service) id", DescTR: ""},
+		},
+		Body: []Field{
+			{Name: "expose", Type: "array", Items: "object", Enum: nil, Default: "", Required: true, Desc: "services published at the VPC endpoint", DescTR: ""},
+		},
+	},
+	{ID: "detachContainerVpc", Method: "DELETE", Path: "/cloud/containers/{id}/vpc", Tag: "Containers",
+		Summary: "Detach the environment from its VPC", SummaryTR: "Ortamın VPC bağını kaldır",
+		Desc: "Needs `\"confirm\": true`. Answers `state: detaching`; GET returns `attached: false` / `off` when done (about a minute). The /28 block is released. Connects a **node** container environment (Mini / Small / Starter / Standard / Pro) to one subnet of your private network (VPC) in tr-ist-1. The environment gets a fixed **VPC source range** (/28, 16 addresses) inside the subnet: connections from your containers to servers in the VPC come from this range, and it does not change when nodes are replaced, scaled, the plan changes or a node is renewed automatically, so allow it once in your server firewalls. The first address of the range is the **VPC endpoint**: servers in the VPC reach the services you publish (`expose`, at most 20) at `endpoint:port` (TCP to the service's internal address `<service>.<namespace>.svc.cluster.local:80`); it is never reachable from the internet. Free (no gateway needed, VPC traffic is free). The subnet must be /26 or larger; an environment joins one VPC subnet at a time. Serverless environments answer 501 `not_supported` (coming later). Errors: `already_attached` 409 (another subnet: detach first), `subnet_too_small` 422, `subnet_full` 409 (no free /28 block), `invalid_expose` 422, `busy` 409 (the previous attachment is still being removed), `not_available` 403. Published ports: 1-65535 except 22, 2200, 6443, 9100, 9750, 10250-10256, 30000-32767, 51820-51821; each port once.", DescTR: "`\"confirm\": true` gerekir. `state: detaching` döner; bitince GET `attached: false` / `off` gösterir (yaklaşık bir dakika). /28 blok serbest kalır. **Düğümlü** bir Kapsayıcı ortamını (Mini / Küçük / Başlangıç / Standart / Pro) tr-ist-1'deki özel ağınızın (VPC) bir subnetine bağlar. Ortama subnet içinde sabit bir **VPC kaynak aralığı** (/28, 16 adres) ayrılır: kapsayıcılarınızdan VPC'deki sunuculara giden bağlantılar bu aralıktan gelir ve düğüm değişimi, ölçekleme, paket değişikliği ya da otomatik düğüm yenilemede DEĞİŞMEZ; sunucu güvenlik duvarınızda bir kez izin vermeniz yeter. Aralığın ilk adresi **VPC uç noktasıdır**: VPC'deki sunucular yayınladığınız servislere (`expose`, en çok 20) `uç_nokta:port` ile ulaşır (servisin iç adresine `<servis>.<ns>.svc.cluster.local:80` TCP); internetten erişilemez. Ücretsizdir (kapı gerekmez, VPC trafiği ücretsiz). Subnet en az /26 olmalı; bir ortam aynı anda tek VPC subnetine bağlanır. Sunucusuz ortamlar 501 `not_supported` döner (yakında). Hatalar: `already_attached` 409 (başka subnet: önce kaldırın), `subnet_too_small` 422, `subnet_full` 409 (boş /28 blok yok), `invalid_expose` 422, `busy` 409 (önceki bağ kaldırılıyor), `not_available` 403. Yayın portları: 1-65535; 22, 2200, 6443, 9100, 9750, 10250-10256, 30000-32767, 51820-51821 hariç; her port bir kez.",
+		Scope: "services_write", Command: []string{"container", "vpc", "detach"},
+		HasBody: true, BodyRequired: true, ListResponse: false, Paginated: false, Confirm: true, Money: false, Hidden: false,
+		Columns: []string{"status", "message"},
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Container environment (service) id", DescTR: ""},
+		},
+		Body: []Field{
+			{Name: "confirm", Type: "boolean", Items: "", Enum: nil, Default: "", Required: true, Desc: "", DescTR: ""},
 		},
 	},
 	{ID: "acmeChallengeStatus", Method: "GET", Path: "/cloud/dns/acme-challenge", Tag: "Managed DNS",
@@ -4416,7 +4467,7 @@ var Ops = []Op{
 	},
 	{ID: "createVpcPortForward", Method: "POST", Path: "/cloud/vpcs/{vpc_id}/port-forwards", Tag: "Private networks",
 		Summary: "Forward a public port of the gateway", SummaryTR: "Kapının dış portunu yönlendir",
-		Desc: "public_ip:public_port of the gateway -> target_ip:target_port inside the VPC. The gateway must be on (409 `gateway_disabled`); one forward per protocol + public port; at most 20.", DescTR: "Kapının public_ip:public_port adresi -> VPC içinde target_ip:target_port. Kapı açık olmalı (409 `gateway_disabled`); protokol + dış port başına bir yönlendirme; en çok 20.",
+		Desc: "public_ip:public_port of the gateway -> target_ip:target_port inside the VPC. The gateway must be on (409 `gateway_disabled`); one forward per protocol + public port; at most 20. `source_cidrs`: only these public IPv4 networks may use the forward (a single IP is /32; write the network address, e.g. 198.51.100.0/24); at most 20; empty list or left out = everyone. Private, reserved and our own platform ranges are refused (422 `invalid_source`).", DescTR: "Kapının public_ip:public_port adresi -> VPC içinde target_ip:target_port. Kapı açık olmalı (409 `gateway_disabled`); protokol + dış port başına bir yönlendirme; en çok 20. `source_cidrs`: yönlendirmeyi yalnız bu public IPv4 ağları kullanabilir (tek IP /32; ağ adresi yazılır, ör. 198.51.100.0/24); en çok 20; boş liste ya da verilmezse herkes. Özel, ayrılmış ve platform aralıkları reddedilir (422 `invalid_source`).",
 		Scope: "cloud_write", Command: []string{"vpc", "port-forward", "add"},
 		HasBody: true, BodyRequired: true, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
 		Columns: []string{"id", "protocol", "public_port", "target_ip", "target_port", "created_at"},
@@ -4428,6 +4479,21 @@ var Ops = []Op{
 			{Name: "public_port", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "", DescTR: ""},
 			{Name: "target_ip", Type: "string", Items: "", Enum: nil, Default: "", Required: true, Desc: "", DescTR: ""},
 			{Name: "target_port", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "", DescTR: ""},
+			{Name: "source_cidrs", Type: "array", Items: "string", Enum: nil, Default: "", Required: false, Desc: "allowed source networks (public IPv4 CIDR); empty = everyone", DescTR: ""},
+		},
+	},
+	{ID: "updateVpcPortForward", Method: "PATCH", Path: "/cloud/vpcs/{vpc_id}/port-forwards/{pf_id}", Tag: "Private networks",
+		Summary: "Change who may use a port forward", SummaryTR: "Port yönlendirmeyi kimin kullanabileceğini değiştir",
+		Desc: "`source_cidrs`: only these public IPv4 networks may use the forward (a single IP is /32; write the network address, e.g. 198.51.100.0/24); at most 20; empty list or left out = everyone. Private, reserved and our own platform ranges are refused (422 `invalid_source`). The list replaces the old one; `[]` opens it to everyone. Takes effect on the gateway within seconds.", DescTR: "`source_cidrs`: yönlendirmeyi yalnız bu public IPv4 ağları kullanabilir (tek IP /32; ağ adresi yazılır, ör. 198.51.100.0/24); en çok 20; boş liste ya da verilmezse herkes. Özel, ayrılmış ve platform aralıkları reddedilir (422 `invalid_source`). Liste eskisinin yerine geçer; `[]` herkese açar. Kapıda saniyeler içinde uygulanır.",
+		Scope: "cloud_write", Command: []string{"vpc", "port-forward", "update"},
+		HasBody: true, BodyRequired: true, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
+		Columns: []string{"id", "protocol", "public_port", "target_ip", "target_port", "created_at"},
+		Params: []Param{
+			{Name: "vpc_id", In: "path", Type: "string", Items: "", Enum: nil, Default: "", Required: true, Desc: "VPC id (from GET /cloud/vpcs)", DescTR: ""},
+			{Name: "pf_id", In: "path", Type: "string", Items: "", Enum: nil, Default: "", Required: true, Desc: "Port forward id", DescTR: ""},
+		},
+		Body: []Field{
+			{Name: "source_cidrs", Type: "array", Items: "string", Enum: nil, Default: "", Required: true, Desc: "allowed source networks (public IPv4 CIDR); empty = everyone", DescTR: ""},
 		},
 	},
 	{ID: "deleteVpcPortForward", Method: "DELETE", Path: "/cloud/vpcs/{vpc_id}/port-forwards/{pf_id}", Tag: "Private networks",

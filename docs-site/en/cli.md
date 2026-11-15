@@ -51,6 +51,7 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro affiliate payment-method set` | Save affiliate payout method | `PUT /affiliate/payment-method` |
 | `gyro affiliate withdraw` | Withdraw affiliate | `POST /affiliate/withdraw` |
 | `gyro api request DELETE /auth/session` | Revoke the key in use (sign out) | `DELETE /auth/session` |
+| `gyro api request DELETE /cloud/containers/{id}/vpc` | Detach the environment from its VPC | `DELETE /cloud/containers/{id}/vpc` |
 | `gyro api request DELETE /cloud/mail/{id}/aliases/{aid}` | DELETE aliases:delete (GyroMail) | `DELETE /cloud/mail/{id}/aliases/{aid}` |
 | `gyro api request DELETE /cloud/mail/{id}/autoresponders/{local}` | DELETE autoresponder:delete (GyroMail) | `DELETE /cloud/mail/{id}/autoresponders/{local}` |
 | `gyro api request DELETE /cloud/mail/{id}/mailboxes/{local}` | DELETE mailboxes:delete (GyroMail) | `DELETE /cloud/mail/{id}/mailboxes/{local}` |
@@ -65,6 +66,7 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro api request GET /cloud/billing/usage` | Hour-by-hour usage ledger (or daily/monthly totals). Times are Europe/Istanbul. | `GET /cloud/billing/usage` |
 | `gyro api request GET /cloud/containers/{id}/logs` | Search the environment's logs | `GET /cloud/containers/{id}/logs` |
 | `gyro api request GET /cloud/containers/{id}/services/{name}/logs` | Service logs | `GET /cloud/containers/{id}/services/{name}/logs` |
+| `gyro api request GET /cloud/containers/{id}/vpc` | Get the environment's VPC attachment | `GET /cloud/containers/{id}/vpc` |
 | `gyro api request GET /cloud/mail/{id}/aliases` | GET aliases (GyroMail) | `GET /cloud/mail/{id}/aliases` |
 | `gyro api request GET /cloud/mail/{id}/autoresponders` | GET autoresponder (GyroMail) | `GET /cloud/mail/{id}/autoresponders` |
 | `gyro api request GET /cloud/mail/{id}/catch-all` | GET catch-all (GyroMail) | `GET /cloud/mail/{id}/catch-all` |
@@ -74,8 +76,10 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro api request GET /cloud/storage` | List storage services | `GET /cloud/storage` |
 | `gyro api request GET /cloud/storage/{id}/buckets` | GET buckets (GyroDepolama) | `GET /cloud/storage/{id}/buckets` |
 | `gyro api request GET /cloud/storage/{id}/keys` | GET access-keys (GyroDepolama) | `GET /cloud/storage/{id}/keys` |
+| `gyro api request PATCH /cloud/containers/{id}/vpc` | Change the published services | `PATCH /cloud/containers/{id}/vpc` |
 | `gyro api request PATCH /cloud/mail/{id}/aliases/{aid}` | PATCH aliases:edit (GyroMail) | `PATCH /cloud/mail/{id}/aliases/{aid}` |
 | `gyro api request PATCH /cloud/mail/{id}/mailboxes/{local}` | PATCH mailboxes:edit (GyroMail) | `PATCH /cloud/mail/{id}/mailboxes/{local}` |
+| `gyro api request PATCH /cloud/vpcs/{vpc_id}/port-forwards/{pf_id}` | Change who may use a port forward | `PATCH /cloud/vpcs/{vpc_id}/port-forwards/{pf_id}` |
 | `gyro api request POST /auth/device/code` | Start a browser sign-in (device code) | `POST /auth/device/code` |
 | `gyro api request POST /auth/device/token` | Poll for the key (device code) | `POST /auth/device/token` |
 | `gyro api request POST /cloud/billing/estimate` | Hourly / daily / monthly cost of prepaid plans and serverless containers, and how long the balance lasts | `POST /cloud/billing/estimate` |
@@ -86,6 +90,7 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro api request POST /cloud/mail/{id}/migrations` | POST sync-jobs:create (GyroMail) | `POST /cloud/mail/{id}/migrations` |
 | `gyro api request POST /cloud/storage/{id}/buckets` | Create a bucket | `POST /cloud/storage/{id}/buckets` |
 | `gyro api request POST /cloud/storage/{id}/keys` | POST access-keys:create (GyroDepolama) | `POST /cloud/storage/{id}/keys` |
+| `gyro api request PUT /cloud/containers/{id}/vpc` | Attach the environment to a VPC subnet | `PUT /cloud/containers/{id}/vpc` |
 | `gyro balance` | Account balance | `GET /balance` |
 | `gyro balance setting update` | Update balance settings | `PATCH /balance/settings` |
 | `gyro balance top-up` | Create a balance top-up invoice and get its payment link | `POST /cloud/balance/top-up` |

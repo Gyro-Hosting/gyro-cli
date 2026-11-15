@@ -35,4 +35,5 @@ gyro vpc port-forward [flags]
 * [gyro vpc port-forward add](gyro_vpc_port-forward_add.md)	 - Kapının dış portunu yönlendir
 * [gyro vpc port-forward list](gyro_vpc_port-forward_list.md)	 - Port yönlendirmeleri listele
 * [gyro vpc port-forward remove](gyro_vpc_port-forward_remove.md)	 - Port yönlendirmeyi sil
+* [gyro vpc port-forward update](gyro_vpc_port-forward_update.md)	 - Port yönlendirmeyi kimin kullanabileceğini değiştir (kaynak izin listesi)
 

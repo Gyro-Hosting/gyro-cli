@@ -1,0 +1,91 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-vpc-port-forward-update - Change who may use a port forward (source allow list)
+
+
+.SH SYNOPSIS
+\fBgyro vpc port-forward update   --source  ... | --any [flags]\fP
+
+
+.SH DESCRIPTION
+Only the given public IPv4 networks may use the forward (a single IP becomes /32; write the network
+address, e.g. 198.51.100.0/24; at most 20). The list replaces the old one; --any opens it to everyone.
+
+
+.SH OPTIONS
+\fB--any\fP[=false]
+	allow everyone (empty list)
+
+.PP
+\fB--dry-run\fP[=false]
+	show the request without changing anything
+
+.PP
+\fB-h\fP, \fB--help\fP[=false]
+	help for update
+
+.PP
+\fB--source\fP=[]
+	allowed source IPv4 or CIDR (repeatable or comma separated)
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH EXAMPLE
+.EX
+  gyro vpc port-forward update vpc-1a2b3c4d pf-9c8b7a6d --source 203.0.113.10 --source 198.51.100.0/24
+  gyro vpc port-forward update vpc-1a2b3c4d pf-9c8b7a6d --any
+.EE
+
+
+.SH SEE ALSO
+\fBgyro-vpc-port-forward(1)\fP

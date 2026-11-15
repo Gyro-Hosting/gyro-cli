@@ -51,6 +51,7 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro affiliate payment-method set` | Ödeme Hedefini Kaydetme | `PUT /affiliate/payment-method` |
 | `gyro affiliate withdraw` | Ödeme Talebi Açma | `POST /affiliate/withdraw` |
 | `gyro api request DELETE /auth/session` | Kullanılan anahtarı iptal et (çıkış) | `DELETE /auth/session` |
+| `gyro api request DELETE /cloud/containers/{id}/vpc` | Ortamın VPC bağını kaldır | `DELETE /cloud/containers/{id}/vpc` |
 | `gyro api request DELETE /cloud/mail/{id}/aliases/{aid}` | aliases:delete (GyroMail) | `DELETE /cloud/mail/{id}/aliases/{aid}` |
 | `gyro api request DELETE /cloud/mail/{id}/autoresponders/{local}` | autoresponder:delete (GyroMail) | `DELETE /cloud/mail/{id}/autoresponders/{local}` |
 | `gyro api request DELETE /cloud/mail/{id}/mailboxes/{local}` | mailboxes:delete (GyroMail) | `DELETE /cloud/mail/{id}/mailboxes/{local}` |
@@ -65,6 +66,7 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro api request GET /cloud/billing/usage` | Hour-by-hour usage ledger (or daily/monthly totals). Times are Europe/Istanbul. | `GET /cloud/billing/usage` |
 | `gyro api request GET /cloud/containers/{id}/logs` | Ortamın loglarında ara | `GET /cloud/containers/{id}/logs` |
 | `gyro api request GET /cloud/containers/{id}/services/{name}/logs` | Servis logları | `GET /cloud/containers/{id}/services/{name}/logs` |
+| `gyro api request GET /cloud/containers/{id}/vpc` | Ortamın VPC bağını getir | `GET /cloud/containers/{id}/vpc` |
 | `gyro api request GET /cloud/mail/{id}/aliases` | aliases (GyroMail) | `GET /cloud/mail/{id}/aliases` |
 | `gyro api request GET /cloud/mail/{id}/autoresponders` | autoresponder (GyroMail) | `GET /cloud/mail/{id}/autoresponders` |
 | `gyro api request GET /cloud/mail/{id}/catch-all` | catch-all (GyroMail) | `GET /cloud/mail/{id}/catch-all` |
@@ -74,8 +76,10 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro api request GET /cloud/storage` | Depolama hizmetlerini listele | `GET /cloud/storage` |
 | `gyro api request GET /cloud/storage/{id}/buckets` | buckets (GyroDepolama) | `GET /cloud/storage/{id}/buckets` |
 | `gyro api request GET /cloud/storage/{id}/keys` | access-keys (GyroDepolama) | `GET /cloud/storage/{id}/keys` |
+| `gyro api request PATCH /cloud/containers/{id}/vpc` | Yayınlanan servisleri değiştir | `PATCH /cloud/containers/{id}/vpc` |
 | `gyro api request PATCH /cloud/mail/{id}/aliases/{aid}` | aliases:edit (GyroMail) | `PATCH /cloud/mail/{id}/aliases/{aid}` |
 | `gyro api request PATCH /cloud/mail/{id}/mailboxes/{local}` | mailboxes:edit (GyroMail) | `PATCH /cloud/mail/{id}/mailboxes/{local}` |
+| `gyro api request PATCH /cloud/vpcs/{vpc_id}/port-forwards/{pf_id}` | Port yönlendirmeyi kimin kullanabileceğini değiştir | `PATCH /cloud/vpcs/{vpc_id}/port-forwards/{pf_id}` |
 | `gyro api request POST /auth/device/code` | Tarayıcıyla girişi başlat (cihaz kodu) | `POST /auth/device/code` |
 | `gyro api request POST /auth/device/token` | Anahtarı sorgula (cihaz kodu) | `POST /auth/device/token` |
 | `gyro api request POST /cloud/billing/estimate` | Hourly / daily / monthly cost of prepaid plans and serverless containers, and how long the balance lasts | `POST /cloud/billing/estimate` |
@@ -86,6 +90,7 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro api request POST /cloud/mail/{id}/migrations` | sync-jobs:create (GyroMail) | `POST /cloud/mail/{id}/migrations` |
 | `gyro api request POST /cloud/storage/{id}/buckets` | Kova oluştur | `POST /cloud/storage/{id}/buckets` |
 | `gyro api request POST /cloud/storage/{id}/keys` | access-keys:create (GyroDepolama) | `POST /cloud/storage/{id}/keys` |
+| `gyro api request PUT /cloud/containers/{id}/vpc` | Ortamı bir VPC subnetine bağla | `PUT /cloud/containers/{id}/vpc` |
 | `gyro balance` | Hesap bakiyesi | `GET /balance` |
 | `gyro balance setting update` | Cüzdan Ayarlarını Değiştirme | `PATCH /balance/settings` |
 | `gyro balance top-up` | Bakiye yükleme faturası oluştur, ödeme linkini al | `POST /cloud/balance/top-up` |

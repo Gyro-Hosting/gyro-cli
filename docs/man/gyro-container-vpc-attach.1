@@ -1,0 +1,106 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-container-vpc-attach - Attach the environment to a VPC subnet
+
+
+.SH SYNOPSIS
+\fBgyro container vpc attach  --subnet  [--vpc ] [--expose service:port ...] [flags]\fP
+
+
+.SH DESCRIPTION
+Connects a node container environment (Mini, Small, Starter, Standard, Pro) to one subnet of your private network
+(VPC) in tr-ist-1. The environment gets a fixed VPC source range (/28) inside the subnet: connections from your
+containers to the VPC servers come from it and it does not change when nodes are replaced, scaled or renewed.
+The first address is the VPC endpoint: VPC servers reach the services you publish (--expose service:port) at
+endpoint:port. Never reachable from the internet. Free. The subnet must be /26 or larger. Serverless: not yet.
+
+
+.SH OPTIONS
+\fB--dry-run\fP[=false]
+	show the request without changing anything
+
+.PP
+\fB--expose\fP=[]
+	publish a service at the VPC endpoint: service:port (repeatable, at most 20)
+
+.PP
+\fB-h\fP, \fB--help\fP[=false]
+	help for attach
+
+.PP
+\fB--subnet\fP=""
+	subnet id (/26 or larger)
+
+.PP
+\fB--vpc\fP=""
+	VPC id (gyro vpc list); checked against the subnet
+
+.PP
+\fB--wait\fP[=false]
+	wait until the nodes are in the subnet (state ready)
+
+.PP
+\fB--wait-timeout\fP=10m0s
+	maximum time for --wait
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH EXAMPLE
+.EX
+  gyro container vpc attach 17000 --vpc vpc-1a2b3c4d --subnet sn-5e6f7a8b --expose api:8080 --wait
+  gyro vpc subnet list vpc-1a2b3c4d    # subnet ids
+.EE
+
+
+.SH SEE ALSO
+\fBgyro-container-vpc(1)\fP

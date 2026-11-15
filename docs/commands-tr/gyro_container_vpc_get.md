@@ -1,0 +1,50 @@
+## gyro container vpc get
+
+Ortamın VPC bağını göster (kaynak aralığı, uç nokta, yayınlanan servisler)
+
+### Synopsis
+
+Düğümlü bir Kapsayıcı ortamını (Mini, Küçük, Başlangıç, Standart, Pro) tr-ist-1'deki özel ağınızın (VPC) bir
+subnetine bağlar. Ortama subnet içinde sabit bir VPC kaynak aralığı (/28) ayrılır: kapsayıcılarınızdan VPC
+sunucularına giden bağlantılar buradan gelir; düğüm değişimi, ölçekleme ya da yenilemede değişmez. İlk adres VPC
+uç noktasıdır: VPC sunucuları yayınladığınız servislere (--expose servis:port) uç_nokta:port ile ulaşır.
+İnternetten erişilemez. Ücretsizdir. Subnet en az /26 olmalı. Sunucusuz: yakında.
+
+```
+gyro container vpc get <ENVIRONMENT_ID> [flags]
+```
+
+### Examples
+
+```
+  gyro container vpc get 17000
+  gyro container vpc get 17000 -o json
+```
+
+### Options
+
+```
+  -h, --help   help for get
+```
+
+### Options inherited from parent commands
+
+```
+      --api-url string     API taban adresi (ortam GYRO_API_URL)
+      --debug              HTTP isteklerini stderr'e yaz (sırlar maskeli)
+      --lang string        mesaj dili: tr ya da en (varsayılan yerel ayar)
+      --no-color           renkleri kapat (NO_COLOR da olur)
+      --no-header          tablo başlığını yazma
+  -o, --output string      çıktı biçimi: table, json, yaml, text
+  -p, --profile string     kullanılacak profil (ortam GYRO_PROFILE)
+      --query string       sonuca uygulanacak JMESPath sorgusu
+  -q, --quiet              yalnız kimlikleri yaz
+      --timeout duration   toplam zaman aşımı, ör. 30s, 10m
+      --wide               tüm tablo sütunlarını göster
+  -y, --yes                onay sorma
+```
+
+### SEE ALSO
+
+* [gyro container vpc](gyro_container_vpc.md)	 - Düğümlü ortamın özel ağı (VPC): sabit kaynak aralığı, VPC uç noktası
+

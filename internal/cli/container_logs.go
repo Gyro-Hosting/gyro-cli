@@ -64,7 +64,7 @@ JSON / logfmt satırlarda --where alan koşulları (status>=500, method=POST, pa
 		RunE: func(cmd *cobra.Command, args []string) error {
 			env := args[0]
 			if !isNumeric(env) {
-				return &ExitErr{Code: ExitUsage, Err: errors.New(i18n.S("the environment id is a number (gyro container list)", "ortam numarası sayı olmalı (gyro container list)"))}
+				return &ExitErr{Code: ExitUsage, Err: errors.New(i18n.S("the environment id is a number (gyro service list)", "ortam numarası sayı olmalı (gyro service list)"))}
 			}
 			if len(args) == 2 {
 				svc = args[1]

@@ -13,7 +13,7 @@ gyro-vpc-port-forward-add - Forward a public port of the gateway
 Forward a public port of the gateway
 
 .PP
-public_ip:public_port of the gateway -> target_ip:target_port inside the VPC. The gateway must be on (409 \fBgateway_disabled\fR); one forward per protocol + public port; at most 20.
+public_ip:public_port of the gateway -> target_ip:target_port inside the VPC. The gateway must be on (409 \fBgateway_disabled\fR); one forward per protocol + public port; at most 20. \fBsource_cidrs\fR: only these public IPv4 networks may use the forward (a single IP is /32; write the network address, e.g. 198.51.100.0/24); at most 20; empty list or left out = everyone. Private, reserved and our own platform ranges are refused (422 \fBinvalid_source\fR).
 
 .PP
 API: POST /cloud/vpcs/{vpc_id}/port-forwards (operationId createVpcPortForward, scope cloud_write)
@@ -46,6 +46,10 @@ API: POST /cloud/vpcs/{vpc_id}/port-forwards (operationId createVpcPortForward, 
 .PP
 \fB--set\fP=[]
 	extra body field key=value (repeatable)
+
+.PP
+\fB--source-cidrs\fP=[]
+	allowed source networks (public IPv4 CIDR); empty = everyone
 
 .PP
 \fB--target-ip\fP=""

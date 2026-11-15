@@ -145,7 +145,7 @@ pakete göre 2-3; bkz. "gyro limits".`),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			env := args[0]
 			if !isNumeric(env) {
-				return &ExitErr{Code: ExitUsage, Err: errors.New(i18n.S("the environment id is a number (gyro container list)", "ortam numarası sayı olmalı (gyro container list)"))}
+				return &ExitErr{Code: ExitUsage, Err: errors.New(i18n.S("the environment id is a number (gyro service list)", "ortam numarası sayı olmalı (gyro service list)"))}
 			}
 			if svc == "" {
 				return &ExitErr{Code: ExitUsage, Err: errors.New(i18n.S("--service is required", "--service gerekli"))}

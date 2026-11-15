@@ -35,4 +35,5 @@ gyro vpc port-forward [flags]
 * [gyro vpc port-forward add](gyro_vpc_port-forward_add.md)	 - Forward a public port of the gateway
 * [gyro vpc port-forward list](gyro_vpc_port-forward_list.md)	 - List port forwards
 * [gyro vpc port-forward remove](gyro_vpc_port-forward_remove.md)	 - Delete a port forward
+* [gyro vpc port-forward update](gyro_vpc_port-forward_update.md)	 - Change who may use a port forward (source allow list)
 

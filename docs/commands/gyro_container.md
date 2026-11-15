@@ -61,4 +61,5 @@ gyro container [flags]
 * [gyro container secret](gyro_container_secret.md)	 - Delete secret values
 * [gyro container service](gyro_container_service.md)	 - List container services
 * [gyro container sizes](gyro_container_sizes.md)	 - Serverless container sizes (vCPU / memory pairs) and prices
+* [gyro container vpc](gyro_container_vpc.md)	 - Private network (VPC) of a node environment: fixed source range, VPC endpoint
 

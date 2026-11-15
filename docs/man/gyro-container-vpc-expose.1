@@ -1,0 +1,94 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-container-vpc-expose - Replace the services published at the VPC endpoint
+
+
+.SH SYNOPSIS
+\fBgyro container vpc expose  --expose service:port ... | --clear [flags]\fP
+
+
+.SH DESCRIPTION
+Connects a node container environment (Mini, Small, Starter, Standard, Pro) to one subnet of your private network
+(VPC) in tr-ist-1. The environment gets a fixed VPC source range (/28) inside the subnet: connections from your
+containers to the VPC servers come from it and it does not change when nodes are replaced, scaled or renewed.
+The first address is the VPC endpoint: VPC servers reach the services you publish (--expose service:port) at
+endpoint:port. Never reachable from the internet. Free. The subnet must be /26 or larger. Serverless: not yet.
+
+
+.SH OPTIONS
+\fB--clear\fP[=false]
+	remove every published service
+
+.PP
+\fB--dry-run\fP[=false]
+	show the request without changing anything
+
+.PP
+\fB--expose\fP=[]
+	service:port (repeatable; the list replaces the old one)
+
+.PP
+\fB-h\fP, \fB--help\fP[=false]
+	help for expose
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH EXAMPLE
+.EX
+  gyro container vpc expose 17000 --expose api:8080 --expose web:80
+  gyro container vpc expose 17000 --clear
+.EE
+
+
+.SH SEE ALSO
+\fBgyro-container-vpc(1)\fP
