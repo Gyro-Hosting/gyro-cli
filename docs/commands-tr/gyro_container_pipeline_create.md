@@ -39,6 +39,7 @@ gyro container pipeline create <ID> [flags]
       --name string                               Görünen ad (1-48)
       --notify strings                            Notifications (channels: the environment's alert settings)
       --provider string                           provider (github|gitlab|gitea|git|archive)
+      --release release_failed                    one-off job run with the new image (settings of the first target service) BEFORE the deploy, e.g. ["npm","run","migrate"]; when it fails nothing is deployed (run error release_failed). Also `release:` in gyro-pipeline.yml (top level or under deploy:)
       --repo archive                              github / gitlab / gitea / git için zorunlu: https klon adresi (kimlik bilgisi yok) ya da SSH adresi git@sunucu:kurum/depo.git / ssh://kullanici@sunucu[:port]/yol (deploy key gerekir). provider archive için göndermeyin (arşiv pipeline deposuz çalışır; `archive` ile gönderilen değer yok sayılır, yanıtta `repo` boş görünür).
       --repo-file                                 Read gyro-pipeline.yml from the repository (GitHub, GitLab, Gitea)
       --set stringArray                           ek gövde alanı anahtar=değer (tekrarlanabilir)

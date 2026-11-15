@@ -108,6 +108,10 @@ API: POST /cloud/containers/{id}/pipelines (operationId pipeline_create, scope s
 	provider (github|gitlab|gitea|git|archive)
 
 .PP
+\fB--release\fP=[]
+	one-off job run with the new image (settings of the first target service) BEFORE the deploy, e.g. ["npm","run","migrate"]; when it fails nothing is deployed (run error \fBrelease_failed\fR). Also \fBrelease:\fR in gyro-pipeline.yml (top level or under deploy:)
+
+.PP
 \fB--repo\fP=""
 	Required for github / gitlab / gitea / git: https clone URL (no credentials) or SSH address git@host:org/repo.git / ssh://user@host[:port]/path (needs a deploy key). Leave it out for provider \fBarchive\fR (an archive pipeline has no repository; a value sent with \fBarchive\fR is ignored and the answer shows \fBrepo\fR empty).
 

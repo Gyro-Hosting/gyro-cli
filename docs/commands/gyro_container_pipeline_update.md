@@ -39,6 +39,7 @@ gyro container pipeline update <ID> <PIPELINE> [flags]
       --name string                               Display name (1-48)
       --notify strings                            Notifications (channels: the environment's alert settings)
       --provider string                           provider (github|gitlab|gitea|git|archive)
+      --release release_failed                    one-off job run with the new image (settings of the first target service) BEFORE the deploy, e.g. ["npm","run","migrate"]; when it fails nothing is deployed (run error release_failed). Also `release:` in gyro-pipeline.yml (top level or under deploy:)
       --repo archive                              Required for github / gitlab / gitea / git: https clone URL (no credentials) or SSH address git@host:org/repo.git / ssh://user@host[:port]/path (needs a deploy key). Leave it out for provider archive (an archive pipeline has no repository; a value sent with `archive` is ignored and the answer shows `repo` empty).
       --repo-file                                 Read gyro-pipeline.yml from the repository (GitHub, GitLab, Gitea)
       --set stringArray                           extra body field key=value (repeatable)
