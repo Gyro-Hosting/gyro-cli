@@ -38,6 +38,7 @@ gyro s3 [flags]
 * [gyro s3 cors](gyro_s3_cors.md)	 - Kovanın CORS kuralları
 * [gyro s3 create](gyro_s3_create.md)	 - Nesne depolama (S3) sipariş et
 * [gyro s3 delete](gyro_s3_delete.md)	 - Depolama hizmetini iptal et
+* [gyro s3 events](gyro_s3_events.md)	 - Kovanın olay webhook'larını listele
 * [gyro s3 folder](gyro_s3_folder.md)	 - Klasördeki nesneleri say
 * [gyro s3 get](gyro_s3_get.md)	 - Depolama hizmeti ayrıntısı
 * [gyro s3 key](gyro_s3_key.md)	 - Erişim anahtarları (gizli anahtar bir kez gösterilir)

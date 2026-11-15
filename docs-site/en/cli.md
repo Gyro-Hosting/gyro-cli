@@ -65,6 +65,7 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro api request GET /cloud/billing/statement/{month}` | Monthly usage statement (not an invoice); JSON, PDF or CSV | `GET /cloud/billing/statement/{month}` |
 | `gyro api request GET /cloud/billing/usage` | Hour-by-hour usage ledger (or daily/monthly totals). Times are Europe/Istanbul. | `GET /cloud/billing/usage` |
 | `gyro api request GET /cloud/containers/{id}/logs` | Search the environment's logs | `GET /cloud/containers/{id}/logs` |
+| `gyro api request GET /cloud/containers/{id}/schedules` | List scheduled jobs | `GET /cloud/containers/{id}/schedules` |
 | `gyro api request GET /cloud/containers/{id}/services/{name}/logs` | Service logs | `GET /cloud/containers/{id}/services/{name}/logs` |
 | `gyro api request GET /cloud/containers/{id}/vpc` | Get the environment's VPC attachment | `GET /cloud/containers/{id}/vpc` |
 | `gyro api request GET /cloud/mail/{id}/aliases` | GET aliases (GyroMail) | `GET /cloud/mail/{id}/aliases` |
@@ -76,6 +77,7 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro api request GET /cloud/storage` | List storage services | `GET /cloud/storage` |
 | `gyro api request GET /cloud/storage/{id}/buckets` | GET buckets (GyroDepolama) | `GET /cloud/storage/{id}/buckets` |
 | `gyro api request GET /cloud/storage/{id}/keys` | GET access-keys (GyroDepolama) | `GET /cloud/storage/{id}/keys` |
+| `gyro api request PATCH /cloud/containers/{id}/schedules/{sched}` | Change a scheduled job | `PATCH /cloud/containers/{id}/schedules/{sched}` |
 | `gyro api request PATCH /cloud/containers/{id}/vpc` | Change the published services | `PATCH /cloud/containers/{id}/vpc` |
 | `gyro api request PATCH /cloud/mail/{id}/aliases/{aid}` | PATCH aliases:edit (GyroMail) | `PATCH /cloud/mail/{id}/aliases/{aid}` |
 | `gyro api request PATCH /cloud/mail/{id}/mailboxes/{local}` | PATCH mailboxes:edit (GyroMail) | `PATCH /cloud/mail/{id}/mailboxes/{local}` |
@@ -83,6 +85,7 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro api request POST /auth/device/code` | Start a browser sign-in (device code) | `POST /auth/device/code` |
 | `gyro api request POST /auth/device/token` | Poll for the key (device code) | `POST /auth/device/token` |
 | `gyro api request POST /cloud/billing/estimate` | Hourly / daily / monthly cost of prepaid plans and serverless containers, and how long the balance lasts | `POST /cloud/billing/estimate` |
+| `gyro api request POST /cloud/containers/{id}/schedules` | Create a scheduled job | `POST /cloud/containers/{id}/schedules` |
 | `gyro api request POST /cloud/containers/{id}/services/{name}/run` | Run a one-off job | `POST /cloud/containers/{id}/services/{name}/run` |
 | `gyro api request POST /cloud/licenses/{id}/change-ip` | POST method change_ip (LisansAPP) | `POST /cloud/licenses/{id}/change-ip` |
 | `gyro api request POST /cloud/mail/{id}/aliases` | POST aliases:create (GyroMail) | `POST /cloud/mail/{id}/aliases` |
@@ -162,6 +165,12 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro container registry imports` | Image imports (progress and history) | `GET /cloud/containers/{id}/registry/imports` |
 | `gyro container registry policy` | Image clean-up policy | `PUT /cloud/containers/{id}/registry/policy` |
 | `gyro container registry rotate` | Rotate the registry password | `POST /cloud/containers/{id}/registry/rotate` |
+| `gyro container schedule delete` | Delete a scheduled job | `DELETE /cloud/containers/{id}/schedules/{sched}` |
+| `gyro container schedule get` | Get a scheduled job | `GET /cloud/containers/{id}/schedules/{sched}` |
+| `gyro container schedule pause` | Pause a scheduled job | `POST /cloud/containers/{id}/schedules/{sched}/pause` |
+| `gyro container schedule preview` | Next run times of a timing | `POST /cloud/containers/{id}/schedules/preview` |
+| `gyro container schedule resume` | Resume a scheduled job | `POST /cloud/containers/{id}/schedules/{sched}/resume` |
+| `gyro container schedule run-now` | Run a scheduled job now | `POST /cloud/containers/{id}/schedules/{sched}/run` |
 | `gyro container secret delete` | Delete secret values | `DELETE /cloud/containers/{id}/services/{name}/secrets` |
 | `gyro container secret set` | Set secret values | `PUT /cloud/containers/{id}/services/{name}/secrets` |
 | `gyro container service autoscale` | Autoscaling / alert threshold of a service | `PUT /cloud/containers/{id}/services/{name}/autoscaling` |
@@ -454,6 +463,16 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro storage cors set` | Replace the CORS rules of a bucket | `PUT /cloud/storage/{id}/buckets/{bucket}/cors` |
 | `gyro storage create` | Order Object Storage (S3) | `POST /cloud/storage` |
 | `gyro storage delete` | Cancel a storage service | `DELETE /cloud/storage/{id}` |
+| `gyro storage events add` | Add an event webhook to a bucket | `POST /cloud/storage/{id}/buckets/{bucket}/events` |
+| `gyro storage events delete` | Delete an event webhook | `DELETE /cloud/storage/{id}/events/{event}` |
+| `gyro storage events deliveries` | Recent deliveries of a webhook | `GET /cloud/storage/{id}/events/{event}/deliveries` |
+| `gyro storage events get` | Get an event webhook | `GET /cloud/storage/{id}/events/{event}` |
+| `gyro storage events list` | List the event webhooks of a bucket | `GET /cloud/storage/{id}/buckets/{bucket}/events` |
+| `gyro storage events list-all` | List all event webhooks of the service | `GET /cloud/storage/{id}/events` |
+| `gyro storage events rotate-secret` | Rotate the signing secret | `POST /cloud/storage/{id}/events/{event}/rotate-secret` |
+| `gyro storage events test` | Send a test event | `POST /cloud/storage/{id}/events/{event}/test` |
+| `gyro storage events update` | Change an event webhook | `PATCH /cloud/storage/{id}/events/{event}` |
+| `gyro storage events usage` | Event allowance of this month | `GET /cloud/storage/{id}/events/usage` |
 | `gyro storage folder count` | Count objects in a folder | `GET /cloud/storage/{id}/buckets/{bucket}/folders/count` |
 | `gyro storage folder create` | Create a folder | `POST /cloud/storage/{id}/buckets/{bucket}/folders` |
 | `gyro storage folder delete` | Delete a folder with its contents | `DELETE /cloud/storage/{id}/buckets/{bucket}/folders` |

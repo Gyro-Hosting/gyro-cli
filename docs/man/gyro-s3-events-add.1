@@ -1,0 +1,113 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-s3-events-add - Add an event webhook to a bucket
+
+
+.SH SYNOPSIS
+\fBgyro s3 events add   [flags]\fP
+
+
+.SH DESCRIPTION
+Add an event webhook to a bucket
+
+.PP
+\fBBucket events\fP send a signed HTTPS POST to your address when an object is created (upload, copy, multipart upload), deleted, or a bulk delete runs. Body: \fB{"id", "event", "created_at", "data": {service_id, bucket, key, size, etag, content_type, version_id (Protected Storage), method (put / multipart / delete / bulk), source (api / panel), access_key_id, event_time}}\fR - no object content. Headers: \fBX-Gyro-Event\fR, \fBX-Gyro-Delivery\fR (unique id, use it to drop duplicates), \fBX-Gyro-Timestamp\fR, \fBX-Gyro-Signature: sha256=HMAC-SHA256(secret, timestamp + "." + raw body)\fR (same format as account webhooks). Delivery is at least once with no ordering guarantee; a non-2xx answer or no answer within 6 s is retried (8 attempts, about 2 hours); 20 failures in a row disable the webhook (\fBdisabled_reason\fR = \fBauto_failures\fR). Requests come from 45.87.174.151, 45.87.174.153, 45.87.174.154. Targets: https only, port 443 or 8443, public internet (private, loopback and Gyro platform addresses are refused, the name is resolved again on every delivery). Filters: \fBprefix\fR (key starts with) and \fBsuffix\fR (key ends with one of, at most 10). Limits: 5 webhooks per bucket, 20 per service (\fBs3.max_event_hooks\fR, raised with a support ticket). Price: a monthly free allowance per bucket (see \fBGET /cloud/storage/{id}/events/usage\fR) plus prepaid event packs valid in the month of purchase; no overage invoice: when the allowance is used up new events are not sent. Known gaps: a bulk delete does not list the keys; lifecycle deletions produce no event. The answer carries \fBsecret\fR once. A refusal is 422 \fBtool_action_failed\fR with a message in the account language (invalid / private / unresolvable URL, port, event type, limits).
+
+.PP
+API: POST /cloud/storage/{id}/buckets/{bucket}/events (operationId createBucketEventWebhook, scope services_write)
+
+
+.SH OPTIONS
+\fB--data\fP=""
+	request body as JSON, @file or @- (stdin)
+
+.PP
+\fB--description\fP=""
+	description
+
+.PP
+\fB--dry-run\fP[=false]
+	show the price quote / request without changing anything
+
+.PP
+\fB--events\fP=[]
+	default: all three. Short names created / deleted / deleted_bulk are accepted
+
+.PP
+\fB-h\fP, \fB--help\fP[=false]
+	help for add
+
+.PP
+\fB--idempotency-key\fP=""
+	idempotency key (automatic for money operations)
+
+.PP
+\fB--prefix\fP=""
+	prefix
+
+.PP
+\fB--set\fP=[]
+	extra body field key=value (repeatable)
+
+.PP
+\fB--suffix\fP=[]
+	a comma separated text is accepted too
+
+.PP
+\fB--url\fP=""
+	url
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH SEE ALSO
+\fBgyro-s3-events(1)\fP

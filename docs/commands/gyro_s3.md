@@ -38,6 +38,7 @@ gyro s3 [flags]
 * [gyro s3 cors](gyro_s3_cors.md)	 - CORS rules of a bucket
 * [gyro s3 create](gyro_s3_create.md)	 - Order Object Storage (S3)
 * [gyro s3 delete](gyro_s3_delete.md)	 - Cancel a storage service
+* [gyro s3 events](gyro_s3_events.md)	 - List the event webhooks of a bucket
 * [gyro s3 folder](gyro_s3_folder.md)	 - Count objects in a folder
 * [gyro s3 get](gyro_s3_get.md)	 - Get a storage service
 * [gyro s3 key](gyro_s3_key.md)	 - Access keys (secret shown once)
