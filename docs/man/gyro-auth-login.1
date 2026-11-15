@@ -1,0 +1,98 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-auth-login - Sign in with the browser (creates a time-limited API key for this profile)
+
+
+.SH SYNOPSIS
+\fBgyro auth login [flags]\fP
+
+
+.SH DESCRIPTION
+Opens the Gyro panel in your browser; you approve the request there (permissions and expiry are chosen on that page)
+and the new key is stored in the profile, exactly like 'gyro configure'. No key is copied by hand.
+Over SSH or without a display the address is only printed: open it on any device where you are signed in.
+In CI keep using a key: echo "$KEY" | gyro configure --token-stdin
+
+
+.SH OPTIONS
+\fB-h\fP, \fB--help\fP[=false]
+	help for login
+
+.PP
+\fB--keyring\fP[=false]
+	store the key in the OS keychain
+
+.PP
+\fB--no-browser\fP[=false]
+	only print the address, do not open a browser
+
+.PP
+\fB--scopes\fP=""
+	preselect scopes (comma separated, e.g. cloud_read,services_read); you can still change them in the browser
+
+.PP
+\fB--template\fP=""
+	preselect a permission template: readonly, dns, cloud, containers, storage, billing, full
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH EXAMPLE
+.EX
+  gyro auth login
+  gyro auth login --profile work --no-browser
+  gyro auth login --template readonly
+.EE
+
+
+.SH SEE ALSO
+\fBgyro-auth(1)\fP

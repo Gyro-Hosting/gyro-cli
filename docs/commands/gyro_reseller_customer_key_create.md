@@ -18,6 +18,7 @@ gyro reseller customer key create <ID> [flags]
       --actions strings          Optional action allow list: server actions (reboot) or tool:action / tool:* / method:name
       --data string              request body as JSON, @file or @- (stdin)
       --dry-run                  show the price quote / request without changing anything
+      --expires string           Key expiry: never (default), 7d, 30d, 90d, 1y, <n>d (up to 1830) or a date YYYY-MM-DD (end of day). Expired keys are refused with 401 key_expired and revoked; the owner is mailed 7 days before.
   -h, --help                     help for create
       --idempotency-key string   idempotency key (automatic for money operations)
       --ips strings              ips
@@ -26,6 +27,7 @@ gyro reseller customer key create <ID> [flags]
       --scopes strings           scopes
       --services int64Slice      Optional service allow list (default [])
       --set stringArray          extra body field key=value (repeatable)
+      --template string          Ready-made scope set, added to scopes: readonly (cloud_read, services_read), dns (services_read, services_write, dns_acme), cloud (cloud_*, services_*), containers / storage (services_read, services_write, cloud_read), full (every delegable scope). (readonly|dns|cloud|containers|storage|full)
 ```
 
 ### Options inherited from parent commands

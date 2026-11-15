@@ -31,5 +31,5 @@ gyro configure list [flags]
 
 ### SEE ALSO
 
-* [gyro configure](gyro_configure.md)	 - API anahtarını ve tercihleri adlı bir profile kaydet
+* [gyro configure](gyro_configure.md)	 - API anahtarını (ya da tarayıcı girişini) ve tercihleri adlı bir profile kaydet
 

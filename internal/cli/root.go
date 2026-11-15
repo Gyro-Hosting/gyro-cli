@@ -175,8 +175,8 @@ func (a *App) Client() (*api.Client, error) {
 	}
 	if tok == "" {
 		return nil, &ExitErr{ExitAuth, errors.New(i18n.S(
-			"no API key: run `gyro configure` or set GYRO_TOKEN (create keys in Client area → account menu (top right) → API Credentials)",
-			"API anahtarı yok: `gyro configure` çalıştırın ya da GYRO_TOKEN ayarlayın (anahtar: Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri)"))}
+			"no API key: run `gyro auth login` (browser) or `gyro configure`, or set GYRO_TOKEN (create keys in Client area → account menu (top right) → API Credentials)",
+			"API anahtarı yok: `gyro auth login` (tarayıcı) ya da `gyro configure` çalıştırın veya GYRO_TOKEN ayarlayın (anahtar: Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri)"))}
 	}
 	c := a.NewClient(a.APIURL(), tok)
 	c.Lang = i18n.Lang()
@@ -285,6 +285,7 @@ func NewRoot(a *App) *cobra.Command {
 
 	// hand-written commands first; generated ones fill the gaps
 	addConfigure(a, root)
+	addAuth(a, root)
 	addContext(a, root)
 	addVersion(a, root)
 	addCompletion(a, root)
@@ -321,7 +322,7 @@ func rootLong() string {
 balance and everything else the Gyro Public API offers (API spec `+spec.APIVersion+`).
 
 Get started:
-  gyro configure                 # store an API key (Client area → account menu (top right) → API Credentials)
+  gyro auth login                # sign in with the browser (or: gyro configure to paste an API key)
   gyro server list
   gyro server create --plan standart-2-4 --location falkenstein --image ubuntu-24.04 --ssh-key mykey --wait
   gyro server ssh web-1
@@ -332,7 +333,7 @@ Account limits (gyro limits) are raised with a support ticket: gyro ticket creat
 bakiye ve Gyro Public API'nin sunduğu her şey (API sürümü `+spec.APIVersion+`).
 
 Başlarken:
-  gyro configure                 # API anahtarını kaydedin (Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri)
+  gyro auth login                # tarayıcıyla giriş (ya da: anahtar yapıştırmak için gyro configure)
   gyro server list
   gyro server create --plan standart-2-4 --location falkenstein --image ubuntu-24.04 --ssh-key anahtarim --wait
   gyro server ssh web-1

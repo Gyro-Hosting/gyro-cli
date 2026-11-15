@@ -2,7 +2,7 @@
 openapi: 3.1.0
 info:
   title: Gyro Public API
-  version: 2.30.0
+  version: 2.31.0
   summary: Manage Gyro cloud servers, SSH keys and billing programmatically.
   x-summary-tr: Gyro bulut sunucularınızı, SSH anahtarlarınızı ve faturalarınızı programla yönetin.
   description: "The Gyro Public API lets you automate everything you do in the Gyro client area:\norder and manage cloud servers, keep SSH keys, read invoices and\
@@ -84,7 +84,9 @@ info:
     \ while on, 4.99 EUR/month cap), server cards `/cloud/servers/{id}/nics` and turning the public IPv4 off/on `/cloud/servers/{id}/public-ip`. Additive.\n\n**2.30.0**:\
     \ container extra nodes `PUT /cloud/containers/{id}/nodes` (same price as a plan node, hourly; removal drains first), egress change advance notice (`egress_change`,\
     \ `pending_egress_ips`) with an optional approval step (`PUT .../egress-approval`, `POST .../egress-change/approve`), and `DELETE /cloud/containers/{id}` (prepaid\
-    \ environment delete, same as the panel). Additive.\n"
+    \ environment delete, same as the panel). Additive.\n\n**2.31.0**: browser sign-in for command-line tools: `POST /auth/device/code`, `POST /auth/device/token`\
+    \ (device authorization), `GET` / `DELETE /auth/session`; key expiry (`expires` on `POST /cloud/keys`, `expires_at` in answers, 401 `key_expired`) and permission\
+    \ templates (`template`). Additive.\n"
   x-description-tr: "Gyro Public API, müşteri panelinde yaptığınız her işi otomatikleştirmenizi sağlar:\nbulut sunucu siparişi ve yönetimi, SSH anahtarları, fatura\
     \ ve bakiye okuma.\nResmi Terraform sağlayıcısı (`gyro-hosting/gyro`) ve `gyroctl` bu API'yi kullanır.\n\n* **Taban adres** `https://www.gyrohosting.com/api/v1/client`\n\
     * **Kimlik** `Authorization: Bearer wck_...` (anahtarı *Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri* bölümünden oluşturun)\n* **Biçim** JSON\
@@ -163,7 +165,9 @@ info:
     \ saatlik ön ödemeli, ayda en çok 4,99 €), sunucu kartları `/cloud/servers/{id}/nics` ve public IPv4 kapat/aç `/cloud/servers/{id}/public-ip`. Geriye uyumlu.\n\
     \n**2.30.0**: kapsayıcı ek düğüm `PUT /cloud/containers/{id}/nodes` (paketteki düğümle aynı fiyat, saatlik; çıkarma önce boşaltır), çıkış IP değişikliğinin önceden\
     \ duyurusu (`egress_change`, `pending_egress_ips`) ve isteğe bağlı onay adımı (`PUT .../egress-approval`, `POST .../egress-change/approve`), `DELETE /cloud/containers/{id}`\
-    \ (ön ödemeli ortamı silme, panelle aynı). Geriye uyumlu.\n"
+    \ (ön ödemeli ortamı silme, panelle aynı). Geriye uyumlu.\n\n**2.31.0**: komut satırı araçları için tarayıcıyla giriş: `POST /auth/device/code`, `POST /auth/device/token`\
+    \ (cihaz yetkilendirmesi), `GET` / `DELETE /auth/session`; anahtar son kullanma tarihi (`POST /cloud/keys` için `expires`, yanıtlarda `expires_at`, 401 `key_expired`)\
+    \ ve izin şablonları (`template`). Geriye uyumlu.\n"
   contact:
     name: Gyro Hosting
     url: https://www.gyrohosting.com
@@ -320,6 +324,16 @@ tags:
   x-description-tr: 'Gyro Bulut İstanbul (tr-ist-1) sunucuları için özel ağlar (VPC): subnetler, özel ağ kartları, sunucunun public IPv4''ünü kapatma ve VPC kapısı
     (NAT ile internet çıkışı, port yönlendirme, subnetler arası kural). VPC, subnet ve özel trafik ücretsiz; kapı açıkken ön ödemeli bakiyeden saatlik ücretlenir
     (ayda en çok 4,99 €).'
+- name: Authentication
+  description: 'Browser sign-in for command-line tools (device authorization, like `gh auth login`) and the session of the key in use. 1) `POST /auth/device/code`
+    (no key) returns a `user_code` and an address; 2) the user opens it, signs in to the panel, checks the code and the request''s IP/client, picks permissions and
+    expiry, approves; 3) the tool polls `POST /auth/device/token` every `interval` seconds and receives a new client API key once. The key is an ordinary key: listed
+    and revocable on the API Credentials page, same permission model, money rules and IP lock. In CI keep using a key created on the panel or with `POST /cloud/keys`.'
+  x-description-tr: 'Komut satırı araçları için tarayıcıyla giriş (cihaz yetkilendirmesi, `gh auth login` gibi) ve kullanılan anahtarın oturumu. 1) `POST /auth/device/code`
+    (anahtarsız) bir `user_code` ve adres döner; 2) kullanıcı adresi açar, panele giriş yapar, kodu ve isteğin IP/istemci bilgisini kontrol eder, izinleri ve süreyi
+    seçip onaylar; 3) araç her `interval` saniyede `POST /auth/device/token` sorgular ve yeni müşteri API anahtarını bir kez alır. Anahtar sıradan bir anahtardır:
+    API Kimlik Bilgileri sayfasında görünür ve iptal edilebilir, izin modeli, para kuralları ve IP kilidi aynıdır. CI''da panelde ya da `POST /cloud/keys` ile oluşturulan
+    anahtarı kullanmaya devam edin.'
 paths:
   /whoami:
     get:
@@ -12289,7 +12303,7 @@ paths:
                   data:
                     type: object
                     properties:
-                      deploy_key: &id098
+                      deploy_key: &id101
                         type: object
                         nullable: true
                         properties:
@@ -22809,6 +22823,178 @@ paths:
         '503':
           description: capacity / pool_exhausted (try again later)
           content: *id088
+  /auth/device/code:
+    post:
+      tags: &id093
+      - Authentication
+      operationId: createDeviceCode
+      security: []
+      summary: Start a browser sign-in (device code)
+      x-summary-tr: Tarayıcıyla girişi başlat (cihaz kodu)
+      x-cli:
+        command: auth login
+      description: 'No API key. Limits: 10 codes per IP per 10 minutes (429 `rate_limited`). The code is valid for `expires_in` seconds. `template` / `scopes` only
+        preselect permissions on the approval page; the user decides.'
+      x-description-tr: 'API anahtarı gerekmez. Sınır: IP başına 10 dakikada 10 kod (429 `rate_limited`). Kod `expires_in` saniye geçerlidir. `template` / `scopes`
+        onay sayfasındaki izinleri yalnız önceden seçer; karar kullanıcınındır.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                client_name:
+                  type: string
+                  example: gyro-cli
+                client_version:
+                  type: string
+                  example: 1.31.0
+                hostname:
+                  type: string
+                  example: laptop
+                os:
+                  type: string
+                  example: linux/amd64
+                template:
+                  type: string
+                  enum:
+                  - readonly
+                  - dns
+                  - cloud
+                  - containers
+                  - storage
+                  - billing
+                  - full
+                  - custom
+                scopes:
+                  type: array
+                  items:
+                    type: string
+                  example:
+                  - cloud_read
+                  - services_read
+                lang:
+                  type: string
+                  enum:
+                  - tr
+                  - en
+      responses:
+        '200':
+          description: Code issued
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/DeviceCode'
+        '422':
+          $ref: '#/components/responses/Validation'
+        '429':
+          description: rate_limited
+          content:
+            application/json:
+              schema: &id094
+                $ref: '#/components/schemas/Error'
+  /auth/device/token:
+    post:
+      tags: *id093
+      operationId: pollDeviceToken
+      security: []
+      summary: Poll for the key (device code)
+      x-summary-tr: Anahtarı sorgula (cihaz kodu)
+      x-cli:
+        command: auth login
+      description: 'No API key. 400 errors while waiting: `authorization_pending` (keep polling every `interval` s), `slow_down` (details.interval is the new interval),
+        `access_denied` (denied in the browser, or the account can no longer get a key), `expired_token`, `invalid_grant` (unknown or already used code). 200 once:
+        the new key (`access_token`).'
+      x-description-tr: 'API anahtarı gerekmez. Beklerken 400 hataları: `authorization_pending` (her `interval` saniyede sormaya devam), `slow_down` (details.interval
+        yeni aralık), `access_denied` (tarayıcıda reddedildi ya da hesap artık anahtar alamıyor), `expired_token`, `invalid_grant` (bilinmeyen ya da kullanılmış kod).
+        200 bir kez: yeni anahtar (`access_token`).'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                device_code:
+                  type: string
+              required:
+              - device_code
+      responses:
+        '200':
+          description: 'Approved: the key, once'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/DeviceToken'
+        '400':
+          description: authorization_pending | slow_down | access_denied | expired_token | invalid_grant
+          content:
+            application/json:
+              schema: *id094
+        '429':
+          description: rate_limited
+          content:
+            application/json:
+              schema: *id094
+  /auth/session:
+    get:
+      tags: *id093
+      operationId: getAuthSession
+      summary: 'Key in use: account, permissions, expiry'
+      x-summary-tr: 'Kullanılan anahtar: hesap, izinler, bitiş'
+      x-cli:
+        command: auth status
+      description: Any valid key (no scope needed).
+      x-description-tr: Geçerli her anahtar (kapsam gerekmez).
+      responses:
+        '200':
+          description: Session
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      key:
+                        $ref: '#/components/schemas/AuthKey'
+                      account:
+                        $ref: '#/components/schemas/AuthAccount'
+        '401': &id095
+          $ref: '#/components/responses/Unauthorized'
+    delete:
+      tags: *id093
+      operationId: deleteAuthSession
+      summary: Revoke the key in use (sign out)
+      x-summary-tr: Kullanılan anahtarı iptal et (çıkış)
+      x-cli:
+        command: auth logout
+      description: Revokes the key that sends this request (any valid key, no scope needed). It stays listed as revoked on the API Credentials page.
+      x-description-tr: Bu isteği gönderen anahtarı iptal eder (geçerli her anahtar, kapsam gerekmez). API Kimlik Bilgileri sayfasında iptal edilmiş olarak görünür.
+      responses:
+        '200':
+          description: Revoked
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      revoked:
+                        type: boolean
+                      id:
+                        type: integer
+        '401': *id095
 components:
   securitySchemes:
     bearerAuth:
@@ -22818,7 +23004,8 @@ components:
       description: "Client API key. Scopes: `Module:Addons/GyroAPI/cloud_read`, `.../cloud_write`, `.../cloud_order` (spends balance),\n`.../cloud_delete`, plus core\
         \ scopes such as `Invoices/GetInvoices`, `Balance/GetBalance`. Optional IP allow list per key.\nDefault limit 60 requests per minute per key (`X-RateLimit-*`\
         \ headers, `429` with `Retry-After`).\n v2 scopes: `services_read`, `services_write`, `webhooks`, `keys`, `reseller`, `billing_pay`, `billing_read`, `users`\
-        \ (all under `Module:Addons/GyroAPI/`). ACME keys carry only `dns_acme`."
+        \ (all under `Module:Addons/GyroAPI/`). ACME keys carry only `dns_acme`. Keys can expire (`expires_at`): an expired key gets 401 `key_expired` and is revoked.\
+        \ Command line: `gyro auth login` signs in with the browser instead of copying a key."
   parameters:
     ServerId:
       name: id
@@ -24125,6 +24312,26 @@ components:
         rate_limit:
           type: integer
           description: Requests per minute (<= your own limit; 0 = default)
+        template:
+          type: string
+          enum:
+          - readonly
+          - dns
+          - cloud
+          - containers
+          - storage
+          - full
+          description: 'Ready-made scope set, added to scopes: readonly (cloud_read, services_read), dns (services_read, services_write, dns_acme), cloud (cloud_*,
+            services_*), containers / storage (services_read, services_write, cloud_read), full (every delegable scope).'
+          x-description-tr: 'Hazır kapsam kümesi, scopes listesine eklenir: readonly (cloud_read, services_read), dns (services_read, services_write, dns_acme), cloud
+            (cloud_*, services_*), containers / storage (services_read, services_write, cloud_read), full (devredilebilen tüm kapsamlar).'
+        expires:
+          type: string
+          example: 90d
+          description: 'Key expiry: never (default), 7d, 30d, 90d, 1y, <n>d (up to 1830) or a date YYYY-MM-DD (end of day). Expired keys are refused with 401 key_expired
+            and revoked; the owner is mailed 7 days before.'
+          x-description-tr: 'Anahtarın son kullanma tarihi: never (varsayılan), 7d, 30d, 90d, 1y, <n>d (en çok 1830) ya da tarih YYYY-MM-DD (gün sonu). Süresi dolan
+            anahtar 401 key_expired ile reddedilir ve iptal edilir; 7 gün önce hesap sahibine e-posta gider.'
     ApiKey:
       type: object
       properties:
@@ -24171,6 +24378,11 @@ components:
           type: string
           format: date-time
         last_used_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        expires_at:
           type:
           - string
           - 'null'
@@ -25211,7 +25423,7 @@ components:
           maxLength: 255
         color:
           type: string
-          enum: &id093
+          enum: &id096
           - gray
           - blue
           - green
@@ -25264,22 +25476,22 @@ components:
       required:
       - name
       properties:
-        name: &id094
+        name: &id097
           type: string
           minLength: 1
           maxLength: 40
           description: 'Letter or digit first; then letters, digits, space and . _ - / + # & ( ). Unique per account (case-insensitive). Reserved: Genel, General,
             Default.'
-        description: &id095
+        description: &id098
           type:
           - string
           - 'null'
           maxLength: 255
-        color: &id096
+        color: &id099
           type: string
-          enum: *id093
+          enum: *id096
           default: blue
-        icon: &id097
+        icon: &id100
           type: string
           enum:
           - folder
@@ -25314,10 +25526,10 @@ components:
     ProjectUpdate:
       type: object
       properties:
-        name: *id094
-        description: *id095
-        color: *id096
-        icon: *id097
+        name: *id097
+        description: *id098
+        color: *id099
+        icon: *id100
     ProjectRef:
       type:
       - object
@@ -25667,7 +25879,7 @@ components:
                   fingerprint:
                     type: string
                     example: SHA256:+DiY3wvvV6TuJJhbpZisF/zLDA0zPMSvHdkr4UvCOqU
-            deploy_key: *id098
+            deploy_key: *id101
         archive:
           type: object
           properties:
@@ -26097,12 +26309,12 @@ components:
           type: string
         egress_change:
           $ref: '#/components/schemas/ContainerEgressChange'
-        pending_egress_ips: &id100
+        pending_egress_ips: &id103
           type: array
           items:
             type: string
           description: new egress IPs announced but not in use for sure yet; add them to your allow lists now
-        egress_hold_hours: &id099
+        egress_hold_hours: &id102
           type: integer
           description: approval window (0 = off)
     ContainerEnvironment:
@@ -26185,10 +26397,10 @@ components:
         node_monthly_eur:
           type: number
           description: price of one node per month (an extra node costs the same)
-        egress_hold_hours: *id099
+        egress_hold_hours: *id102
         egress_change:
           $ref: '#/components/schemas/ContainerEgressChange'
-        pending_egress_ips: *id100
+        pending_egress_ips: *id103
     VpcPortForward:
       type: object
       properties:
@@ -26397,3 +26609,91 @@ components:
           - automatic
         applied_at:
           type: string
+    AuthKey:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+          example: Gyro CLI · laptop · 2026-11-15
+        token_prefix:
+          type: string
+          example: wck_4J4TOQcLG
+        source:
+          type: string
+          enum:
+          - panel
+          - api
+          - device
+          description: where the key was created; device = gyro auth login
+        expires_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        permissions:
+          type: integer
+          description: number of endpoint permissions
+        scopes:
+          type: array
+          items:
+            type: string
+          description: Gyro API scopes among them (cloud_read, services_write, ...)
+        sub_account:
+          type: boolean
+        ips:
+          type: array
+          items:
+            type: string
+        created_at:
+          type: string
+          format: date-time
+    AuthAccount:
+      type: object
+      description: Masked account identity.
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+          example: G*** P***
+        email:
+          type: string
+          example: g***@example.com
+    DeviceCode:
+      type: object
+      properties:
+        device_code:
+          type: string
+          description: Secret, single use; send only to /auth/device/token
+          example: gdc_…
+        user_code:
+          type: string
+          example: BCDF-GHJK
+          description: 8 letters (no vowels), shown to the user
+        verification_uri:
+          type: string
+          example: https://www.gyrohosting.com/device
+        verification_uri_complete:
+          type: string
+          example: https://www.gyrohosting.com/device?code=BCDF-GHJK
+        expires_in:
+          type: integer
+          example: 300
+        interval:
+          type: integer
+          example: 5
+    DeviceToken:
+      type: object
+      properties:
+        access_token:
+          type: string
+          description: The new client API key (wck_…), returned exactly once
+        token_type:
+          type: string
+          const: Bearer
+        key:
+          $ref: '#/components/schemas/AuthKey'
+        account:
+          $ref: '#/components/schemas/AuthAccount'

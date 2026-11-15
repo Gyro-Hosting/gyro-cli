@@ -1,6 +1,6 @@
 ## gyro configure
 
-Store an API key and preferences in a named profile
+Store an API key (or sign in with the browser) and preferences in a named profile
 
 ### Synopsis
 

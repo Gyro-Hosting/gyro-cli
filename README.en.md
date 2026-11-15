@@ -28,7 +28,8 @@ The install script verifies the checksum and, when gpg is available, the signatu
 ## Getting started
 
 ```sh
-gyro configure                    # API key: Client area → account menu (top right) → API Credentials (wck_...)
+gyro auth login                   # sign in with the browser (no key to copy)
+# or: gyro configure              # paste an API key: Client area → account menu (top right) → API Credentials (wck_...)
 gyro whoami
 gyro plan list --location falkenstein
 gyro server create web-1 --plan pro-2-8 --location falkenstein --image ubuntu-24.04 \
@@ -80,14 +81,17 @@ gyro
 ├── key           list · create · delete                       (sub-account API keys)
 ├── reseller      customer list|get|create|update|delete · customer key … · assign · report · setting
 ├── me · address · affiliate · reference · sms · ping · activity list · whoami
-└── configure · context · api request|operations · completion · version
+└── auth login|status|logout · configure · context · api request|operations · completion · version
 ```
 
 Full list: `gyro api operations` (every endpoint and its command) and [docs/commands](docs/commands/gyro.md).
 
 ## Profiles and credentials
 
-- `gyro configure [--profile name]` checks the key (`/whoami`) and writes `~/.config/gyro/config.toml` (mode 0600).
+- `gyro auth login [--profile name] [--no-browser] [--template readonly]` opens the panel in your browser (device authorization, like `gh auth login`):
+  check the code, pick permissions and the key lifetime, approve; the CLI stores the new time-limited key in the profile. Over SSH the address is only printed.
+  `gyro auth status` shows account, key, permissions and expiry; `gyro auth logout` revokes the key and removes it locally.
+- `gyro configure [--profile name]` (asks for the browser sign-in first) checks the key (`/whoami`) and writes `~/.config/gyro/config.toml` (mode 0600).
   `--keyring` keeps the key in the OS keychain instead. Scripts: `echo "$KEY" | gyro configure --token-stdin --profile ci`.
 - Precedence: flags (`--profile`, `--api-url`) > environment (`GYRO_TOKEN`, `GYRO_PROFILE`, `GYRO_API_URL`, `GYRO_OUTPUT`, `GYRO_LANG`) > profile > default.
 - `gyro context` shows the active profile, URL, masked key and permissions; `gyro context use <profile>` switches the default.

@@ -27,7 +27,7 @@ T = {
 </table>
 <p>Tek dosyalık program (Linux, macOS, Windows; amd64, arm64). Sürüm dosyalarının SHA-256 listesi Gyro sürüm anahtarıyla imzalıdır
 (<code>E96B E963 5E77 A0D9 119A C8C3 A798 6589 A154 B990</code>).</p>"""),
-   ("start", "Başlarken", """<pre><code>gyro configure                     # API anahtarı: Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri
+   ("start", "Başlarken", """<pre><code>gyro auth login                    # tarayıcıyla giriş (anahtar kopyalamadan); ya da gyro configure ile anahtar yapıştırın
 gyro whoami
 gyro plan list --location falkenstein
 gyro server create web-1 --plan pro-2-8 --location falkenstein --image ubuntu-24.04 \\
@@ -50,7 +50,8 @@ $ gyro invoice list --unpaid
 $ gyro dns record add example.com --type A --name www --value 203.0.113.10
 $ gyro mail mailbox list example.com</code></pre>"""),
    ("profiles", "Profiller ve kimlik", """<ul>
-<li><code>gyro configure [--profile ad]</code> anahtarı doğrular ve <code>~/.config/gyro/config.toml</code> dosyasına (izin 0600) yazar; <code>--keyring</code> işletim sistemi anahtar zincirini kullanır.</li>
+<li><code>gyro auth login [--profile ad] [--no-browser] [--template readonly]</code> paneli tarayıcıda açar; kodu kontrol edip izinleri ve anahtarın süresini seçerek onaylarsınız, süreli anahtar profile kaydedilir. <code>gyro auth status</code> hesap/anahtar/izin/bitişi gösterir, <code>gyro auth logout</code> anahtarı iptal edip yerelden siler.</li>
+<li><code>gyro configure [--profile ad]</code> (önce tarayıcı girişini önerir) anahtarı doğrular ve <code>~/.config/gyro/config.toml</code> dosyasına (izin 0600) yazar; <code>--keyring</code> işletim sistemi anahtar zincirini kullanır.</li>
 <li>Betikler: <code>echo "$ANAHTAR" | gyro configure --token-stdin --profile ci</code> ya da yalnız <code>GYRO_TOKEN</code>.</li>
 <li>Öncelik: bayrak &gt; ortam (<code>GYRO_TOKEN</code>, <code>GYRO_PROFILE</code>, <code>GYRO_API_URL</code>, <code>GYRO_OUTPUT</code>, <code>GYRO_LANG</code>) &gt; profil.</li>
 <li><code>gyro context</code> etkin profili ve anahtar yetkilerini gösterir; <code>gyro context use ad</code> varsayılanı değiştirir.</li></ul>"""),
@@ -95,7 +96,7 @@ gyro service tool run 48001 &lt;araç&gt; &lt;eylem&gt; --set alan=değer</code>
 </table>
 <p>A single binary for Linux, macOS and Windows (amd64, arm64). Release checksums are signed with the Gyro release key
 (<code>E96B E963 5E77 A0D9 119A C8C3 A798 6589 A154 B990</code>).</p>"""),
-   ("start", "Getting started", """<pre><code>gyro configure                     # API key: Client area → account menu (top right) → API Credentials
+   ("start", "Getting started", """<pre><code>gyro auth login                    # sign in with the browser (no key to copy); or paste a key with gyro configure
 gyro whoami
 gyro plan list --location falkenstein
 gyro server create web-1 --plan pro-2-8 --location falkenstein --image ubuntu-24.04 \\
@@ -118,7 +119,8 @@ $ gyro invoice list --unpaid
 $ gyro dns record add example.com --type A --name www --value 203.0.113.10
 $ gyro mail mailbox list example.com</code></pre>"""),
    ("profiles", "Profiles and credentials", """<ul>
-<li><code>gyro configure [--profile name]</code> checks the key and writes <code>~/.config/gyro/config.toml</code> (mode 0600); <code>--keyring</code> uses the OS keychain.</li>
+<li><code>gyro auth login [--profile name] [--no-browser] [--template readonly]</code> opens the panel in your browser; check the code, pick permissions and the key lifetime, approve, and the time-limited key is stored in the profile. <code>gyro auth status</code> shows account/key/permissions/expiry, <code>gyro auth logout</code> revokes the key and removes it locally.</li>
+<li><code>gyro configure [--profile name]</code> (offers the browser sign-in first) checks the key and writes <code>~/.config/gyro/config.toml</code> (mode 0600); <code>--keyring</code> uses the OS keychain.</li>
 <li>Scripts: <code>echo "$KEY" | gyro configure --token-stdin --profile ci</code> or just <code>GYRO_TOKEN</code>.</li>
 <li>Precedence: flag &gt; environment (<code>GYRO_TOKEN</code>, <code>GYRO_PROFILE</code>, <code>GYRO_API_URL</code>, <code>GYRO_OUTPUT</code>, <code>GYRO_LANG</code>) &gt; profile.</li>
 <li><code>gyro context</code> shows the active profile and key permissions; <code>gyro context use name</code> switches the default.</li></ul>"""),
@@ -175,8 +177,8 @@ def page(lang):
     return f"""<!doctype html><html lang="{lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{e(t["title"])}</title>
 <meta name="description" content="{e(t["desc"])}">
-<link rel="alternate" hreflang="{t["other"]}" href="../{t["other"]}/cli.html"><link rel="stylesheet" href="../assets/style.css"><link rel="icon" href="../assets/logo.svg"></head>
-<body><header><a class="logo" href="./"><img src="../assets/logo.svg" width="26" height="26" alt="">Gyro Developers</a><span class="sp"></span>
+<link rel="alternate" hreflang="{t["other"]}" href="../{t["other"]}/cli.html"><link rel="stylesheet" href="../assets/style.css"><meta property="og:site_name" content="Gyro Hosting"><meta property="og:image" content="https://www.gyrohosting.com/resources/uploads/logo/2023-04-15/gyro-bilisim-reklamcilik-ve-danismanlik-hizmetleri.png"><link rel="icon" type="image/x-icon" href="https://www.gyrohosting.com/resources/uploads/logo/favicon.ico"></head>
+<body><header><a class="logo" href="./"><img class="lg lg-l" src="../assets/gyro-logo.png" width="89" height="32" alt="Gyro Hosting"><img class="lg lg-d" src="../assets/gyro-logo-dark.png" width="89" height="32" alt="Gyro Hosting"><span>Developers</span></a><span class="sp"></span>
 <a href="./">{e(t["nav_api"])}</a><a href="../{t["other"]}/cli.html" hreflang="{t["other"]}">{e(t["other_label"])}</a></header>
 <div class="wrap"><nav aria-label="cli"><h4>{e(t["nav_title"])}</h4>{nav}<a href="#reference">{e(t["ref"])}</a></nav>
 <main><section id="top"><h1>gyro <span class="badge">CLI</span></h1><p class="mut">{e(t["desc"])}</p></section>{body}{ref}</main></div>

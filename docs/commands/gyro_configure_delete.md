@@ -31,5 +31,5 @@ gyro configure delete <PROFILE> [flags]
 
 ### SEE ALSO
 
-* [gyro configure](gyro_configure.md)	 - Store an API key and preferences in a named profile
+* [gyro configure](gyro_configure.md)	 - Store an API key (or sign in with the browser) and preferences in a named profile
 

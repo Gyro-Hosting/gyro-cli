@@ -5,10 +5,10 @@ Gyro Hosting komut satırı aracı
 ### Synopsis
 
 gyro, Gyro Hosting hizmetlerinizi terminalden yönetir: bulut sunucular, SSH anahtarları, faturalar,
-bakiye ve Gyro Public API'nin sunduğu her şey (API sürümü 2.30.0).
+bakiye ve Gyro Public API'nin sunduğu her şey (API sürümü 2.31.0).
 
 Başlarken:
-  gyro configure                 # API anahtarını kaydedin (Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri)
+  gyro auth login                # tarayıcıyla giriş (ya da: anahtar yapıştırmak için gyro configure)
   gyro server list
   gyro server create --plan standart-2-4 --location falkenstein --image ubuntu-24.04 --ssh-key anahtarim --wait
   gyro server ssh web-1
@@ -41,11 +41,12 @@ Hesap sınırları (gyro limits) destek talebiyle artırılır: gyro ticket crea
 * [gyro affiliate](gyro_affiliate.md)	 - Program Durumunu Okuma
 * [gyro api](gyro_api.md)	 - Herhangi bir API ucunu doğrudan çağır ('gh api' gibi)
 * [gyro app](gyro_app.md)	 - Tek tık uygulamalar
+* [gyro auth](gyro_auth.md)	 - Tarayıcıyla giriş yap, CLI oturumunu göster ya da kapat
 * [gyro balance](gyro_balance.md)	 - Hesap bakiyesi (tek başına) ve hareketler
 * [gyro billing](gyro_billing.md)	 - Ön ödemeli saatlik kullanım (İstanbul bulut, kapsayıcı): bakiye, kullanım, tahmin, döküm
 * [gyro bulk](gyro_bulk.md)	 - Bir eylemi 50 sunucuya kadar toplu çalıştır
 * [gyro completion](gyro_completion.md)	 - Kabuk tamamlama betiği üret
-* [gyro configure](gyro_configure.md)	 - API anahtarını ve tercihleri adlı bir profile kaydet
+* [gyro configure](gyro_configure.md)	 - API anahtarını (ya da tarayıcı girişini) ve tercihleri adlı bir profile kaydet
 * [gyro container](gyro_container.md)	 - Gyro Kapsayıcı (ECS), İstanbul: servisler, sürümler, loglar, alan adları
 * [gyro context](gyro_context.md)	 - Etkin profili, API adresini ve anahtarı göster (anahtarı doğrula)
 * [gyro dedicated](gyro_dedicated.md)	 - Fiziksel sunucular

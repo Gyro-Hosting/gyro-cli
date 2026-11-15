@@ -18,6 +18,7 @@ gyro reseller customer key create <ID> [flags]
       --actions strings          Optional action allow list: server actions (reboot) or tool:action / tool:* / method:name
       --data string              istek gövdesi JSON, @dosya ya da @- (stdin)
       --dry-run                  hiçbir şeyi değiştirmeden teklifi / isteği göster
+      --expires string           Anahtarın son kullanma tarihi: never (varsayılan), 7d, 30d, 90d, 1y, <n>d (en çok 1830) ya da tarih YYYY-MM-DD (gün sonu). Süresi dolan anahtar 401 key_expired ile reddedilir ve iptal edilir; 7 gün önce hesap sahibine e-posta gider.
   -h, --help                     help for create
       --idempotency-key string   tekrar güvenliği anahtarı (para işlemlerinde otomatik)
       --ips strings              ips
@@ -26,6 +27,7 @@ gyro reseller customer key create <ID> [flags]
       --scopes strings           scopes
       --services int64Slice      Optional service allow list (default [])
       --set stringArray          ek gövde alanı anahtar=değer (tekrarlanabilir)
+      --template string          Hazır kapsam kümesi, scopes listesine eklenir: readonly (cloud_read, services_read), dns (services_read, services_write, dns_acme), cloud (cloud_*, services_*), containers / storage (services_read, services_write, cloud_read), full (devredilebilen tüm kapsamlar). (readonly|dns|cloud|containers|storage|full)
 ```
 
 ### Options inherited from parent commands

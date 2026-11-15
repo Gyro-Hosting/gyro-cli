@@ -32,7 +32,7 @@ func addConfigure(a *App, root *cobra.Command) {
 	cfg := &cobra.Command{
 		Use:     "configure",
 		GroupID: "cli",
-		Short:   i18n.S("Store an API key and preferences in a named profile", "API anahtarını ve tercihleri adlı bir profile kaydet"),
+		Short:   i18n.S("Store an API key (or sign in with the browser) and preferences in a named profile", "API anahtarını (ya da tarayıcı girişini) ve tercihleri adlı bir profile kaydet"),
 		Long: i18n.S(`Interactive setup, like 'aws configure'. Profiles live in ~/.config/gyro/config.toml (mode 0600).
 Use --profile NAME for more than one account; --keyring keeps the key in the OS keychain instead of the file.
 Non-interactive: echo "$KEY" | gyro configure --token-stdin --profile ci`,
@@ -65,6 +65,20 @@ Etkileşimsiz: echo "$ANAHTAR" | gyro configure --token-stdin --profile ci`),
 			}
 			if interactive {
 				fmt.Fprintln(a.Err, i18n.F("Configuring profile %q (%s)", "%q profili yapılandırılıyor (%s)", name, c.FilePath()))
+				// 1.31.0: browser sign-in first (no key to copy); answering "n" keeps the classic paste-a-key flow
+				if ans := strings.ToLower(a.Prompt(r, i18n.S("Sign in with the browser? (Y/n)", "Tarayıcıyla giriş yapılsın mı? (E/h)"), "")); ans == "" || strings.HasPrefix(ans, "y") || strings.HasPrefix(ans, "e") {
+					if err := c.Save(); err != nil {
+						return err
+					}
+					ctx, cancel := a.Ctx()
+					defer cancel()
+					u := firstNonEmpty(p.APIURL, a.Env("GYRO_API_URL"), api.DefaultURL)
+					tok, err := a.deviceLogin(ctx, u, "", nil, false, keyring)
+					if err != nil {
+						return err
+					}
+					return a.storeLogin(name, "", tok, keyring)
+				}
 				old, _, _ := c.TokenFor(name)
 				label := i18n.S("API key (wck_...)", "API anahtarı (wck_...)")
 				if old != "" {

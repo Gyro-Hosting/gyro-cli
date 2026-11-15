@@ -329,7 +329,7 @@ func snippet(b []byte) string {
 	return s
 }
 
-var secretKeys = []string{"password", "secret", "token", "private_key", "auth_code", "epp"}
+var secretKeys = []string{"password", "secret", "token", "private_key", "auth_code", "epp", "device_code"}
 
 // Redact masks secret-looking JSON fields (used for --debug logging).
 func Redact(b []byte) []byte {

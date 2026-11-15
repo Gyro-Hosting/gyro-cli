@@ -29,7 +29,8 @@ Kurulum betiği gpg varsa imzayı, her durumda sağlama toplamını doğrular.
 ## Başlarken
 
 ```sh
-gyro configure                    # API anahtarı: Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri (wck_...)
+gyro auth login                   # tarayıcıyla giriş (anahtar kopyalamadan)
+# ya da: gyro configure           # API anahtarı yapıştırın: Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri (wck_...)
 gyro whoami                       # anahtar ve yetkileri
 gyro plan list --location falkenstein
 gyro server create web-1 --plan pro-2-8 --location falkenstein --image ubuntu-24.04 \
@@ -88,14 +89,17 @@ gyro
 ├── key           list · create · delete                       (alt hesap API anahtarları)
 ├── reseller      customer list|get|create|update|delete · customer key … · assign · report · setting
 ├── me · address · affiliate · reference · sms · ping · activity list · whoami
-└── configure · context · api request|operations · completion · version
+└── auth login|status|logout · configure · context · api request|operations · completion · version
 ```
 
 Tam liste: `gyro api operations` (her API ucu ve karşılığı olan komut) ve [docs/commands-tr](docs/commands-tr/gyro.md).
 
 ## Profiller ve kimlik
 
-- `gyro configure [--profile ad]` — anahtarı doğrular (`/whoami`) ve `~/.config/gyro/config.toml` dosyasına (izin 0600) yazar.
+- `gyro auth login [--profile ad] [--no-browser] [--template readonly]` — paneli tarayıcıda açar (cihaz yetkilendirmesi, `gh auth login` gibi):
+  kodu kontrol edin, izinleri ve anahtarın süresini seçip onaylayın; CLI yeni süreli anahtarı profile kaydeder. SSH bağlantısında adres yalnız yazdırılır.
+  `gyro auth status` hesabı, anahtarı, izinleri ve bitişi gösterir; `gyro auth logout` anahtarı iptal edip yerelden siler.
+- `gyro configure [--profile ad]` — (önce tarayıcı girişini önerir) anahtarı doğrular (`/whoami`) ve `~/.config/gyro/config.toml` dosyasına (izin 0600) yazar.
   `--keyring` ile anahtar dosya yerine işletim sistemi anahtar zincirinde (macOS Keychain, Windows Credential Manager,
   Linux Secret Service) tutulur. Betikler için: `echo "$ANAHTAR" | gyro configure --token-stdin --profile ci`.
 - Öncelik: bayrak (`--profile`, `--api-url`) > ortam (`GYRO_TOKEN`, `GYRO_PROFILE`, `GYRO_API_URL`, `GYRO_OUTPUT`, `GYRO_LANG`) > profil > varsayılan.

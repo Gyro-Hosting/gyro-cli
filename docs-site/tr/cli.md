@@ -50,12 +50,14 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro affiliate get` | Program Durumunu Okuma | `GET /affiliate` |
 | `gyro affiliate payment-method set` | Ödeme Hedefini Kaydetme | `PUT /affiliate/payment-method` |
 | `gyro affiliate withdraw` | Ödeme Talebi Açma | `POST /affiliate/withdraw` |
+| `gyro api request DELETE /auth/session` | Kullanılan anahtarı iptal et (çıkış) | `DELETE /auth/session` |
 | `gyro api request DELETE /cloud/mail/{id}/aliases/{aid}` | aliases:delete (GyroMail) | `DELETE /cloud/mail/{id}/aliases/{aid}` |
 | `gyro api request DELETE /cloud/mail/{id}/autoresponders/{local}` | autoresponder:delete (GyroMail) | `DELETE /cloud/mail/{id}/autoresponders/{local}` |
 | `gyro api request DELETE /cloud/mail/{id}/mailboxes/{local}` | mailboxes:delete (GyroMail) | `DELETE /cloud/mail/{id}/mailboxes/{local}` |
 | `gyro api request DELETE /cloud/mail/{id}/migrations/{jid}` | sync-jobs:delete (GyroMail) | `DELETE /cloud/mail/{id}/migrations/{jid}` |
 | `gyro api request DELETE /cloud/storage/{id}/buckets/{bucket}` | buckets:delete (GyroDepolama) | `DELETE /cloud/storage/{id}/buckets/{bucket}` |
 | `gyro api request DELETE /cloud/storage/{id}/keys/{key}` | access-keys:delete (GyroDepolama) | `DELETE /cloud/storage/{id}/keys/{key}` |
+| `gyro api request GET /auth/session` | Kullanılan anahtar: hesap, izinler, bitiş | `GET /auth/session` |
 | `gyro api request GET /cloud/account/limits` | Hesap sınırları ve kullanım | `GET /cloud/account/limits` |
 | `gyro api request GET /cloud/apps` | Kurulabilir uygulamaları listele | `GET /cloud/apps` |
 | `gyro api request GET /cloud/billing/balance` | Balance, hourly cost of running prepaid services and estimated time left | `GET /cloud/billing/balance` |
@@ -72,6 +74,8 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro api request GET /cloud/storage/{id}/keys` | access-keys (GyroDepolama) | `GET /cloud/storage/{id}/keys` |
 | `gyro api request PATCH /cloud/mail/{id}/aliases/{aid}` | aliases:edit (GyroMail) | `PATCH /cloud/mail/{id}/aliases/{aid}` |
 | `gyro api request PATCH /cloud/mail/{id}/mailboxes/{local}` | mailboxes:edit (GyroMail) | `PATCH /cloud/mail/{id}/mailboxes/{local}` |
+| `gyro api request POST /auth/device/code` | Tarayıcıyla girişi başlat (cihaz kodu) | `POST /auth/device/code` |
+| `gyro api request POST /auth/device/token` | Anahtarı sorgula (cihaz kodu) | `POST /auth/device/token` |
 | `gyro api request POST /cloud/billing/estimate` | Hourly / daily / monthly cost of prepaid plans and serverless containers, and how long the balance lasts | `POST /cloud/billing/estimate` |
 | `gyro api request POST /cloud/licenses/{id}/change-ip` | method change_ip (LisansAPP) | `POST /cloud/licenses/{id}/change-ip` |
 | `gyro api request POST /cloud/mail/{id}/aliases` | aliases:create (GyroMail) | `POST /cloud/mail/{id}/aliases` |

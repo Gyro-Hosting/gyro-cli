@@ -29,6 +29,10 @@ API: POST /cloud/reseller/customers/{id}/keys (operationId createResellerCustome
 	show the price quote / request without changing anything
 
 .PP
+\fB--expires\fP=""
+	Key expiry: never (default), 7d, 30d, 90d, 1y, d (up to 1830) or a date YYYY-MM-DD (end of day). Expired keys are refused with 401 key_expired and revoked; the owner is mailed 7 days before.
+
+.PP
 \fB-h\fP, \fB--help\fP[=false]
 	help for create
 
@@ -59,6 +63,10 @@ API: POST /cloud/reseller/customers/{id}/keys (operationId createResellerCustome
 .PP
 \fB--set\fP=[]
 	extra body field key=value (repeatable)
+
+.PP
+\fB--template\fP=""
+	Ready-made scope set, added to scopes: readonly (cloud_read, services_read), dns (services_read, services_write, dns\fIacme), cloud (cloud\fP\fI, services_\fP), containers / storage (services_read, services_write, cloud_read), full (every delegable scope). (readonly|dns|cloud|containers|storage|full)
 
 
 .SH OPTIONS INHERITED FROM PARENT COMMANDS

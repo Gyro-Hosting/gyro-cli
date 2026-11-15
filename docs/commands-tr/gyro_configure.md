@@ -1,6 +1,6 @@
 ## gyro configure
 
-API anahtarını ve tercihleri adlı bir profile kaydet
+API anahtarını (ya da tarayıcı girişini) ve tercihleri adlı bir profile kaydet
 
 ### Synopsis
 
