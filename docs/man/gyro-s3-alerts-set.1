@@ -1,0 +1,101 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-s3-alerts-set - Set the fill alert of a bucket
+
+
+.SH SYNOPSIS
+\fBgyro s3 alerts set   [flags]\fP
+
+
+.SH DESCRIPTION
+Set the fill alert of a bucket
+
+.PP
+Sets or replaces the threshold (the alert re-arms). If the bucket is already above it, the e-mail is sent within ~5 minutes. \fBtype\fR percent (1-100, of the package size) or gb (1 to the package size). Errors: 422 \fBtool_action_failed\fR with a message in the account language. A \fBfill alert\fP sends one e-mail to the account address when a bucket's usage reaches the threshold: \fBpercent\fR = a share of the package size (every bucket of the service shares the package) or \fBgb\fR = an absolute size. Checked every 5 minutes. After the e-mail the alert is \fBtriggered\fR; it re-arms when usage drops below 95% of the threshold, and the next crossing sends again. The alert only informs, uploads are not stopped. The package-wide 80% / 100% e-mails stay as they are. Object Storage and Protected Storage (old versions and delete markers count as usage).
+
+.PP
+API: PUT /cloud/storage/{id}/buckets/{bucket}/alert (operationId setStorageBucketAlert, scope services_write)
+
+
+.SH OPTIONS
+\fB--data\fP=""
+	request body as JSON, @file or @- (stdin)
+
+.PP
+\fB--dry-run\fP[=false]
+	show the price quote / request without changing anything
+
+.PP
+\fB-h\fP, \fB--help\fP[=false]
+	help for set
+
+.PP
+\fB--idempotency-key\fP=""
+	idempotency key (automatic for money operations)
+
+.PP
+\fB--set\fP=[]
+	extra body field key=value (repeatable)
+
+.PP
+\fB--type\fP=""
+	type (percent|gb)
+
+.PP
+\fB--value\fP=0
+	value
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH SEE ALSO
+\fBgyro-s3-alerts(1)\fP

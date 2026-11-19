@@ -2,7 +2,7 @@
 openapi: 3.1.0
 info:
   title: Gyro Public API
-  version: 2.42.0
+  version: 2.43.0
   summary: Manage Gyro cloud servers, SSH keys and billing programmatically.
   x-summary-tr: Gyro bulut sunucularınızı, SSH anahtarlarınızı ve faturalarınızı programla yönetin.
   description: "The Gyro Public API lets you automate everything you do in the Gyro client area:\norder and manage cloud servers, keep SSH keys, read invoices and\
@@ -108,8 +108,12 @@ info:
     \ with `details.pricing` otherwise). Node environments stay free. Additive.\n\n**2.39.0**: port forwards take an optional `name` (POST, and `PATCH /cloud/vpcs/{vpc_id}/port-forwards/{pf_id}`\
     \ with `source_cidrs` and/or `name`). `GET /cloud/containers/{id}/services/{name}` always returns `spec.alerts` (`min_ready` 0 when off). Additive.\n\n**2.40.0**:\
     \ scheduled snapshots of Gyro Cloud Istanbul servers: `GET|PUT|DELETE /cloud/servers/{id}/snapshot-schedule` (daily or weekly at a Türkiye time, keep the last\
-    \ N automatic snapshots). Additive.\n\n**2.42.0**: account activity `GET /activity` (sign-ins and security events of the client area, `account_read` permission,\
-    \ `gyro activity`). Additive.\n"
+    \ N automatic snapshots). Additive.\n\n**2.41.0**: saved cards (`GET|POST /cloud/account/cards`, `PATCH|DELETE /cloud/account/cards/{id}`) and automatic balance\
+    \ top-up (`GET|PUT /cloud/account/auto-topup`). Card numbers never pass through the API; adding a card needs 3-D Secure in the browser. Additive.\n\n**2.42.0**:\
+    \ account activity `GET /activity` (sign-ins and security events of the client area, `account_read` permission, `gyro activity`). Additive.\n\n**2.43.0**: per-bucket\
+    \ fill alerts (`GET /cloud/storage/{id}/alerts`, `GET|PUT|DELETE /cloud/storage/{id}/buckets/{bucket}/alert`; e-mail when a bucket reaches a percent-of-package\
+    \ or GB threshold, re-arms below 95%). Protected Storage: the old-version rule (`gyro-eski-surum`) now also removes delete markers with no version left (`ExpiredObjectDeleteMarker`);\
+    \ lifecycle rules run nightly (Object Storage ~03:00, Protected Storage 03:30 Türkiye time). Additive.\n"
   x-description-tr: "Gyro Public API, müşteri panelinde yaptığınız her işi otomatikleştirmenizi sağlar:\nbulut sunucu siparişi ve yönetimi, SSH anahtarları, fatura\
     \ ve bakiye okuma.\nResmi Terraform sağlayıcısı (`gyro-hosting/gyro`) ve `gyroctl` bu API'yi kullanır.\n\n* **Taban adres** `https://www.gyrohosting.com/api/v1/client`\n\
     * **Kimlik** `Authorization: Bearer wck_...` (anahtarı *Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri* bölümünden oluşturun)\n* **Biçim** JSON\
@@ -212,8 +216,12 @@ info:
     : true` ister (yoksa 422 `confirm_required` + `details.pricing`). Düğümlü ortamlar ücretsiz kalır. Geriye uyumlu.\n\n**2.39.0**: port yönlendirmelere isteğe bağlı\
     \ `name` (POST; `PATCH /cloud/vpcs/{vpc_id}/port-forwards/{pf_id}` `source_cidrs` ve/veya `name`). `GET /cloud/containers/{id}/services/{name}` `spec.alerts`'ı\
     \ her zaman döner (kapalıyken `min_ready` 0). Geriye uyumlu.\n\n**2.40.0**: Gyro Bulut İstanbul sunucularında zamanlanmış snapshot: `GET|PUT|DELETE /cloud/servers/{id}/snapshot-schedule`\
-    \ (her gün ya da her hafta, Türkiye saatiyle; son N otomatik snapshot tutulur). Geriye uyumlu.\n\n**2.42.0**: hesap etkinlikleri `GET /activity` (müşteri panelindeki\
-    \ girişler ve güvenlik olayları, `account_read` izni, `gyro activity`). Geriye uyumlu.\n"
+    \ (her gün ya da her hafta, Türkiye saatiyle; son N otomatik snapshot tutulur). Geriye uyumlu.\n\n**2.41.0**: kayıtlı kartlar (`GET|POST /cloud/account/cards`,\
+    \ `PATCH|DELETE /cloud/account/cards/{id}`) ve otomatik bakiye yükleme (`GET|PUT /cloud/account/auto-topup`). Kart numarası API'den geçmez; kart tarayıcıda 3D\
+    \ Secure ile eklenir. Geriye uyumlu.\n\n**2.42.0**: hesap etkinlikleri `GET /activity` (müşteri panelindeki girişler ve güvenlik olayları, `account_read` izni,\
+    \ `gyro activity`). Geriye uyumlu.\n\n**2.43.0**: kova bazlı doluluk uyarıları (`GET /cloud/storage/{id}/alerts`, `GET|PUT|DELETE /cloud/storage/{id}/buckets/{bucket}/alert`;\
+    \ kova paketin yüzdesi ya da GB eşiğine ulaşınca e-posta, %95 altında yeniden kurulur). Korumalı Depolama: eski sürüm kuralı (`gyro-eski-surum`) artık sürümü\
+    \ kalmamış silme işaretlerini de temizler (`ExpiredObjectDeleteMarker`); yaşam döngüsü kuralları her gece çalışır (Nesne ~03:00, Korumalı 03:30 TR). Geriye uyumlu.\n"
   contact:
     name: Gyro Hosting
     url: https://www.gyrohosting.com
@@ -27147,6 +27155,353 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /cloud/account/cards:
+    get:
+      tags:
+      - Billing
+      operationId: listSavedCards
+      summary: List saved cards
+      x-summary-tr: Kayıtlı kartları listele
+      x-scope: billing_read
+      x-cli:
+        command: account card list
+      description: Masked cards only (brand, last 4, expiry). The card is kept by the bank (VakıfBank PanCode); Gyro stores no card number. `add_url` opens the client
+        area page where a card is added with 3-D Secure.
+      x-description-tr: Yalnız maskeli kart (marka, son 4, SKT). Kartı banka saklar (VakıfBank PanCode); Gyro kart numarası tutmaz. `add_url` kartın 3D Secure ile
+        eklendiği panel sayfasıdır.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      cards:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                            brand:
+                              type: string
+                            scheme:
+                              type: string
+                            last4:
+                              type: string
+                            exp_month:
+                              type: integer
+                            exp_year:
+                              type: integer
+                            expired:
+                              type: boolean
+                            default:
+                              type: boolean
+                            auto_pay:
+                              type: boolean
+                            auto_pay_rank:
+                              type: integer
+                              description: Order in the auto-payment chain (0 = not used)
+                            gateway:
+                              type: string
+                            status:
+                              type: string
+                              enum:
+                              - active
+                              - blocked
+                              - pending
+                              - deleted
+                              - unknown
+                              description: blocked = declined by its bank (closed/invalid/expired), add a new card
+                      add_url:
+                        type: string
+                      card_storage:
+                        type: boolean
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/Validation'
+    post:
+      tags:
+      - Billing
+      operationId: addSavedCard
+      summary: Add a card (not possible over the API)
+      x-summary-tr: Kart ekle (API ile yapılamaz)
+      x-scope: billing_pay
+      x-cli:
+        command: account card add
+      description: 'Always 409 `card_add_requires_3d` with `details.add_url`: cards are added in the browser with 3-D Secure, card numbers are never accepted by the
+        API.'
+      x-description-tr: 'Her zaman 409 `card_add_requires_3d` ve `details.add_url`: kart tarayıcıda 3D Secure ile eklenir, API kart numarası kabul etmez.'
+      responses:
+        '409':
+          description: card_add_requires_3d
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /cloud/account/cards/{id}:
+    parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    patch:
+      tags:
+      - Billing
+      operationId: updateSavedCard
+      summary: Use a card for auto-payment / make it the default
+      x-summary-tr: Kartı otomatik ödemede kullan / varsayılan yap
+      x-scope: billing_pay
+      x-cli:
+        command: account card update
+      description: '`auto_pay` true adds the card to the end of the auto-payment chain (renewal invoices are paid from balance first, then from these cards in order),
+        false removes it. `default: true` makes it the default card. Expired cards are refused (422 card_expired).'
+      x-description-tr: '`auto_pay` true kartı otomatik ödeme sırasının sonuna ekler (yenileme faturaları önce bakiyeden, sonra sırayla bu kartlardan ödenir), false
+        çıkarır. `default: true` varsayılan kart yapar. Süresi dolmuş kart reddedilir.'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                auto_pay:
+                  type: boolean
+                default:
+                  type: boolean
+                  enum:
+                  - true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      brand:
+                        type: string
+                      scheme:
+                        type: string
+                      last4:
+                        type: string
+                      exp_month:
+                        type: integer
+                      exp_year:
+                        type: integer
+                      expired:
+                        type: boolean
+                      default:
+                        type: boolean
+                      auto_pay:
+                        type: boolean
+                      auto_pay_rank:
+                        type: integer
+                        description: Order in the auto-payment chain (0 = not used)
+                      gateway:
+                        type: string
+                      status:
+                        type: string
+                        enum:
+                        - active
+                        - blocked
+                        - pending
+                        - deleted
+                        - unknown
+                        description: blocked = declined by its bank (closed/invalid/expired), add a new card
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/Validation'
+    delete:
+      tags:
+      - Billing
+      operationId: deleteSavedCard
+      summary: Delete a saved card (also at the bank)
+      x-summary-tr: Kayıtlı kartı sil (bankadan da)
+      x-scope: billing_pay
+      x-cli:
+        command: account card delete
+        confirm: true
+      description: '`"confirm": true` required. The card is removed from the account and deleted at the bank; `bank` = removed | failed (retried automatically).'
+      x-description-tr: '`"confirm": true` gerekir. Kart hesaptan kaldırılır ve bankadan silinir; `bank` = removed | failed (otomatik yeniden denenir).'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - confirm
+              properties:
+                confirm:
+                  type: boolean
+                  enum:
+                  - true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      deleted:
+                        type: boolean
+                      id:
+                        type: integer
+                      bank:
+                        type: string
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/Validation'
+  /cloud/account/auto-topup:
+    get:
+      tags:
+      - Billing
+      operationId: getAutoTopup
+      summary: Automatic balance top-up setting
+      x-summary-tr: Otomatik bakiye yükleme ayarı
+      x-scope: billing_read
+      x-cli:
+        command: account auto-topup get
+      description: When the balance drops below `threshold`, `amount` (TRY, excl. VAT) is charged to the saved card and credited as a balance top-up invoice incl.
+        VAT. Checked hourly. Limits per day/month apply.
+      x-description-tr: Bakiye `threshold` altına inince `amount` (TL, KDV hariç) kayıtlı karttan çekilir, KDV'li bakiye yükleme faturasıyla yüklenir. Saatte bir
+        kontrol edilir; günlük/aylık sınırlar vardır.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      available:
+                        type: boolean
+                      enabled:
+                        type: boolean
+                      paused:
+                        type: boolean
+                        description: Paused by Gyro staff
+                      threshold:
+                        $ref: '#/components/schemas/Money'
+                      amount:
+                        $ref: '#/components/schemas/Money'
+                      card_id:
+                        type:
+                        - integer
+                        - 'null'
+                      limits:
+                        type: object
+                        properties:
+                          min:
+                            type: number
+                          max_single:
+                            type: number
+                          daily_count:
+                            type: integer
+                          daily_amount:
+                            type: number
+                          monthly:
+                            type: number
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/Validation'
+    put:
+      tags:
+      - Billing
+      operationId: setAutoTopup
+      summary: Turn automatic top-up on/off
+      x-summary-tr: Otomatik yüklemeyi aç/kapat
+      x-scope: billing_pay
+      x-cli:
+        command: account auto-topup set
+      description: 'Enabling needs `consent: true` (authorises the charges). `amount` at least the minimum (250 TRY), at most `limits.max_single`. Omitted fields
+        keep their value. `card_id` 0 = the auto-payment card.'
+      x-description-tr: 'Açmak için `consent: true` gerekir (çekimlere onay). `amount` en az 250 TL, en çok `limits.max_single`. Gönderilmeyen alan değişmez. `card_id`
+        0 = otomatik ödeme kartı.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - enabled
+              properties:
+                enabled:
+                  type: boolean
+                consent:
+                  type: boolean
+                threshold:
+                  type: number
+                  minimum: 0
+                amount:
+                  type: number
+                  minimum: 250
+                card_id:
+                  type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      available:
+                        type: boolean
+                      enabled:
+                        type: boolean
+                      paused:
+                        type: boolean
+                        description: Paused by Gyro staff
+                      threshold:
+                        $ref: '#/components/schemas/Money'
+                      amount:
+                        $ref: '#/components/schemas/Money'
+                      card_id:
+                        type:
+                        - integer
+                        - 'null'
+                      limits:
+                        type: object
+                        properties:
+                          min:
+                            type: number
+                          max_single:
+                            type: number
+                          daily_count:
+                            type: integer
+                          daily_amount:
+                            type: number
+                          monthly:
+                            type: number
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/Validation'
   /activity:
     get:
       tags:
@@ -27260,6 +27615,203 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+        '422':
+          $ref: '#/components/responses/Validation'
+  /cloud/storage/{id}/alerts:
+    get:
+      tags: &id001
+      - Object storage
+      operationId: listStorageBucketAlerts
+      summary: Fill alerts of all buckets
+      x-summary-tr: Tüm kovaların doluluk uyarıları
+      x-scope: services_read
+      x-cli:
+        command: storage alerts list
+        confirm: false
+      description: 'A **fill alert** sends one e-mail to the account address when a bucket''s usage reaches the threshold: `percent` = a share of the package size
+        (every bucket of the service shares the package) or `gb` = an absolute size. Checked every 5 minutes. After the e-mail the alert is `triggered`; it re-arms
+        when usage drops below 95% of the threshold, and the next crossing sends again. The alert only informs, uploads are not stopped. The package-wide 80% / 100%
+        e-mails stay as they are. Object Storage and Protected Storage (old versions and delete markers count as usage).'
+      x-description-tr: '**Doluluk uyarısı**, kova kullanımı eşiğe ulaşınca hesap e-posta adresine bir e-posta gönderir: `percent` = paket boyutunun yüzdesi (hizmetin
+        tüm kovaları paketi ortak kullanır) ya da `gb` = mutlak boyut. 5 dakikada bir kontrol edilir. E-postadan sonra uyarı `triggered` olur; kullanım eşiğin %95''inin
+        altına inince yeniden kurulur ve eşik tekrar aşılırsa yine gönderilir. Uyarı yalnız bilgilendirir, yüklemeyi durdurmaz. Paket genelindeki %80 / %100 e-postaları
+        aynen sürer. Nesne Depolama ve Korumalı Depolama (eski sürümler ve silme işaretleri kullanıma dahildir).'
+      parameters:
+      - &id002
+        name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      items:
+                        type: array
+                        items: &id003
+                          $ref: '#/components/schemas/StorageBucketAlert'
+                      package_gb:
+                        type: number
+                      package_bytes:
+                        type: integer
+                      rearm_pct:
+                        type: integer
+                        example: 95
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+  /cloud/storage/{id}/buckets/{bucket}/alert:
+    get:
+      tags: *id001
+      operationId: getStorageBucketAlert
+      summary: Fill alert of a bucket
+      x-summary-tr: Kovanın doluluk uyarısı
+      x-scope: services_read
+      x-cli:
+        command: storage alerts get
+        confirm: false
+      description: 'Threshold, state and current usage of one bucket. A **fill alert** sends one e-mail to the account address when a bucket''s usage reaches the
+        threshold: `percent` = a share of the package size (every bucket of the service shares the package) or `gb` = an absolute size. Checked every 5 minutes. After
+        the e-mail the alert is `triggered`; it re-arms when usage drops below 95% of the threshold, and the next crossing sends again. The alert only informs, uploads
+        are not stopped. The package-wide 80% / 100% e-mails stay as they are. Object Storage and Protected Storage (old versions and delete markers count as usage).'
+      x-description-tr: 'Bir kovanın eşiği, durumu ve güncel kullanımı. **Doluluk uyarısı**, kova kullanımı eşiğe ulaşınca hesap e-posta adresine bir e-posta gönderir:
+        `percent` = paket boyutunun yüzdesi (hizmetin tüm kovaları paketi ortak kullanır) ya da `gb` = mutlak boyut. 5 dakikada bir kontrol edilir. E-postadan sonra
+        uyarı `triggered` olur; kullanım eşiğin %95''inin altına inince yeniden kurulur ve eşik tekrar aşılırsa yine gönderilir. Uyarı yalnız bilgilendirir, yüklemeyi
+        durdurmaz. Paket genelindeki %80 / %100 e-postaları aynen sürer. Nesne Depolama ve Korumalı Depolama (eski sürümler ve silme işaretleri kullanıma dahildir).'
+      parameters:
+      - *id002
+      - &id004
+        name: bucket
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Bucket name
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      item: *id003
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+    put:
+      tags: *id001
+      operationId: setStorageBucketAlert
+      summary: Set the fill alert of a bucket
+      x-summary-tr: Kovanın doluluk uyarısını ayarla
+      x-scope: services_write
+      x-cli:
+        command: storage alerts set
+        confirm: false
+      description: 'Sets or replaces the threshold (the alert re-arms). If the bucket is already above it, the e-mail is sent within ~5 minutes. `type` percent (1-100,
+        of the package size) or gb (1 to the package size). Errors: 422 `tool_action_failed` with a message in the account language. A **fill alert** sends one e-mail
+        to the account address when a bucket''s usage reaches the threshold: `percent` = a share of the package size (every bucket of the service shares the package)
+        or `gb` = an absolute size. Checked every 5 minutes. After the e-mail the alert is `triggered`; it re-arms when usage drops below 95% of the threshold, and
+        the next crossing sends again. The alert only informs, uploads are not stopped. The package-wide 80% / 100% e-mails stay as they are. Object Storage and Protected
+        Storage (old versions and delete markers count as usage).'
+      x-description-tr: 'Eşiği ayarlar ya da değiştirir (uyarı yeniden kurulur). Kova zaten eşiğin üzerindeyse e-posta ~5 dakika içinde gider. `type` percent (1-100,
+        paketin yüzdesi) ya da gb (1 ile paket boyutu arası). Hata: hesap dilinde mesajla 422 `tool_action_failed`. **Doluluk uyarısı**, kova kullanımı eşiğe ulaşınca
+        hesap e-posta adresine bir e-posta gönderir: `percent` = paket boyutunun yüzdesi (hizmetin tüm kovaları paketi ortak kullanır) ya da `gb` = mutlak boyut.
+        5 dakikada bir kontrol edilir. E-postadan sonra uyarı `triggered` olur; kullanım eşiğin %95''inin altına inince yeniden kurulur ve eşik tekrar aşılırsa yine
+        gönderilir. Uyarı yalnız bilgilendirir, yüklemeyi durdurmaz. Paket genelindeki %80 / %100 e-postaları aynen sürer. Nesne Depolama ve Korumalı Depolama (eski
+        sürümler ve silme işaretleri kullanıma dahildir).'
+      parameters:
+      - *id002
+      - *id004
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - type
+              - value
+              properties:
+                type:
+                  type: string
+                  enum:
+                  - percent
+                  - gb
+                value:
+                  type: integer
+                  minimum: 1
+                  example: 80
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      item: *id003
+                      message:
+                        type: string
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
+    delete:
+      tags: *id001
+      operationId: deleteStorageBucketAlert
+      summary: Remove the fill alert of a bucket
+      x-summary-tr: Kovanın doluluk uyarısını kaldır
+      x-scope: services_write
+      x-cli:
+        command: storage alerts delete
+        confirm: true
+      description: Turns the alert off. Bucket data is not touched, so no `confirm` is needed.
+      x-description-tr: Uyarıyı kapatır. Kova verisine dokunulmaz; `confirm` gerekmez.
+      parameters:
+      - *id002
+      - *id004
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      item: *id003
+                      message:
+                        type: string
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
         '422':
           $ref: '#/components/responses/Validation'
 components:
@@ -31778,4 +32330,55 @@ components:
           description: Sign-ins only
         created_at:
           type: string
+          format: date-time
+    StorageBucketAlert:
+      type: object
+      description: Fill alert of one bucket.
+      x-description-tr: Bir kovanın doluluk uyarısı.
+      properties:
+        bucket:
+          type: string
+          example: gyro-proje
+        used_bytes:
+          type: integer
+          description: 'bucket usage (Protected Storage: old versions and delete markers included)'
+        used_gb:
+          type: number
+        package_pct:
+          type: number
+          description: bucket usage as a percentage of the package size (all buckets share the package)
+        enabled:
+          type: boolean
+        type:
+          type:
+          - string
+          - 'null'
+          enum:
+          - percent
+          - gb
+          - null
+        value:
+          type:
+          - integer
+          - 'null'
+          description: 'percent: 1-100 of the package size; gb: 1 to the package size in GB'
+        threshold_bytes:
+          type:
+          - integer
+          - 'null'
+        threshold_gb:
+          type:
+          - number
+          - 'null'
+        state:
+          type: string
+          enum:
+          - 'off'
+          - armed
+          - triggered
+          description: triggered = the e-mail was sent; re-arms when usage drops below 95% of the threshold
+        last_sent_at:
+          type:
+          - string
+          - 'null'
           format: date-time

@@ -32,6 +32,7 @@ gyro s3 [flags]
 ### SEE ALSO
 
 * [gyro](gyro.md)	 - Gyro Hosting command-line interface
+* [gyro s3 alerts](gyro_s3_alerts.md)	 - Fill alerts of all buckets
 * [gyro s3 bucket](gyro_s3_bucket.md)	 - Buckets
 * [gyro s3 call](gyro_s3_call.md)	 - Call a module method of a service
 * [gyro s3 connect](gyro_s3_connect.md)	 - GET connect (GyroDepolama)

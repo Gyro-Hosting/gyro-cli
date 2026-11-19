@@ -5,7 +5,7 @@ Gyro Hosting komut satırı aracı
 ### Synopsis
 
 gyro, Gyro Hosting hizmetlerinizi terminalden yönetir: bulut sunucular, SSH anahtarları, faturalar,
-bakiye ve Gyro Public API'nin sunduğu her şey (API sürümü 2.42.0).
+bakiye ve Gyro Public API'nin sunduğu her şey (API sürümü 2.43.0).
 
 Başlarken:
   gyro auth login                # tarayıcıyla giriş (ya da: anahtar yapıştırmak için gyro configure)
@@ -36,6 +36,7 @@ Hesap sınırları (gyro limits) destek talebiyle artırılır: gyro ticket crea
 
 ### SEE ALSO
 
+* [gyro account](gyro_account.md)	 - Otomatik bakiye yükleme ayarı
 * [gyro activity](gyro_activity.md)	 - Hesap etkinlikleri (girişler ve güvenlik olayları)
 * [gyro address](gyro_address.md)	 - Fatura adresleri
 * [gyro affiliate](gyro_affiliate.md)	 - Program Durumunu Okuma

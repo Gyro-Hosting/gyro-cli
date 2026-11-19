@@ -32,6 +32,7 @@ gyro s3 [flags]
 ### SEE ALSO
 
 * [gyro](gyro.md)	 - Gyro Hosting komut satırı aracı
+* [gyro s3 alerts](gyro_s3_alerts.md)	 - Tüm kovaların doluluk uyarıları
 * [gyro s3 bucket](gyro_s3_bucket.md)	 - Kovalar
 * [gyro s3 call](gyro_s3_call.md)	 - Hizmetin modül metodunu çağır
 * [gyro s3 connect](gyro_s3_connect.md)	 - connect (GyroDepolama)

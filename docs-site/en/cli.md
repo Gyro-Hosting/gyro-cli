@@ -38,6 +38,12 @@ gyro: manage Gyro Hosting services from your terminal.
 
 | Command | Description | API |
 |---|---|---|
+| `gyro account auto-topup get` | Automatic balance top-up setting | `GET /cloud/account/auto-topup` |
+| `gyro account auto-topup set` | Turn automatic top-up on/off | `PUT /cloud/account/auto-topup` |
+| `gyro account card add` | Add a card (not possible over the API) | `POST /cloud/account/cards` |
+| `gyro account card delete` | Delete a saved card (also at the bank) | `DELETE /cloud/account/cards/{id}` |
+| `gyro account card list` | List saved cards | `GET /cloud/account/cards` |
+| `gyro account card update` | Use a card for auto-payment / make it the default | `PATCH /cloud/account/cards/{id}` |
 | `gyro activity get` | Account activity (sign-ins and security events) | `GET /activity` |
 | `gyro activity list` | List write calls made with your API keys | `GET /cloud/activity` |
 | `gyro address create` | Create address | `POST /addresses` |
@@ -460,6 +466,10 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro ssh-key delete` | Delete an SSH key | `DELETE /cloud/ssh-keys/{id}` |
 | `gyro ssh-key get` | Get an SSH key | `GET /cloud/ssh-keys/{id}` |
 | `gyro ssh-key list` | List SSH keys | `GET /cloud/ssh-keys` |
+| `gyro storage alerts delete` | Remove the fill alert of a bucket | `DELETE /cloud/storage/{id}/buckets/{bucket}/alert` |
+| `gyro storage alerts get` | Fill alert of a bucket | `GET /cloud/storage/{id}/buckets/{bucket}/alert` |
+| `gyro storage alerts list` | Fill alerts of all buckets | `GET /cloud/storage/{id}/alerts` |
+| `gyro storage alerts set` | Set the fill alert of a bucket | `PUT /cloud/storage/{id}/buckets/{bucket}/alert` |
 | `gyro storage bucket rename` | Rename a bucket | `POST /cloud/storage/{id}/buckets/{bucket}/rename` |
 | `gyro storage connect get` | GET connect (GyroDepolama) | `GET /cloud/storage/{id}/connect` |
 | `gyro storage cors delete` | Remove every CORS rule of a bucket | `DELETE /cloud/storage/{id}/buckets/{bucket}/cors` |

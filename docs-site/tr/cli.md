@@ -38,6 +38,12 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 
 | Komut | Açıklama | API |
 |---|---|---|
+| `gyro account auto-topup get` | Otomatik bakiye yükleme ayarı | `GET /cloud/account/auto-topup` |
+| `gyro account auto-topup set` | Otomatik yüklemeyi aç/kapat | `PUT /cloud/account/auto-topup` |
+| `gyro account card add` | Kart ekle (API ile yapılamaz) | `POST /cloud/account/cards` |
+| `gyro account card delete` | Kayıtlı kartı sil (bankadan da) | `DELETE /cloud/account/cards/{id}` |
+| `gyro account card list` | Kayıtlı kartları listele | `GET /cloud/account/cards` |
+| `gyro account card update` | Kartı otomatik ödemede kullan / varsayılan yap | `PATCH /cloud/account/cards/{id}` |
 | `gyro activity get` | Hesap etkinlikleri (girişler ve güvenlik olayları) | `GET /activity` |
 | `gyro activity list` | API anahtarlarınızla yapılan yazma çağrılarını listele | `GET /cloud/activity` |
 | `gyro address create` | Adres Ekleme | `POST /addresses` |
@@ -460,6 +466,10 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro ssh-key delete` | SSH anahtarını sil | `DELETE /cloud/ssh-keys/{id}` |
 | `gyro ssh-key get` | SSH anahtarını getir | `GET /cloud/ssh-keys/{id}` |
 | `gyro ssh-key list` | SSH anahtarlarını listele | `GET /cloud/ssh-keys` |
+| `gyro storage alerts delete` | Kovanın doluluk uyarısını kaldır | `DELETE /cloud/storage/{id}/buckets/{bucket}/alert` |
+| `gyro storage alerts get` | Kovanın doluluk uyarısı | `GET /cloud/storage/{id}/buckets/{bucket}/alert` |
+| `gyro storage alerts list` | Tüm kovaların doluluk uyarıları | `GET /cloud/storage/{id}/alerts` |
+| `gyro storage alerts set` | Kovanın doluluk uyarısını ayarla | `PUT /cloud/storage/{id}/buckets/{bucket}/alert` |
 | `gyro storage bucket rename` | Kova adını değiştir | `POST /cloud/storage/{id}/buckets/{bucket}/rename` |
 | `gyro storage connect get` | connect (GyroDepolama) | `GET /cloud/storage/{id}/connect` |
 | `gyro storage cors delete` | Kovanın tüm CORS kurallarını kaldır | `DELETE /cloud/storage/{id}/buckets/{bucket}/cors` |
