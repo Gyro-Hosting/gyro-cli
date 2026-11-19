@@ -2,7 +2,7 @@
 .TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
 
 .SH NAME
-gyro-activity - Write log of your API keys
+gyro-activity - Account activity (sign-ins and security events)
 
 
 .SH SYNOPSIS
@@ -10,12 +10,40 @@ gyro-activity - Write log of your API keys
 
 
 .SH DESCRIPTION
-Write log of your API keys
+Account activity (sign-ins and security events)
 
 
 .SH OPTIONS
+\fB--all\fP[=false]
+	fetch every page
+
+.PP
+\fB--from\fP=""
+	From this day (YYYY-MM-DD, whole day, Türkiye time) or time (ISO 8601), inclusive
+
+.PP
 \fB-h\fP, \fB--help\fP[=false]
 	help for activity
+
+.PP
+\fB--limit\fP=0
+	items per page (max 100)
+
+.PP
+\fB--page\fP=1
+	page number
+
+.PP
+\fB--param-lang\fP=""
+	Language of \fBtitle\fR (default: the account language) (tr|en)
+
+.PP
+\fB--to\fP=""
+	Until this day (YYYY-MM-DD, whole day) or time (ISO 8601), inclusive
+
+.PP
+\fB--type\fP=""
+	login = sign-ins only, action = account events only (all|login|action)
 
 
 .SH OPTIONS INHERITED FROM PARENT COMMANDS
@@ -68,4 +96,4 @@ Write log of your API keys
 
 
 .SH SEE ALSO
-\fBgyro(1)\fP, \fBgyro-activity-list(1)\fP
+\fBgyro(1)\fP, \fBgyro-activity-get(1)\fP, \fBgyro-activity-list(1)\fP

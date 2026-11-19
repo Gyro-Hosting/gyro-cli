@@ -1,6 +1,6 @@
 ## gyro activity
 
-API anahtarlarınızın yazma kaydı
+Hesap etkinlikleri (girişler ve güvenlik olayları)
 
 ```
 gyro activity [flags]
@@ -9,7 +9,14 @@ gyro activity [flags]
 ### Options
 
 ```
-  -h, --help   help for activity
+      --all                tüm sayfaları getir
+      --from string        Bu günden (YYYY-AA-GG, tüm gün, Türkiye saati) ya da andan (ISO 8601) itibaren, dahil
+  -h, --help               help for activity
+      --limit int          sayfa başına kayıt (en çok 100)
+      --page int           sayfa numarası (default 1)
+      --param-lang title   title dili (varsayılan: hesap dili) (tr|en)
+      --to string          Bu güne (YYYY-AA-GG, tüm gün) ya da ana (ISO 8601) kadar, dahil
+      --type string        login = yalnız girişler, action = yalnız hesap olayları (all|login|action)
 ```
 
 ### Options inherited from parent commands
@@ -32,5 +39,6 @@ gyro activity [flags]
 ### SEE ALSO
 
 * [gyro](gyro.md)	 - Gyro Hosting komut satırı aracı
+* [gyro activity get](gyro_activity_get.md)	 - Hesap etkinlikleri (girişler ve güvenlik olayları)
 * [gyro activity list](gyro_activity_list.md)	 - API anahtarlarınızla yapılan yazma çağrılarını listele
 

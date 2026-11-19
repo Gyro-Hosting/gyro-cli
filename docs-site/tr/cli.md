@@ -38,6 +38,7 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 
 | Komut | Açıklama | API |
 |---|---|---|
+| `gyro activity get` | Hesap etkinlikleri (girişler ve güvenlik olayları) | `GET /activity` |
 | `gyro activity list` | API anahtarlarınızla yapılan yazma çağrılarını listele | `GET /cloud/activity` |
 | `gyro address create` | Adres Ekleme | `POST /addresses` |
 | `gyro address default` | Varsayılanı Taşıma | `POST /addresses/{id}/default` |

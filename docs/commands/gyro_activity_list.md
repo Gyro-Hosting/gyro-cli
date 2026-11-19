@@ -42,5 +42,5 @@ gyro activity list [flags]
 
 ### SEE ALSO
 
-* [gyro activity](gyro_activity.md)	 - Write log of your API keys
+* [gyro activity](gyro_activity.md)	 - Account activity (sign-ins and security events)
 

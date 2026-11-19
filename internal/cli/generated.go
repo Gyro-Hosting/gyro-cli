@@ -165,7 +165,7 @@ var groupShorts = map[string][2]string{
 	"product":   {"Full product catalog (all product lines)", "Tüm ürün kataloğu (tüm ürün hatları)"},
 	"reference": {"Countries, states and cities", "Ülkeler, iller ve ilçeler"},
 	"sms":       {"SMS messages", "SMS mesajları"},
-	"activity":  {"Write log of your API keys", "API anahtarlarınızın yazma kaydı"},
+	"activity":  {"Account activity (sign-ins, security events); list = write log of your API keys", "Hesap etkinlikleri (girişler, güvenlik olayları); list = API anahtarlarınızın yazma kaydı"},
 	"image":     {"Operating system images", "İşletim sistemi imajları"},
 	"location":  {"Locations", "Lokasyonlar"},
 	"container": {"Gyro Containers (ECS), Istanbul: services, versions, logs, domains", "Gyro Kapsayıcı (ECS), İstanbul: servisler, sürümler, loglar, alan adları"},

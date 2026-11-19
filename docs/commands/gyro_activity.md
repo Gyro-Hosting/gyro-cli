@@ -1,6 +1,6 @@
 ## gyro activity
 
-Write log of your API keys
+Account activity (sign-ins and security events)
 
 ```
 gyro activity [flags]
@@ -9,7 +9,14 @@ gyro activity [flags]
 ### Options
 
 ```
-  -h, --help   help for activity
+      --all                fetch every page
+      --from string        From this day (YYYY-MM-DD, whole day, Türkiye time) or time (ISO 8601), inclusive
+  -h, --help               help for activity
+      --limit int          items per page (max 100)
+      --page int           page number (default 1)
+      --param-lang title   Language of title (default: the account language) (tr|en)
+      --to string          Until this day (YYYY-MM-DD, whole day) or time (ISO 8601), inclusive
+      --type string        login = sign-ins only, action = account events only (all|login|action)
 ```
 
 ### Options inherited from parent commands
@@ -32,5 +39,6 @@ gyro activity [flags]
 ### SEE ALSO
 
 * [gyro](gyro.md)	 - Gyro Hosting command-line interface
+* [gyro activity get](gyro_activity_get.md)	 - Account activity (sign-ins and security events)
 * [gyro activity list](gyro_activity_list.md)	 - List write calls made with your API keys
 

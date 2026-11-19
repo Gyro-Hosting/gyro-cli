@@ -38,6 +38,7 @@ gyro: manage Gyro Hosting services from your terminal.
 
 | Command | Description | API |
 |---|---|---|
+| `gyro activity get` | Account activity (sign-ins and security events) | `GET /activity` |
 | `gyro activity list` | List write calls made with your API keys | `GET /cloud/activity` |
 | `gyro address create` | Create address | `POST /addresses` |
 | `gyro address default` | Set default address (path: {id}) | `POST /addresses/{id}/default` |

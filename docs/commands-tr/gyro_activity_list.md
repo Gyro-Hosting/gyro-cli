@@ -42,5 +42,5 @@ gyro activity list [flags]
 
 ### SEE ALSO
 
-* [gyro activity](gyro_activity.md)	 - API anahtarlarınızın yazma kaydı
+* [gyro activity](gyro_activity.md)	 - Hesap etkinlikleri (girişler ve güvenlik olayları)
 

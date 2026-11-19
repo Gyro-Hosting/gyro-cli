@@ -1,0 +1,105 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-activity-get - Account activity (sign-ins and security events)
+
+
+.SH SYNOPSIS
+\fBgyro activity get [flags]\fP
+
+
+.SH DESCRIPTION
+Account activity (sign-ins and security events)
+
+.PP
+The records of \fBAccount > Activity\fP in the client area (\fB/myaccount/info#activity\fR): sign-ins with IP, location, browser and platform, and account events (password, two-factor, passkey, session and trusted-device changes, profile and address changes ...). Newest first. Only your own account: the key decides the account, there is no account parameter, and sub-account keys get 403. Same privacy as the panel: full IP of your own sign-ins; the raw user agent and stored event data are not returned. Needs the \fBaccount_read\fR permission (Account / read on the key screen; the read-only template includes it). The write log of your API keys stays at \fBGET /cloud/activity\fR\&.
+
+.PP
+API: GET /activity (operationId getAccountActivity, scope account_read)
+
+
+.SH OPTIONS
+\fB--all\fP[=false]
+	fetch every page
+
+.PP
+\fB--from\fP=""
+	From this day (YYYY-MM-DD, whole day, Türkiye time) or time (ISO 8601), inclusive
+
+.PP
+\fB-h\fP, \fB--help\fP[=false]
+	help for get
+
+.PP
+\fB--limit\fP=0
+	items per page (max 100)
+
+.PP
+\fB--page\fP=1
+	page number
+
+.PP
+\fB--param-lang\fP=""
+	Language of \fBtitle\fR (default: the account language) (tr|en)
+
+.PP
+\fB--to\fP=""
+	Until this day (YYYY-MM-DD, whole day) or time (ISO 8601), inclusive
+
+.PP
+\fB--type\fP=""
+	login = sign-ins only, action = account events only (all|login|action)
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH SEE ALSO
+\fBgyro-activity(1)\fP
