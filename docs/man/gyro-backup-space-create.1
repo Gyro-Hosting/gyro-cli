@@ -1,0 +1,125 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-backup-space-create - Order a backup space
+
+
+.SH SYNOPSIS
+\fBgyro backup-space create [flags]\fP
+
+
+.SH DESCRIPTION
+Order a backup space
+
+.PP
+Orders ONE backup space and pays from the account balance (never a stored card). The space is bound to \fBserver_id\fR, one of your active servers (Gyro Cloud tr-ist-1, TR VDS, managed or dedicated); it may be omitted when the account has exactly one. Only that server's IPv4 addresses can connect (SFTP, port 2201). Billed per \fBcycle\fR (fixed EUR prices charged in the account currency, VAT excluded) and renewed from the balance like other services. Send \fB"dry_run": true\fR for a quote; a real order needs \fB"confirm": true\fR and an \fBIdempotency-Key\fR header. The space is set up within about a minute (\fBbackup_space.state\fR \fBpending\fR -> \fBactive\fR); then read the password with \fBGET /cloud/backup-spaces/{id}/credentials\fR\&. Errors: 402 \fBinsufficient_balance\fR; 403 \fBnot_available\fR (not on sale for this account), \fBorders_disabled\fR; 409 \fBserver_required\fR (no active server), \fBcapacity_unavailable\fR; 422 \fBconfirm_required\fR (with \fBquote\fR), \fBproduct_not_orderable\fR, \fBcycle_invalid\fR, \fBserver_id_required\fR, \fBinvalid_server\fR, \fBinvalid_quantity\fR; 429 \fBdaily_limit\fR\&.
+
+.PP
+API: POST /cloud/backup-spaces (operationId createBackupSpace, scope cloud_order)
+
+
+.SH OPTIONS
+\fB--cycle\fP=""
+	billing cycle (monthly|quarterly|semiannually|annually)
+
+.PP
+\fB--data\fP=""
+	request body as JSON, @file or @- (stdin)
+
+.PP
+\fB--dry-run\fP[=false]
+	show the price quote / request without changing anything
+
+.PP
+\fB--end-customer-id\fP=0
+	reseller main key: assign to this end-customer
+
+.PP
+\fB-h\fP, \fB--help\fP[=false]
+	help for create
+
+.PP
+\fB--idempotency-key\fP=""
+	idempotency key (automatic for money operations)
+
+.PP
+\fB--name\fP=""
+	name (nickname)
+
+.PP
+\fB--plan\fP=""
+	plan from GET /cloud/backup-spaces/plans (50gb, 100gb, 250gb, 500gb, 1tb)
+
+.PP
+\fB--product-id\fP=0
+	product id instead of plan
+
+.PP
+\fB--project-id\fP=0
+	project (0 = default project)
+
+.PP
+\fB--server-id\fP=0
+	server to bind the space to (optional when the account has one active server)
+
+.PP
+\fB--set\fP=[]
+	extra body field key=value (repeatable)
+
+.PP
+\fB--tags\fP=[]
+	tags
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH SEE ALSO
+\fBgyro-backup-space(1)\fP

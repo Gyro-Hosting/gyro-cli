@@ -101,6 +101,14 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro api request POST /cloud/storage/{id}/buckets` | Kova oluştur | `POST /cloud/storage/{id}/buckets` |
 | `gyro api request POST /cloud/storage/{id}/keys` | access-keys:create (GyroDepolama) | `POST /cloud/storage/{id}/keys` |
 | `gyro api request PUT /cloud/containers/{id}/vpc` | Ortamı bir VPC subnetine bağla | `PUT /cloud/containers/{id}/vpc` |
+| `gyro backup-space attach-server` | Alanı başka sunucuya bağla | `PUT /cloud/backup-spaces/{id}/server` |
+| `gyro backup-space create` | Yedekleme alanı sipariş et | `POST /cloud/backup-spaces` |
+| `gyro backup-space credentials` | Parolayla SFTP bağlantı bilgisi | `GET /cloud/backup-spaces/{id}/credentials` |
+| `gyro backup-space delete` | Yedekleme alanını iptal et (sil) | `DELETE /cloud/backup-spaces/{id}` |
+| `gyro backup-space get` | Yedekleme alanı ayrıntısı | `GET /cloud/backup-spaces/{id}` |
+| `gyro backup-space list` | Yedekleme alanlarını listele | `GET /cloud/backup-spaces` |
+| `gyro backup-space plans` | Yedekleme alanı paketlerini listele | `GET /cloud/backup-spaces/plans` |
+| `gyro backup-space reset-password` | SFTP parolasını sıfırla | `POST /cloud/backup-spaces/{id}/password` |
 | `gyro balance` | Hesap bakiyesi | `GET /balance` |
 | `gyro balance setting update` | Cüzdan Ayarlarını Değiştirme | `PATCH /balance/settings` |
 | `gyro balance top-up` | Bakiye yükleme faturası oluştur, ödeme linkini al | `POST /cloud/balance/top-up` |

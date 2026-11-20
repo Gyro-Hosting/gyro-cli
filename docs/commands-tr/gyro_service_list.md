@@ -20,7 +20,7 @@ gyro service list [flags]
   -h, --help                        help for list
       --limit int                   sayfa başına kayıt (en çok 100)
       --page int                    sayfa numarası (default 1)
-      --product-line string          (cloud_server|vds|dedicated_server|mail|monitor|storage|license|app)
+      --product-line string          (cloud_server|vds|dedicated_server|mail|monitor|storage|license|app|backup_space)
       --project project_not_found   Only services in this project (0 = default project). Unknown project: 404 project_not_found.
       --status string               
 ```

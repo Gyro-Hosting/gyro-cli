@@ -49,6 +49,7 @@ var resourceAliases = map[string][]string{
 	"domain": {"domains"}, "ticket": {"tickets"}, "service": {"services", "svc"}, "webhook": {"webhooks", "hook"},
 	"order": {"orders"}, "location": {"locations", "loc"}, "image": {"images"},
 	"snapshot": {"snapshots"}, "backup": {"backups"}, "mail": {"email"}, "monitor": {"monitors"},
+	"backup-space": {"backup-spaces", "bs"},
 }
 
 func summary(o *spec.Op) string {
@@ -152,23 +153,24 @@ func addGenerated(a *App, root *cobra.Command) {
 
 // groupShorts describes well-known generated groups (others take the summary of their list/get child).
 var groupShorts = map[string][2]string{
-	"domain":    {"Domains: search, register, transfer, nameservers, DNS, WHOIS", "Alan adları: sorgu, kayıt, transfer, ad sunucuları, DNS, WHOIS"},
-	"ticket":    {"Support tickets", "Destek talepleri"},
-	"order":     {"Orders (preview and create)", "Siparişler (önizleme ve oluşturma)"},
-	"reseller":  {"Reseller: end-customers, assignments, keys, report", "Bayi: uç-müşteriler, atamalar, anahtarlar, rapor"},
-	"service":   {"All services of every product line (generic bridge)", "Tüm ürün hatlarındaki hizmetler (genel köprü)"},
-	"key":       {"Sub-account API keys", "Alt hesap API anahtarları"},
-	"webhook":   {"Webhooks (signed event callbacks)", "Webhook'lar (imzalı olay bildirimleri)"},
-	"me":        {"Your profile, notifications and security", "Profiliniz, bildirimler ve güvenlik"},
-	"address":   {"Billing addresses", "Fatura adresleri"},
-	"affiliate": {"Affiliate programme", "Satış ortaklığı programı"},
-	"product":   {"Full product catalog (all product lines)", "Tüm ürün kataloğu (tüm ürün hatları)"},
-	"reference": {"Countries, states and cities", "Ülkeler, iller ve ilçeler"},
-	"sms":       {"SMS messages", "SMS mesajları"},
-	"activity":  {"Account activity (sign-ins, security events); list = write log of your API keys", "Hesap etkinlikleri (girişler, güvenlik olayları); list = API anahtarlarınızın yazma kaydı"},
-	"image":     {"Operating system images", "İşletim sistemi imajları"},
-	"location":  {"Locations", "Lokasyonlar"},
-	"container": {"Gyro Containers (ECS), Istanbul: services, versions, logs, domains", "Gyro Kapsayıcı (ECS), İstanbul: servisler, sürümler, loglar, alan adları"},
+	"domain":       {"Domains: search, register, transfer, nameservers, DNS, WHOIS", "Alan adları: sorgu, kayıt, transfer, ad sunucuları, DNS, WHOIS"},
+	"ticket":       {"Support tickets", "Destek talepleri"},
+	"order":        {"Orders (preview and create)", "Siparişler (önizleme ve oluşturma)"},
+	"reseller":     {"Reseller: end-customers, assignments, keys, report", "Bayi: uç-müşteriler, atamalar, anahtarlar, rapor"},
+	"service":      {"All services of every product line (generic bridge)", "Tüm ürün hatlarındaki hizmetler (genel köprü)"},
+	"key":          {"Sub-account API keys", "Alt hesap API anahtarları"},
+	"webhook":      {"Webhooks (signed event callbacks)", "Webhook'lar (imzalı olay bildirimleri)"},
+	"me":           {"Your profile, notifications and security", "Profiliniz, bildirimler ve güvenlik"},
+	"address":      {"Billing addresses", "Fatura adresleri"},
+	"affiliate":    {"Affiliate programme", "Satış ortaklığı programı"},
+	"product":      {"Full product catalog (all product lines)", "Tüm ürün kataloğu (tüm ürün hatları)"},
+	"reference":    {"Countries, states and cities", "Ülkeler, iller ve ilçeler"},
+	"sms":          {"SMS messages", "SMS mesajları"},
+	"activity":     {"Account activity (sign-ins, security events); list = write log of your API keys", "Hesap etkinlikleri (girişler, güvenlik olayları); list = API anahtarlarınızın yazma kaydı"},
+	"image":        {"Operating system images", "İşletim sistemi imajları"},
+	"location":     {"Locations", "Lokasyonlar"},
+	"container":    {"Gyro Containers (ECS), Istanbul: services, versions, logs, domains", "Gyro Kapsayıcı (ECS), İstanbul: servisler, sürümler, loglar, alan adları"},
+	"backup-space": {"Backup Space: SFTP backup space bound to one of your servers (tr-ist-1)", "Yedekleme Alanı: sunucunuza bağlı SFTP yedekleme alanı (tr-ist-1)"},
 }
 
 // fillGroupShorts gives auto-created groups a description taken from their list/get child.
@@ -652,7 +654,12 @@ func runGenerated(a *App, cmd *cobra.Command, op *spec.Op, o *genOpts, args []st
 	if err := a.printOpResult(op, resp); err != nil {
 		return err
 	}
-	warnSecrets(a, resp.Data)
+	if op.ID == "getBackupSpaceCredentials" {
+		// the SFTP password can be read again at any time: no "shown only once" note, but keep it out of shell history / logs
+		a.Info("%s", i18n.S("This output contains the SFTP password: do not paste it into logs or tickets.", "Bu çıktıda SFTP parolası var: günlüklere ya da taleplere yapıştırmayın."))
+	} else {
+		warnSecrets(a, resp.Data)
+	}
 	if o.wait && firstID != "" {
 		return a.waitServerIdle(ctx, firstID, o.waitFor)
 	}
@@ -688,6 +695,11 @@ func (a *App) printOpResult(op *spec.Op, resp *api.Response) error {
 	p := a.Printer()
 	if op.ID == opListContainerServices {
 		if done, err := a.printContainerServices(resp); done {
+			return err
+		}
+	}
+	if op.ID == opListBackupSpacePlans {
+		if done, err := a.printBackupSpacePlans(resp); done {
 			return err
 		}
 	}

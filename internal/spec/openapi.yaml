@@ -2,7 +2,7 @@
 openapi: 3.1.0
 info:
   title: Gyro Public API
-  version: 2.43.1
+  version: 2.44.0
   summary: Manage Gyro cloud servers, SSH keys and billing programmatically.
   x-summary-tr: Gyro bulut sunucularınızı, SSH anahtarlarınızı ve faturalarınızı programla yönetin.
   description: "The Gyro Public API lets you automate everything you do in the Gyro client area:\norder and manage cloud servers, keep SSH keys, read invoices and\
@@ -116,7 +116,11 @@ info:
     \ lifecycle rules run nightly (Object Storage ~03:00, Protected Storage 03:30 Türkiye time). Additive.\n\n**2.43.1**: storage access keys. `POST /cloud/storage/{id}/keys`\
     \ with a partial `perms` list gives the key access ONLY to the listed buckets (unlisted buckets: no access; before: read-write). Without `perms` the key is read-write\
     \ on every bucket, as before. Create / rotate with an `Idempotency-Key` still withholds the secret (`secret_withheld: true`) and now returns `key.secret_retrieval`:\
-    \ fetch it once, within 7 days, with `POST /cloud/services/{id}/tools/access-keys/reveal` `{\"key_id\": \"...\"}` sent without an Idempotency-Key (no confirm).\n"
+    \ fetch it once, within 7 days, with `POST /cloud/services/{id}/tools/access-keys/reveal` `{\"key_id\": \"...\"}` sent without an Idempotency-Key (no confirm).\n\
+    \n**2.44.0**: Backup Space (`GET /cloud/backup-spaces/plans`, `GET|POST /cloud/backup-spaces`, `GET|DELETE /cloud/backup-spaces/{id}`, `GET /cloud/backup-spaces/{id}/credentials`,\
+    \ `POST /cloud/backup-spaces/{id}/password`, `PUT /cloud/backup-spaces/{id}/server`): an SFTP space with a hard quota bound to one server of the account, reachable\
+    \ only from that server's IPv4 addresses. Size changes: `/cloud/services/{id}/resize-options` and `/resize`. `product_line=backup_space` in `/cloud/services`.\
+    \ Additive.\n"
   x-description-tr: "Gyro Public API, müşteri panelinde yaptığınız her işi otomatikleştirmenizi sağlar:\nbulut sunucu siparişi ve yönetimi, SSH anahtarları, fatura\
     \ ve bakiye okuma.\nResmi Terraform sağlayıcısı (`gyro-hosting/gyro`) ve `gyroctl` bu API'yi kullanır.\n\n* **Taban adres** `https://www.gyrohosting.com/api/v1/client`\n\
     * **Kimlik** `Authorization: Bearer wck_...` (anahtarı *Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri* bölümünden oluşturun)\n* **Biçim** JSON\
@@ -228,7 +232,10 @@ info:
     \n**2.43.1**: depolama erişim anahtarları. `POST /cloud/storage/{id}/keys` kısmi `perms` listesiyle anahtara YALNIZ listelenen kovalarda yetki verir (listede\
     \ olmayan kova: yetki yok; önceden okuma-yazma). `perms` yoksa anahtar eskisi gibi tüm kovalarda okuma-yazmadır. Idempotency-Key ile oluşturma / yenilemede gizli\
     \ değer yine yanıtta yoktur (`secret_withheld: true`); yanıttaki `key.secret_retrieval` ile 7 gün içinde bir kez `POST /cloud/services/{id}/tools/access-keys/reveal`\
-    \ `{\"key_id\": \"...\"}` (Idempotency-Key olmadan, confirm gerekmez) gönderilerek alınır.\n"
+    \ `{\"key_id\": \"...\"}` (Idempotency-Key olmadan, confirm gerekmez) gönderilerek alınır.\n\n**2.44.0**: Yedekleme Alanı (`GET /cloud/backup-spaces/plans`, `GET|POST\
+    \ /cloud/backup-spaces`, `GET|DELETE /cloud/backup-spaces/{id}`, `GET /cloud/backup-spaces/{id}/credentials`, `POST /cloud/backup-spaces/{id}/password`, `PUT\
+    \ /cloud/backup-spaces/{id}/server`): hesaptaki bir sunucuya bağlı, yalnız o sunucunun IPv4 adreslerinden erişilen kesin kotalı SFTP alanı. Boyut değişimi: `/cloud/services/{id}/resize-options`\
+    \ ve `/resize`. `/cloud/services` içinde `product_line=backup_space`. Geriye uyumlu.\n"
   contact:
     name: Gyro Hosting
     url: https://www.gyrohosting.com
@@ -306,6 +313,11 @@ tags:
 - name: Object storage
   description: 'Typed S3 storage shortcuts: buckets, access keys (secret shown once), usage, connection details.'
   x-description-tr: 'S3 depolama kısayolları: kovalar, erişim anahtarları (gizli bir kez), kullanım, bağlantı bilgisi.'
+- name: Backup space
+  description: SFTP backup space with a hard quota, bound to ONE server of your account and reachable only from that server's IPv4 addresses (tr-ist-1). Order, connection
+    details, password reset, bind to another server, cancel. Size changes use the generic plan change endpoints.
+  x-description-tr: 'Kesin kotalı SFTP yedekleme alanı: hesabınızdaki BİR sunucuya bağlıdır ve yalnız o sunucunun IPv4 adreslerinden erişilir (tr-ist-1). Sipariş,
+    bağlantı bilgisi, parola sıfırlama, başka sunucuya bağlama, iptal. Boyut değişimi genel paket değişikliği uçlarıyla yapılır.'
 - name: Monitoring (uptime)
   description: 'Typed uptime-monitor shortcuts: monitors, channels, heartbeats, status pages.'
   x-description-tr: 'Uptime izleme kısayolları: monitörler, kanallar, heartbeat, durum sayfaları.'
@@ -1575,6 +1587,7 @@ paths:
           - storage
           - license
           - app
+          - backup_space
       - name: status
         in: query
         schema:
@@ -27865,6 +27878,458 @@ paths:
           $ref: '#/components/responses/Conflict'
         '422':
           $ref: '#/components/responses/Validation'
+  /cloud/backup-spaces/plans:
+    get:
+      tags: &id001
+      - Backup space
+      operationId: listBackupSpacePlans
+      summary: List backup space plans
+      x-summary-tr: Yedekleme alanı paketlerini listele
+      x-scope: cloud_read
+      x-cli:
+        command: backup-space plans
+        confirm: false
+      description: 'Orderable sizes (50 GB to 1 TB) with prices per billing cycle (fixed EUR, VAT excluded; `list_amount` = strike-through list price) and `servers`:
+        the servers of the account a space can be bound to. Empty `plans` = not orderable for this account yet. `available: false` = no capacity right now.'
+      x-description-tr: 'Sipariş edilebilir boyutlar (50 GB - 1 TB), dönem başına fiyat (sabit EUR, KDV hariç; `list_amount` = üstü çizili liste fiyatı) ve `servers`:
+        alanın bağlanabileceği hesap sunucuları. `plans` boşsa bu hesap henüz sipariş veremez. `available: false` = şu an kapasite yok.'
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      plans:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/BackupSpacePlan'
+                      servers:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            server_id:
+                              type: integer
+                            name:
+                              type: string
+                            ip:
+                              type: string
+                              example: 203.0.113.10
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /cloud/backup-spaces:
+    get:
+      tags: *id001
+      operationId: listBackupSpaces
+      summary: List backup spaces
+      x-summary-tr: Yedekleme alanlarını listele
+      x-scope: services_read
+      x-cli:
+        command: backup-space list
+        confirm: false
+      description: Backup spaces of the account (same filters and paging as GET /cloud/services; `product_line=backup_space`).
+      x-description-tr: Hesabın yedekleme alanları (GET /cloud/services ile aynı süzgeç ve sayfalama; `product_line=backup_space`).
+      parameters:
+      - name: status
+        in: query
+        schema:
+          type: string
+        description: service status filter (active, suspended, cancelled …)
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    post:
+      tags: *id001
+      operationId: createBackupSpace
+      summary: Order a backup space
+      x-summary-tr: Yedekleme alanı sipariş et
+      x-scope: cloud_order
+      x-cli:
+        command: backup-space create
+        money: true
+        confirm: true
+      description: 'Orders ONE backup space and pays from the account balance (never a stored card). The space is bound to `server_id`, one of your active servers
+        (Gyro Cloud tr-ist-1, TR VDS, managed or dedicated); it may be omitted when the account has exactly one. Only that server''s IPv4 addresses can connect (SFTP,
+        port 2201). Billed per `cycle` (fixed EUR prices charged in the account currency, VAT excluded) and renewed from the balance like other services. Send `"dry_run":
+        true` for a quote; a real order needs `"confirm": true` and an `Idempotency-Key` header. The space is set up within about a minute (`backup_space.state` `pending`
+        -> `active`); then read the password with `GET /cloud/backup-spaces/{id}/credentials`. Errors: 402 `insufficient_balance`; 403 `not_available` (not on sale
+        for this account), `orders_disabled`; 409 `server_required` (no active server), `capacity_unavailable`; 422 `confirm_required` (with `quote`), `product_not_orderable`,
+        `cycle_invalid`, `server_id_required`, `invalid_server`, `invalid_quantity`; 429 `daily_limit`.'
+      x-description-tr: 'TEK bir yedekleme alanı sipariş eder ve hesap bakiyesinden öder (kayıtlı kart asla). Alan `server_id` ile hesabınızdaki etkin bir sunucuya
+        bağlanır (Gyro Bulut tr-ist-1, TR VDS, yönetilen ya da fiziksel); hesapta tek sunucu varsa gönderilmeyebilir. Yalnız o sunucunun IPv4 adresleri bağlanabilir
+        (SFTP, port 2201). `cycle` dönemine göre ücretlendirilir (sabit EUR fiyat hesap para biriminde, KDV hariç) ve diğer hizmetler gibi bakiyeden yenilenir. Teklif
+        için `"dry_run": true`; gerçek sipariş `"confirm": true` ve `Idempotency-Key` başlığı ister. Alan yaklaşık bir dakikada kurulur (`backup_space.state` `pending`
+        -> `active`); parola `GET /cloud/backup-spaces/{id}/credentials` ile alınır. Hatalar: 402 `insufficient_balance`; 403 `not_available` (bu hesap için satışta
+        değil), `orders_disabled`; 409 `server_required` (etkin sunucu yok), `capacity_unavailable`; 422 `confirm_required` (`quote` ile), `product_not_orderable`,
+        `cycle_invalid`, `server_id_required`, `invalid_server`, `invalid_quantity`; 429 `daily_limit`.'
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                plan:
+                  type: string
+                  example: 100gb
+                  description: plan from GET /cloud/backup-spaces/plans (50gb, 100gb, 250gb, 500gb, 1tb)
+                  x-description-tr: GET /cloud/backup-spaces/plans paketi
+                product_id:
+                  type: integer
+                  description: product id instead of plan
+                  x-description-tr: plan yerine ürün kimliği
+                cycle:
+                  type: string
+                  enum:
+                  - monthly
+                  - quarterly
+                  - semiannually
+                  - annually
+                  default: monthly
+                  description: billing cycle
+                  x-description-tr: fatura dönemi
+                server_id:
+                  type: integer
+                  description: server to bind the space to (optional when the account has one active server)
+                  x-description-tr: alanın bağlanacağı sunucu (hesapta tek etkin sunucu varsa isteğe bağlı)
+                name:
+                  type: string
+                  maxLength: 60
+                  example: gyro-proje-yedek
+                  description: name (nickname)
+                  x-description-tr: ad (takma ad)
+                tags:
+                  type: array
+                  items:
+                    type: string
+                  maxItems: 10
+                project_id:
+                  type:
+                  - integer
+                  - 'null'
+                  description: project (0 = default project)
+                  x-description-tr: proje (0 = Genel)
+                end_customer_id:
+                  type: integer
+                  description: 'reseller main key: assign to this end-customer'
+                confirm:
+                  type: boolean
+                dry_run:
+                  type: boolean
+            example:
+              plan: 100gb
+              cycle: monthly
+              server_id: 12345
+              name: gyro-proje-yedek
+              confirm: true
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      backup_space:
+                        type:
+                        - object
+                        - 'null'
+                        description: the new service
+                      plan:
+                        type: string
+                      size_gb:
+                        type: integer
+                      cycle:
+                        type: string
+                      server_id:
+                        type: integer
+                      next:
+                        type: string
+                      order:
+                        type: object
+                      payment:
+                        type:
+                        - object
+                        - 'null'
+                      invoice:
+                        type:
+                        - object
+                        - 'null'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '200':
+          description: Dry-run quote (`dry_run`, `quote`)
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+        '409': &id004
+          $ref: '#/components/responses/Conflict'
+        '422': &id003
+          $ref: '#/components/responses/Validation'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+  /cloud/backup-spaces/{id}:
+    get:
+      tags: *id001
+      operationId: getBackupSpace
+      summary: Get a backup space
+      x-summary-tr: Yedekleme alanı ayrıntısı
+      x-scope: services_read
+      x-cli:
+        command: backup-space get
+        confirm: false
+      description: 'Service row plus `backup_space`: SFTP host, port, user, writable path, size, usage, bound server, allowed IPs and state. The password is not included
+        (see /credentials).'
+      x-description-tr: 'Hizmet satırı ve `backup_space`: SFTP adresi, port, kullanıcı, yazılabilir dizin, boyut, kullanım, bağlı sunucu, izinli IP''ler ve durum.
+        Parola yoktur (/credentials).'
+      parameters:
+      - &id002
+        name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Backup space (service) id
+        x-description-tr: Yedekleme alanı (hizmet) kimliği
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      name:
+                        type: string
+                      status:
+                        type: string
+                      backup_space: &id006
+                        $ref: '#/components/schemas/BackupSpaceConnection'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: *id001
+      operationId: deleteBackupSpace
+      summary: Cancel (delete) a backup space
+      x-summary-tr: Yedekleme alanını iptal et (sil)
+      x-scope: cloud_delete
+      x-cli:
+        command: backup-space delete
+        confirm: true
+      description: '`confirm=true` is required. `immediate=true` cancels now: SFTP access stops and the space with EVERY file in it is deleted permanently within
+        about a minute (no snapshot, no grace period; cannot be undone). Without `immediate` a cancellation request is filed and the space keeps working until it
+        is processed. 403 `immediate_disabled` when the operator turned immediate deletion off.'
+      x-description-tr: '`confirm=true` zorunlu. `immediate=true` hemen iptal eder: SFTP erişimi durur ve alan İÇİNDEKİ TÜM DOSYALARLA yaklaşık bir dakikada kalıcı
+        olarak silinir (snapshot yok, bekleme süresi yok; geri alınamaz). `immediate` olmadan iptal talebi açılır, işlenene kadar alan çalışır. Anında silme operatörce
+        kapatıldıysa 403 `immediate_disabled`.'
+      parameters:
+      - *id002
+      - name: confirm
+        in: query
+        required: true
+        schema:
+          type: boolean
+      - name: immediate
+        in: query
+        schema:
+          type: boolean
+        description: delete the space and every file now (cannot be undone)
+        x-description-tr: alanı ve tüm dosyaları şimdi sil (geri alınamaz)
+      responses:
+        '202':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                        enum:
+                        - cancelling
+                        - cancellation_requested
+                        - cancelled
+                      backup_space_id:
+                        type: integer
+                      note:
+                        type: string
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422': *id003
+  /cloud/backup-spaces/{id}/credentials:
+    get:
+      tags: *id001
+      operationId: getBackupSpaceCredentials
+      summary: SFTP connection with the password
+      x-summary-tr: Parolayla SFTP bağlantı bilgisi
+      x-scope: services_write
+      x-cli:
+        command: backup-space credentials
+        confirm: false
+      description: 'Host, port, user, path and the SFTP password (`Cache-Control: no-store`). Needs `services_write` because it reveals a secret. 409 `not_ready`
+        while the space is being set up.'
+      x-description-tr: 'Adres, port, kullanıcı, dizin ve SFTP parolası (`Cache-Control: no-store`). Gizli değer gösterdiği için `services_write` ister. Alan kurulurken
+        409 `not_ready`.'
+      parameters:
+      - *id002
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: &id005
+                    $ref: '#/components/schemas/BackupSpaceCredentials'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409': *id004
+  /cloud/backup-spaces/{id}/password:
+    post:
+      tags: *id001
+      operationId: resetBackupSpacePassword
+      summary: Reset the SFTP password
+      x-summary-tr: SFTP parolasını sıfırla
+      x-scope: services_write
+      x-cli:
+        command: backup-space reset-password
+        confirm: true
+      description: 'Creates a new random password and returns it once. The old password stops working at once and open SFTP sessions are closed; update your backup
+        jobs. `"confirm": true` required. 409 `not_actionable` when the space is not active; 502 `backend_unavailable` = try again in a few minutes.'
+      x-description-tr: 'Yeni rastgele parola üretir ve bir kez döndürür. Eski parola hemen geçersiz olur, açık SFTP oturumları kapanır; yedek işlerinizi güncelleyin.
+        `"confirm": true` zorunlu. Alan etkin değilse 409 `not_actionable`; 502 `backend_unavailable` = birkaç dakika sonra yeniden deneyin.'
+      parameters:
+      - *id002
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - confirm
+              properties:
+                confirm:
+                  type: boolean
+                  enum:
+                  - true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: *id005
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409': *id004
+        '422': *id003
+  /cloud/backup-spaces/{id}/server:
+    put:
+      tags: *id001
+      operationId: attachBackupSpaceServer
+      summary: Bind the space to another server
+      x-summary-tr: Alanı başka sunucuya bağla
+      x-scope: services_write
+      x-cli:
+        command: backup-space attach-server
+        confirm: false
+      description: Binds the space to `server_id` (one of your active servers; optional when the account has one). From then on only that server's IPv4 addresses
+        can connect; the previous server loses access at once. Files are not touched. When the bound server's IP changes or the server is cancelled, access follows
+        automatically.
+      x-description-tr: Alanı `server_id` sunucusuna bağlar (hesabınızdaki etkin sunuculardan biri; tek sunucu varsa isteğe bağlı). Bundan sonra yalnız o sunucunun
+        IPv4 adresleri bağlanabilir; önceki sunucunun erişimi hemen kapanır. Dosyalara dokunulmaz. Bağlı sunucunun IP'si değişir ya da sunucu iptal edilirse erişim
+        kendiliğinden eşitlenir.
+      parameters:
+      - *id002
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                server_id:
+                  type: integer
+                  description: server id
+                  x-description-tr: sunucu kimliği
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      backup_space_id:
+                        type: integer
+                      backup_space: *id006
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409': *id004
+        '422': *id003
 components:
   securitySchemes:
     bearerAuth:
@@ -32433,3 +32898,127 @@ components:
           - string
           - 'null'
           format: date-time
+    BackupSpacePlan:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: product id
+        plan:
+          type: string
+          example: 100gb
+          description: 'plan name for POST /cloud/backup-spaces: 50gb | 100gb | 250gb | 500gb | 1tb'
+        name:
+          type: string
+          example: Gyro Yedekleme Alanı 100 GB
+        region:
+          type: string
+          example: tr-ist-1
+        protocol:
+          type: string
+          const: sftp
+        size_gb:
+          type: integer
+          description: hard quota in GB (writes are refused when full)
+        available:
+          type: boolean
+          description: false = not orderable right now (capacity)
+        prices:
+          type: array
+          items:
+            type: object
+            properties:
+              cycle:
+                type: string
+                enum:
+                - monthly
+                - quarterly
+                - semiannually
+                - annually
+              amount:
+                type: number
+              list_amount:
+                type:
+                - number
+                - 'null'
+                description: list price before the discount (strike-through)
+              currency:
+                type: string
+                example: EUR
+        tax_included:
+          type: boolean
+          const: false
+    BackupSpaceConnection:
+      type: object
+      description: 'Connection and state of the space (no password: use /credentials).'
+      x-description-tr: 'Alanın bağlantısı ve durumu (parola yok: /credentials).'
+      properties:
+        host:
+          type: string
+          example: 45.87.174.12
+          description: SFTP host (empty until the space is set up)
+        port:
+          type: integer
+          example: 2201
+        user:
+          type: string
+          example: y-m12345
+        path:
+          type: string
+          example: /veri
+          description: writable directory (the root is read-only)
+        protocol:
+          type: string
+          const: sftp
+        size_gb:
+          type: integer
+        size_plan:
+          type: string
+          example: 100gb
+        used_bytes:
+          type:
+          - integer
+          - 'null'
+        used_percent:
+          type:
+          - number
+          - 'null'
+        server_id:
+          type:
+          - integer
+          - 'null'
+          description: bound server
+        allowed_ips:
+          type: array
+          items:
+            type: string
+          description: IPv4 addresses of the bound server allowed to connect
+        state:
+          type: string
+          enum:
+          - pending
+          - active
+          - noserver
+          - suspended
+          - cancelled
+          - purged
+          description: pending = being set up; noserver = no bound server (no one can connect); suspended = access locked, data kept; cancelled/purged = deleted
+    BackupSpaceCredentials:
+      type: object
+      properties:
+        backup_space_id:
+          type: integer
+        host:
+          type: string
+        port:
+          type: integer
+        user:
+          type: string
+        password:
+          type: string
+          format: password
+          description: SFTP password (secret)
+        path:
+          type: string
+        protocol:
+          type: string

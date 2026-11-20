@@ -101,6 +101,14 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro api request POST /cloud/storage/{id}/buckets` | Create a bucket | `POST /cloud/storage/{id}/buckets` |
 | `gyro api request POST /cloud/storage/{id}/keys` | POST access-keys:create (GyroDepolama) | `POST /cloud/storage/{id}/keys` |
 | `gyro api request PUT /cloud/containers/{id}/vpc` | Attach the environment to a VPC subnet | `PUT /cloud/containers/{id}/vpc` |
+| `gyro backup-space attach-server` | Bind the space to another server | `PUT /cloud/backup-spaces/{id}/server` |
+| `gyro backup-space create` | Order a backup space | `POST /cloud/backup-spaces` |
+| `gyro backup-space credentials` | SFTP connection with the password | `GET /cloud/backup-spaces/{id}/credentials` |
+| `gyro backup-space delete` | Cancel (delete) a backup space | `DELETE /cloud/backup-spaces/{id}` |
+| `gyro backup-space get` | Get a backup space | `GET /cloud/backup-spaces/{id}` |
+| `gyro backup-space list` | List backup spaces | `GET /cloud/backup-spaces` |
+| `gyro backup-space plans` | List backup space plans | `GET /cloud/backup-spaces/plans` |
+| `gyro backup-space reset-password` | Reset the SFTP password | `POST /cloud/backup-spaces/{id}/password` |
 | `gyro balance` | Account balance | `GET /balance` |
 | `gyro balance setting update` | Update balance settings | `PATCH /balance/settings` |
 | `gyro balance top-up` | Create a balance top-up invoice and get its payment link | `POST /cloud/balance/top-up` |
