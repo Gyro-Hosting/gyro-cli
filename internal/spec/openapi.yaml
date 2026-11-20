@@ -2,7 +2,7 @@
 openapi: 3.1.0
 info:
   title: Gyro Public API
-  version: 2.43.0
+  version: 2.43.1
   summary: Manage Gyro cloud servers, SSH keys and billing programmatically.
   x-summary-tr: Gyro bulut sunucularınızı, SSH anahtarlarınızı ve faturalarınızı programla yönetin.
   description: "The Gyro Public API lets you automate everything you do in the Gyro client area:\norder and manage cloud servers, keep SSH keys, read invoices and\
@@ -113,7 +113,10 @@ info:
     \ account activity `GET /activity` (sign-ins and security events of the client area, `account_read` permission, `gyro activity`). Additive.\n\n**2.43.0**: per-bucket\
     \ fill alerts (`GET /cloud/storage/{id}/alerts`, `GET|PUT|DELETE /cloud/storage/{id}/buckets/{bucket}/alert`; e-mail when a bucket reaches a percent-of-package\
     \ or GB threshold, re-arms below 95%). Protected Storage: the old-version rule (`gyro-eski-surum`) now also removes delete markers with no version left (`ExpiredObjectDeleteMarker`);\
-    \ lifecycle rules run nightly (Object Storage ~03:00, Protected Storage 03:30 Türkiye time). Additive.\n"
+    \ lifecycle rules run nightly (Object Storage ~03:00, Protected Storage 03:30 Türkiye time). Additive.\n\n**2.43.1**: storage access keys. `POST /cloud/storage/{id}/keys`\
+    \ with a partial `perms` list gives the key access ONLY to the listed buckets (unlisted buckets: no access; before: read-write). Without `perms` the key is read-write\
+    \ on every bucket, as before. Create / rotate with an `Idempotency-Key` still withholds the secret (`secret_withheld: true`) and now returns `key.secret_retrieval`:\
+    \ fetch it once, within 7 days, with `POST /cloud/services/{id}/tools/access-keys/reveal` `{\"key_id\": \"...\"}` sent without an Idempotency-Key (no confirm).\n"
   x-description-tr: "Gyro Public API, müşteri panelinde yaptığınız her işi otomatikleştirmenizi sağlar:\nbulut sunucu siparişi ve yönetimi, SSH anahtarları, fatura\
     \ ve bakiye okuma.\nResmi Terraform sağlayıcısı (`gyro-hosting/gyro`) ve `gyroctl` bu API'yi kullanır.\n\n* **Taban adres** `https://www.gyrohosting.com/api/v1/client`\n\
     * **Kimlik** `Authorization: Bearer wck_...` (anahtarı *Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri* bölümünden oluşturun)\n* **Biçim** JSON\
@@ -221,7 +224,11 @@ info:
     \ Secure ile eklenir. Geriye uyumlu.\n\n**2.42.0**: hesap etkinlikleri `GET /activity` (müşteri panelindeki girişler ve güvenlik olayları, `account_read` izni,\
     \ `gyro activity`). Geriye uyumlu.\n\n**2.43.0**: kova bazlı doluluk uyarıları (`GET /cloud/storage/{id}/alerts`, `GET|PUT|DELETE /cloud/storage/{id}/buckets/{bucket}/alert`;\
     \ kova paketin yüzdesi ya da GB eşiğine ulaşınca e-posta, %95 altında yeniden kurulur). Korumalı Depolama: eski sürüm kuralı (`gyro-eski-surum`) artık sürümü\
-    \ kalmamış silme işaretlerini de temizler (`ExpiredObjectDeleteMarker`); yaşam döngüsü kuralları her gece çalışır (Nesne ~03:00, Korumalı 03:30 TR). Geriye uyumlu.\n"
+    \ kalmamış silme işaretlerini de temizler (`ExpiredObjectDeleteMarker`); yaşam döngüsü kuralları her gece çalışır (Nesne ~03:00, Korumalı 03:30 TR). Geriye uyumlu.\n\
+    \n**2.43.1**: depolama erişim anahtarları. `POST /cloud/storage/{id}/keys` kısmi `perms` listesiyle anahtara YALNIZ listelenen kovalarda yetki verir (listede\
+    \ olmayan kova: yetki yok; önceden okuma-yazma). `perms` yoksa anahtar eskisi gibi tüm kovalarda okuma-yazmadır. Idempotency-Key ile oluşturma / yenilemede gizli\
+    \ değer yine yanıtta yoktur (`secret_withheld: true`); yanıttaki `key.secret_retrieval` ile 7 gün içinde bir kez `POST /cloud/services/{id}/tools/access-keys/reveal`\
+    \ `{\"key_id\": \"...\"}` (Idempotency-Key olmadan, confirm gerekmez) gönderilerek alınır.\n"
   contact:
     name: Gyro Hosting
     url: https://www.gyrohosting.com
@@ -5596,8 +5603,14 @@ paths:
       summary: POST access-keys:create (GyroDepolama)
       x-summary-tr: access-keys:create (GyroDepolama)
       x-scope: services_write
-      description: 'Typed shortcut of the generic bridge: tool `access-keys`, action `create`. Body fields are the tool''s own fields.'
-      x-description-tr: 'Genel köprünün kısayolu: araç `access-keys`, eylem `create`. Gövde alanları aracın kendi alanlarıdır.'
+      description: 'Create an S3 access key (tool `access-keys`, action `create`; `"confirm": true`). Body: `label` (optional), `perms` (optional) `"bucket-a:rw,bucket-b:r,bucket-c:none"`.
+        With `perms` the key reaches ONLY the listed buckets; unlisted buckets get no access. Without `perms` the key is read-write on every bucket. The answer has
+        `key.id` and `key.secret` (shown once). With an `Idempotency-Key` header the stored answer never carries the secret: `key.secret_withheld: true` and `key.secret_retrieval`
+        (POST /cloud/services/{id}/tools/access-keys/reveal with `{"key_id"}`, no Idempotency-Key, once, within 7 days).'
+      x-description-tr: 'S3 erişim anahtarı oluşturur (araç `access-keys`, eylem `create`; `"confirm": true`). Gövde: `label` (isteğe bağlı), `perms` (isteğe bağlı)
+        `"kova-a:rw,kova-b:r,kova-c:none"`. `perms` verilirse anahtar YALNIZ listelenen kovalara erişir; listede olmayan kovada yetkisi olmaz. `perms` yoksa tüm kovalarda
+        okuma-yazma. Yanıtta `key.id` ve `key.secret` (bir kez). `Idempotency-Key` başlığıyla saklanan yanıtta gizli değer olmaz: `key.secret_withheld: true` ve `key.secret_retrieval`
+        (POST /cloud/services/{id}/tools/access-keys/reveal, `{"key_id"}`, Idempotency-Key olmadan, 7 gün içinde bir kez).'
       parameters:
       - name: id
         in: path
@@ -5631,6 +5644,15 @@ paths:
               properties:
                 confirm:
                   type: boolean
+                label:
+                  type: string
+                  maxLength: 40
+                  description: Key label shown in the panel.
+                perms:
+                  type: string
+                  example: gyro-proje-yedek:rw,gyro-proje-medya:r
+                  description: Comma separated bucket:permission (rw | r | none). Listed buckets only; unlisted buckets get no access. Omit for read-write on every
+                    bucket.
   /cloud/storage/{id}/keys/{key}/rotate:
     post:
       tags:
@@ -27619,7 +27641,7 @@ paths:
           $ref: '#/components/responses/Validation'
   /cloud/storage/{id}/alerts:
     get:
-      tags: &id001
+      tags:
       - Object storage
       operationId: listStorageBucketAlerts
       summary: Fill alerts of all buckets
@@ -27637,8 +27659,7 @@ paths:
         altına inince yeniden kurulur ve eşik tekrar aşılırsa yine gönderilir. Uyarı yalnız bilgilendirir, yüklemeyi durdurmaz. Paket genelindeki %80 / %100 e-postaları
         aynen sürer. Nesne Depolama ve Korumalı Depolama (eski sürümler ve silme işaretleri kullanıma dahildir).'
       parameters:
-      - &id002
-        name: id
+      - name: id
         in: path
         required: true
         schema:
@@ -27657,7 +27678,7 @@ paths:
                     properties:
                       items:
                         type: array
-                        items: &id003
+                        items:
                           $ref: '#/components/schemas/StorageBucketAlert'
                       package_gb:
                         type: number
@@ -27674,7 +27695,8 @@ paths:
           $ref: '#/components/responses/Validation'
   /cloud/storage/{id}/buckets/{bucket}/alert:
     get:
-      tags: *id001
+      tags:
+      - Object storage
       operationId: getStorageBucketAlert
       summary: Fill alert of a bucket
       x-summary-tr: Kovanın doluluk uyarısı
@@ -27691,9 +27713,13 @@ paths:
         uyarı `triggered` olur; kullanım eşiğin %95''inin altına inince yeniden kurulur ve eşik tekrar aşılırsa yine gönderilir. Uyarı yalnız bilgilendirir, yüklemeyi
         durdurmaz. Paket genelindeki %80 / %100 e-postaları aynen sürer. Nesne Depolama ve Korumalı Depolama (eski sürümler ve silme işaretleri kullanıma dahildir).'
       parameters:
-      - *id002
-      - &id004
-        name: bucket
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: bucket
         in: path
         required: true
         schema:
@@ -27710,7 +27736,8 @@ paths:
                   data:
                     type: object
                     properties:
-                      item: *id003
+                      item:
+                        $ref: '#/components/schemas/StorageBucketAlert'
         '404':
           $ref: '#/components/responses/NotFound'
         '409':
@@ -27718,7 +27745,8 @@ paths:
         '422':
           $ref: '#/components/responses/Validation'
     put:
-      tags: *id001
+      tags:
+      - Object storage
       operationId: setStorageBucketAlert
       summary: Set the fill alert of a bucket
       x-summary-tr: Kovanın doluluk uyarısını ayarla
@@ -27739,8 +27767,18 @@ paths:
         gönderilir. Uyarı yalnız bilgilendirir, yüklemeyi durdurmaz. Paket genelindeki %80 / %100 e-postaları aynen sürer. Nesne Depolama ve Korumalı Depolama (eski
         sürümler ve silme işaretleri kullanıma dahildir).'
       parameters:
-      - *id002
-      - *id004
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: bucket
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Bucket name
       requestBody:
         required: true
         content:
@@ -27771,7 +27809,8 @@ paths:
                   data:
                     type: object
                     properties:
-                      item: *id003
+                      item:
+                        $ref: '#/components/schemas/StorageBucketAlert'
                       message:
                         type: string
         '404':
@@ -27781,7 +27820,8 @@ paths:
         '422':
           $ref: '#/components/responses/Validation'
     delete:
-      tags: *id001
+      tags:
+      - Object storage
       operationId: deleteStorageBucketAlert
       summary: Remove the fill alert of a bucket
       x-summary-tr: Kovanın doluluk uyarısını kaldır
@@ -27792,8 +27832,18 @@ paths:
       description: Turns the alert off. Bucket data is not touched, so no `confirm` is needed.
       x-description-tr: Uyarıyı kapatır. Kova verisine dokunulmaz; `confirm` gerekmez.
       parameters:
-      - *id002
-      - *id004
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id
+      - name: bucket
+        in: path
+        required: true
+        schema:
+          type: string
+        description: Bucket name
       responses:
         '200':
           description: OK
@@ -27805,7 +27855,8 @@ paths:
                   data:
                     type: object
                     properties:
-                      item: *id003
+                      item:
+                        $ref: '#/components/schemas/StorageBucketAlert'
                       message:
                         type: string
         '404':

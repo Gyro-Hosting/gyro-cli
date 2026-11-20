@@ -3,7 +3,7 @@
 package spec
 
 // APIVersion is info.version of the spec this table was generated from.
-const APIVersion = "2.43.0"
+const APIVersion = "2.43.1"
 
 // Ops lists every API operation.
 var Ops = []Op{
@@ -4624,7 +4624,7 @@ var Ops = []Op{
 	},
 	{ID: "typed_post_storage__id__keys", Method: "POST", Path: "/cloud/storage/{id}/keys", Tag: "Object storage",
 		Summary: "POST access-keys:create (GyroDepolama)", SummaryTR: "access-keys:create (GyroDepolama)",
-		Desc: "Typed shortcut of the generic bridge: tool `access-keys`, action `create`. Body fields are the tool's own fields.", DescTR: "Genel köprünün kısayolu: araç `access-keys`, eylem `create`. Gövde alanları aracın kendi alanlarıdır.",
+		Desc: "Create an S3 access key (tool `access-keys`, action `create`; `\"confirm\": true`). Body: `label` (optional), `perms` (optional) `\"bucket-a:rw,bucket-b:r,bucket-c:none\"`. With `perms` the key reaches ONLY the listed buckets; unlisted buckets get no access. Without `perms` the key is read-write on every bucket. The answer has `key.id` and `key.secret` (shown once). With an `Idempotency-Key` header the stored answer never carries the secret: `key.secret_withheld: true` and `key.secret_retrieval` (POST /cloud/services/{id}/tools/access-keys/reveal with `{\"key_id\"}`, no Idempotency-Key, once, within 7 days).", DescTR: "S3 erişim anahtarı oluşturur (araç `access-keys`, eylem `create`; `\"confirm\": true`). Gövde: `label` (isteğe bağlı), `perms` (isteğe bağlı) `\"kova-a:rw,kova-b:r,kova-c:none\"`. `perms` verilirse anahtar YALNIZ listelenen kovalara erişir; listede olmayan kovada yetkisi olmaz. `perms` yoksa tüm kovalarda okuma-yazma. Yanıtta `key.id` ve `key.secret` (bir kez). `Idempotency-Key` başlığıyla saklanan yanıtta gizli değer olmaz: `key.secret_withheld: true` ve `key.secret_retrieval` (POST /cloud/services/{id}/tools/access-keys/reveal, `{\"key_id\"}`, Idempotency-Key olmadan, 7 gün içinde bir kez).",
 		Scope: "services_write", Command: []string{"storage", "key", "create"},
 		HasBody: true, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: true, Money: false, Hidden: false,
 		Params: []Param{
@@ -4632,6 +4632,8 @@ var Ops = []Op{
 		},
 		Body: []Field{
 			{Name: "confirm", Type: "boolean", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
+			{Name: "label", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "Key label shown in the panel.", DescTR: ""},
+			{Name: "perms", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "Comma separated bucket:permission (rw | r | none). Listed buckets only; unlisted buckets get no access. Omit for read-write on every bucket.", DescTR: ""},
 		},
 	},
 	{ID: "typed_delete_storage__id__keys__key", Method: "DELETE", Path: "/cloud/storage/{id}/keys/{key}", Tag: "Object storage",
