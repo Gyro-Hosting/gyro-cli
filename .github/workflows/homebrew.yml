@@ -1,0 +1,78 @@
+# Updates Gyro-Hosting/homebrew-tap (Formula/gyro.rb) right after a release, with the tap's own signed-checksum generator
+# (scripts/update_formula.py verifies gyro_<v>_SHA256SUMS against the release GPG key before writing any hash).
+# The tap's hourly schedule stays as a fallback, but GitHub runs it only a few times a day.
+#
+# Triggers (same as npm.yml):
+#   release published            - releases published by a person or a PAT (tag push -> draft -> publish)
+#   workflow_run spec-sync       - automatic spec-sync releases (published with GITHUB_TOKEN, which emits no release event)
+#   workflow_dispatch            - manual; dry_run (default true) builds the formula and checks write access with
+#                                  `git push --dry-run`, without changing the tap
+# Auth: TAP_DEPLOY_KEY repository secret = private half of a WRITE deploy key on Gyro-Hosting/homebrew-tap only (no PAT).
+name: homebrew
+on:
+  release:
+    types: [published]
+  workflow_run:
+    workflows: [spec-sync]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      tag: {description: 'Release tag, e.g. v1.42.0 (empty = latest release)', type: string, required: false}
+      dry_run: {description: 'Do not push (check access only)', type: boolean, default: true}
+permissions:
+  contents: read
+concurrency:
+  group: homebrew-tap
+  cancel-in-progress: false
+jobs:
+  formula:
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Resolve release tag
+        id: tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          IN_TAG: ${{ inputs.tag }}
+        run: |
+          # automatic runs always use the latest published release (never downgrade the formula)
+          tag="$IN_TAG"
+          if [ -z "$tag" ]; then tag=$(gh release view --json tagName -q .tagName); fi
+          case "$tag" in v[0-9]*.[0-9]*.[0-9]*) ;; *) echo "bad tag '$tag'"; exit 1;; esac
+          draft=$(gh release view "$tag" --json isDraft -q .isDraft)
+          [ "$draft" = "false" ] || { echo "$tag is still a draft"; exit 1; }
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v4
+        with:
+          repository: Gyro-Hosting/homebrew-tap
+          ssh-key: ${{ secrets.TAP_DEPLOY_KEY }}
+          path: tap
+      - name: Regenerate formula (signature checked)
+        working-directory: tap
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.tag.outputs.tag }}
+        run: python3 scripts/update_formula.py "$TAG"
+      - name: Commit and push
+        working-directory: tap
+        env:
+          DRY: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run && 'true' || 'false' }}
+          TAG: ${{ steps.tag.outputs.tag }}
+        run: |
+          git config user.name "gyro-release-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet; then echo "formula already at $TAG"; changed=false; else git commit -qam "gyro ${TAG#v}"; changed=true; fi
+          if [ "$DRY" = "true" ]; then
+            [ "$changed" = "true" ] && git show --stat --format='would push: %s' HEAD | head -3
+            # a new ref makes git compute a real update (receive-pack refuses read-only keys); --dry-run sends nothing
+            git push --dry-run origin HEAD:refs/heads/dry-run-check || { echo "::error::no write access to the tap (TAP_DEPLOY_KEY)"; exit 1; }
+            echo "DRY RUN: write access OK, changed=$changed, nothing pushed"
+            exit 0
+          fi
+          [ "$changed" = "true" ] || exit 0
+          for i in 1 2 3; do
+            git push origin HEAD:main && exit 0
+            git pull --rebase -q origin main || { git rebase --abort; git reset -q --hard origin/main; python3 scripts/update_formula.py "$TAG"; git diff --quiet && exit 0; git commit -qam "gyro ${TAG#v}"; }
+          done
+          exit 1
