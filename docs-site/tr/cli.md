@@ -370,6 +370,10 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro reseller customer list` | Uç-müşterileri listele | `GET /cloud/reseller/customers` |
 | `gyro reseller customer update` | Uç-müşteriyi güncelle (askıya alma = anahtarları çalışmaz) | `PATCH /cloud/reseller/customers/{id}` |
 | `gyro reseller report get` | Uç-müşteri başına kullanım ve fatura raporu | `GET /cloud/reseller/report` |
+| `gyro reseller service get` | Hizmetin bayi görünümü (durum, bitiş, açık faturalar) | `GET /cloud/reseller/services/{id}` |
+| `gyro reseller service suspend` | Hizmeti askıya al (bayi) | `POST /cloud/reseller/services/{id}/suspend` |
+| `gyro reseller service terminate` | Hizmeti sonlandır (bayi) | `POST /cloud/reseller/services/{id}/terminate` |
+| `gyro reseller service unsuspend` | Hizmeti askıdan çıkar (bayi) | `POST /cloud/reseller/services/{id}/unsuspend` |
 | `gyro reseller setting get` | Bayi ayarları | `GET /cloud/reseller/settings` |
 | `gyro reseller setting set` | Bayi ayarlarını kaydet (beyaz etiket) | `PUT /cloud/reseller/settings` |
 | `gyro security-group attach` | Güvenlik grubunu sunucuya bağla | `POST /cloud/servers/{id}/security-groups/{sg}` |

@@ -370,6 +370,10 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro reseller customer list` | List end-customers | `GET /cloud/reseller/customers` |
 | `gyro reseller customer update` | Update an end-customer (suspend = its keys stop working) | `PATCH /cloud/reseller/customers/{id}` |
 | `gyro reseller report get` | Usage and billing report per end-customer | `GET /cloud/reseller/report` |
+| `gyro reseller service get` | Reseller view of a service (status, due date, open invoices) | `GET /cloud/reseller/services/{id}` |
+| `gyro reseller service suspend` | Suspend a service (reseller) | `POST /cloud/reseller/services/{id}/suspend` |
+| `gyro reseller service terminate` | Terminate a service (reseller) | `POST /cloud/reseller/services/{id}/terminate` |
+| `gyro reseller service unsuspend` | Unsuspend a service (reseller) | `POST /cloud/reseller/services/{id}/unsuspend` |
 | `gyro reseller setting get` | Reseller settings | `GET /cloud/reseller/settings` |
 | `gyro reseller setting set` | Save reseller settings (white label) | `PUT /cloud/reseller/settings` |
 | `gyro security-group attach` | Attach a security group to a server | `POST /cloud/servers/{id}/security-groups/{sg}` |

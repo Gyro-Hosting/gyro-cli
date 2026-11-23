@@ -35,5 +35,6 @@ gyro reseller [flags]
 * [gyro reseller assign](gyro_reseller_assign.md)	 - Assign a service to an end-customer (customer_id 0 = unassign)
 * [gyro reseller customer](gyro_reseller_customer.md)	 - List end-customers
 * [gyro reseller report](gyro_reseller_report.md)	 - Usage and billing report per end-customer
+* [gyro reseller service](gyro_reseller_service.md)	 - Reseller view of a service (status, due date, open invoices)
 * [gyro reseller setting](gyro_reseller_setting.md)	 - Reseller settings
 

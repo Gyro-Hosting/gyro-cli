@@ -1,0 +1,97 @@
+.nh
+.TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
+
+.SH NAME
+gyro-reseller-service-suspend - Suspend a service (reseller)
+
+
+.SH SYNOPSIS
+\fBgyro reseller service suspend  [flags]\fP
+
+
+.SH DESCRIPTION
+Suspend a service (reseller)
+
+.PP
+Suspends an active service (e.g. the end-customer did not pay the reseller). Data is kept. Repeating on a suspended service returns \fBchanged: false\fR\&. 422 \fBinvalid_service_state\fR when the service is not active. Only services on the reseller's own account (404 \fBservice_not_found\fR otherwise); reseller keys only (403 \fBnot_reseller\fR, sub-account keys 403 \fBsubkey_forbidden\fR). Built for billing-panel modules (WHMCS / WISECP Gyro reseller module) that mirror the panel's lifecycle on Gyro.
+
+.PP
+API: POST /cloud/reseller/services/{id}/suspend (operationId suspendResellerService, scope reseller)
+
+
+.SH OPTIONS
+\fB--data\fP=""
+	request body as JSON, @file or @- (stdin)
+
+.PP
+\fB--dry-run\fP[=false]
+	show the price quote / request without changing anything
+
+.PP
+\fB-h\fP, \fB--help\fP[=false]
+	help for suspend
+
+.PP
+\fB--idempotency-key\fP=""
+	idempotency key (automatic for money operations)
+
+.PP
+\fB--reason\fP=""
+	shown in the Gyro panel
+
+.PP
+\fB--set\fP=[]
+	extra body field key=value (repeatable)
+
+
+.SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--api-url\fP=""
+	API base URL (env GYRO_API_URL)
+
+.PP
+\fB--debug\fP[=false]
+	log HTTP requests to stderr (secrets masked)
+
+.PP
+\fB--lang\fP=""
+	message language: tr or en (default from locale)
+
+.PP
+\fB--no-color\fP[=false]
+	disable colours (also NO_COLOR)
+
+.PP
+\fB--no-header\fP[=false]
+	omit the table header
+
+.PP
+\fB-o\fP, \fB--output\fP=""
+	output format: table, json, yaml, text
+
+.PP
+\fB-p\fP, \fB--profile\fP=""
+	profile to use (env GYRO_PROFILE)
+
+.PP
+\fB--query\fP=""
+	JMESPath query applied to the result
+
+.PP
+\fB-q\fP, \fB--quiet\fP[=false]
+	print only ids
+
+.PP
+\fB--timeout\fP=0s
+	overall timeout, e.g. 30s, 10m
+
+.PP
+\fB--wide\fP[=false]
+	show all table columns
+
+.PP
+\fB-y\fP, \fB--yes\fP[=false]
+	do not ask for confirmation
+
+
+.SH SEE ALSO
+\fBgyro-reseller-service(1)\fP

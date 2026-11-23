@@ -3,7 +3,7 @@
 package spec
 
 // APIVersion is info.version of the spec this table was generated from.
-const APIVersion = "2.44.0"
+const APIVersion = "2.45.0"
 
 // Ops lists every API operation.
 var Ops = []Op{
@@ -2951,6 +2951,54 @@ var Ops = []Op{
 		Params: []Param{
 			{Name: "from", In: "query", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
 			{Name: "to", In: "query", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
+		},
+	},
+	{ID: "getResellerService", Method: "GET", Path: "/cloud/reseller/services/{id}", Tag: "Reseller",
+		Summary: "Reseller view of a service (status, due date, open invoices)", SummaryTR: "Hizmetin bayi görünümü (durum, bitiş, açık faturalar)",
+		Desc: "Status, product, cycle, price, due date, who suspended it, the assigned end-customer and the open invoices of the service. Only services on the reseller's own account (404 `service_not_found` otherwise); reseller keys only (403 `not_reseller`, sub-account keys 403 `subkey_forbidden`). Built for billing-panel modules (WHMCS / WISECP Gyro reseller module) that mirror the panel's lifecycle on Gyro.", DescTR: "Hizmetin durumu, ürünü, dönemi, fiyatı, bitiş tarihi, kimin askıya aldığı, atanmış uç müşteri ve açık faturaları. Yalnız bayinin kendi hesabındaki hizmetler (aksi 404 `service_not_found`); yalnız bayi anahtarları (403 `not_reseller`, alt hesap anahtarı 403 `subkey_forbidden`). Paneldeki yaşam döngüsünü Gyro'ya yansıtan fatura paneli modülleri (WHMCS / WISECP Gyro bayi modülü) için.",
+		Scope: "reseller", Command: []string{"reseller", "service", "get"},
+		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
+		Columns: []string{"service_id", "status", "product_id", "name", "cycle", "amount", "due_date", "reseller_suspended", "customer_id", "overdue", "changed"},
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Service id (a service on the reseller's own account)", DescTR: "Hizmet kimliği (bayinin kendi hesabındaki hizmet)"},
+		},
+	},
+	{ID: "suspendResellerService", Method: "POST", Path: "/cloud/reseller/services/{id}/suspend", Tag: "Reseller",
+		Summary: "Suspend a service (reseller)", SummaryTR: "Hizmeti askıya al (bayi)",
+		Desc: "Suspends an active service (e.g. the end-customer did not pay the reseller). Data is kept. Repeating on a suspended service returns `changed: false`. 422 `invalid_service_state` when the service is not active. Only services on the reseller's own account (404 `service_not_found` otherwise); reseller keys only (403 `not_reseller`, sub-account keys 403 `subkey_forbidden`). Built for billing-panel modules (WHMCS / WISECP Gyro reseller module) that mirror the panel's lifecycle on Gyro.", DescTR: "Etkin hizmeti askıya alır (ör. uç müşteri bayiye ödemedi). Veri korunur. Askıdaki hizmette tekrar `changed: false` döner. Hizmet etkin değilse 422 `invalid_service_state`. Yalnız bayinin kendi hesabındaki hizmetler (aksi 404 `service_not_found`); yalnız bayi anahtarları (403 `not_reseller`, alt hesap anahtarı 403 `subkey_forbidden`). Paneldeki yaşam döngüsünü Gyro'ya yansıtan fatura paneli modülleri (WHMCS / WISECP Gyro bayi modülü) için.",
+		Scope: "reseller", Command: []string{"reseller", "service", "suspend"},
+		HasBody: true, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
+		Columns: []string{"service_id", "status", "product_id", "name", "cycle", "amount", "due_date", "reseller_suspended", "customer_id", "overdue", "changed"},
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Service id (a service on the reseller's own account)", DescTR: "Hizmet kimliği (bayinin kendi hesabındaki hizmet)"},
+		},
+		Body: []Field{
+			{Name: "reason", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "shown in the Gyro panel", DescTR: "Gyro panelinde görünür"},
+		},
+	},
+	{ID: "terminateResellerService", Method: "POST", Path: "/cloud/reseller/services/{id}/terminate", Tag: "Reseller",
+		Summary: "Terminate a service (reseller)", SummaryTR: "Hizmeti sonlandır (bayi)",
+		Desc: "`\"confirm\": true` required (422 `confirm_required`). `\"immediate\": true` cancels now: billing stops and the resource and its data are deleted (status `cancelling`, `cancelled` within about a minute; cannot be undone; 403 `immediate_disabled` when the operator turned it off). Without `immediate` a cancellation request is filed (active services only; a suspended service answers 409 `terminate_needs_immediate`). Cancellation rules of the product are checked first (422 `cancellation_rejected`). A cancelled service or an existing request returns `changed: false`. Only services on the reseller's own account (404 `service_not_found` otherwise); reseller keys only (403 `not_reseller`, sub-account keys 403 `subkey_forbidden`). Built for billing-panel modules (WHMCS / WISECP Gyro reseller module) that mirror the panel's lifecycle on Gyro.", DescTR: "`\"confirm\": true` zorunlu (422 `confirm_required`). `\"immediate\": true` hemen iptal eder: ücretlendirme durur, kaynak ve verisi silinir (durum `cancelling`, yaklaşık bir dakikada `cancelled`; geri alınamaz; operatör kapattıysa 403 `immediate_disabled`). `immediate` olmadan iptal talebi açılır (yalnız etkin hizmet; askıdaki hizmette 409 `terminate_needs_immediate`). Önce ürünün iptal kuralları denetlenir (422 `cancellation_rejected`). İptal edilmiş hizmette ya da açık talepte `changed: false` döner. Yalnız bayinin kendi hesabındaki hizmetler (aksi 404 `service_not_found`); yalnız bayi anahtarları (403 `not_reseller`, alt hesap anahtarı 403 `subkey_forbidden`). Paneldeki yaşam döngüsünü Gyro'ya yansıtan fatura paneli modülleri (WHMCS / WISECP Gyro bayi modülü) için.",
+		Scope: "reseller", Command: []string{"reseller", "service", "terminate"},
+		HasBody: true, BodyRequired: true, ListResponse: false, Paginated: false, Confirm: true, Money: false, Hidden: false,
+		Columns: []string{"service_id", "status", "changed", "immediate", "note"},
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Service id (a service on the reseller's own account)", DescTR: "Hizmet kimliği (bayinin kendi hesabındaki hizmet)"},
+		},
+		Body: []Field{
+			{Name: "confirm", Type: "boolean", Items: "", Enum: []string{"true"}, Default: "", Required: true, Desc: "", DescTR: ""},
+			{Name: "immediate", Type: "boolean", Items: "", Enum: nil, Default: "false", Required: false, Desc: "delete now (cannot be undone)", DescTR: "şimdi sil (geri alınamaz)"},
+			{Name: "reason", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
+		},
+	},
+	{ID: "unsuspendResellerService", Method: "POST", Path: "/cloud/reseller/services/{id}/unsuspend", Tag: "Reseller",
+		Summary: "Unsuspend a service (reseller)", SummaryTR: "Hizmeti askıdan çıkar (bayi)",
+		Desc: "Lifts a suspension that the reseller made. A suspension made by Gyro cannot be lifted here: 409 `suspended_by_provider`; 409 `overdue_invoice` while a Gyro invoice of the service is past due (pay it first). Repeating on an active service returns `changed: false`. Only services on the reseller's own account (404 `service_not_found` otherwise); reseller keys only (403 `not_reseller`, sub-account keys 403 `subkey_forbidden`). Built for billing-panel modules (WHMCS / WISECP Gyro reseller module) that mirror the panel's lifecycle on Gyro.", DescTR: "Bayinin koyduğu askıyı kaldırır. Gyro'nun koyduğu askı buradan kaldırılamaz: 409 `suspended_by_provider`; hizmetin vadesi geçmiş Gyro faturası varken 409 `overdue_invoice` (önce ödeyin). Etkin hizmette tekrar `changed: false` döner. Yalnız bayinin kendi hesabındaki hizmetler (aksi 404 `service_not_found`); yalnız bayi anahtarları (403 `not_reseller`, alt hesap anahtarı 403 `subkey_forbidden`). Paneldeki yaşam döngüsünü Gyro'ya yansıtan fatura paneli modülleri (WHMCS / WISECP Gyro bayi modülü) için.",
+		Scope: "reseller", Command: []string{"reseller", "service", "unsuspend"},
+		HasBody: false, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: false, Money: false, Hidden: false,
+		Columns: []string{"service_id", "status", "product_id", "name", "cycle", "amount", "due_date", "reseller_suspended", "customer_id", "overdue", "changed"},
+		Params: []Param{
+			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "Service id (a service on the reseller's own account)", DescTR: "Hizmet kimliği (bayinin kendi hesabındaki hizmet)"},
 		},
 	},
 	{ID: "getResellerSettings", Method: "GET", Path: "/cloud/reseller/settings", Tag: "Reseller",

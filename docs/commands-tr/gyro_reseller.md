@@ -35,5 +35,6 @@ gyro reseller [flags]
 * [gyro reseller assign](gyro_reseller_assign.md)	 - Hizmeti uç-müşteriye ata (customer_id 0 = atamayı kaldır)
 * [gyro reseller customer](gyro_reseller_customer.md)	 - Uç-müşterileri listele
 * [gyro reseller report](gyro_reseller_report.md)	 - Uç-müşteri başına kullanım ve fatura raporu
+* [gyro reseller service](gyro_reseller_service.md)	 - Hizmetin bayi görünümü (durum, bitiş, açık faturalar)
 * [gyro reseller setting](gyro_reseller_setting.md)	 - Bayi ayarları
 
