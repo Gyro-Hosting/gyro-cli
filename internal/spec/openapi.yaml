@@ -122,10 +122,10 @@ info:
     \ only from that server's IPv4 addresses. Size changes: `/cloud/services/{id}/resize-options` and `/resize`. `product_line=backup_space` in `/cloud/services`.\
     \ Additive.\n\n**2.45.0**: Reseller service lifecycle for billing-panel modules: `GET /cloud/reseller/services/{id}`, `POST /cloud/reseller/services/{id}/suspend|unsuspend|terminate`\
     \ (the reseller can lift only its own suspension). Gyro reseller modules for WHMCS and WISECP use them. Additive.\n\n**2.46.0**: account context. A panel user\
-    \ that the owner of another account added under *Account > Users* can work in that account with its OWN key: `GET /accounts` lists the accounts the key holder\
-    \ can reach with their permissions; send `X-Account-Id: <id>` on any request to act in that account. Permissions are exactly the panel permissions of that user\
-    \ (checked on every request, so a removed user or permission stops working at once); a missing permission answers 403 `account_permission_denied`, account-owner-only\
-    \ endpoints (API keys, webhooks, panel users, reseller, profile, addresses, balance, cards) 403 `account_owner_only`, an account you are not a user of 403 `account_not_accessible`,\
+    \ that the owner of another account added under *Sub-Accounts* can work in that account with its OWN key: `GET /accounts` lists the accounts the key holder can\
+    \ reach with their permissions; send `X-Account-Id: <id>` on any request to act in that account. Permissions are exactly the panel permissions of that user (checked\
+    \ on every request, so a removed user or permission stops working at once); a missing permission answers 403 `account_permission_denied`, account-owner-only endpoints\
+    \ (API keys, webhooks, panel users, reseller, profile, addresses, balance, cards) 403 `account_owner_only`, an account you are not a user of 403 `account_not_accessible`,\
     \ a malformed id 422 `invalid_account_id`, sub-account keys 403 `account_context_forbidden`. Without the header nothing changes. Device sign-in can pick a default\
     \ account (`account_context` in the token answer); CLI `--account`, MCP `account_id`, Terraform `account_id`.\n"
   x-description-tr: "Gyro Public API, müşteri panelinde yaptığınız her işi otomatikleştirmenizi sağlar:\nbulut sunucu siparişi ve yönetimi, SSH anahtarları, fatura\
@@ -244,9 +244,9 @@ info:
     \ /cloud/backup-spaces/{id}/server`): hesaptaki bir sunucuya bağlı, yalnız o sunucunun IPv4 adreslerinden erişilen kesin kotalı SFTP alanı. Boyut değişimi: `/cloud/services/{id}/resize-options`\
     \ ve `/resize`. `/cloud/services` içinde `product_line=backup_space`. Geriye uyumlu.\n\n**2.45.0**: Fatura paneli modülleri için bayi hizmet yaşam döngüsü: `GET\
     \ /cloud/reseller/services/{id}`, `POST /cloud/reseller/services/{id}/suspend|unsuspend|terminate` (bayi yalnız kendi askısını kaldırabilir). WHMCS ve WISECP\
-    \ Gyro bayi modülleri bunları kullanır. Geriye uyumlu.\n\n**2.46.0**: hesap bağlamı. Başka bir hesabın sahibinin *Hesap > Kullanıcılar* altında eklediği panel\
-    \ kullanıcısı, KENDİ anahtarıyla o hesapta çalışabilir: `GET /accounts` anahtar sahibinin erişebildiği hesapları izinleriyle listeler; herhangi bir isteğe `X-Account-Id:\
-    \ <id>` eklenince istek o hesapta yapılır. İzinler o kullanıcının paneldeki izinlerinin aynısıdır (her istekte yeniden denetlenir; kullanıcı ya da izin kaldırılınca\
+    \ Gyro bayi modülleri bunları kullanır. Geriye uyumlu.\n\n**2.46.0**: hesap bağlamı. Başka bir hesabın sahibinin *Alt Hesaplar* altında eklediği panel kullanıcısı,\
+    \ KENDİ anahtarıyla o hesapta çalışabilir: `GET /accounts` anahtar sahibinin erişebildiği hesapları izinleriyle listeler; herhangi bir isteğe `X-Account-Id: <id>`\
+    \ eklenince istek o hesapta yapılır. İzinler o kullanıcının paneldeki izinlerinin aynısıdır (her istekte yeniden denetlenir; kullanıcı ya da izin kaldırılınca\
     \ hemen geçersiz olur). Eksik izin 403 `account_permission_denied`, yalnız hesap sahibine açık uçlar (API anahtarları, webhook, panel kullanıcıları, bayi, profil,\
     \ adresler, bakiye, kartlar) 403 `account_owner_only`, kullanıcısı olmadığınız hesap 403 `account_not_accessible`, hatalı id 422 `invalid_account_id`, alt hesap\
     \ anahtarları 403 `account_context_forbidden`. Başlık yoksa hiçbir şey değişmez. Cihazla girişte varsayılan hesap seçilebilir (token yanıtında `account_context`);\

@@ -94,7 +94,7 @@ Full list: `gyro api operations` (every endpoint and its command) and [docs/comm
   `gyro auth status` shows account, key, permissions and expiry; `gyro auth logout` revokes the key and removes it locally.
 - `gyro configure [--profile name]` (asks for the browser sign-in first) checks the key (`/whoami`) and writes `~/.config/gyro/config.toml` (mode 0600).
   `--keyring` keeps the key in the OS keychain instead. Scripts: `echo "$KEY" | gyro configure --token-stdin --profile ci`.
-- Working in another account (API 2.46.0): when the owner of an account adds you under *Account > Users*, you act there with your own key.
+- Working in another account (API 2.46.0): when the owner of an account adds you under *Sub-Accounts*, you act there with your own key.
   `gyro account list` shows the accounts you can reach and your permissions; `--account <id>` for one command, `GYRO_ACCOUNT=<id>` for a shell,
   `gyro account use <id>` for the profile default (`gyro account use self` resets it). `gyro auth login` stores the account picked on the approval page.
   Permissions are exactly the panel user permissions; a refused operation answers 403 (`account_permission_denied`, `account_owner_only`), exit code 3.

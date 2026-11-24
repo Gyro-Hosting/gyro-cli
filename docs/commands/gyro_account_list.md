@@ -4,7 +4,7 @@ Accounts you can act in with --account (your own + accounts you are a panel user
 
 ### Synopsis
 
-Lists your own account and every account whose owner added you under Account > Users, with your permissions there.
+Lists your own account and every account whose owner added you under Sub-Accounts, with your permissions there.
 Act in one of them with --account <id>, GYRO_ACCOUNT=<id> or make it the profile default with 'gyro account use <id>'.
 Permissions are exactly the panel permissions; owner-only operations (API keys, webhooks, users, balance, cards) are refused.
 

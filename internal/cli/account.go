@@ -78,10 +78,10 @@ func addAccount(a *App, root *cobra.Command) {
 		Use:     "list",
 		Aliases: []string{"ls"},
 		Short:   i18n.S("Accounts you can act in with --account (your own + accounts you are a panel user of)", "--account ile işlem yapabildiğiniz hesaplar (kendi hesabınız + panel kullanıcısı olduğunuz hesaplar)"),
-		Long: i18n.S(`Lists your own account and every account whose owner added you under Account > Users, with your permissions there.
+		Long: i18n.S(`Lists your own account and every account whose owner added you under Sub-Accounts, with your permissions there.
 Act in one of them with --account <id>, GYRO_ACCOUNT=<id> or make it the profile default with 'gyro account use <id>'.
 Permissions are exactly the panel permissions; owner-only operations (API keys, webhooks, users, balance, cards) are refused.`,
-			`Kendi hesabınızı ve sizi Hesap > Kullanıcılar altında ekleyen her hesabı oradaki izinlerinizle listeler.
+			`Kendi hesabınızı ve sizi Alt Hesaplar altında ekleyen her hesabı oradaki izinlerinizle listeler.
 Birinde işlem yapmak için --account <id>, GYRO_ACCOUNT=<id> ya da profil varsayılanı için 'gyro account use <id>'.
 İzinler paneldeki izinlerin aynısıdır; yalnız hesap sahibine açık işlemler (API anahtarları, webhook, kullanıcılar, bakiye, kartlar) reddedilir.`),
 		Example:     "  gyro account list\n  gyro server list --account 12345\n  gyro account use 12345",

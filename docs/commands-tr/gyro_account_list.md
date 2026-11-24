@@ -4,7 +4,7 @@
 
 ### Synopsis
 
-Kendi hesabınızı ve sizi Hesap > Kullanıcılar altında ekleyen her hesabı oradaki izinlerinizle listeler.
+Kendi hesabınızı ve sizi Alt Hesaplar altında ekleyen her hesabı oradaki izinlerinizle listeler.
 Birinde işlem yapmak için --account <id>, GYRO_ACCOUNT=<id> ya da profil varsayılanı için 'gyro account use <id>'.
 İzinler paneldeki izinlerin aynısıdır; yalnız hesap sahibine açık işlemler (API anahtarları, webhook, kullanıcılar, bakiye, kartlar) reddedilir.
 
