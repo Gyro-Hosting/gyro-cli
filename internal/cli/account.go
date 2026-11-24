@@ -23,7 +23,8 @@ type accountAccess struct {
 	Domains      string `json:"domains"`
 	Invoices     string `json:"invoices"`
 	Tickets      string `json:"tickets"`
-	Orders       string `json:"orders"`
+	Orders       bool   `json:"orders"`
+	SSO          bool   `json:"sso"`
 	Passwords    bool   `json:"passwords"`
 	AccountAdmin bool   `json:"account_admin"`
 }

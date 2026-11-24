@@ -5205,7 +5205,7 @@ var Ops = []Op{
 		Desc: "Your own account first, then every account whose owner added you as an active panel user, with your permissions there. Any valid key (no scope needed); sub-account keys answer 403 `account_context_forbidden`. Use the `id` as `X-Account-Id`.", DescTR: "Önce kendi hesabınız, sonra sizi etkin panel kullanıcısı olarak ekleyen her hesap, oradaki izinlerinizle. Geçerli her anahtar (kapsam gerekmez); alt hesap anahtarları 403 `account_context_forbidden`. `id` değerini `X-Account-Id` olarak gönderin.",
 		Scope: "", Command: []string{"account", "list"},
 		HasBody: false, BodyRequired: false, ListResponse: true, Paginated: true, Confirm: false, Money: false, Hidden: false,
-		Columns: []string{"id", "name", "email", "is_self", "role"},
+		Columns: []string{"id", "name", "company_name", "email", "is_self", "role"},
 		Params: []Param{
 			{Name: "page", In: "query", Type: "integer", Items: "", Enum: nil, Default: "1", Required: false, Desc: "", DescTR: ""},
 			{Name: "limit", In: "query", Type: "integer", Items: "", Enum: nil, Default: "50", Required: false, Desc: "", DescTR: ""},

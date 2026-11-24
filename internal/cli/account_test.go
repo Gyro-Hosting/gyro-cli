@@ -18,7 +18,7 @@ func TestAccountContext(t *testing.T) {
 			map[string]any{"id": 35554, "name": "G*** P***", "email": "g***@example.com", "is_self": true, "role": "owner", "permissions": []any{},
 				"access": map[string]any{"services": "manage", "tickets": "manage", "passwords": true, "account_admin": true}},
 			map[string]any{"id": 35553, "name": "G*** P*** M***", "email": "g***@example.com", "is_self": false, "role": "member",
-				"permissions": []any{"view_services", "view_tickets"}, "access": map[string]any{"services": "read", "tickets": "manage", "invoices": "none"}}},
+				"permissions": []any{"view_services", "view_tickets"}, "access": map[string]any{"services": "read", "tickets": "manage", "invoices": "none", "orders": false}}},
 			"meta": map[string]any{"total": 2, "page": 1, "limit": 100, "next_page": 0}})
 	}
 	m.routes["GET /cloud/ssh-keys"] = func(w http.ResponseWriter, r *http.Request, b map[string]any) {

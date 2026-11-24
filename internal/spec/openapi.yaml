@@ -35021,7 +35021,7 @@ components:
           description: false = the service was already in the requested state (idempotent repeat)
     AccountAccess:
       type: object
-      description: 'Permission summary per area: none | read | manage (owner: manage everywhere).'
+      description: 'Permission summary (owner: everything).'
       properties:
         services:
           type: string
@@ -35039,47 +35039,34 @@ components:
           type: string
           enum:
           - none
-          - read
-          - manage
+          - read_pay
         tickets:
           type: string
           enum:
           - none
-          - read
           - manage
         orders:
-          type: string
-          enum:
-          - none
-          - read
-          - manage
-        affiliate:
-          type: string
-          enum:
-          - none
-          - read
-          - manage
-        reseller:
-          type: string
-          enum:
-          - none
-          - read
-          - manage
+          type: boolean
         passwords:
           type: boolean
         sso:
           type: boolean
+        affiliate:
+          type: boolean
         account_admin:
           type: boolean
+          description: 'Owner only: API keys, webhooks, panel users, reseller, profile, addresses, balance, cards.'
     AccountContext:
       type: object
-      description: An account the key holder can act in (masked identity).
+      description: An account the key holder can act in (name as in the panel account switcher, e-mail masked).
       properties:
         id:
           type: integer
         name:
           type: string
-          example: G*** P***
+          example: Gyro Proje
+        company_name:
+          type: string
         email:
           type: string
           example: g***@example.com
