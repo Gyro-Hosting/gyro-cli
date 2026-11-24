@@ -68,6 +68,7 @@ type Options struct {
 	Debug    bool
 	Wide     bool
 	Timeout  time.Duration
+	Account  string // --account (API 2.46.0 X-Account-Id)
 }
 
 // App is shared by all commands.
@@ -180,6 +181,11 @@ func (a *App) Client() (*api.Client, error) {
 	}
 	c := a.NewClient(a.APIURL(), tok)
 	c.Lang = i18n.Lang()
+	acct, err := a.AccountID()
+	if err != nil {
+		return nil, err
+	}
+	c.AccountID = acct
 	if a.Opt.Debug {
 		c.Debug = a.Err
 	}
@@ -268,6 +274,7 @@ func NewRoot(a *App) *cobra.Command {
 	f.BoolVarP(&a.Opt.Yes, "yes", "y", false, i18n.S("do not ask for confirmation", "onay sorma"))
 	f.BoolVar(&a.Opt.Debug, "debug", false, i18n.S("log HTTP requests to stderr (secrets masked)", "HTTP isteklerini stderr'e yaz (sırlar maskeli)"))
 	f.BoolVar(&a.Opt.Wide, "wide", false, i18n.S("show all table columns", "tüm tablo sütunlarını göster"))
+	f.StringVar(&a.Opt.Account, "account", "", i18n.S("act in another account you are a panel user of (id from `gyro account list`; \"self\" = your own; env GYRO_ACCOUNT, profile default: `gyro account use`)", "panel kullanıcısı olduğunuz başka bir hesapta işlem yap (`gyro account list` id'si; \"self\" = kendi hesabınız; ortam GYRO_ACCOUNT, profil varsayılanı: `gyro account use`)"))
 	f.DurationVar(&a.Opt.Timeout, "timeout", 0, i18n.S("overall timeout, e.g. 30s, 10m", "toplam zaman aşımı, ör. 30s, 10m"))
 	_ = root.RegisterFlagCompletionFunc("output", fixedCompletion("table", "json", "yaml", "text"))
 	_ = root.RegisterFlagCompletionFunc("lang", fixedCompletion("tr", "en"))
@@ -286,6 +293,7 @@ func NewRoot(a *App) *cobra.Command {
 	// hand-written commands first; generated ones fill the gaps
 	addConfigure(a, root)
 	addAuth(a, root)
+	addAccount(a, root)
 	addContext(a, root)
 	addVersion(a, root)
 	addCompletion(a, root)

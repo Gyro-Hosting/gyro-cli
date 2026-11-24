@@ -25,8 +25,8 @@ var update = flag.Bool("update", false, "rewrite golden files")
 /* ------------------------------------------------------------------ mock API */
 
 type call struct {
-	Method, Path, Query, Idem, Auth string
-	Body                            map[string]any
+	Method, Path, Query, Idem, Auth, Acct string
+	Body                                  map[string]any
 }
 
 type mock struct {
@@ -203,7 +203,7 @@ func newMock(t *testing.T) (*mock, *httptest.Server) {
 		var body map[string]any
 		_ = json.Unmarshal(raw, &body)
 		m.mu.Lock()
-		m.calls = append(m.calls, call{Method: r.Method, Path: r.URL.Path, Query: r.URL.RawQuery, Idem: r.Header.Get("Idempotency-Key"), Auth: r.Header.Get("Authorization"), Body: body})
+		m.calls = append(m.calls, call{Method: r.Method, Path: r.URL.Path, Query: r.URL.RawQuery, Idem: r.Header.Get("Idempotency-Key"), Auth: r.Header.Get("Authorization"), Acct: r.Header.Get("X-Account-Id"), Body: body})
 		m.mu.Unlock()
 		if r.Header.Get("Authorization") != "Bearer wck_test" {
 			j(w, 401, errBody("invalid_token", "Invalid API key."))

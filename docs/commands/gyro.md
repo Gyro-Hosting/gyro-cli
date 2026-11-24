@@ -5,7 +5,7 @@ Gyro Hosting command-line interface
 ### Synopsis
 
 gyro manages your Gyro Hosting services from the terminal: cloud servers, SSH keys, invoices,
-balance and everything else the Gyro Public API offers (API spec 2.45.0).
+balance and everything else the Gyro Public API offers (API spec 2.46.0).
 
 Get started:
   gyro auth login                # sign in with the browser (or: gyro configure to paste an API key)
@@ -19,24 +19,25 @@ Account limits (gyro limits) are raised with a support ticket: gyro ticket creat
 ### Options
 
 ```
-      --api-url string     API base URL (env GYRO_API_URL)
-      --debug              log HTTP requests to stderr (secrets masked)
-  -h, --help               help for gyro
-      --lang string        message language: tr or en (default from locale)
-      --no-color           disable colours (also NO_COLOR)
-      --no-header          omit the table header
-  -o, --output string      output format: table, json, yaml, text
-  -p, --profile string     profile to use (env GYRO_PROFILE)
-      --query string       JMESPath query applied to the result
-  -q, --quiet              print only ids
-      --timeout duration   overall timeout, e.g. 30s, 10m
-      --wide               show all table columns
-  -y, --yes                do not ask for confirmation
+      --account gyro account list   act in another account you are a panel user of (id from gyro account list; "self" = your own; env GYRO_ACCOUNT, profile default: `gyro account use`)
+      --api-url string              API base URL (env GYRO_API_URL)
+      --debug                       log HTTP requests to stderr (secrets masked)
+  -h, --help                        help for gyro
+      --lang string                 message language: tr or en (default from locale)
+      --no-color                    disable colours (also NO_COLOR)
+      --no-header                   omit the table header
+  -o, --output string               output format: table, json, yaml, text
+  -p, --profile string              profile to use (env GYRO_PROFILE)
+      --query string                JMESPath query applied to the result
+  -q, --quiet                       print only ids
+      --timeout duration            overall timeout, e.g. 30s, 10m
+      --wide                        show all table columns
+  -y, --yes                         do not ask for confirmation
 ```
 
 ### SEE ALSO
 
-* [gyro account](gyro_account.md)	 - Automatic balance top-up setting
+* [gyro account](gyro_account.md)	 - Accounts you can act in, account settings
 * [gyro activity](gyro_activity.md)	 - Account activity (sign-ins and security events)
 * [gyro address](gyro_address.md)	 - Billing addresses
 * [gyro affiliate](gyro_affiliate.md)	 - Get affiliate

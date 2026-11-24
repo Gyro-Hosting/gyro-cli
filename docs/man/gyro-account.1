@@ -2,7 +2,7 @@
 .TH "GYRO" "1" "Nov 2026" "Gyro Hosting" "gyro manual"
 
 .SH NAME
-gyro-account - Automatic balance top-up setting
+gyro-account - Accounts you can act in, account settings
 
 
 .SH SYNOPSIS
@@ -10,7 +10,7 @@ gyro-account - Automatic balance top-up setting
 
 
 .SH DESCRIPTION
-Automatic balance top-up setting
+Accounts you can act in, account settings
 
 
 .SH OPTIONS
@@ -19,6 +19,10 @@ Automatic balance top-up setting
 
 
 .SH OPTIONS INHERITED FROM PARENT COMMANDS
+\fB--account\fP=""
+	act in another account you are a panel user of (id from \fBgyro account list\fR; "self" = your own; env GYRO_ACCOUNT, profile default: \fBgyro account use\fR)
+
+.PP
 \fB--api-url\fP=""
 	API base URL (env GYRO_API_URL)
 
@@ -68,4 +72,4 @@ Automatic balance top-up setting
 
 
 .SH SEE ALSO
-\fBgyro(1)\fP, \fBgyro-account-auto-topup(1)\fP, \fBgyro-account-card(1)\fP
+\fBgyro(1)\fP, \fBgyro-account-auto-topup(1)\fP, \fBgyro-account-card(1)\fP, \fBgyro-account-list(1)\fP, \fBgyro-account-use(1)\fP

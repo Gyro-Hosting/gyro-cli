@@ -27,6 +27,7 @@ type Client struct {
 	Token      string
 	UserAgent  string
 	Lang       string // Accept-Language
+	AccountID  string // X-Account-Id (API 2.46.0): act in another account the key holder is a panel user of; "" = own account
 	HTTP       *http.Client
 	MaxRetries int
 	Debug      io.Writer // when set, requests/responses are logged here (Authorization masked)
@@ -153,6 +154,9 @@ func (c *Client) Do(ctx context.Context, r Request) (*Response, error) {
 		}
 		if c.Lang != "" {
 			req.Header.Set("Accept-Language", c.Lang)
+		}
+		if c.AccountID != "" {
+			req.Header.Set("X-Account-Id", c.AccountID)
 		}
 		if r.Body != nil {
 			req.Header.Set("Content-Type", "application/json")

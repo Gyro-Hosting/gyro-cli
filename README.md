@@ -103,7 +103,11 @@ Tam liste: `gyro api operations` (her API ucu ve karşılığı olan komut) ve [
 - `gyro configure [--profile ad]` — (önce tarayıcı girişini önerir) anahtarı doğrular (`/whoami`) ve `~/.config/gyro/config.toml` dosyasına (izin 0600) yazar.
   `--keyring` ile anahtar dosya yerine işletim sistemi anahtar zincirinde (macOS Keychain, Windows Credential Manager,
   Linux Secret Service) tutulur. Betikler için: `echo "$ANAHTAR" | gyro configure --token-stdin --profile ci`.
-- Öncelik: bayrak (`--profile`, `--api-url`) > ortam (`GYRO_TOKEN`, `GYRO_PROFILE`, `GYRO_API_URL`, `GYRO_OUTPUT`, `GYRO_LANG`) > profil > varsayılan.
+- Başka hesapta çalışmak (API 2.46.0): bir hesabın sahibi sizi *Hesap > Kullanıcılar* altında eklediyse kendi anahtarınızla o hesapta işlem yaparsınız.
+  `gyro account list` erişebildiğiniz hesapları ve izinlerinizi gösterir; tek komut için `--account <id>`, oturum için `GYRO_ACCOUNT=<id>`,
+  profil varsayılanı için `gyro account use <id>` (`gyro account use self` geri alır). `gyro auth login` onay sayfasında seçilen hesabı profile yazar.
+  İzinler paneldeki kullanıcı izinlerinin aynısıdır; yetkisiz işlem 403 (`account_permission_denied`, `account_owner_only`) ile çıkış kodu 3 verir.
+- Öncelik: bayrak (`--profile`, `--api-url`, `--account`) > ortam (`GYRO_TOKEN`, `GYRO_PROFILE`, `GYRO_API_URL`, `GYRO_OUTPUT`, `GYRO_LANG`, `GYRO_ACCOUNT`) > profil > varsayılan.
 - `gyro context` etkin profili, adresi, maskeli anahtarı ve yetkileri gösterir; `gyro context use <profil>` varsayılanı değiştirir.
 - Varsayılan API adresi: `https://www.gyrohosting.com/api/v1/client`.
 

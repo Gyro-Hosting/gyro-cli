@@ -48,14 +48,16 @@ type authAccount struct {
 }
 
 type authSession struct {
-	Key     authKey     `json:"key"`
-	Account authAccount `json:"account"`
+	Key            authKey      `json:"key"`
+	Account        authAccount  `json:"account"`
+	AccountContext *authAccount `json:"account_context"` // API 2.46.0: account selected with X-Account-Id
 }
 
 type deviceToken struct {
-	AccessToken string      `json:"access_token"`
-	Key         authKey     `json:"key"`
-	Account     authAccount `json:"account"`
+	AccessToken    string       `json:"access_token"`
+	Key            authKey      `json:"key"`
+	Account        authAccount  `json:"account"`
+	AccountContext *authAccount `json:"account_context"` // API 2.46.0: default account picked on the approval page
 }
 
 // headless reports an environment where opening a browser makes no sense (SSH session, no display).
@@ -202,6 +204,11 @@ func (a *App) storeLogin(name, apiURL string, tok *deviceToken, useKeyring bool)
 	if err := c.SetToken(name, tok.AccessToken, useKeyring); err != nil {
 		return err
 	}
+	// API 2.46.0: the account picked on the approval page becomes the profile default (own account = none)
+	p.Account = 0
+	if tok.AccountContext != nil && tok.AccountContext.ID > 0 && tok.AccountContext.ID != tok.Account.ID {
+		p.Account = tok.AccountContext.ID
+	}
 	if c.DefaultProfile == "" {
 		c.DefaultProfile = name
 	}
@@ -212,6 +219,9 @@ func (a *App) storeLogin(name, apiURL string, tok *deviceToken, useKeyring bool)
 	fmt.Fprintln(a.Err, i18n.F("Signed in to account #%d %s (%s).", "#%d %s hesabına giriş yapıldı (%s).", tok.Account.ID, tok.Account.Name, tok.Account.Email))
 	fmt.Fprintln(a.Err, i18n.F("Key %q: %d permission(s)%s, expires %s.", "%q anahtarı: %d izin%s, bitiş %s.", tok.Key.Name, tok.Key.Permissions,
 		scopeList(tok.Key.Scopes), expiryText(tok.Key.ExpiresAt)))
+	if p.Account > 0 {
+		fmt.Fprintln(a.Err, i18n.F("Default account: #%d %s (as a panel user; override with --account self).", "Varsayılan hesap: #%d %s (panel kullanıcısı olarak; --account self ile geçersiz kılın).", p.Account, tok.AccountContext.Name))
+	}
 	fmt.Fprintln(a.Err, i18n.F("Saved to profile %q (%s).", "%q profiline kaydedildi (%s).", name, c.FilePath()))
 	return nil
 }
@@ -285,13 +295,17 @@ CI'da anahtar kullanmaya devam edin: echo "$ANAHTAR" | gyro configure --token-st
 			_, src, _ := a.Token()
 			row := map[string]any{"profile": a.ProfileName(), "token_source": src, "account_id": s.Account.ID, "account": s.Account.Name, "email": s.Account.Email,
 				"key_id": s.Key.ID, "key_name": s.Key.Name, "key_prefix": s.Key.TokenPrefix, "source": s.Key.Source, "expires_at": expiryText(s.Key.ExpiresAt),
-				"permissions": s.Key.Permissions, "scopes": strings.Join(s.Key.Scopes, ","), "ips": strings.Join(s.Key.IPs, ",")}
+				"permissions": s.Key.Permissions, "scopes": strings.Join(s.Key.Scopes, ","), "ips": strings.Join(s.Key.IPs, ","), "acting_in": ""}
+			if s.AccountContext != nil {
+				row["acting_in"] = fmt.Sprintf("#%d %s", s.AccountContext.ID, s.AccountContext.Name)
+			}
 			if a.Machine() {
 				return a.Printer().Print(s, nil, "")
 			}
 			cols := []output.Column{{Header: "profile", Path: "profile"}, {Header: "account_id", Path: "account_id"}, {Header: "account", Path: "account"},
 				{Header: "email", Path: "email"}, {Header: "key_name", Path: "key_name"}, {Header: "key_prefix", Path: "key_prefix"}, {Header: "source", Path: "source"},
-				{Header: "expires_at", Path: "expires_at"}, {Header: "permissions", Path: "permissions"}, {Header: "scopes", Path: "scopes"}, {Header: "ips", Path: "ips"}, {Header: "token_source", Path: "token_source"}}
+				{Header: "expires_at", Path: "expires_at"}, {Header: "permissions", Path: "permissions"}, {Header: "scopes", Path: "scopes"}, {Header: "ips", Path: "ips"}, {Header: "token_source", Path: "token_source"},
+				{Header: "acting_in", Path: "acting_in"}}
 			return a.Printer().Print(row, cols, "key_id")
 		},
 	}

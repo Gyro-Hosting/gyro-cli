@@ -5,7 +5,7 @@ Gyro Hosting komut satırı aracı
 ### Synopsis
 
 gyro, Gyro Hosting hizmetlerinizi terminalden yönetir: bulut sunucular, SSH anahtarları, faturalar,
-bakiye ve Gyro Public API'nin sunduğu her şey (API sürümü 2.45.0).
+bakiye ve Gyro Public API'nin sunduğu her şey (API sürümü 2.46.0).
 
 Başlarken:
   gyro auth login                # tarayıcıyla giriş (ya da: anahtar yapıştırmak için gyro configure)
@@ -19,24 +19,25 @@ Hesap sınırları (gyro limits) destek talebiyle artırılır: gyro ticket crea
 ### Options
 
 ```
-      --api-url string     API taban adresi (ortam GYRO_API_URL)
-      --debug              HTTP isteklerini stderr'e yaz (sırlar maskeli)
-  -h, --help               help for gyro
-      --lang string        mesaj dili: tr ya da en (varsayılan yerel ayar)
-      --no-color           renkleri kapat (NO_COLOR da olur)
-      --no-header          tablo başlığını yazma
-  -o, --output string      çıktı biçimi: table, json, yaml, text
-  -p, --profile string     kullanılacak profil (ortam GYRO_PROFILE)
-      --query string       sonuca uygulanacak JMESPath sorgusu
-  -q, --quiet              yalnız kimlikleri yaz
-      --timeout duration   toplam zaman aşımı, ör. 30s, 10m
-      --wide               tüm tablo sütunlarını göster
-  -y, --yes                onay sorma
+      --account gyro account list   panel kullanıcısı olduğunuz başka bir hesapta işlem yap (gyro account list id'si; "self" = kendi hesabınız; ortam GYRO_ACCOUNT, profil varsayılanı: `gyro account use`)
+      --api-url string              API taban adresi (ortam GYRO_API_URL)
+      --debug                       HTTP isteklerini stderr'e yaz (sırlar maskeli)
+  -h, --help                        help for gyro
+      --lang string                 mesaj dili: tr ya da en (varsayılan yerel ayar)
+      --no-color                    renkleri kapat (NO_COLOR da olur)
+      --no-header                   tablo başlığını yazma
+  -o, --output string               çıktı biçimi: table, json, yaml, text
+  -p, --profile string              kullanılacak profil (ortam GYRO_PROFILE)
+      --query string                sonuca uygulanacak JMESPath sorgusu
+  -q, --quiet                       yalnız kimlikleri yaz
+      --timeout duration            toplam zaman aşımı, ör. 30s, 10m
+      --wide                        tüm tablo sütunlarını göster
+  -y, --yes                         onay sorma
 ```
 
 ### SEE ALSO
 
-* [gyro account](gyro_account.md)	 - Otomatik bakiye yükleme ayarı
+* [gyro account](gyro_account.md)	 - İşlem yapabildiğiniz hesaplar, hesap ayarları
 * [gyro activity](gyro_activity.md)	 - Hesap etkinlikleri (girişler ve güvenlik olayları)
 * [gyro address](gyro_address.md)	 - Fatura adresleri
 * [gyro affiliate](gyro_affiliate.md)	 - Program Durumunu Okuma

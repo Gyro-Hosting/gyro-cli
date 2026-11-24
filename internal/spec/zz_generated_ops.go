@@ -3,7 +3,7 @@
 package spec
 
 // APIVersion is info.version of the spec this table was generated from.
-const APIVersion = "2.45.0"
+const APIVersion = "2.46.0"
 
 // Ops lists every API operation.
 var Ops = []Op{
@@ -5198,6 +5198,17 @@ var Ops = []Op{
 		Columns: []string{"delivered", "delivery_id", "http_code", "error"},
 		Params: []Param{
 			{Name: "id", In: "path", Type: "integer", Items: "", Enum: nil, Default: "", Required: true, Desc: "", DescTR: ""},
+		},
+	},
+	{ID: "listAccounts", Method: "GET", Path: "/accounts", Tag: "Authentication",
+		Summary: "Accounts I can act in (X-Account-Id)", SummaryTR: "İşlem yapabildiğim hesaplar (X-Account-Id)",
+		Desc: "Your own account first, then every account whose owner added you as an active panel user, with your permissions there. Any valid key (no scope needed); sub-account keys answer 403 `account_context_forbidden`. Use the `id` as `X-Account-Id`.", DescTR: "Önce kendi hesabınız, sonra sizi etkin panel kullanıcısı olarak ekleyen her hesap, oradaki izinlerinizle. Geçerli her anahtar (kapsam gerekmez); alt hesap anahtarları 403 `account_context_forbidden`. `id` değerini `X-Account-Id` olarak gönderin.",
+		Scope: "", Command: []string{"account", "list"},
+		HasBody: false, BodyRequired: false, ListResponse: true, Paginated: true, Confirm: false, Money: false, Hidden: false,
+		Columns: []string{"id", "name", "email", "is_self", "role"},
+		Params: []Param{
+			{Name: "page", In: "query", Type: "integer", Items: "", Enum: nil, Default: "1", Required: false, Desc: "", DescTR: ""},
+			{Name: "limit", In: "query", Type: "integer", Items: "", Enum: nil, Default: "50", Required: false, Desc: "", DescTR: ""},
 		},
 	},
 	{ID: "getAccountActivity", Method: "GET", Path: "/activity", Tag: "Account",

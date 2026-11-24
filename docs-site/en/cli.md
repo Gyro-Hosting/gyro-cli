@@ -65,6 +65,7 @@ gyro: manage Gyro Hosting services from your terminal.
 | `gyro api request DELETE /cloud/mail/{id}/migrations/{jid}` | DELETE sync-jobs:delete (GyroMail) | `DELETE /cloud/mail/{id}/migrations/{jid}` |
 | `gyro api request DELETE /cloud/storage/{id}/buckets/{bucket}` | DELETE buckets:delete (GyroDepolama) | `DELETE /cloud/storage/{id}/buckets/{bucket}` |
 | `gyro api request DELETE /cloud/storage/{id}/keys/{key}` | DELETE access-keys:delete (GyroDepolama) | `DELETE /cloud/storage/{id}/keys/{key}` |
+| `gyro api request GET /accounts` | Accounts I can act in (X-Account-Id) | `GET /accounts` |
 | `gyro api request GET /auth/session` | Key in use: account, permissions, expiry | `GET /auth/session` |
 | `gyro api request GET /cloud/account/limits` | Account limits and usage | `GET /cloud/account/limits` |
 | `gyro api request GET /cloud/apps` | List installable apps | `GET /cloud/apps` |

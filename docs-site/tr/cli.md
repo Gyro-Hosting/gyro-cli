@@ -65,6 +65,7 @@ gyro: Gyro Hosting hizmetlerini terminalden yönetin.
 | `gyro api request DELETE /cloud/mail/{id}/migrations/{jid}` | sync-jobs:delete (GyroMail) | `DELETE /cloud/mail/{id}/migrations/{jid}` |
 | `gyro api request DELETE /cloud/storage/{id}/buckets/{bucket}` | buckets:delete (GyroDepolama) | `DELETE /cloud/storage/{id}/buckets/{bucket}` |
 | `gyro api request DELETE /cloud/storage/{id}/keys/{key}` | access-keys:delete (GyroDepolama) | `DELETE /cloud/storage/{id}/keys/{key}` |
+| `gyro api request GET /accounts` | İşlem yapabildiğim hesaplar (X-Account-Id) | `GET /accounts` |
 | `gyro api request GET /auth/session` | Kullanılan anahtar: hesap, izinler, bitiş | `GET /auth/session` |
 | `gyro api request GET /cloud/account/limits` | Hesap sınırları ve kullanım | `GET /cloud/account/limits` |
 | `gyro api request GET /cloud/apps` | Kurulabilir uygulamaları listele | `GET /cloud/apps` |

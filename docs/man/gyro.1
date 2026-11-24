@@ -11,7 +11,7 @@ gyro - Gyro Hosting command-line interface
 
 .SH DESCRIPTION
 gyro manages your Gyro Hosting services from the terminal: cloud servers, SSH keys, invoices,
-balance and everything else the Gyro Public API offers (API spec 2.45.0).
+balance and everything else the Gyro Public API offers (API spec 2.46.0).
 
 .PP
 Get started:
@@ -26,6 +26,10 @@ Account limits (gyro limits) are raised with a support ticket: gyro ticket creat
 
 
 .SH OPTIONS
+\fB--account\fP=""
+	act in another account you are a panel user of (id from \fBgyro account list\fR; "self" = your own; env GYRO_ACCOUNT, profile default: \fBgyro account use\fR)
+
+.PP
 \fB--api-url\fP=""
 	API base URL (env GYRO_API_URL)
 

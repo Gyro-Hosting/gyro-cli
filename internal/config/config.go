@@ -9,7 +9,7 @@
 //	lang = "tr"
 //
 // Precedence: command-line flag > environment (GYRO_TOKEN, GYRO_PROFILE, GYRO_API_URL, GYRO_OUTPUT,
-// GYRO_LANG) > profile > built-in default.
+// GYRO_LANG, GYRO_ACCOUNT) > profile > built-in default.
 package config
 
 import (
@@ -36,6 +36,8 @@ type Profile struct {
 	Lang         string `toml:"lang,omitempty"`
 	SSHUser      string `toml:"ssh_user,omitempty"`
 	SSHIdentity  string `toml:"ssh_identity,omitempty"`
+	// Account: default account context (X-Account-Id, API 2.46.0); 0 = own account. Set by `gyro account use` / `gyro auth login`.
+	Account int64 `toml:"account,omitzero"`
 }
 
 // File is the whole config file.
