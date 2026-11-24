@@ -127,7 +127,11 @@ info:
     \ on every request, so a removed user or permission stops working at once); a missing permission answers 403 `account_permission_denied`, account-owner-only endpoints\
     \ (API keys, webhooks, panel users, reseller, profile, addresses, balance, cards) 403 `account_owner_only`, an account you are not a user of 403 `account_not_accessible`,\
     \ a malformed id 422 `invalid_account_id`, sub-account keys 403 `account_context_forbidden`. Without the header nothing changes. Device sign-in can pick a default\
-    \ account (`account_context` in the token answer); CLI `--account`, MCP `account_id`, Terraform `account_id`.\n"
+    \ account (`account_context` in the token answer); CLI `--account`, MCP `account_id`, Terraform `account_id`. In a context: orders, invoice payments and domain\
+    \ registration / transfer are paid from the target account balance only (422 `balance_only`, no saved card); `GET /cloud/activity` (the owner's API audit log)\
+    \ is owner only; service tools that change something need `manage_services`, tools revealing credentials (console, password reset, rescue, 2FA, webmail, OS reinstall,\
+    \ access keys, pipeline webhook secret; bulk rebuild / reset_password) also `view_passwords`, webmail / groupware sign-in `allow_sso`; without `view_passwords`\
+    \ secret fields come back `null`. If the target account may not use the API (API access restricted to selected customers), the answer is 403 `account_not_accessible`.\n"
   x-description-tr: "Gyro Public API, müşteri panelinde yaptığınız her işi otomatikleştirmenizi sağlar:\nbulut sunucu siparişi ve yönetimi, SSH anahtarları, fatura\
     \ ve bakiye okuma.\nResmi Terraform sağlayıcısı (`gyro-hosting/gyro`) ve `gyroctl` bu API'yi kullanır.\n\n* **Taban adres** `https://www.gyrohosting.com/api/v1/client`\n\
     * **Kimlik** `Authorization: Bearer wck_...` (anahtarı *Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri* bölümünden oluşturun)\n* **Biçim** JSON\
@@ -250,7 +254,11 @@ info:
     \ hemen geçersiz olur). Eksik izin 403 `account_permission_denied`, yalnız hesap sahibine açık uçlar (API anahtarları, webhook, panel kullanıcıları, bayi, profil,\
     \ adresler, bakiye, kartlar) 403 `account_owner_only`, kullanıcısı olmadığınız hesap 403 `account_not_accessible`, hatalı id 422 `invalid_account_id`, alt hesap\
     \ anahtarları 403 `account_context_forbidden`. Başlık yoksa hiçbir şey değişmez. Cihazla girişte varsayılan hesap seçilebilir (token yanıtında `account_context`);\
-    \ CLI `--account`, MCP `account_id`, Terraform `account_id`.\n"
+    \ CLI `--account`, MCP `account_id`, Terraform `account_id`. Bağlamda sipariş, fatura ödemesi ve alan adı kaydı / transferi yalnız hedef hesabın bakiyesinden\
+    \ ödenir (422 `balance_only`, kayıtlı kart kullanılmaz); `GET /cloud/activity` (hesap sahibinin API denetim kaydı) yalnız sahibe açıktır; bir şey değiştiren hizmet\
+    \ araçları `manage_services` ister, kimlik bilgisi gösteren araçlar (konsol, parola sıfırlama, kurtarma, 2FA, webmail, işletim sistemi yeniden kurulumu, erişim\
+    \ anahtarları, pipeline webhook sırrı; toplu rebuild / reset_password) ayrıca `view_passwords`, webmail / groupware girişi `allow_sso` ister; `view_passwords`\
+    \ yoksa gizli alanlar `null` döner. Hedef hesabın API kullanımı kapalıysa (API erişimi seçili müşterilerle sınırlı) yanıt 403 `account_not_accessible` olur.\n"
   contact:
     name: Gyro Hosting
     url: https://www.gyrohosting.com
@@ -489,8 +497,7 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
-      x-account-permission:
-      - view_services
+      x-account-permission: owner_only
   /cloud/products:
     get:
       tags:
@@ -1160,6 +1167,10 @@ paths:
           description: 'Forbidden (incl. X-Account-Id: account_permission_denied, account_owner_only, account_not_accessible)'
       x-account-permission:
       - manage_services
+      x-account-permission-extra:
+      - when: action in (reset_password, enable_rescue, rebuild)
+        need:
+        - view_passwords
   /cloud/servers/{id}/snapshots:
     parameters:
     - $ref: '#/components/parameters/ServerId'
@@ -1844,6 +1855,13 @@ paths:
           description: 'Forbidden (incl. X-Account-Id: account_permission_denied, account_owner_only, account_not_accessible)'
       x-account-permission:
       - view_services
+      x-account-permission-extra:
+      - when: tool in (webmail, groupware)
+        need:
+        - allow_sso
+      - when: tool in (reset-password, vnc-console, rescue-mode, two-factor, webmail, devices, reinstall-os, access-keys) or ecs-pipeline:webhook
+        need:
+        - view_passwords
   /cloud/services/{id}/tools/{tool}/{action}:
     parameters:
     - name: id
@@ -1908,6 +1926,16 @@ paths:
           description: 'Forbidden (incl. X-Account-Id: account_permission_denied, account_owner_only, account_not_accessible)'
       x-account-permission:
       - manage_services
+      x-account-permission-extra:
+      - when: action not in (list, get, navigate, search, browse, read, info, fetch, load, preview, status)
+        need:
+        - manage_services
+      - when: tool in (webmail, groupware)
+        need:
+        - allow_sso
+      - when: tool in (reset-password, vnc-console, rescue-mode, two-factor, webmail, devices, reinstall-os, access-keys) or ecs-pipeline:webhook
+        need:
+        - view_passwords
   /cloud/services/{id}/methods/{method}:
     parameters:
     - name: id
@@ -2338,6 +2366,7 @@ paths:
           description: 'Forbidden (incl. X-Account-Id: account_permission_denied, account_owner_only, account_not_accessible)'
       x-account-permission:
       - manage_services
+      - view_passwords
   /cloud/bulk:
     post:
       tags:
@@ -2391,6 +2420,10 @@ paths:
           description: 'Forbidden (incl. X-Account-Id: account_permission_denied, account_owner_only, account_not_accessible)'
       x-account-permission:
       - manage_services
+      x-account-permission-extra:
+      - when: body action in (reset_password, enable_rescue, rebuild)
+        need:
+        - view_passwords
   /cloud/webhooks:
     get:
       tags:
@@ -6127,6 +6160,7 @@ paths:
                     bucket.
       x-account-permission:
       - manage_services
+      - view_passwords
   /cloud/storage/{id}/keys/{key}/rotate:
     post:
       tags:
@@ -6180,6 +6214,7 @@ paths:
                   type: boolean
       x-account-permission:
       - manage_services
+      - view_passwords
   /cloud/storage/{id}/keys/{key}:
     delete:
       tags:
@@ -6233,6 +6268,7 @@ paths:
                   type: boolean
       x-account-permission:
       - manage_services
+      - view_passwords
   /cloud/storage/{id}/usage:
     get:
       tags:
@@ -6780,6 +6816,7 @@ paths:
         confirm: false
       x-account-permission:
       - view_services
+      - manage_services
   /cloud/storage/{id}/connect:
     get:
       tags:
@@ -7424,6 +7461,7 @@ paths:
         confirm: false
       x-account-permission:
       - view_services
+      - manage_services
   /cloud/storage/{id}/events/{event}:
     get:
       tags:
@@ -7787,6 +7825,7 @@ paths:
         confirm: false
       x-account-permission:
       - view_services
+      - manage_services
   /cloud/monitors/{id}/monitors:
     get:
       tags:
@@ -11078,6 +11117,7 @@ paths:
         confirm: false
       x-account-permission:
       - view_services
+      - manage_services
   /cloud/containers/{id}/services/{name}/env:
     put:
       tags:
@@ -11403,6 +11443,7 @@ paths:
         confirm: false
       x-account-permission:
       - view_services
+      - manage_services
   /cloud/containers/{id}/logs:
     get:
       tags:
@@ -11558,6 +11599,7 @@ paths:
         confirm: false
       x-account-permission:
       - view_services
+      - manage_services
   /cloud/containers/{id}/logs/query:
     post:
       tags:
@@ -11814,6 +11856,7 @@ paths:
         confirm: false
       x-account-permission:
       - view_services
+      - manage_services
   /cloud/containers/{id}/logs/usage:
     get:
       tags:
@@ -11918,6 +11961,7 @@ paths:
         confirm: false
       x-account-permission:
       - view_services
+      - manage_services
   /cloud/containers/{id}/logs/plans:
     get:
       tags:
@@ -11984,6 +12028,7 @@ paths:
         confirm: false
       x-account-permission:
       - view_services
+      - manage_services
   /cloud/containers/{id}/logs/retention:
     put:
       tags:
@@ -12114,6 +12159,7 @@ paths:
         confirm: false
       x-account-permission:
       - view_services
+      - manage_services
     put:
       tags:
       - Containers
@@ -13108,6 +13154,7 @@ paths:
         confirm: false
       x-account-permission:
       - view_services
+      - manage_services
   /cloud/containers/{id}/egress-approval:
     put:
       tags:
@@ -13591,6 +13638,7 @@ paths:
         confirm: false
       x-account-permission:
       - view_services
+      - manage_services
     delete:
       tags:
       - Containers
@@ -13805,6 +13853,7 @@ paths:
           description: 'Forbidden (incl. X-Account-Id: account_permission_denied, account_owner_only, account_not_accessible)'
       x-account-permission:
       - view_services
+      - manage_services
   /cloud/containers/{id}/services/{name}/run:
     post:
       tags:
@@ -14121,6 +14170,7 @@ paths:
         confirm: false
       x-account-permission:
       - view_services
+      - manage_services
   /cloud/containers/{id}/schedules:
     get:
       tags:
@@ -14172,6 +14222,7 @@ paths:
         confirm: false
       x-account-permission:
       - view_services
+      - manage_services
     post:
       tags:
       - Containers
@@ -14447,6 +14498,7 @@ paths:
         confirm: false
       x-account-permission:
       - view_services
+      - manage_services
     patch:
       tags:
       - Containers
@@ -15707,6 +15759,8 @@ paths:
         confirm: false
       x-account-permission:
       - view_services
+      - manage_services
+      - view_passwords
   /cloud/containers/{id}/pipelines/{pipeline}/webhook/rotate:
     post:
       tags:
@@ -16004,6 +16058,7 @@ paths:
         confirm: false
       x-account-permission:
       - view_services
+      - manage_services
     post:
       tags:
       - Containers
@@ -16124,6 +16179,7 @@ paths:
         confirm: false
       x-account-permission:
       - view_services
+      - manage_services
   /cloud/containers/{id}/pipeline-runs/{run}/logs:
     get:
       tags:
@@ -16185,6 +16241,7 @@ paths:
         confirm: false
       x-account-permission:
       - view_services
+      - manage_services
   /cloud/containers/{id}/pipeline-runs/{run}/cancel:
     post:
       tags:
@@ -16692,6 +16749,7 @@ paths:
         confirm: false
       x-account-permission:
       - view_services
+      - manage_services
     put:
       tags:
       - Containers
@@ -18769,6 +18827,13 @@ paths:
         description: Okuma eylemi. Verilmezse aracın varsayılan listesi alınır.
       x-account-permission:
       - view_services
+      x-account-permission-extra:
+      - when: tool in (webmail, groupware)
+        need:
+        - allow_sso
+      - when: tool in (reset-password, vnc-console, rescue-mode, two-factor, webmail, devices, reinstall-os, access-keys) or ecs-pipeline:webhook
+        need:
+        - view_passwords
   /services/{id}/tools/{tool}/{action}:
     post:
       tags:
@@ -18856,6 +18921,16 @@ paths:
                   description: ''
       x-account-permission:
       - manage_services
+      x-account-permission-extra:
+      - when: action not in (list, get, navigate, search, browse, read, info, fetch, load, preview, status)
+        need:
+        - manage_services
+      - when: tool in (webmail, groupware)
+        need:
+        - allow_sso
+      - when: tool in (reset-password, vnc-console, rescue-mode, two-factor, webmail, devices, reinstall-os, access-keys) or ecs-pipeline:webhook
+        need:
+        - view_passwords
   /services/{id}/module-method:
     post:
       tags:
@@ -19243,6 +19318,7 @@ paths:
           maxLength: 191
       x-account-permission:
       - new_orders
+      x-account-payment: balance_only
   /domains/transfer:
     post:
       tags:
@@ -19344,6 +19420,7 @@ paths:
           maxLength: 191
       x-account-permission:
       - new_orders
+      x-account-payment: balance_only
   /domains/whois-profiles:
     get:
       tags:
@@ -22042,6 +22119,7 @@ paths:
           maxLength: 191
       x-account-permission:
       - new_orders
+      x-account-payment: balance_only
   /orders/preview:
     post:
       tags:
@@ -22261,6 +22339,7 @@ paths:
               - payment
       x-account-permission:
       - view_invoices
+      x-account-payment: balance_only
   /invoices/{id}/coupon:
     post:
       tags:
@@ -29899,6 +29978,7 @@ paths:
           $ref: '#/components/responses/Conflict'
       x-account-permission:
       - manage_services
+      - view_passwords
   /cloud/backup-spaces/{id}/password:
     post:
       tags:
@@ -29955,6 +30035,7 @@ paths:
           $ref: '#/components/responses/Validation'
       x-account-permission:
       - manage_services
+      - view_passwords
   /cloud/backup-spaces/{id}/server:
     put:
       tags:
@@ -30018,7 +30099,7 @@ paths:
       - manage_services
   /cloud/reseller/services/{id}:
     get:
-      tags: &id001
+      tags:
       - Reseller
       operationId: getResellerService
       summary: Reseller view of a service (status, due date, open invoices)
@@ -30033,8 +30114,7 @@ paths:
         hizmetler (aksi 404 `service_not_found`); yalnız bayi anahtarları (403 `not_reseller`, alt hesap anahtarı 403 `subkey_forbidden`). Paneldeki yaşam döngüsünü
         Gyro'ya yansıtan fatura paneli modülleri (WHMCS / WISECP Gyro bayi modülü) için.
       parameters:
-      - &id002
-        name: id
+      - name: id
         in: path
         required: true
         schema:
@@ -30058,7 +30138,8 @@ paths:
       x-account-permission: owner_only
   /cloud/reseller/services/{id}/suspend:
     post:
-      tags: *id001
+      tags:
+      - Reseller
       operationId: suspendResellerService
       summary: Suspend a service (reseller)
       x-summary-tr: Hizmeti askıya al (bayi)
@@ -30073,7 +30154,13 @@ paths:
         422 `invalid_service_state`. Yalnız bayinin kendi hesabındaki hizmetler (aksi 404 `service_not_found`); yalnız bayi anahtarları (403 `not_reseller`, alt hesap
         anahtarı 403 `subkey_forbidden`). Paneldeki yaşam döngüsünü Gyro''ya yansıtan fatura paneli modülleri (WHMCS / WISECP Gyro bayi modülü) için.'
       parameters:
-      - *id002
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id (a service on the reseller's own account)
+        x-description-tr: Hizmet kimliği (bayinin kendi hesabındaki hizmet)
       requestBody:
         required: false
         content:
@@ -30100,12 +30187,13 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
-        '422': &id004
+        '422':
           $ref: '#/components/responses/Validation'
       x-account-permission: owner_only
   /cloud/reseller/services/{id}/unsuspend:
     post:
-      tags: *id001
+      tags:
+      - Reseller
       operationId: unsuspendResellerService
       summary: Unsuspend a service (reseller)
       x-summary-tr: Hizmeti askıdan çıkar (bayi)
@@ -30121,7 +30209,13 @@ paths:
         yalnız bayi anahtarları (403 `not_reseller`, alt hesap anahtarı 403 `subkey_forbidden`). Paneldeki yaşam döngüsünü Gyro''ya yansıtan fatura paneli modülleri
         (WHMCS / WISECP Gyro bayi modülü) için.'
       parameters:
-      - *id002
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id (a service on the reseller's own account)
+        x-description-tr: Hizmet kimliği (bayinin kendi hesabındaki hizmet)
       responses:
         '200':
           description: OK
@@ -30136,12 +30230,13 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
-        '409': &id003
+        '409':
           $ref: '#/components/responses/Conflict'
       x-account-permission: owner_only
   /cloud/reseller/services/{id}/terminate:
     post:
-      tags: *id001
+      tags:
+      - Reseller
       operationId: terminateResellerService
       summary: Terminate a service (reseller)
       x-summary-tr: Hizmeti sonlandır (bayi)
@@ -30160,7 +30255,13 @@ paths:
         ya da açık talepte `changed: false` döner. Yalnız bayinin kendi hesabındaki hizmetler (aksi 404 `service_not_found`); yalnız bayi anahtarları (403 `not_reseller`,
         alt hesap anahtarı 403 `subkey_forbidden`). Paneldeki yaşam döngüsünü Gyro''ya yansıtan fatura paneli modülleri (WHMCS / WISECP Gyro bayi modülü) için.'
       parameters:
-      - *id002
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: Service id (a service on the reseller's own account)
+        x-description-tr: Hizmet kimliği (bayinin kendi hesabındaki hizmet)
       requestBody:
         required: true
         content:
@@ -30215,8 +30316,10 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
-        '409': *id003
-        '422': *id004
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/Validation'
       x-account-permission: owner_only
   /accounts:
     get:
@@ -35101,10 +35204,14 @@ x-account-context:
   since: 2.46.0
   list: /accounts
   operations: 520
+  payment: 'balance_only (orders, invoice payment, domain register / transfer: target account balance, no saved card)'
+  secrets: null without view_passwords
   errors:
     '422':
     - invalid_account_id
     - account_context_unsupported
+    - balance_only
+    - idempotency_key_reuse
     '403':
     - account_not_accessible
     - account_permission_denied

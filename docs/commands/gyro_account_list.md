@@ -6,7 +6,9 @@ Accounts you can act in with --account (your own + accounts you are a panel user
 
 Lists your own account and every account whose owner added you under Sub-Accounts, with your permissions there.
 Act in one of them with --account <id>, GYRO_ACCOUNT=<id> or make it the profile default with 'gyro account use <id>'.
-Permissions are exactly the panel permissions; owner-only operations (API keys, webhooks, users, balance, cards) are refused.
+Permissions are exactly the panel permissions; owner-only operations (API keys, webhooks, users, balance, cards, the API activity log) are refused.
+Orders, invoice payments and domain registration / transfer are paid from that account's balance only (no saved card).
+Without the "view passwords" permission secret fields come back empty; console, password reset, rescue, rebuild and similar tools are refused.
 
 ```
 gyro account list [flags]

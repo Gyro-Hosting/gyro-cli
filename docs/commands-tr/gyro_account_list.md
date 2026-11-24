@@ -6,7 +6,9 @@
 
 Kendi hesabınızı ve sizi Alt Hesaplar altında ekleyen her hesabı oradaki izinlerinizle listeler.
 Birinde işlem yapmak için --account <id>, GYRO_ACCOUNT=<id> ya da profil varsayılanı için 'gyro account use <id>'.
-İzinler paneldeki izinlerin aynısıdır; yalnız hesap sahibine açık işlemler (API anahtarları, webhook, kullanıcılar, bakiye, kartlar) reddedilir.
+İzinler paneldeki izinlerin aynısıdır; yalnız hesap sahibine açık işlemler (API anahtarları, webhook, kullanıcılar, bakiye, kartlar, API etkinlik kaydı) reddedilir.
+Sipariş, fatura ödemesi ve alan adı kaydı / transferi yalnız o hesabın bakiyesinden ödenir (kayıtlı kart kullanılmaz).
+"Parolaları görüntüleme" izni yoksa gizli alanlar boş döner; konsol, parola sıfırlama, kurtarma, yeniden kurulum gibi araçlar reddedilir.
 
 ```
 gyro account list [flags]

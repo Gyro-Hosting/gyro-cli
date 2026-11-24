@@ -80,10 +80,14 @@ func addAccount(a *App, root *cobra.Command) {
 		Short:   i18n.S("Accounts you can act in with --account (your own + accounts you are a panel user of)", "--account ile işlem yapabildiğiniz hesaplar (kendi hesabınız + panel kullanıcısı olduğunuz hesaplar)"),
 		Long: i18n.S(`Lists your own account and every account whose owner added you under Sub-Accounts, with your permissions there.
 Act in one of them with --account <id>, GYRO_ACCOUNT=<id> or make it the profile default with 'gyro account use <id>'.
-Permissions are exactly the panel permissions; owner-only operations (API keys, webhooks, users, balance, cards) are refused.`,
+Permissions are exactly the panel permissions; owner-only operations (API keys, webhooks, users, balance, cards, the API activity log) are refused.
+Orders, invoice payments and domain registration / transfer are paid from that account's balance only (no saved card).
+Without the "view passwords" permission secret fields come back empty; console, password reset, rescue, rebuild and similar tools are refused.`,
 			`Kendi hesabınızı ve sizi Alt Hesaplar altında ekleyen her hesabı oradaki izinlerinizle listeler.
 Birinde işlem yapmak için --account <id>, GYRO_ACCOUNT=<id> ya da profil varsayılanı için 'gyro account use <id>'.
-İzinler paneldeki izinlerin aynısıdır; yalnız hesap sahibine açık işlemler (API anahtarları, webhook, kullanıcılar, bakiye, kartlar) reddedilir.`),
+İzinler paneldeki izinlerin aynısıdır; yalnız hesap sahibine açık işlemler (API anahtarları, webhook, kullanıcılar, bakiye, kartlar, API etkinlik kaydı) reddedilir.
+Sipariş, fatura ödemesi ve alan adı kaydı / transferi yalnız o hesabın bakiyesinden ödenir (kayıtlı kart kullanılmaz).
+"Parolaları görüntüleme" izni yoksa gizli alanlar boş döner; konsol, parola sıfırlama, kurtarma, yeniden kurulum gibi araçlar reddedilir.`),
 		Example:     "  gyro account list\n  gyro server list --account 12345\n  gyro account use 12345",
 		Args:        cobra.NoArgs,
 		Annotations: map[string]string{"operationId": "listAccounts"},

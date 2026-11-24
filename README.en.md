@@ -98,6 +98,7 @@ Full list: `gyro api operations` (every endpoint and its command) and [docs/comm
   `gyro account list` shows the accounts you can reach and your permissions; `--account <id>` for one command, `GYRO_ACCOUNT=<id>` for a shell,
   `gyro account use <id>` for the profile default (`gyro account use self` resets it). `gyro auth login` stores the account picked on the approval page.
   Permissions are exactly the panel user permissions; a refused operation answers 403 (`account_permission_denied`, `account_owner_only`), exit code 3.
+  Payments in another account (orders, invoices, domain registration / transfer) come from that account's balance only; without the "view passwords" permission secrets come back empty.
 - Precedence: flags (`--profile`, `--api-url`, `--account`) > environment (`GYRO_TOKEN`, `GYRO_PROFILE`, `GYRO_API_URL`, `GYRO_OUTPUT`, `GYRO_LANG`, `GYRO_ACCOUNT`) > profile > default.
 - `gyro context` shows the active profile, URL, masked key and permissions; `gyro context use <profile>` switches the default.
 
