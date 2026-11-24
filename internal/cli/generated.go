@@ -40,7 +40,7 @@ func markHandledCmd(cmds ...string) {
 }
 
 var globalFlags = map[string]bool{"profile": true, "api-url": true, "output": true, "query": true, "no-header": true,
-	"quiet": true, "no-color": true, "lang": true, "yes": true, "debug": true, "wide": true, "timeout": true, "help": true,
+	"quiet": true, "no-color": true, "lang": true, "yes": true, "debug": true, "wide": true, "timeout": true, "help": true, "account": true,
 	"data": true, "set": true, "dry-run": true, "wait": true, "all": true, "page": true, "limit": true, "idempotency-key": true}
 
 // resourceAliases are extra names for generated group commands.

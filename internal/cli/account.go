@@ -83,8 +83,9 @@ Permissions are exactly the panel permissions; owner-only operations (API keys, 
 			`Kendi hesabınızı ve sizi Hesap > Kullanıcılar altında ekleyen her hesabı oradaki izinlerinizle listeler.
 Birinde işlem yapmak için --account <id>, GYRO_ACCOUNT=<id> ya da profil varsayılanı için 'gyro account use <id>'.
 İzinler paneldeki izinlerin aynısıdır; yalnız hesap sahibine açık işlemler (API anahtarları, webhook, kullanıcılar, bakiye, kartlar) reddedilir.`),
-		Example: "  gyro account list\n  gyro server list --account 12345\n  gyro account use 12345",
-		Args:    cobra.NoArgs,
+		Example:     "  gyro account list\n  gyro server list --account 12345\n  gyro account use 12345",
+		Args:        cobra.NoArgs,
+		Annotations: map[string]string{"operationId": "listAccounts"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			items, raw, err := a.listAccounts()
 			if err != nil {
