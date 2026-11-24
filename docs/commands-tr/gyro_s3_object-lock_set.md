@@ -6,7 +6,7 @@ Kovanın varsayılan saklamasını ayarla
 
 Kovanın varsayılan saklamasını ayarla
 
-Yalnız kilitli kovalar. `mode` GOVERNANCE ya da COMPLIANCE ve `days` 1-3650, ya da OFF (yeni nesnelere otomatik saklama yok; mevcut kilitler sürer). GOVERNANCE: yalnız Gyro personeli talep üzerine aşabilir. COMPLIANCE kilidi süresi dolana kadar kimse (Gyro dahil) kısaltamaz, GOVERNANCE'a çeviremez, kaldıramaz; veri saklanır ve iptalde bile süre sonuna kadar ücret sürer. `"confirm": true` ve `"acknowledge": "COMPLIANCE"` gönderin.
+Yalnız kilitli kovalar. `mode` GOVERNANCE ya da COMPLIANCE ve `days` 1-3650, ya da OFF (yeni nesnelere otomatik saklama yok; mevcut kilitler sürer). GOVERNANCE: yalnız Gyro personeli talep üzerine aşabilir. COMPLIANCE kilidi süresi dolana kadar kimse (Gyro dahil) kısaltamaz, GOVERNANCE'a çeviremez, kaldıramaz; veri saklanır ve iptalde bile süre sonuna kadar ücret sürer. `"confirm": true` ve `"acknowledge": "COMPLIANCE"` gönderin. Kilit bitişi hizmet bitiş (yenileme) tarihini aşamaz: bugün + `days` (ya da yeni bitiş) daha sonraysa yanıt 422 `retention_exceeds_service_end` olur (`details.service_end`, `details.max_days`). `GET /cloud/storage/{id}/object-lock` `service_end` ve `max_retention_days` gösterir; daha uzun kilit için hizmeti yenileyin ya da daha uzun döneme (`biennially`, `triennially`) geçirin.
 
 API: PUT /cloud/storage/{id}/buckets/{bucket}/object-lock (operationId setStorageBucketObjectLock, scope services_write)
 
@@ -19,7 +19,7 @@ gyro s3 object-lock set <ID> <BUCKET> [flags]
 ```
       --acknowledge string       Yalnız COMPLIANCE: kaldırılamayacağını kabul için COMPLIANCE yazın
       --data string              istek gövdesi JSON, @dosya ya da @- (stdin)
-      --days int                 Retention days (not with OFF)
+      --days int                 Retention days (not with OFF); at most the days left until the service end date (see max_retention_days)
       --dry-run                  hiçbir şeyi değiştirmeden teklifi / isteği göster
   -h, --help                     help for set
       --idempotency-key string   tekrar güvenliği anahtarı (para işlemlerinde otomatik)

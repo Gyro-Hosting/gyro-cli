@@ -458,6 +458,8 @@ func hint(e *api.Error) string {
 		return i18n.S("Another action is running on this server; add --wait or retry shortly.", "Sunucuda başka bir işlem sürüyor; --wait ekleyin ya da biraz sonra deneyin.")
 	case "invalid_replicas":
 		return replicaHint(e)
+	case "retention_exceeds_service_end":
+		return lockEndHint(e)
 	case "confirm_required":
 		return i18n.S("Re-run with --yes to confirm.", "Onaylamak için --yes ile tekrar çalıştırın.")
 	}

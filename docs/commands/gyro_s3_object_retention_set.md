@@ -6,7 +6,7 @@ Lock an object version
 
 Lock an object version
 
-Sets or extends the retention of one version (`version_id` empty = current) for `days` 1-3650 from now. Retention can only be extended; COMPLIANCE cannot be switched to GOVERNANCE. COMPLIANCE cannot be shortened, switched to GOVERNANCE or removed by anyone (Gyro included) until it expires; the data is kept and the service keeps being billed until then, even after cancellation. Send `"confirm": true` and `"acknowledge": "COMPLIANCE"`.
+Sets or extends the retention of one version (`version_id` empty = current) for `days` 1-3650 from now. Retention can only be extended; COMPLIANCE cannot be switched to GOVERNANCE. COMPLIANCE cannot be shortened, switched to GOVERNANCE or removed by anyone (Gyro included) until it expires; the data is kept and the service keeps being billed until then, even after cancellation. Send `"confirm": true` and `"acknowledge": "COMPLIANCE"`. The lock may not end after the service end (renewal) date: if today + `days` (or the new retain-until) is later, the answer is 422 `retention_exceeds_service_end` with `details.service_end` and `details.max_days`. `GET /cloud/storage/{id}/object-lock` shows `service_end` and `max_retention_days`; renew or move the service to a longer cycle (`biennially`, `triennially`) for a longer lock.
 
 API: PUT /cloud/storage/{id}/buckets/{bucket}/objects/retention (operationId setStorageObjectRetention, scope services_write)
 
@@ -19,7 +19,7 @@ gyro s3 object retention set <ID> <BUCKET> [flags]
 ```
       --acknowledge string       COMPLIANCE only: type COMPLIANCE
       --data string              request body as JSON, @file or @- (stdin)
-      --days int                 days
+      --days int                 Retention days from now; at most the days left until the service end date (see max_retention_days)
       --dry-run                  show the price quote / request without changing anything
   -h, --help                     help for set
       --idempotency-key string   idempotency key (automatic for money operations)

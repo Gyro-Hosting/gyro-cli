@@ -2,7 +2,7 @@
 openapi: 3.1.0
 info:
   title: Gyro Public API
-  version: 2.46.0
+  version: 2.46.1
   summary: Manage Gyro cloud servers, SSH keys and billing programmatically.
   x-summary-tr: Gyro bulut sunucularınızı, SSH anahtarlarınızı ve faturalarınızı programla yönetin.
   description: "The Gyro Public API lets you automate everything you do in the Gyro client area:\norder and manage cloud servers, keep SSH keys, read invoices and\
@@ -131,7 +131,14 @@ info:
     \ registration / transfer are paid from the target account balance only (422 `balance_only`, no saved card); `GET /cloud/activity` (the owner's API audit log)\
     \ is owner only; service tools that change something need `manage_services`, tools revealing credentials (console, password reset, rescue, 2FA, webmail, OS reinstall,\
     \ access keys, pipeline webhook secret; bulk rebuild / reset_password) also `view_passwords`, webmail / groupware sign-in `allow_sso`; without `view_passwords`\
-    \ secret fields come back `null`. If the target account may not use the API (API access restricted to selected customers), the answer is 403 `account_not_accessible`.\n"
+    \ secret fields come back `null`. If the target account may not use the API (API access restricted to selected customers), the answer is 403 `account_not_accessible`.\n\
+    \n**2.46.1**: Protected Storage. (1) An object lock may not end after the service end (renewal) date, with no tolerance: `PUT /cloud/storage/{id}/buckets/{bucket}/object-lock`\
+    \ (today + `days`) and `PUT .../objects/retention` answer 422 `retention_exceeds_service_end` with `details.field`, `details.service_end` (ISO 8601) and `details.max_days`;\
+    \ the S3 endpoint refuses the same (retain-until header, PutObjectRetention, PutObjectLockConfiguration, multipart / copy) with 400 `InvalidRequest`, and refuses\
+    \ new uploads to a bucket whose default retention would end after the service end. `GET /cloud/storage/{id}/object-lock` now returns `service_end` and a dynamic\
+    \ `max_retention_days` (days left until the service end, at most 3650). After a renewal the limit moves to the new end date within minutes. Legal Hold has no\
+    \ end date and is not affected. (2) Protected plans (`protected-*`) can be ordered for 2 years (`cycle: biennially`) and 3 years (`triennially`): price = yearly\
+    \ x2 / x3 (no extra discount), the object lock add-on per bucket likewise; `GET /cloud/storage/plans` lists both cycles for protected plans.\n"
   x-description-tr: "Gyro Public API, müşteri panelinde yaptığınız her işi otomatikleştirmenizi sağlar:\nbulut sunucu siparişi ve yönetimi, SSH anahtarları, fatura\
     \ ve bakiye okuma.\nResmi Terraform sağlayıcısı (`gyro-hosting/gyro`) ve `gyroctl` bu API'yi kullanır.\n\n* **Taban adres** `https://www.gyrohosting.com/api/v1/client`\n\
     * **Kimlik** `Authorization: Bearer wck_...` (anahtarı *Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri* bölümünden oluşturun)\n* **Biçim** JSON\
@@ -258,7 +265,14 @@ info:
     \ ödenir (422 `balance_only`, kayıtlı kart kullanılmaz); `GET /cloud/activity` (hesap sahibinin API denetim kaydı) yalnız sahibe açıktır; bir şey değiştiren hizmet\
     \ araçları `manage_services` ister, kimlik bilgisi gösteren araçlar (konsol, parola sıfırlama, kurtarma, 2FA, webmail, işletim sistemi yeniden kurulumu, erişim\
     \ anahtarları, pipeline webhook sırrı; toplu rebuild / reset_password) ayrıca `view_passwords`, webmail / groupware girişi `allow_sso` ister; `view_passwords`\
-    \ yoksa gizli alanlar `null` döner. Hedef hesabın API kullanımı kapalıysa (API erişimi seçili müşterilerle sınırlı) yanıt 403 `account_not_accessible` olur.\n"
+    \ yoksa gizli alanlar `null` döner. Hedef hesabın API kullanımı kapalıysa (API erişimi seçili müşterilerle sınırlı) yanıt 403 `account_not_accessible` olur.\n\
+    \n**2.46.1**: Korumalı Depolama. (1) Nesne kilidinin bitişi hizmet bitiş (yenileme) tarihini aşamaz, tolerans yok: `PUT /cloud/storage/{id}/buckets/{bucket}/object-lock`\
+    \ (bugün + `days`) ve `PUT .../objects/retention` 422 `retention_exceeds_service_end` döner (`details.field`, `details.service_end` ISO 8601, `details.max_days`);\
+    \ S3 ucu aynı istekleri (retain-until başlığı, PutObjectRetention, PutObjectLockConfiguration, çok parçalı / kopyalama) 400 `InvalidRequest` ile reddeder ve varsayılan\
+    \ saklaması hizmet bitişini aşacak kovaya yeni yüklemeyi reddeder. `GET /cloud/storage/{id}/object-lock` artık `service_end` ve dinamik `max_retention_days` (hizmet\
+    \ bitişine kalan gün, en çok 3650) döner. Yenilemeden sonra sınır dakikalar içinde yeni bitişe kayar. Legal Hold süresiz olduğu için etkilenmez. (2) Korumalı\
+    \ paketler (`protected-*`) 2 yıllık (`cycle: biennially`) ve 3 yıllık (`triennially`) sipariş edilebilir: fiyat yıllık x2 / x3 (ek indirim yok), kova başına nesne\
+    \ kilidi eki de aynı; `GET /cloud/storage/plans` korumalı paketlerde iki dönemi de listeler.\n"
   contact:
     name: Gyro Hosting
     url: https://www.gyrohosting.com
@@ -23882,9 +23896,11 @@ paths:
         command: storage object-lock status
         confirm: false
       description: 'Locked-bucket rights (Object Lock add-on) and use, the default retention of every bucket, and the last lock scan (number of COMPLIANCE / GOVERNANCE
-        / legal hold versions and the latest end date). Protected Storage only: a standard Object Storage service answers 409 `feature_not_available`.'
+        / legal hold versions and the latest end date). Protected Storage only: a standard Object Storage service answers 409 `feature_not_available`. `service_end`
+        and `max_retention_days` show the current lock limit (a lock may not end after the service end date).'
       x-description-tr: 'Kilitli kova hakkı (Nesne Kilidi ek hizmeti) ve kullanımı, kovaların varsayılan saklaması ve son kilit taraması (COMPLIANCE / GOVERNANCE
-        / legal hold sürüm sayısı, en geç bitiş). Yalnız Korumalı Depolama: standart Nesne Depolama hizmeti 409 `feature_not_available` döner.'
+        / legal hold sürüm sayısı, en geç bitiş). Yalnız Korumalı Depolama: standart Nesne Depolama hizmeti 409 `feature_not_available` döner. `service_end` ve `max_retention_days`
+        şu anki kilit sınırını gösterir (kilit hizmet bitişinden sonra bitemez).'
       parameters:
       - name: id
         in: path
@@ -24329,10 +24345,16 @@ paths:
         confirm: true
       description: 'Locked buckets only. `mode` GOVERNANCE or COMPLIANCE with `days` 1-3650, or OFF (new objects get no automatic retention; existing locks stay).
         GOVERNANCE: only Gyro staff can bypass it on request. COMPLIANCE cannot be shortened, switched to GOVERNANCE or removed by anyone (Gyro included) until it
-        expires; the data is kept and the service keeps being billed until then, even after cancellation. Send `"confirm": true` and `"acknowledge": "COMPLIANCE"`.'
+        expires; the data is kept and the service keeps being billed until then, even after cancellation. Send `"confirm": true` and `"acknowledge": "COMPLIANCE"`.
+        The lock may not end after the service end (renewal) date: if today + `days` (or the new retain-until) is later, the answer is 422 `retention_exceeds_service_end`
+        with `details.service_end` and `details.max_days`. `GET /cloud/storage/{id}/object-lock` shows `service_end` and `max_retention_days`; renew or move the service
+        to a longer cycle (`biennially`, `triennially`) for a longer lock.'
       x-description-tr: 'Yalnız kilitli kovalar. `mode` GOVERNANCE ya da COMPLIANCE ve `days` 1-3650, ya da OFF (yeni nesnelere otomatik saklama yok; mevcut kilitler
         sürer). GOVERNANCE: yalnız Gyro personeli talep üzerine aşabilir. COMPLIANCE kilidi süresi dolana kadar kimse (Gyro dahil) kısaltamaz, GOVERNANCE''a çeviremez,
-        kaldıramaz; veri saklanır ve iptalde bile süre sonuna kadar ücret sürer. `"confirm": true` ve `"acknowledge": "COMPLIANCE"` gönderin.'
+        kaldıramaz; veri saklanır ve iptalde bile süre sonuna kadar ücret sürer. `"confirm": true` ve `"acknowledge": "COMPLIANCE"` gönderin. Kilit bitişi hizmet
+        bitiş (yenileme) tarihini aşamaz: bugün + `days` (ya da yeni bitiş) daha sonraysa yanıt 422 `retention_exceeds_service_end` olur (`details.service_end`, `details.max_days`).
+        `GET /cloud/storage/{id}/object-lock` `service_end` ve `max_retention_days` gösterir; daha uzun kilit için hizmeti yenileyin ya da daha uzun döneme (`biennially`,
+        `triennially`) geçirin.'
       parameters:
       - name: id
         in: path
@@ -24365,7 +24387,21 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         '422':
-          $ref: '#/components/responses/Validation'
+          description: 'Validation or business rule failure: `retention_exceeds_service_end` (details: field, service_end, max_days), `compliance_confirm_required`,
+            `invalid_mode`, `confirm_required` ...'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: retention_exceeds_service_end
+                  message: The lock period cannot go beyond the service end date (2026-12-24T21:22:00+03:00); at most 29 days now. Extend the service period (longer
+                    billing cycle) for a longer lock.
+                  details:
+                    field: days
+                    service_end: '2026-12-24T21:22:00+03:00'
+                    max_days: 29
         '403':
           description: 'Forbidden (incl. X-Account-Id: account_permission_denied, account_owner_only, account_not_accessible)'
       requestBody:
@@ -24385,7 +24421,7 @@ paths:
                   type: integer
                   minimum: 1
                   maximum: 3650
-                  description: Retention days (not with OFF)
+                  description: Retention days (not with OFF); at most the days left until the service end date (see max_retention_days)
                 acknowledge:
                   type: string
                   enum:
@@ -24472,10 +24508,15 @@ paths:
         confirm: true
       description: 'Sets or extends the retention of one version (`version_id` empty = current) for `days` 1-3650 from now. Retention can only be extended; COMPLIANCE
         cannot be switched to GOVERNANCE. COMPLIANCE cannot be shortened, switched to GOVERNANCE or removed by anyone (Gyro included) until it expires; the data is
-        kept and the service keeps being billed until then, even after cancellation. Send `"confirm": true` and `"acknowledge": "COMPLIANCE"`.'
+        kept and the service keeps being billed until then, even after cancellation. Send `"confirm": true` and `"acknowledge": "COMPLIANCE"`. The lock may not end
+        after the service end (renewal) date: if today + `days` (or the new retain-until) is later, the answer is 422 `retention_exceeds_service_end` with `details.service_end`
+        and `details.max_days`. `GET /cloud/storage/{id}/object-lock` shows `service_end` and `max_retention_days`; renew or move the service to a longer cycle (`biennially`,
+        `triennially`) for a longer lock.'
       x-description-tr: 'Bir sürümün saklamasını şimdiden itibaren `days` (1-3650) gün olarak koyar ya da uzatır (`version_id` boş = güncel). Saklama yalnız uzatılabilir;
         COMPLIANCE GOVERNANCE''a çevrilemez. COMPLIANCE kilidi süresi dolana kadar kimse (Gyro dahil) kısaltamaz, GOVERNANCE''a çeviremez, kaldıramaz; veri saklanır
-        ve iptalde bile süre sonuna kadar ücret sürer. `"confirm": true` ve `"acknowledge": "COMPLIANCE"` gönderin.'
+        ve iptalde bile süre sonuna kadar ücret sürer. `"confirm": true` ve `"acknowledge": "COMPLIANCE"` gönderin. Kilit bitişi hizmet bitiş (yenileme) tarihini
+        aşamaz: bugün + `days` (ya da yeni bitiş) daha sonraysa yanıt 422 `retention_exceeds_service_end` olur (`details.service_end`, `details.max_days`). `GET /cloud/storage/{id}/object-lock`
+        `service_end` ve `max_retention_days` gösterir; daha uzun kilit için hizmeti yenileyin ya da daha uzun döneme (`biennially`, `triennially`) geçirin.'
       parameters:
       - name: id
         in: path
@@ -24508,7 +24549,21 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         '422':
-          $ref: '#/components/responses/Validation'
+          description: 'Validation or business rule failure: `retention_exceeds_service_end` (details: field, service_end, max_days), `compliance_confirm_required`,
+            `invalid_mode`, `confirm_required` ...'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: retention_exceeds_service_end
+                  message: The lock period cannot go beyond the service end date (2026-12-24T21:22:00+03:00); at most 29 days now. Extend the service period (longer
+                    billing cycle) for a longer lock.
+                  details:
+                    field: days
+                    service_end: '2026-12-24T21:22:00+03:00'
+                    max_days: 29
         '403':
           description: 'Forbidden (incl. X-Account-Id: account_permission_denied, account_owner_only, account_not_accessible)'
       requestBody:
@@ -24532,6 +24587,7 @@ paths:
                   type: integer
                   minimum: 1
                   maximum: 3650
+                  description: Retention days from now; at most the days left until the service end date (see max_retention_days)
                 acknowledge:
                   type: string
                   enum:
@@ -26569,17 +26625,19 @@ paths:
         command: storage create
         money: true
       description: 'Orders 1..N storage services of a plan in ONE order (`quantity`, default 1, max 25) and pays from the account balance (never a stored card). Billed
-        per `cycle` (monthly | quarterly | semiannually | annually; fixed EUR prices charged in the account currency) and renewed from the balance like other services.
-        `extra_traffic` (`1tb` | `5tb`) adds a one-time traffic pack for this month; `object_lock_buckets` (protected plans, 1-50) buys object lock rights (billed
-        every cycle). `name` (with `{n}`), `tags` and `project_id` label the services. Send `"dry_run": true` for a quote; a real order needs `"confirm": true` and
-        an `Idempotency-Key` header. The first bucket and the first access key are created automatically within about a minute (status `inprocess` -> `active`); then
-        use `/cloud/storage/{id}/buckets`, `/cloud/storage/{id}/keys` and `/cloud/storage/{id}/connect`. Errors: 402 `insufficient_balance`, 409 `capacity_unavailable`,
-        422 `confirm_required` (with `quote`), `product_not_orderable`, `cycle_invalid`, `invalid_extra_traffic`, `invalid_object_lock`, `invalid_quantity`; 429 `daily_limit`.'
+        per `cycle` (monthly | quarterly | semiannually | annually; protected plans also biennially = 2 years, triennially = 3 years; fixed EUR prices charged in
+        the account currency) and renewed from the balance like other services. `extra_traffic` (`1tb` | `5tb`) adds a one-time traffic pack for this month; `object_lock_buckets`
+        (protected plans, 1-50) buys object lock rights (billed every cycle; a lock may not end after the service end date, so choose a long cycle for long locks).
+        `name` (with `{n}`), `tags` and `project_id` label the services. Send `"dry_run": true` for a quote; a real order needs `"confirm": true` and an `Idempotency-Key`
+        header. The first bucket and the first access key are created automatically within about a minute (status `inprocess` -> `active`); then use `/cloud/storage/{id}/buckets`,
+        `/cloud/storage/{id}/keys` and `/cloud/storage/{id}/connect`. Errors: 402 `insufficient_balance`, 409 `capacity_unavailable`, 422 `confirm_required` (with
+        `quote`), `product_not_orderable`, `cycle_invalid`, `invalid_extra_traffic`, `invalid_object_lock`, `invalid_quantity`; 429 `daily_limit`.'
       x-description-tr: 'Bir paketten 1..N depolama hizmetini TEK siparişte açar (`quantity`, varsayılan 1, en çok 25) ve hesap bakiyesinden öder (kayıtlı kart asla).
-        `cycle` dönemine göre ücretlendirilir (monthly | quarterly | semiannually | annually; sabit EUR fiyat hesap para biriminde) ve diğer hizmetler gibi bakiyeden
-        yenilenir. `extra_traffic` (`1tb` | `5tb`) bu ay için tek seferlik trafik paketi ekler; `object_lock_buckets` (korumalı paketler, 1-50) nesne kilidi hakkı
-        alır (her dönem ücretlenir). `name` (`{n}` ile), `tags` ve `project_id` hizmetleri adlandırır. Teklif için `"dry_run": true`; gerçek sipariş `"confirm": true`
-        ve `Idempotency-Key` başlığı ister. İlk kova ve ilk erişim anahtarı yaklaşık bir dakikada kendiliğinden oluşur (durum `inprocess` -> `active`); sonra `/cloud/storage/{id}/buckets`,
+        `cycle` dönemine göre ücretlendirilir (monthly | quarterly | semiannually | annually; korumalı paketlerde ayrıca biennially = 2 yıl, triennially = 3 yıl;
+        sabit EUR fiyat hesap para biriminde) ve diğer hizmetler gibi bakiyeden yenilenir. `extra_traffic` (`1tb` | `5tb`) bu ay için tek seferlik trafik paketi ekler;
+        `object_lock_buckets` (korumalı paketler, 1-50) nesne kilidi hakkı alır (her dönem ücretlenir; kilit bitişi hizmet bitişini aşamaz, uzun kilit için uzun dönem
+        seçin). `name` (`{n}` ile), `tags` ve `project_id` hizmetleri adlandırır. Teklif için `"dry_run": true`; gerçek sipariş `"confirm": true` ve `Idempotency-Key`
+        başlığı ister. İlk kova ve ilk erişim anahtarı yaklaşık bir dakikada kendiliğinden oluşur (durum `inprocess` -> `active`); sonra `/cloud/storage/{id}/buckets`,
         `/keys`, `/connect`.'
       parameters:
       - $ref: '#/components/parameters/IdempotencyKey'
@@ -26601,14 +26659,16 @@ paths:
                   x-description-tr: plan yerine ürün kimliği
                 cycle:
                   type: string
-                  enum:
+                  enum: &id001
                   - monthly
                   - quarterly
                   - semiannually
                   - annually
+                  - biennially
+                  - triennially
                   default: monthly
-                  description: billing cycle
-                  x-description-tr: fatura dönemi
+                  description: billing cycle; biennially (2 years) and triennially (3 years) for protected plans only
+                  x-description-tr: fatura dönemi; biennially (2 yıl) ve triennially (3 yıl) yalnız korumalı paketlerde
                 quantity:
                   type: integer
                   minimum: 1
@@ -32457,6 +32517,8 @@ components:
           type: integer
         max_retention_days:
           type: integer
+          description: 'Days a lock can be set for right now: days left until the service end date (at most 3650).'
+          x-description-tr: 'Şu an verilebilecek en uzun kilit: hizmet bitişine kalan gün (en çok 3650).'
         buckets:
           type: array
           items:
@@ -32465,6 +32527,13 @@ components:
           oneOf:
           - $ref: '#/components/schemas/StorageLockScan'
           - type: 'null'
+        service_end:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Service end (renewal) date; no lock may end after it.
+          x-description-tr: Hizmet bitiş (yenileme) tarihi; hiçbir kilit bundan sonra bitemez.
     StorageObjectRetention:
       type: object
       properties:
@@ -33529,11 +33598,8 @@ components:
             properties:
               cycle:
                 type: string
-                enum:
-                - monthly
-                - quarterly
-                - semiannually
-                - annually
+                enum: *id001
+                description: 'biennially / triennially: protected plans only'
               amount:
                 type: number
               list_amount:

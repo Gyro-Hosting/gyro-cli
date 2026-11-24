@@ -6,7 +6,7 @@ Nesne depolama (S3) sipariş et
 
 Nesne depolama (S3) sipariş et
 
-Bir paketten 1..N depolama hizmetini TEK siparişte açar (`quantity`, varsayılan 1, en çok 25) ve hesap bakiyesinden öder (kayıtlı kart asla). `cycle` dönemine göre ücretlendirilir (monthly | quarterly | semiannually | annually; sabit EUR fiyat hesap para biriminde) ve diğer hizmetler gibi bakiyeden yenilenir. `extra_traffic` (`1tb` | `5tb`) bu ay için tek seferlik trafik paketi ekler; `object_lock_buckets` (korumalı paketler, 1-50) nesne kilidi hakkı alır (her dönem ücretlenir). `name` (`{n}` ile), `tags` ve `project_id` hizmetleri adlandırır. Teklif için `"dry_run": true`; gerçek sipariş `"confirm": true` ve `Idempotency-Key` başlığı ister. İlk kova ve ilk erişim anahtarı yaklaşık bir dakikada kendiliğinden oluşur (durum `inprocess` -> `active`); sonra `/cloud/storage/{id}/buckets`, `/keys`, `/connect`.
+Bir paketten 1..N depolama hizmetini TEK siparişte açar (`quantity`, varsayılan 1, en çok 25) ve hesap bakiyesinden öder (kayıtlı kart asla). `cycle` dönemine göre ücretlendirilir (monthly | quarterly | semiannually | annually; korumalı paketlerde ayrıca biennially = 2 yıl, triennially = 3 yıl; sabit EUR fiyat hesap para biriminde) ve diğer hizmetler gibi bakiyeden yenilenir. `extra_traffic` (`1tb` | `5tb`) bu ay için tek seferlik trafik paketi ekler; `object_lock_buckets` (korumalı paketler, 1-50) nesne kilidi hakkı alır (her dönem ücretlenir; kilit bitişi hizmet bitişini aşamaz, uzun kilit için uzun dönem seçin). `name` (`{n}` ile), `tags` ve `project_id` hizmetleri adlandırır. Teklif için `"dry_run": true`; gerçek sipariş `"confirm": true` ve `Idempotency-Key` başlığı ister. İlk kova ve ilk erişim anahtarı yaklaşık bir dakikada kendiliğinden oluşur (durum `inprocess` -> `active`); sonra `/cloud/storage/{id}/buckets`, `/keys`, `/connect`.
 
 API: POST /cloud/storage (operationId createStorageServices, scope cloud_order)
 
@@ -17,7 +17,7 @@ gyro s3 create [flags]
 ### Options
 
 ```
-      --cycle string              fatura dönemi (monthly|quarterly|semiannually|annually)
+      --cycle string              fatura dönemi; biennially (2 yıl) ve triennially (3 yıl) yalnız korumalı paketlerde (monthly|quarterly|semiannually|annually|biennially|triennially)
       --data string               istek gövdesi JSON, @dosya ya da @- (stdin)
       --dry-run                   hiçbir şeyi değiştirmeden teklifi / isteği göster
       --end-customer-id int       reseller main key: assign to this end-customer

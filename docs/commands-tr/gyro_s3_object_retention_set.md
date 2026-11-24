@@ -6,7 +6,7 @@ Nesne sürümünü kilitle
 
 Nesne sürümünü kilitle
 
-Bir sürümün saklamasını şimdiden itibaren `days` (1-3650) gün olarak koyar ya da uzatır (`version_id` boş = güncel). Saklama yalnız uzatılabilir; COMPLIANCE GOVERNANCE'a çevrilemez. COMPLIANCE kilidi süresi dolana kadar kimse (Gyro dahil) kısaltamaz, GOVERNANCE'a çeviremez, kaldıramaz; veri saklanır ve iptalde bile süre sonuna kadar ücret sürer. `"confirm": true` ve `"acknowledge": "COMPLIANCE"` gönderin.
+Bir sürümün saklamasını şimdiden itibaren `days` (1-3650) gün olarak koyar ya da uzatır (`version_id` boş = güncel). Saklama yalnız uzatılabilir; COMPLIANCE GOVERNANCE'a çevrilemez. COMPLIANCE kilidi süresi dolana kadar kimse (Gyro dahil) kısaltamaz, GOVERNANCE'a çeviremez, kaldıramaz; veri saklanır ve iptalde bile süre sonuna kadar ücret sürer. `"confirm": true` ve `"acknowledge": "COMPLIANCE"` gönderin. Kilit bitişi hizmet bitiş (yenileme) tarihini aşamaz: bugün + `days` (ya da yeni bitiş) daha sonraysa yanıt 422 `retention_exceeds_service_end` olur (`details.service_end`, `details.max_days`). `GET /cloud/storage/{id}/object-lock` `service_end` ve `max_retention_days` gösterir; daha uzun kilit için hizmeti yenileyin ya da daha uzun döneme (`biennially`, `triennially`) geçirin.
 
 API: PUT /cloud/storage/{id}/buckets/{bucket}/objects/retention (operationId setStorageObjectRetention, scope services_write)
 
@@ -19,7 +19,7 @@ gyro s3 object retention set <ID> <BUCKET> [flags]
 ```
       --acknowledge string       Yalnız COMPLIANCE: COMPLIANCE yazın
       --data string              istek gövdesi JSON, @dosya ya da @- (stdin)
-      --days int                 days
+      --days int                 Retention days from now; at most the days left until the service end date (see max_retention_days)
       --dry-run                  hiçbir şeyi değiştirmeden teklifi / isteği göster
   -h, --help                     help for set
       --idempotency-key string   tekrar güvenliği anahtarı (para işlemlerinde otomatik)

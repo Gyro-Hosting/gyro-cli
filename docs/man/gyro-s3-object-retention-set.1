@@ -13,7 +13,7 @@ gyro-s3-object-retention-set - Lock an object version
 Lock an object version
 
 .PP
-Sets or extends the retention of one version (\fBversion_id\fR empty = current) for \fBdays\fR 1-3650 from now. Retention can only be extended; COMPLIANCE cannot be switched to GOVERNANCE. COMPLIANCE cannot be shortened, switched to GOVERNANCE or removed by anyone (Gyro included) until it expires; the data is kept and the service keeps being billed until then, even after cancellation. Send \fB"confirm": true\fR and \fB"acknowledge": "COMPLIANCE"\fR\&.
+Sets or extends the retention of one version (\fBversion_id\fR empty = current) for \fBdays\fR 1-3650 from now. Retention can only be extended; COMPLIANCE cannot be switched to GOVERNANCE. COMPLIANCE cannot be shortened, switched to GOVERNANCE or removed by anyone (Gyro included) until it expires; the data is kept and the service keeps being billed until then, even after cancellation. Send \fB"confirm": true\fR and \fB"acknowledge": "COMPLIANCE"\fR\&. The lock may not end after the service end (renewal) date: if today + \fBdays\fR (or the new retain-until) is later, the answer is 422 \fBretention_exceeds_service_end\fR with \fBdetails.service_end\fR and \fBdetails.max_days\fR\&. \fBGET /cloud/storage/{id}/object-lock\fR shows \fBservice_end\fR and \fBmax_retention_days\fR; renew or move the service to a longer cycle (\fBbiennially\fR, \fBtriennially\fR) for a longer lock.
 
 .PP
 API: PUT /cloud/storage/{id}/buckets/{bucket}/objects/retention (operationId setStorageObjectRetention, scope services_write)
@@ -29,7 +29,7 @@ API: PUT /cloud/storage/{id}/buckets/{bucket}/objects/retention (operationId set
 
 .PP
 \fB--days\fP=0
-	days
+	Retention days from now; at most the days left until the service end date (see max_retention_days)
 
 .PP
 \fB--dry-run\fP[=false]

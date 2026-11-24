@@ -6,7 +6,7 @@ Korumalı Depolama: nesne kilidi özeti
 
 Korumalı Depolama: nesne kilidi özeti
 
-Kilitli kova hakkı (Nesne Kilidi ek hizmeti) ve kullanımı, kovaların varsayılan saklaması ve son kilit taraması (COMPLIANCE / GOVERNANCE / legal hold sürüm sayısı, en geç bitiş). Yalnız Korumalı Depolama: standart Nesne Depolama hizmeti 409 `feature_not_available` döner.
+Kilitli kova hakkı (Nesne Kilidi ek hizmeti) ve kullanımı, kovaların varsayılan saklaması ve son kilit taraması (COMPLIANCE / GOVERNANCE / legal hold sürüm sayısı, en geç bitiş). Yalnız Korumalı Depolama: standart Nesne Depolama hizmeti 409 `feature_not_available` döner. `service_end` ve `max_retention_days` şu anki kilit sınırını gösterir (kilit hizmet bitişinden sonra bitemez).
 
 API: GET /cloud/storage/{id}/object-lock (operationId getStorageObjectLock, scope services_read)
 

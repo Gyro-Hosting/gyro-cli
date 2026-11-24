@@ -6,7 +6,7 @@ Protected Storage: object lock summary
 
 Protected Storage: object lock summary
 
-Locked-bucket rights (Object Lock add-on) and use, the default retention of every bucket, and the last lock scan (number of COMPLIANCE / GOVERNANCE / legal hold versions and the latest end date). Protected Storage only: a standard Object Storage service answers 409 `feature_not_available`.
+Locked-bucket rights (Object Lock add-on) and use, the default retention of every bucket, and the last lock scan (number of COMPLIANCE / GOVERNANCE / legal hold versions and the latest end date). Protected Storage only: a standard Object Storage service answers 409 `feature_not_available`. `service_end` and `max_retention_days` show the current lock limit (a lock may not end after the service end date).
 
 API: GET /cloud/storage/{id}/object-lock (operationId getStorageObjectLock, scope services_read)
 

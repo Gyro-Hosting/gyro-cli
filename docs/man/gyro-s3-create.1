@@ -13,7 +13,7 @@ gyro-s3-create - Order Object Storage (S3)
 Order Object Storage (S3)
 
 .PP
-Orders 1..N storage services of a plan in ONE order (\fBquantity\fR, default 1, max 25) and pays from the account balance (never a stored card). Billed per \fBcycle\fR (monthly | quarterly | semiannually | annually; fixed EUR prices charged in the account currency) and renewed from the balance like other services. \fBextra_traffic\fR (\fB1tb\fR | \fB5tb\fR) adds a one-time traffic pack for this month; \fBobject_lock_buckets\fR (protected plans, 1-50) buys object lock rights (billed every cycle). \fBname\fR (with \fB{n}\fR), \fBtags\fR and \fBproject_id\fR label the services. Send \fB"dry_run": true\fR for a quote; a real order needs \fB"confirm": true\fR and an \fBIdempotency-Key\fR header. The first bucket and the first access key are created automatically within about a minute (status \fBinprocess\fR -> \fBactive\fR); then use \fB/cloud/storage/{id}/buckets\fR, \fB/cloud/storage/{id}/keys\fR and \fB/cloud/storage/{id}/connect\fR\&. Errors: 402 \fBinsufficient_balance\fR, 409 \fBcapacity_unavailable\fR, 422 \fBconfirm_required\fR (with \fBquote\fR), \fBproduct_not_orderable\fR, \fBcycle_invalid\fR, \fBinvalid_extra_traffic\fR, \fBinvalid_object_lock\fR, \fBinvalid_quantity\fR; 429 \fBdaily_limit\fR\&.
+Orders 1..N storage services of a plan in ONE order (\fBquantity\fR, default 1, max 25) and pays from the account balance (never a stored card). Billed per \fBcycle\fR (monthly | quarterly | semiannually | annually; protected plans also biennially = 2 years, triennially = 3 years; fixed EUR prices charged in the account currency) and renewed from the balance like other services. \fBextra_traffic\fR (\fB1tb\fR | \fB5tb\fR) adds a one-time traffic pack for this month; \fBobject_lock_buckets\fR (protected plans, 1-50) buys object lock rights (billed every cycle; a lock may not end after the service end date, so choose a long cycle for long locks). \fBname\fR (with \fB{n}\fR), \fBtags\fR and \fBproject_id\fR label the services. Send \fB"dry_run": true\fR for a quote; a real order needs \fB"confirm": true\fR and an \fBIdempotency-Key\fR header. The first bucket and the first access key are created automatically within about a minute (status \fBinprocess\fR -> \fBactive\fR); then use \fB/cloud/storage/{id}/buckets\fR, \fB/cloud/storage/{id}/keys\fR and \fB/cloud/storage/{id}/connect\fR\&. Errors: 402 \fBinsufficient_balance\fR, 409 \fBcapacity_unavailable\fR, 422 \fBconfirm_required\fR (with \fBquote\fR), \fBproduct_not_orderable\fR, \fBcycle_invalid\fR, \fBinvalid_extra_traffic\fR, \fBinvalid_object_lock\fR, \fBinvalid_quantity\fR; 429 \fBdaily_limit\fR\&.
 
 .PP
 API: POST /cloud/storage (operationId createStorageServices, scope cloud_order)
@@ -21,7 +21,7 @@ API: POST /cloud/storage (operationId createStorageServices, scope cloud_order)
 
 .SH OPTIONS
 \fB--cycle\fP=""
-	billing cycle (monthly|quarterly|semiannually|annually)
+	billing cycle; biennially (2 years) and triennially (3 years) for protected plans only (monthly|quarterly|semiannually|annually|biennially|triennially)
 
 .PP
 \fB--data\fP=""
