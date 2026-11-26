@@ -25179,8 +25179,9 @@ paths:
         description: Template id
       responses:
         '202':
-          description: 'OK. With `dry_run: true` the answer is `{"dry_run": true, "quote": {...}}` instead: Gyro Cloud Istanbul plans quote `cycle: "hourly"` and
-            `prepaid` (hourly_eur, monthly_cap_eur); Turkey VDS plans quote `cycle`, `billing: "invoice"`, `total` and `tax` of the first invoice.'
+          description: 'Order placed and paid from the balance; the server is being installed from the template. A `dry_run: true` request answers HTTP 200 with `{"data":
+            {"dry_run": true, "quote": {...}}}` instead (nothing created): Gyro Cloud Istanbul plans quote `cycle: "hourly"` and `prepaid` (hourly_eur, monthly_cap_eur);
+            Turkey VDS plans quote `cycle`, `billing: "invoice"`, `total` and `tax` (Money objects: amount, currency) of the first invoice.'
           content:
             application/json:
               schema:
