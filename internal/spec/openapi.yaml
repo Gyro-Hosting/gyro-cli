@@ -2,7 +2,7 @@
 openapi: 3.1.0
 info:
   title: Gyro Public API
-  version: 2.46.1
+  version: 2.47.0
   summary: Manage Gyro cloud servers, SSH keys and billing programmatically.
   x-summary-tr: Gyro bulut sunucularınızı, SSH anahtarlarınızı ve faturalarınızı programla yönetin.
   description: "The Gyro Public API lets you automate everything you do in the Gyro client area:\norder and manage cloud servers, keep SSH keys, read invoices and\
@@ -138,7 +138,13 @@ info:
     \ new uploads to a bucket whose default retention would end after the service end. `GET /cloud/storage/{id}/object-lock` now returns `service_end` and a dynamic\
     \ `max_retention_days` (days left until the service end, at most 3650). After a renewal the limit moves to the new end date within minutes. Legal Hold has no\
     \ end date and is not affected. (2) Protected plans (`protected-*`) can be ordered for 2 years (`cycle: biennially`) and 3 years (`triennially`): price = yearly\
-    \ x2 / x3 (no extra discount), the object lock add-on per bucket likewise; `GET /cloud/storage/plans` lists both cycles for protected plans.\n"
+    \ x2 / x3 (no extra discount), the object lock add-on per bucket likewise; `GET /cloud/storage/plans` lists both cycles for protected plans.\n\n**2.47.0**: Templates.\
+    \ `POST /cloud/templates/{id}/servers` now also creates a **Turkey VDS** server (e.g. `plan: gvds-2`) from your own template, besides Gyro Cloud Istanbul. A Turkey\
+    \ VDS server is billed with the plan's normal invoice: the first period (new optional body field `cycle`, default monthly; the periods the plan offers: monthly,\
+    \ semiannually, annually, biennially) is paid from the balance at order time and the order is not placed if the balance is not enough; later periods are billed\
+    \ as usual. New optional body field `region` resolves `plan` (default `tr-ist-1`; both families are in tr-ist-1). The `dry_run` quote of a Turkey VDS plan returns\
+    \ `cycle`, `billing: \"invoice\"`, `total` and `tax`; an invalid period answers 422 `cycle_invalid` with `details.cycles`. Gyro Cloud Istanbul plans are unchanged\
+    \ (hourly prepaid, `cycle` ignored).\n"
   x-description-tr: "Gyro Public API, müşteri panelinde yaptığınız her işi otomatikleştirmenizi sağlar:\nbulut sunucu siparişi ve yönetimi, SSH anahtarları, fatura\
     \ ve bakiye okuma.\nResmi Terraform sağlayıcısı (`gyro-hosting/gyro`) ve `gyroctl` bu API'yi kullanır.\n\n* **Taban adres** `https://www.gyrohosting.com/api/v1/client`\n\
     * **Kimlik** `Authorization: Bearer wck_...` (anahtarı *Müşteri paneli → sağ üstteki hesap menüsü → API Kimlik Bilgileri* bölümünden oluşturun)\n* **Biçim** JSON\
@@ -272,7 +278,12 @@ info:
     \ saklaması hizmet bitişini aşacak kovaya yeni yüklemeyi reddeder. `GET /cloud/storage/{id}/object-lock` artık `service_end` ve dinamik `max_retention_days` (hizmet\
     \ bitişine kalan gün, en çok 3650) döner. Yenilemeden sonra sınır dakikalar içinde yeni bitişe kayar. Legal Hold süresiz olduğu için etkilenmez. (2) Korumalı\
     \ paketler (`protected-*`) 2 yıllık (`cycle: biennially`) ve 3 yıllık (`triennially`) sipariş edilebilir: fiyat yıllık x2 / x3 (ek indirim yok), kova başına nesne\
-    \ kilidi eki de aynı; `GET /cloud/storage/plans` korumalı paketlerde iki dönemi de listeler.\n"
+    \ kilidi eki de aynı; `GET /cloud/storage/plans` korumalı paketlerde iki dönemi de listeler.\n\n**2.47.0**: Şablonlar. `POST /cloud/templates/{id}/servers` artık\
+    \ Gyro Bulut İstanbul'un yanında kendi şablonunuzdan **Türkiye VDS** sunucusu da açar (ör. `plan: gvds-2`). Türkiye VDS sunucusu paketin normal faturasıyla faturalanır:\
+    \ ilk dönem (yeni isteğe bağlı gövde alanı `cycle`, varsayılan aylık; paketin sunduğu dönemler: monthly, semiannually, annually, biennially) sipariş anında bakiyeden\
+    \ ödenir, bakiye yetmezse sipariş açılmaz; sonraki dönemler normal faturalanır. Yeni isteğe bağlı gövde alanı `region` `plan` adını çözer (varsayılan `tr-ist-1`;\
+    \ iki aile de tr-ist-1'dedir). Türkiye VDS paketinin `dry_run` teklifi `cycle`, `billing: \"invoice\"`, `total` ve `tax` döndürür; geçersiz dönem 422 `cycle_invalid`\
+    \ (`details.cycles` ile). Gyro Bulut İstanbul paketleri değişmedi (saatlik ön ödemeli, `cycle` yok sayılır).\n"
   contact:
     name: Gyro Hosting
     url: https://www.gyrohosting.com
@@ -25148,9 +25159,17 @@ paths:
         command: template deploy
         money: true
       description: 'A normal prepaid tr-ist-1 order (24-hour balance rule, account limits) installed from the template. `product_id` (or `plan`) from GET /cloud/products?region=tr-ist-1;
-        its disk must be at least the template `min_disk_gb`. Send `"confirm": true` and an `Idempotency-Key` header (`dry_run` for a quote).'
+        `region` resolves the plan name (default `tr-ist-1`; Gyro Cloud Istanbul and Turkey VDS plans are both in tr-ist-1); the plan disk must be at least the template
+        `min_disk_gb`. Send `"confirm": true` and an `Idempotency-Key` header (`dry_run` for a quote). Turkey VDS plans are billed with the plan''s normal invoice:
+        the first period (default monthly; `cycle` = a period the plan offers: monthly, semiannually, annually or biennially) is paid from the balance at order time
+        and the order is not placed if the balance is not enough; later periods are billed as usual. `cycle` is ignored for Gyro Cloud Istanbul plans; an invalid
+        period returns 422 `cycle_invalid` with the allowed `cycles`. On a `dry_run` quote a Turkey VDS plan returns `cycle`, `billing: "invoice"`, `total` and `tax`.'
       x-description-tr: 'Şablondan kurulan normal ön ödemeli tr-ist-1 siparişi (24 saat bakiye kuralı, hesap sınırları). `product_id` (ya da `plan`) GET /cloud/products?region=tr-ist-1''den;
-        diski şablonun `min_disk_gb` değerinden küçük olamaz. `"confirm": true` ve `Idempotency-Key` başlığı gerekir (teklif için `dry_run`).'
+        `region` plan adını çözmek içindir (varsayılan `tr-ist-1`; Gyro Bulut İstanbul ve Türkiye VDS planları da tr-ist-1 bölgesindedir); paketin diski şablonun
+        `min_disk_gb` değerinden küçük olamaz. `"confirm": true` ve `Idempotency-Key` başlığı gerekir (teklif için `dry_run`). Türkiye VDS paketleri paketin normal
+        faturasıyla faturalanır: ilk dönem (varsayılan aylık; `cycle` = paketin sunduğu dönem: monthly, semiannually, annually ya da biennially) sipariş anında bakiyeden
+        ödenir, bakiye yetmezse sipariş açılmaz; sonraki dönemler normal faturalanır. `cycle`, Gyro Bulut İstanbul paketlerinde yok sayılır; geçersiz dönem 422 `cycle_invalid`
+        (izin verilen `cycles` listesiyle) döndürür. Teklifte (`dry_run`) Türkiye VDS planları `cycle`, `billing: "invoice"`, `total` ve `tax` alanlarını döndürür.'
       parameters:
       - name: id
         in: path
@@ -25160,7 +25179,8 @@ paths:
         description: Template id
       responses:
         '202':
-          description: OK
+          description: 'OK. With `dry_run: true` the answer is `{"dry_run": true, "quote": {...}}` instead: Gyro Cloud Istanbul plans quote `cycle: "hourly"` and
+            `prepaid` (hourly_eur, monthly_cap_eur); Turkey VDS plans quote `cycle`, `billing: "invoice"`, `total` and `tax` of the first invoice.'
           content:
             application/json:
               schema:
@@ -25177,8 +25197,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         '422':
-          description: confirm_required | limit_exceeded (new-account limit of the prepaid cloud; details = LimitHint, raise it with a support ticket) | validation
-            errors
+          description: 'confirm_required (details.quote) | cycle_invalid (details.cycles: the periods of the plan) | product_not_orderable | disk_too_small (details.min_disk_gb)
+            | limit_exceeded (new-account limit of the prepaid cloud; details = LimitHint, raise it with a support ticket) | validation errors'
           content:
             application/json:
               schema:
@@ -25213,6 +25233,16 @@ paths:
                   minimum: 0
                   description: 'Optional project for the new service(s) (0 = default project). Checked before the order: unknown id = 404 `project_not_found` (GyroAPI
                     order endpoints) or 422 `checkout_blocked` with `[project_not_found]` (POST /orders).'
+                cycle:
+                  type: string
+                  description: 'Period of the first invoice, only for Turkey VDS plans: monthly (default), semiannually, annually or biennially (the periods the plan
+                    offers). Ignored for Gyro Cloud Istanbul plans; an invalid value = 422 cycle_invalid with the allowed cycles list.'
+                  x-description-tr: 'İlk faturanın dönemi, yalnız Türkiye VDS paketlerinde: monthly (varsayılan), semiannually, annually ya da biennially (paketin
+                    sunduğu dönemler). Gyro Bulut İstanbul paketlerinde yok sayılır; geçersiz değer = 422 cycle_invalid (izin verilen cycles listesiyle).'
+                region:
+                  type: string
+                  description: Region used to resolve the plan name (default tr-ist-1; Gyro Cloud Istanbul and Turkey VDS plans are both in tr-ist-1).
+                  x-description-tr: '`plan` adını çözmek için bölge (varsayılan tr-ist-1; Gyro Bulut İstanbul ve Türkiye VDS planları tr-ist-1 bölgesindedir).'
               required: []
       x-account-permission:
       - new_orders
@@ -26659,7 +26689,7 @@ paths:
                   x-description-tr: plan yerine ürün kimliği
                 cycle:
                   type: string
-                  enum: &id001
+                  enum:
                   - monthly
                   - quarterly
                   - semiannually
@@ -33598,7 +33628,13 @@ components:
             properties:
               cycle:
                 type: string
-                enum: *id001
+                enum:
+                - monthly
+                - quarterly
+                - semiannually
+                - annually
+                - biennially
+                - triennially
                 description: 'biennially / triennially: protected plans only'
               amount:
                 type: number

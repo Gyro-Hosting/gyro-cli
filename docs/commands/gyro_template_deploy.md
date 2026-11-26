@@ -6,7 +6,7 @@ New server from a template
 
 New server from a template
 
-A normal prepaid tr-ist-1 order (24-hour balance rule, account limits) installed from the template. `product_id` (or `plan`) from GET /cloud/products?region=tr-ist-1; its disk must be at least the template `min_disk_gb`. Send `"confirm": true` and an `Idempotency-Key` header (`dry_run` for a quote).
+A normal prepaid tr-ist-1 order (24-hour balance rule, account limits) installed from the template. `product_id` (or `plan`) from GET /cloud/products?region=tr-ist-1; `region` resolves the plan name (default `tr-ist-1`; Gyro Cloud Istanbul and Turkey VDS plans are both in tr-ist-1); the plan disk must be at least the template `min_disk_gb`. Send `"confirm": true` and an `Idempotency-Key` header (`dry_run` for a quote). Turkey VDS plans are billed with the plan's normal invoice: the first period (default monthly; `cycle` = a period the plan offers: monthly, semiannually, annually or biennially) is paid from the balance at order time and the order is not placed if the balance is not enough; later periods are billed as usual. `cycle` is ignored for Gyro Cloud Istanbul plans; an invalid period returns 422 `cycle_invalid` with the allowed `cycles`. On a `dry_run` quote a Turkey VDS plan returns `cycle`, `billing: "invoice"`, `total` and `tax`.
 
 API: POST /cloud/templates/{id}/servers (operationId createServerFromTemplate, scope cloud_order)
 
@@ -17,6 +17,7 @@ gyro template deploy <ID> [flags]
 ### Options
 
 ```
+      --cycle string                   Period of the first invoice, only for Turkey VDS plans: monthly (default), semiannually, annually or biennially (the periods the plan offers). Ignored for Gyro Cloud Istanbul plans; an invalid value = 422 cycle_invalid with the allowed cycles list.
       --data string                    request body as JSON, @file or @- (stdin)
       --dry-run                        show the price quote / request without changing anything
   -h, --help                           help for deploy
@@ -25,6 +26,7 @@ gyro template deploy <ID> [flags]
       --plan string                    plan
       --product-id int                 product_id
       --project-id project_not_found   Optional project for the new service(s) (0 = default project). Checked before the order: unknown id = 404 project_not_found (GyroAPI order endpoints) or 422 `checkout_blocked` with `[project_not_found]` (POST /orders).
+      --region string                  Region used to resolve the plan name (default tr-ist-1; Gyro Cloud Istanbul and Turkey VDS plans are both in tr-ist-1).
       --set stringArray                extra body field key=value (repeatable)
       --ssh-keys int64Slice            ssh_keys (default [])
       --user-data string               user_data

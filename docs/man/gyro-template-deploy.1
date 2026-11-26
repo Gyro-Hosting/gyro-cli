@@ -13,13 +13,17 @@ gyro-template-deploy - New server from a template
 New server from a template
 
 .PP
-A normal prepaid tr-ist-1 order (24-hour balance rule, account limits) installed from the template. \fBproduct_id\fR (or \fBplan\fR) from GET /cloud/products?region=tr-ist-1; its disk must be at least the template \fBmin_disk_gb\fR\&. Send \fB"confirm": true\fR and an \fBIdempotency-Key\fR header (\fBdry_run\fR for a quote).
+A normal prepaid tr-ist-1 order (24-hour balance rule, account limits) installed from the template. \fBproduct_id\fR (or \fBplan\fR) from GET /cloud/products?region=tr-ist-1; \fBregion\fR resolves the plan name (default \fBtr-ist-1\fR; Gyro Cloud Istanbul and Turkey VDS plans are both in tr-ist-1); the plan disk must be at least the template \fBmin_disk_gb\fR\&. Send \fB"confirm": true\fR and an \fBIdempotency-Key\fR header (\fBdry_run\fR for a quote). Turkey VDS plans are billed with the plan's normal invoice: the first period (default monthly; \fBcycle\fR = a period the plan offers: monthly, semiannually, annually or biennially) is paid from the balance at order time and the order is not placed if the balance is not enough; later periods are billed as usual. \fBcycle\fR is ignored for Gyro Cloud Istanbul plans; an invalid period returns 422 \fBcycle_invalid\fR with the allowed \fBcycles\fR\&. On a \fBdry_run\fR quote a Turkey VDS plan returns \fBcycle\fR, \fBbilling: "invoice"\fR, \fBtotal\fR and \fBtax\fR\&.
 
 .PP
 API: POST /cloud/templates/{id}/servers (operationId createServerFromTemplate, scope cloud_order)
 
 
 .SH OPTIONS
+\fB--cycle\fP=""
+	Period of the first invoice, only for Turkey VDS plans: monthly (default), semiannually, annually or biennially (the periods the plan offers). Ignored for Gyro Cloud Istanbul plans; an invalid value = 422 cycle_invalid with the allowed cycles list.
+
+.PP
 \fB--data\fP=""
 	request body as JSON, @file or @- (stdin)
 
@@ -50,6 +54,10 @@ API: POST /cloud/templates/{id}/servers (operationId createServerFromTemplate, s
 .PP
 \fB--project-id\fP=0
 	Optional project for the new service(s) (0 = default project). Checked before the order: unknown id = 404 \fBproject_not_found\fR (GyroAPI order endpoints) or 422 \fBcheckout_blocked\fR with \fB[project_not_found]\fR (POST /orders).
+
+.PP
+\fB--region\fP=""
+	Region used to resolve the plan name (default tr-ist-1; Gyro Cloud Istanbul and Turkey VDS plans are both in tr-ist-1).
 
 .PP
 \fB--set\fP=[]

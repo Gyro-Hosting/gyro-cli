@@ -6,7 +6,7 @@
 
 Şablondan yeni sunucu
 
-Şablondan kurulan normal ön ödemeli tr-ist-1 siparişi (24 saat bakiye kuralı, hesap sınırları). `product_id` (ya da `plan`) GET /cloud/products?region=tr-ist-1'den; diski şablonun `min_disk_gb` değerinden küçük olamaz. `"confirm": true` ve `Idempotency-Key` başlığı gerekir (teklif için `dry_run`).
+Şablondan kurulan normal ön ödemeli tr-ist-1 siparişi (24 saat bakiye kuralı, hesap sınırları). `product_id` (ya da `plan`) GET /cloud/products?region=tr-ist-1'den; `region` plan adını çözmek içindir (varsayılan `tr-ist-1`; Gyro Bulut İstanbul ve Türkiye VDS planları da tr-ist-1 bölgesindedir); paketin diski şablonun `min_disk_gb` değerinden küçük olamaz. `"confirm": true` ve `Idempotency-Key` başlığı gerekir (teklif için `dry_run`). Türkiye VDS paketleri paketin normal faturasıyla faturalanır: ilk dönem (varsayılan aylık; `cycle` = paketin sunduğu dönem: monthly, semiannually, annually ya da biennially) sipariş anında bakiyeden ödenir, bakiye yetmezse sipariş açılmaz; sonraki dönemler normal faturalanır. `cycle`, Gyro Bulut İstanbul paketlerinde yok sayılır; geçersiz dönem 422 `cycle_invalid` (izin verilen `cycles` listesiyle) döndürür. Teklifte (`dry_run`) Türkiye VDS planları `cycle`, `billing: "invoice"`, `total` ve `tax` alanlarını döndürür.
 
 API: POST /cloud/templates/{id}/servers (operationId createServerFromTemplate, scope cloud_order)
 
@@ -17,6 +17,7 @@ gyro template deploy <ID> [flags]
 ### Options
 
 ```
+      --cycle string                   İlk faturanın dönemi, yalnız Türkiye VDS paketlerinde: monthly (varsayılan), semiannually, annually ya da biennially (paketin sunduğu dönemler). Gyro Bulut İstanbul paketlerinde yok sayılır; geçersiz değer = 422 cycle_invalid (izin verilen cycles listesiyle).
       --data string                    istek gövdesi JSON, @dosya ya da @- (stdin)
       --dry-run                        hiçbir şeyi değiştirmeden teklifi / isteği göster
   -h, --help                           help for deploy
@@ -25,6 +26,7 @@ gyro template deploy <ID> [flags]
       --plan string                    plan
       --product-id int                 product_id
       --project-id project_not_found   Optional project for the new service(s) (0 = default project). Checked before the order: unknown id = 404 project_not_found (GyroAPI order endpoints) or 422 `checkout_blocked` with `[project_not_found]` (POST /orders).
+      --region plan                    plan adını çözmek için bölge (varsayılan tr-ist-1; Gyro Bulut İstanbul ve Türkiye VDS planları tr-ist-1 bölgesindedir).
       --set stringArray                ek gövde alanı anahtar=değer (tekrarlanabilir)
       --ssh-keys int64Slice            ssh_keys (default [])
       --user-data string               user_data

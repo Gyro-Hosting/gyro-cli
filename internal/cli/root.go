@@ -460,6 +460,8 @@ func hint(e *api.Error) string {
 		return replicaHint(e)
 	case "retention_exceeds_service_end":
 		return lockEndHint(e)
+	case "cycle_invalid":
+		return cycleHint(e)
 	case "confirm_required":
 		return i18n.S("Re-run with --yes to confirm.", "Onaylamak için --yes ile tekrar çalıştırın.")
 	}

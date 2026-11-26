@@ -3,7 +3,7 @@
 package spec
 
 // APIVersion is info.version of the spec this table was generated from.
-const APIVersion = "2.46.1"
+const APIVersion = "2.47.0"
 
 // Ops lists every API operation.
 var Ops = []Op{
@@ -4898,7 +4898,7 @@ var Ops = []Op{
 	},
 	{ID: "createServerFromTemplate", Method: "POST", Path: "/cloud/templates/{id}/servers", Tag: "Templates",
 		Summary: "New server from a template", SummaryTR: "Şablondan yeni sunucu",
-		Desc: "A normal prepaid tr-ist-1 order (24-hour balance rule, account limits) installed from the template. `product_id` (or `plan`) from GET /cloud/products?region=tr-ist-1; its disk must be at least the template `min_disk_gb`. Send `\"confirm\": true` and an `Idempotency-Key` header (`dry_run` for a quote).", DescTR: "Şablondan kurulan normal ön ödemeli tr-ist-1 siparişi (24 saat bakiye kuralı, hesap sınırları). `product_id` (ya da `plan`) GET /cloud/products?region=tr-ist-1'den; diski şablonun `min_disk_gb` değerinden küçük olamaz. `\"confirm\": true` ve `Idempotency-Key` başlığı gerekir (teklif için `dry_run`).",
+		Desc: "A normal prepaid tr-ist-1 order (24-hour balance rule, account limits) installed from the template. `product_id` (or `plan`) from GET /cloud/products?region=tr-ist-1; `region` resolves the plan name (default `tr-ist-1`; Gyro Cloud Istanbul and Turkey VDS plans are both in tr-ist-1); the plan disk must be at least the template `min_disk_gb`. Send `\"confirm\": true` and an `Idempotency-Key` header (`dry_run` for a quote). Turkey VDS plans are billed with the plan's normal invoice: the first period (default monthly; `cycle` = a period the plan offers: monthly, semiannually, annually or biennially) is paid from the balance at order time and the order is not placed if the balance is not enough; later periods are billed as usual. `cycle` is ignored for Gyro Cloud Istanbul plans; an invalid period returns 422 `cycle_invalid` with the allowed `cycles`. On a `dry_run` quote a Turkey VDS plan returns `cycle`, `billing: \"invoice\"`, `total` and `tax`.", DescTR: "Şablondan kurulan normal ön ödemeli tr-ist-1 siparişi (24 saat bakiye kuralı, hesap sınırları). `product_id` (ya da `plan`) GET /cloud/products?region=tr-ist-1'den; `region` plan adını çözmek içindir (varsayılan `tr-ist-1`; Gyro Bulut İstanbul ve Türkiye VDS planları da tr-ist-1 bölgesindedir); paketin diski şablonun `min_disk_gb` değerinden küçük olamaz. `\"confirm\": true` ve `Idempotency-Key` başlığı gerekir (teklif için `dry_run`). Türkiye VDS paketleri paketin normal faturasıyla faturalanır: ilk dönem (varsayılan aylık; `cycle` = paketin sunduğu dönem: monthly, semiannually, annually ya da biennially) sipariş anında bakiyeden ödenir, bakiye yetmezse sipariş açılmaz; sonraki dönemler normal faturalanır. `cycle`, Gyro Bulut İstanbul paketlerinde yok sayılır; geçersiz dönem 422 `cycle_invalid` (izin verilen `cycles` listesiyle) döndürür. Teklifte (`dry_run`) Türkiye VDS planları `cycle`, `billing: \"invoice\"`, `total` ve `tax` alanlarını döndürür.",
 		Scope: "cloud_order", Command: []string{"template", "deploy"},
 		HasBody: true, BodyRequired: false, ListResponse: false, Paginated: false, Confirm: true, Money: true, Hidden: false,
 		Columns: []string{"end_customer_id", "quantity"},
@@ -4914,6 +4914,8 @@ var Ops = []Op{
 			{Name: "confirm", Type: "boolean", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
 			{Name: "dry_run", Type: "boolean", Items: "", Enum: nil, Default: "", Required: false, Desc: "", DescTR: ""},
 			{Name: "project_id", Type: "integer", Items: "", Enum: nil, Default: "", Required: false, Desc: "Optional project for the new service(s) (0 = default project). Checked before the order: unknown id = 404 `project_not_found` (GyroAPI order endpoints) or 422 `checkout_blocked` with `[project_not_found]` (POST /orders).", DescTR: ""},
+			{Name: "cycle", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "Period of the first invoice, only for Turkey VDS plans: monthly (default), semiannually, annually or biennially (the periods the plan offers). Ignored for Gyro Cloud Istanbul plans; an invalid value = 422 cycle_invalid with the allowed cycles list.", DescTR: "İlk faturanın dönemi, yalnız Türkiye VDS paketlerinde: monthly (varsayılan), semiannually, annually ya da biennially (paketin sunduğu dönemler). Gyro Bulut İstanbul paketlerinde yok sayılır; geçersiz değer = 422 cycle_invalid (izin verilen cycles listesiyle)."},
+			{Name: "region", Type: "string", Items: "", Enum: nil, Default: "", Required: false, Desc: "Region used to resolve the plan name (default tr-ist-1; Gyro Cloud Istanbul and Turkey VDS plans are both in tr-ist-1).", DescTR: "`plan` adını çözmek için bölge (varsayılan tr-ist-1; Gyro Bulut İstanbul ve Türkiye VDS planları tr-ist-1 bölgesindedir)."},
 		},
 	},
 	{ID: "listPanelUsers", Method: "GET", Path: "/cloud/users", Tag: "Panel users",
